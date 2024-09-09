@@ -14,11 +14,11 @@ onBeforeUnmount(() => {
     unbindOutsideClickListener();
 });
 const logoUrl = computed(() => {
-    return `/layout/images/${layoutConfig.darkTheme.value ? 'logo-white' : 'logo-dark'}.svg`;
+    return `/_nuxt/public/layout/images/${layoutConfig.darkTheme.value ? 'logo-white' : 'kongkang'}.jpg`;
 });
 
 const onTopBarMenuButton = () => {
-    topbarMenuActive.value = !topbarMenuActive.value;
+    topbarMenuActive.value = !topbarMenuActive.value;s
 };
 
 const onSettingsClick = () => {
@@ -64,7 +64,7 @@ const isOutsideClicked = (event) => {
     <div class="layout-topbar">
         <router-link to="/" class="layout-topbar-logo">
             <img :src="logoUrl" alt="logo" />
-            <span>SAKAI</span>
+            <span>Evaluate Personnel Msu</span>
         </router-link>
 
         <button class="p-link layout-menu-button layout-topbar-button" @click="onMenuToggle()">

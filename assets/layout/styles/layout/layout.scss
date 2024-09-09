@@ -10,3 +10,7 @@
 @import "./_responsive";
 @import "./_utils";
 @import "./_typography";
+
+.swal2-container {
+    z-index: 2300;
+}

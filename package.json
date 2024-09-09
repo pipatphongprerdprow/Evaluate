@@ -14,20 +14,28 @@
         "format:check": "prettier --check \"**/*.{js,vue,d.ts}\""
     },
     "dependencies": {
+        "@prisma/client": "^5.19.1",
+        "axios": "^1.7.2",
         "chart.js": "3.3.2",
+        "install": "^0.13.0",
         "primeflex": "^3.3.0",
         "primeicons": "^6.0.1",
-        "primevue": "^3.49.1"
+        "primevue": "^3.49.1",
+        "prisma": "^5.19.1",
+        "sweetalert2": "^11.12.2",
+        "upgrade": "^1.1.0",
+        "vue-qrcode-reader": "^5.5.6",
+        "yarn": "^1.22.22"
     },
     "devDependencies": {
+        "@babel/eslint-parser": "^7.18.9",
         "eslint": "^8.30.0",
         "eslint-config-prettier": "^8.5.0",
         "eslint-plugin-nuxt": "^4.0.0",
         "eslint-plugin-prettier": "^4.2.1",
         "eslint-plugin-vue": "^9.4.0",
-        "@babel/eslint-parser": "^7.18.9",
-        "nuxt": "3.3.3",
-        "nuxt-primevue": "^0.3.1",
+        "nuxt": "^3.13.1",
+        "nuxt-primevue": "^3.0.0",
         "prettier": "2.7.1",
         "sass": "^1.60.0",
         "sass-loader": "^10.4.1"
