@@ -3,7 +3,7 @@ import { useLayout } from './composables/layout';
 import { computed } from 'vue';
 const { layoutConfig } = useLayout();
 const logoUrl = computed(() => {
-    return `/public/layout/images/${layoutConfig.darkTheme.value ? 'logo-white' : 'logo-dark'}.svg`;
+    return `/_nuxt/public/layout/images/${layoutConfig.darkTheme.value ? 'logo-white' : 'logo-dark'}.svg`;
 });
 </script>
 

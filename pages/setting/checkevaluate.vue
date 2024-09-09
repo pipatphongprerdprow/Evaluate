@@ -842,7 +842,7 @@ export default {
         
     mounted(){
          this.showDataEvalu();
-         this.showDataPerson();
+         //this.showDataPerson();
     },
     methods: { 
         async showDataEvalu(){

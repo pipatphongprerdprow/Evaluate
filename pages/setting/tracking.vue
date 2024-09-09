@@ -47,7 +47,7 @@
                     <Dialog header="จัดการแบบ ป01" maximizable v-model:visible="DialogAdd" :breakpoints="{ '960px': '75vw' }" :style="{ width: '100vw',height: '100vh' }" :modal="true" position="top">
                         <template v-slot:header>
                             <h3 style="text-align: left;">แบบรายงานผลการปฏิบัติราชการของข้าราชการและพนักงาน</h3> 
-                            <InputText v-model="dataStaffid" type="text" autocomplete="off"/>    
+                            <InputText v-model="dataStaffid" type="hidden" autocomplete="off" style="display: none;"/>    
                         </template>
                         <TabView :activeIndex="activeIndex" @tabChange="onTabChange">
                             <!-- Tab 1 -->
@@ -114,6 +114,7 @@
                                                                     v-model="subP01.p01_score" 
                                                                     :options="p01_scores" 
                                                                     optionLabel="name" 
+                                                                    optionValue="code" 
                                                                     placeholder="เลือกคะแนน" 
                                                                     :value="subP01.p01_score || p01_scores[0]" 
                                                                 />
@@ -143,7 +144,13 @@
                                                                 <td style="text-align: left;">{{ row1.activity }}</td> 
                                                                 <td>{{ row1.indicator }}</td>
                                                                 <td>
-                                                                    <InputText v-model="row1.data_table1" type="number" placeholder="0" autocomplete="off"/>   
+                                                                    <InputText 
+                                                                        v-model.number="row1.data_table1" 
+                                                                        type="text" 
+                                                                        placeholder="0" 
+                                                                        autocomplete="off"
+                                                                        @input="(event) => event.target.value = event.target.value.replace(/[^0-9]/g, '')" 
+                                                                    /> 
                                                                 </td>
                                                             </tr>
                                                         </tbody>
@@ -164,7 +171,13 @@
                                                                 <td style="text-align: left;">{{ row2.activity }}</td> 
                                                                 <td>{{ row2.indicator }}</td>
                                                                 <td>
-                                                                    <InputText v-model="row2.data_table2" type="number" placeholder="0" autocomplete="off"/>   
+                                                                    <InputText 
+                                                                        v-model.number="row2.data_table2" 
+                                                                        type="text" 
+                                                                        placeholder="0" 
+                                                                        autocomplete="off"
+                                                                        @input="(event) => event.target.value = event.target.value.replace(/[^0-9]/g, '')" 
+                                                                    />  
                                                                 </td>
                                                             </tr>
                                                         </tbody>
@@ -431,23 +444,20 @@
                             <!-- Tab 4 -->
                             <TabPanel header="รายงาน ป.04" >
                                 <div class="card">
-                                    <h4 style="text-align: center;">แบบสรุปการประเมินผลการปฏิบัติราชการของข้าราชการและพนักงาน สังกัดมหาวิทยาลัยมหาสารคาม</h4>
+                                    <h4 style="text-align: left">แบบสรุปการประเมินผล</h4>
                                         <div class="p-fluid formgrid grid">
                                             <div class="card">                      
                                                 <h5 class="mb-4"><i class="" style="font-size: x-large;"></i> ส่วนที่ 1 ข้อมูลของผู้รับการประเมิน</h5>
                                                 <!-- ตาราง ก. สมรรถนะหลัก -->
                                                 <div class="employee-info"> 
+                                                    <p><strong>รอบการประเมิน:</strong> </p>
                                                     <p><strong>ชื่อผู้รับการประเมิน:</strong> </p>
-                                                    <p><strong>สังกัด:</strong> </p>
                                                     <p><strong>ตำแหน่ง:</strong> </p>
                                                     <p><strong>ประเภทตำแหน่ง:</strong> </p>
-                                                    <p><strong>คุณวุฒิ:</strong> </p>
-                                                    <p><strong>ประเภทบุคลากร:</strong> </p>
-                                                    <p><strong>รายละเอียดข้อตกลง:</strong> </p>
+                                                    <p><strong>สังกัด:</strong> </p>
                                                     <p><strong>ชื่อผู้ประเมิน:</strong> </p>
-                                                    <p><strong>ตำแหน่ง:</strong> </p>
                                                 </div><br>
-                                                <div class="employee-info">
+                                                <div class="employee-info" style="border: groove;padding: 15px;">
                                                     <h4>คำชี้แจง</h4>
                                                     <h5>แบบสรุปการประเมินผลการปฏิบัติราชการนี้มีด้วยกัน 5 ส่วน ดังนี้</h5>
                                                     <p><strong>ส่วนที่ 1 ข้อมูลของผู้รับการประเมิน</strong> เพื่อระบุรายละเอียดต่างๆ ที่เกี่ยวข้องกับตัวผู้รับการประเมิน</p>
@@ -490,36 +500,36 @@
                                                         </tr>
                                                         <tr style="font-weight: bold;">
                                                             <td colspan="2" style="text-align: right;">รวม</td>
-                                                            <td></td>
+                                                            <td>100%</td>
                                                             <td></td>
                                                         </tr>
                                                     </tbody>
                                                 </table>
                                                 <div class="employee-info">
                                                     <h4>ระดับผลการประเมินที่ได้</h4>
-                                                    <p><strong>[  ] ดีเด่น (90-100)</strong></p>
-                                                    <p><strong>[  ] ดีมาก (80-89)</strong></p>
-                                                    <p><strong>[  ] ดี (70-79)</strong></p>
-                                                    <p><strong>[  ] พอใช้ (60-69)</strong></p>
-                                                    <p><strong>[  ] ต้องปรับปรุง (ต่ำกว่า 60)</strong></p>
+                                                    <p><strong>[ &nbsp;&nbsp;&nbsp; ] ดีเด่น (90-100)</strong></p>
+                                                    <p><strong>[ &nbsp;&nbsp;&nbsp; ] ดีมาก (80-89)</strong></p>
+                                                    <p><strong>[ &nbsp;&nbsp;&nbsp; ] ดี (70-79)</strong></p>
+                                                    <p><strong>[ &nbsp;&nbsp;&nbsp; ] พอใช้ (60-69)</strong></p> 
+                                                    <p><strong>[ <b>&#10003;</b> ] ต้องปรับปรุง (ต่ำกว่า 60)</strong></p>
                                                 </div>
-                                                    <h5 class="mb-4"><i class="" style="font-size: x-large;"></i> ส่วนที่ 3 แผนพัฒนาการปฏิบัติราชการรายบุคคล</h5>
-                                                <table class="styled-table">
+                                                <h5 class="mb-4"><i class="" style="font-size: x-large;"></i> ส่วนที่ 3 แผนพัฒนาการปฏิบัติราชการรายบุคคล</h5>
+                                                <table border="1" cellspacing="0" cellpadding="5">
                                                     <thead>
-                                                        <tr>
-                                                            <th><b>ความรู้/ทักษะ/สมรรถนะที่ต้องการพัฒนา</b></th>
-                                                            <th><b>วิธีการพัฒนา</b></th>
-                                                            <th><b>ช่วงเวลาที่ต้องการพัฒนา</b></th>
+                                                        <tr style="text-align: center;">
+                                                            <th>ความรู้/ทักษะ/สมรรถนะ ที่ต้องการพัฒนา</th>
+                                                            <th>วิธีการพัฒนา</th>
+                                                            <th>ช่วงเวลาที่ต้องการพัฒนา</th> 
                                                         </tr>
                                                     </thead>
                                                     <tbody>
-                                                        <tr>
-                                                            <td>1.testtest</td>
-                                                            <td>testtest11</td>
-                                                            <td>testtest333</td>
-                                                        </tr>
+                                                        <tr v-for="(Tab3T4, idx) in products_Tab3T4" :key="idx"  >
+                                                            <td style="text-align: left;">{{ Tab3T4.p04_re1 }}</td>
+                                                            <td style="text-align: left;">{{ Tab3T4.p04_re2 }}</td>
+                                                            <td style="text-align: left;">{{ Tab3T4.p04_re3 }}</td> 
+                                                        </tr> 
                                                     </tbody>
-                                                </table>
+                                                </table> 
                                                     <h5 class="mb-4"><i class="" style="font-size: x-large;"></i> ส่วนที่ 4 การรับทราบผลการประเมิน</h5>
                                                     <table class="styled-table">
                                                     <tbody>
@@ -692,6 +702,8 @@ export default {
             p04_re3: null,
             products_Tab3: [],
             chkP04: 0,
+            //Tab 4
+            products_Tab3T4: [],
         }
     },
     components: {
@@ -723,6 +735,14 @@ export default {
         openDataEvalu(staff_id){   
             this.dataStaffid = staff_id
             this.products_Tab1 = [];  
+            this.p01_scores = [
+                { name: '- ไม่ระบุ -', code: 0 },
+                { name: '1 คะแนน', code: 1 },
+                { name: '2 คะแนน', code: 2 },
+                { name: '3 คะแนน', code: 3 },
+                { name: '4 คะแนน', code: 4 },
+                { name: '5 คะแนน', code: 5 },
+            ];
 
             // ตั้งค่า coreCompetencies กลับไปเป็นค่าเริ่มต้น
             this.coreCompetencies = [
@@ -753,19 +773,20 @@ export default {
                 year_id: this.dropdownItemYear.code,
                 record: this.dropdownItemRecord.code,
             }).then(res => {     
-                // console.log(res.data);   
+                // console.log(res.data);    
                 if (res.data && Array.isArray(res.data)) {
                     this.products_Tab1 = res.data; 
                     this.products_Tab1.forEach(h => {
                         h.subP01sX.forEach(subP01 => {
-                            // ตรวจสอบและตั้งค่าเริ่มต้น
-                            if (this.p01_scores.find(score => score.code === subP01.p01_score)) {
-                                subP01.p01_score = subP01.p01_score; // ค่าที่มีใน p01_scores
+                            // ตรวจสอบว่าค่า p01_score นั้นถูกต้องหรือไม่
+                            const foundScore = this.p01_scores.find(score => score.code === subP01.p01_score);
+                            if (foundScore) {
+                                subP01.p01_score = foundScore.code; // ใช้ค่าที่ถูกต้อง
                             } else {
-                                subP01.p01_score = this.p01_scores[0]; // ใช้ค่าเริ่มต้นจาก p01_scores
+                                subP01.p01_score = this.p01_scores[0].code; // ใช้ค่าเริ่มต้น "- ไม่ระบุ -"
                             }
                         });
-                    }); 
+                    });
                 } 
                 this.DialogAdd = true; 
             })
@@ -826,19 +847,19 @@ export default {
         },
 
         saveEvaTab1(subP01) {  
-            if(subP01.p01_score.code === 0){
+            if(subP01.p01_score === 0){
                 Swal.fire("แจ้งเตือน","กรุณาเลือกคะแนน !","error");
             }else{
                 axios.post('http://localhost:8000/api/saveP03Po',{
                     staffid_po: this.staffid_po,
                     p01_id: subP01.p01_id,
-                    p01_score: subP01.p01_score.code,
+                    p01_score: subP01.p01_score,
                     p01_detail: subP01.p01_detail,
                 }).then(res => {     
                     // console.log(res.data);   
                     Swal.fire({
                         position: "top-end",
-                        icon: "บันทึกสำเร็จ",
+                        icon: "success",
                         title: "ข้ลมูลผลการประเมินถูกบันทึกเสร็จสิ้น",
                         showConfirmButton: false,
                         timer: 1000
@@ -863,16 +884,16 @@ export default {
                 otherCompetencies: this.otherCompetencies,
                 improvements: this.improvements,
                 suggestions: this.suggestions
-            };
+            }; 
             const res = await axios.post('http://localhost:8000/api/saveP03PoTab1', payload);
-            // console.log(res.data); 
-            Swal.fire({
-                position: "top-end",
-                icon: "บันทึกสำเร็จ",
-                title: "บันทึกข้อมูลสมรรถนะ / ความเห็นเพิ่มเติม เสร็จสิ้น",
-                showConfirmButton: false,
-                timer: 1000
-            });
+                // console.log(res.data);  
+                Swal.fire({
+                    position: "top-end",
+                    icon: "success",
+                    title: "บันทึกข้อมูลสมรรถนะ / ความเห็นเพิ่มเติม เสร็จสิ้น",
+                    showConfirmButton: false,
+                    timer: 1500
+                }); 
         },
 
         onTabChange(event) { 
@@ -887,13 +908,14 @@ export default {
                 this.showdataPoText(this.dataStaffid,this.facid_Main,this.dropdownItemYear.code,this.dropdownItemRecord.code); 
             }
             if (event.index==2) {
-                console.log('แผนพัฒนาการปฏิบัติราชการรายบุคคล -',event.index);
+                console.log('แผนพัฒนาการปฏิบัติราชการรายบุคคล -',event.index); 
+                this.products_Tab3 =[];
                 this.chkp04(this.dataStaffid,this.facid_Main,this.dropdownItemYear.code,this.dropdownItemRecord.code); 
-                
+                this.chkp04data(this.dataStaffid,this.facid_Main,this.dropdownItemYear.code,this.dropdownItemRecord.code);  
             }
             if (event.index==3) {
                 console.log('รายงาน ป.04 -',event.index);
-                
+                this.chkp04dataT4(this.dataStaffid,this.facid_Main,this.dropdownItemYear.code,this.dropdownItemRecord.code);   
             }
         },  
         tab2Data(staff_id){  
@@ -963,6 +985,7 @@ export default {
                 console.error('Error:', error);
             });
         },
+
         chkp04(staff_id,fac_id,year_id,record){
             axios.post('http://localhost:8000/api/showDataPo',{
                 staff_id: staff_id,
@@ -981,6 +1004,7 @@ export default {
                 console.error('Error:', error);
             });
         },
+
         AddDatap04(){ 
             const newData = {
                 p04_re1: this.p04_re1,
@@ -996,7 +1020,7 @@ export default {
             // Add logic to remove the selected item
             this.products_Tab3 = this.products_Tab3.filter((product) => product !== item);
         },
-        saveEvaTab3(){ 
+        saveEvaTab3(){  
             axios.post('http://localhost:8000/api/saveEvaTab3',{
                 staff_id: this.dataStaffid,
                 fac_id: this.facid_Main,
@@ -1005,12 +1029,83 @@ export default {
                 products_Tab3: this.products_Tab3
             }).then(res => {     
                 console.log(res.data);    
-                 
+                Swal.fire({
+                    position: "top-end",
+                    icon: "success",
+                    title: "บันทึก แผนพัฒนาการปฏิบัติราชการรายบุคคล เสร็จสิ้น",
+                    showConfirmButton: false,
+                    timer: 1000
+                });
             })
             .catch(error => {
                 console.error('Error:', error);
             });
-        }
+        },
+        chkp04data(staff_id,fac_id,year_id,record){
+            axios.post('http://localhost:8000/api/showData04Tab3',{
+                staff_id: staff_id,
+                fac_id: fac_id,
+                year_id: year_id,
+                record: record,
+            }).then(res => {     
+                // console.log(res.data);     
+                if(res.data.length > 0){
+                    res.data.forEach(p04 => {
+                        const newData = {
+                            p04_re1: p04.p04_re1,
+                            p04_re2: p04.p04_re2,
+                            p04_re3: p04.p04_re3
+                        };
+                        this.products_Tab3.push(newData); 
+                    });  
+                }
+                this.p04_re1 = '';
+                this.p04_re2 = '';
+                this.p04_re3 = '';
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        },
+        chkp04data(staff_id,fac_id,year_id,record){
+            axios.post('http://localhost:8000/api/showData04Tab3',{
+                staff_id: staff_id,
+                fac_id: fac_id,
+                year_id: year_id,
+                record: record,
+            }).then(res => {     
+                // console.log(res.data);     
+                if(res.data.length > 0){
+                    res.data.forEach(p04 => {
+                        const newData = {
+                            p04_re1: p04.p04_re1,
+                            p04_re2: p04.p04_re2,
+                            p04_re3: p04.p04_re3
+                        };
+                        this.products_Tab3.push(newData); 
+                    });  
+                } 
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        },
+        chkp04dataT4(staff_id,fac_id,year_id,record){
+            axios.post('http://localhost:8000/api/showData04Tab3',{
+                staff_id: staff_id,
+                fac_id: fac_id,
+                year_id: year_id,
+                record: record,
+            }).then(res => {     
+                // console.log(res.data);     
+                if(res.data.length > 0){
+                    this.products_Tab3T4 = res.data;
+                } 
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        },
 
 
  
