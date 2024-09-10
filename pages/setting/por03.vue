@@ -72,27 +72,27 @@
                                         <b style="color: red;">- ไม่มีข้อมูล -</b>
                                     </p>
                                 </td> 
-                                <td class="text-center"> 
+                                <td style=" vertical-align: middle;" class="text-center"> 
                                     <b v-if="subP01.score==1">&#10003;</b>
                                     <b v-if="subP01.score!=1"></b>
                                 </td>
-                                <td class="text-center">
+                                <td style=" vertical-align: middle;" class="text-center">
                                     <b v-if="subP01.score==2">&#10003;</b>
                                     <b v-if="subP01.score!=2"></b>
                                 </td>
-                                <td class="text-center">
+                                <td style=" vertical-align: middle;" class="text-center">
                                     <b v-if="subP01.score==3">&#10003;</b>
                                     <b v-if="subP01.score!=3"></b>
                                 </td>
-                                <td class="text-center">
+                                <td style=" vertical-align: middle;" class="text-center">
                                     <b v-if="subP01.score==4">&#10003;</b>
                                     <b v-if="subP01.score!=4"></b>
                                 </td>
-                                <td class="text-center">
+                                <td style=" vertical-align: middle;" class="text-center">
                                     <b v-if="subP01.score==5">&#10003;</b>
                                     <b v-if="subP01.score!=5"></b>
                                 </td> 
-                                <td class="text-center">
+                                <td style=" vertical-align: middle;" class="text-center">
                                     <SplitButton label="เลือก" :model="itemsBtu(subP01)" severity="warning" class="mb-2 mr-2"></SplitButton>
                                 </td>
                             </tr>
@@ -101,81 +101,76 @@
                 </table> 
                 <br>
             </div>
+            <br>
             <!-- พฤติกรรมการปฏิบัติราชการ -->
-            <B><h4>2.พฤติกรรมการปฏิบัติราชการ</h4></B><br>
-                <table id="ratingTable">
-                <thead>
-                    <tr>
-                        <th rowspan="4">ก. สมรรถนะหลัก (สำหรับข้าราชการและพนักงานทุกคน)</th>
-                        <th rowspan="4">(1) ระดับสมรรถนะที่คาดหวัง</th>
-                        <th rowspan="4">(2) ระดับสมรรถนะที่แสดงออก</th>
-                    </tr>
-                </thead>
-                <tbody> 
-                    <tr v-for="(row, index) in coreCompetencies" :key="index">
-                        <td style="text-align: left;">
-                            {{ row.activity }} 
-                        </td>
-                        <td>{{ row.indicator }}</td>
-                        <td> 
-                        </td>
-                    </tr>
-                </tbody>
-                </table>
-
-                <!-- ตาราง ข. สมรรถนะเฉพาะตามลักษณะงานที่ปฏิบัติ -->
-                <table id="ratingTable">
-                    <thead>
-                        <tr>
-                            <th rowspan="4">ข. สมรรถนะเฉพาะตามลักษณะงานที่ปฏิบัติ (สำหรับข้าราชการและพนักงานเฉพาะตามตำแหน่งที่รับผิดชอบตามที่ ก.บ.ม. กำหนด)</th>
-                            <th rowspan="4">(3) ระดับสมรรถนะที่คาดหวัง</th>
-                            <th rowspan="4">(4) ระดับสมรรถนะที่แสดงออก</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr v-for="(row, index) in jobSpecificCompetencies" :key="index">
-                            <td style="text-align: left;">
-                                {{ row.activity }} 
-                            </td>
-                            <td>{{ row.indicator }}</td>
-                            <td> 
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-
-                <!-- ตาราง ค. สมรรถนะอื่นๆ -->
-                <table id="ratingTable">
-                <thead>
-                    <tr>
-                        <th rowspan="4">ค. สมรรถนะทางการบริหาร(สำหรับตำแหน่งประเภทบริหารตามที่ ก.บ.ม. กำหนด)</th>
-                        <th rowspan="4">(5) ระดับสมรรถนะที่คาดหวัง</th>
-                        <th rowspan="4">(6) ระดับสมรรถนะที่แสดงออก</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-for="(row, index) in otherCompetencies" :key="index">
-                        <td style="text-align: left;">
-                            {{ row.activity }}
-                            <!-- <i class="far fa-edit edit-icon" @click="editRow('other', index)" title="แก้ไข"></i>
-                            <i class="fas fa-trash-alt delete-icon" @click="deleteRow('other', index)" title="ลบ"></i> -->
-                        </td>
-                        <td>{{ row.indicator }}</td>
-                        <td>
-                            <!-- <div class="add-row-form form-container" v-show="activeFormIndex === index && activeCategory === 'other'">
-                                <label for="activity">กิจกรรม/โครงการ/งาน:</label>
-                                <input type="text" v-model="newActivity" style="width: 80%; padding: 8px; margin: 5px 0;"><br>
-                                <label for="file">เลือกไฟล์:</label>
-                                <input type="file" @change="handleFileUpload"><br><br>
-                                <button class="save-button" @click="addRow('other')">บันทึก</button>
-                                <button class="cancel-button" @click="hideForm">ยกเลิก</button>
-                            </div> -->
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+            <B><h4>2.พฤติกรรมการปฏิบัติราชการ</h4></B>
+            <div class="p-fluid formgrid grid">
+                <!-- ตาราง ก. สมรรถนะหลัก -->
+                    <div class="field col-12 md:col-4"> 
+                        <table id="ratingTable">
+                            <thead>
+                                <tr>
+                                    <th style="width: 60%;">ก. สมรรถนะหลัก (สำหรับข้าราชการและพนักงานทุกคน)</th>
+                                    <th style="width: 20%;">(1)ระดับ<br>สมรรถนะ<br>ที่คาดหวัง</th>
+                                    <th style="width: 20%;">(2)ระดับ<br>สมรรถนะ<br>ที่แสดงออก</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="(row1, index) in coreCompetencies" :key="index">
+                                    <td style="text-align: left;">{{ row1.activity }}</td> 
+                                    <td>{{ row1.indicator }}</td>
+                                    <td>  
+                                        <b v-if="row1.data_table1 == '' " style="color: red;">0</b> 
+                                        <b v-if="row1.data_table1 != 0 " >{{ row1.data_table1 }}</b> 
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- ตาราง ข. สมรรถนะเฉพาะตามลักษณะงานที่ปฏิบัติ -->
+                    <div class="field col-12 md:col-4"> 
+                        <table id="ratingTable">
+                            <thead>
+                                <tr>
+                                    <th style="width: 60%;">ข. สมรรถนะเฉพาะตามลักษณะงานที่ปฏิบัติ (สำหรับข้าราชการและพนักงานเฉพาะตามตำแหน่งที่รับผิดชอบตามที่ ก.บ.ม. กำหนด)</th>
+                                    <th style="width: 20%;">(3)ระดับ<br>สมรรถนะ<br>ที่คาดหวัง</th>
+                                    <th style="width: 20%;">(4)ระดับ<br>สมรรถนะ<br>ที่แสดงออก</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="(row2, index) in jobSpecificCompetencies" :key="index">
+                                    <td style="text-align: left;">{{ row2.activity }}</td> 
+                                    <td>{{ row2.indicator }}</td>
+                                    <td>
+                                        <b v-if="row2.data_table2 == '' " style="color: red;">0</b> 
+                                        <b v-if="row2.data_table2 != 0 " >{{ row2.data_table2 }}</b> 
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- ตาราง ค. สมรรถนะอื่นๆ -->
+                    <div class="field col-12 md:col-4"> 
+                        <table id="ratingTable">
+                            <thead>
+                                <tr>
+                                    <th style="width: 60%;">ค. สมรรถนะทางการบริหาร (สำหรับตำแหน่งประเภทบริหารตามที่ ก.บ.ม. กำหนด)</th>
+                                    <th style="width: 20%;">(5)ระดับ<br>สมรรถนะ<br>ที่คาดหวัง</th>
+                                    <th style="width: 20%;">(6)ระดับ<br>สมรรถนะ<br>ที่แสดงออก</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="(row3, index) in otherCompetencies" :key="index">
+                                    <td style="text-align: left;">{{ row3.activity }}</td> 
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
         </div>
-    </div>
 
         <!-- รางานการปฏิบัติราชการตามตัวชี้วัด/เกณฑ์การประเมิน -->
         <Dialog header="จัดการ รางานการปฏิบัติราชการตามตัวชี้วัด/เกณฑ์การประเมิน" maximizable v-model:visible="DialogAdd" :breakpoints="{ '960px': '75vw' }" :style="{ width: '100vw' }" :modal="true" position="top">
@@ -367,33 +362,31 @@ import Swal from 'sweetalert2'
                     }
                 ],
 /*=========== 2.พฤติกรรมการปฏิบัติราชการ =============*/ 
-                // ก. สมรรถนะหลัก (สำหรับข้าราชการและพนักงานทุกคน)
-                coreCompetencies: [
-                    { activity: 'ก. 1 การมุ่งผลสัมฤทธิ์', indicator: '1',report: '1' },
-                    { activity: 'ก. 2 การบริการที่ดี', indicator: '1' },
-                    { activity: 'ก. 3 การสั่งสมความเชี่ยวชาญในงานอาชีพ', indicator: '1' },
-                    { activity: 'ก. 4 การยึดมั่นในความถูกต้องชอบธรรมและจริยธรรม', indicator: '1' },
-                    { activity: 'ก. 5 การทำงานเป็นทีม', indicator: '1' }
-                ],
-                // ข. สมรรถนะเฉพาะตามลักษณะงานที่ปฏิบัติ (สำหรับข้าราชการและพนักงานเฉพาะตามตำแหน่งที่รับผิดชอบตามที่ ก.บ.ม. กำหนด)
-                jobSpecificCompetencies: [
-                    { activity: 'ข. 1 การคิดวิเคราะห์', indicator: '1' },
-                    { activity: 'ข. 2 การดำเนินการเชิงรุก', indicator: '1' },
-                    { activity: 'ข. 3 ความผูกพันที่มีต่อส่วนราชการ', indicator: '1' },
-                    { activity: 'ข. 4 การมองภาพองค์รวม', indicator: '1' },
-                    { activity: 'ข. 5 การสืบเสาะหาข้อมูล', indicator: '1' },
-                    { activity: 'ข. 6 การตรวจสอบความถูกต้องตามกระบวนงาน', indicator: '1' }
-
-                ],
-                // ค. สมรรถนะทางการบริหาร(สำหรับตำแหน่งประเภทบริหารตามที่ ก.บ.ม. กำหนด)
-                otherCompetencies: [
-                    { activity: 'ค. 1 สภาวะผู้นำ', indicator: '0' },
-                    { activity: 'ค. 2 วิสัยทัศน์', indicator: '0' },
-                    { activity: 'ค. 3 การวางกลยุทธ์ภาครัฐ', indicator: '0' },
-                    { activity: 'ค. 4 ศักยภาพเพื่อนำการปรับเปลี่ยน', indicator: '0' },
-                    { activity: 'ค. 5 การสอนงานและการมอบหมายงาน', indicator: '0' }
-
-                ],
+                //ตาราง ก. สมรรถนะหลัก
+           coreCompetencies: [
+                { id: 1, activity: 'ก. 1 การมุ่งผลสัมฤทธิ์', indicator: '1', data_table1: '' },
+                { id: 2, activity: 'ก. 2 การบริการที่ดี', indicator: '1', data_table1: '' },
+                { id: 3, activity: 'ก. 3 การสั่งสมความเชี่ยวชาญในงานอาชีพ', indicator: '1', data_table1: '' },
+                { id: 4, activity: 'ก. 4 การยึดมั่นในความถูกต้องชอบธรรมและจริยธรรม', indicator: '1', data_table1: '' },
+                { id: 5, activity: 'ก. 5 การทำงานเป็นทีม', indicator: '1', data_table1: '' }
+            ],
+            //ตาราง ข. สมรรถนะเฉพาะตามลักษณะงานที่ปฏิบัติ
+            jobSpecificCompetencies: [
+                { id: 6, activity: 'ข. 1 การคิดวิเคราะห์', indicator: '1', data_table2: '' },
+                { id: 7, activity: 'ข. 2 การดำเนินการเชิงรุก', indicator: '1', data_table2: '' },
+                { id: 8, activity: 'ข. 3 ความผูกพันที่มีต่อส่วนราชการ', indicator: '1', data_table2: '' },
+                { id: 9, activity: 'ข. 4 การมองภาพองค์รวม', indicator: '1', data_table2: '' },
+                { id: 10, activity: 'ข. 5 การสืบเสาะหาข้อมูล', indicator: '1', data_table2: '' },
+                { id: 11, activity: 'ข. 6 การตรวจสอบความถูกต้องตามกระบวนงาน', indicator: '1', data_table2: '' }
+            ],
+            //ตาราง ค. สมรรถนะอื่นๆ
+            otherCompetencies: [
+                { id: 12, activity: 'ค. 1 สภาวะผู้นำ', indicator: '0', data_table3: '' },
+                { id: 13, activity: 'ค. 2 วิสัยทัศน์', indicator: '0', data_table3: '' },
+                { id: 14, activity: 'ค. 3 การวางกลยุทธ์ภาครัฐ', indicator: '0', data_table3: '' },
+                { id: 15, activity: 'ค. 4 ศักยภาพเพื่อนำการปรับเปลี่ยน', indicator: '0', data_table3: '' },
+                { id: 16, activity: 'ค. 5 การสอนงานและการมอบหมายงาน', indicator: '0', data_table3: '' }
+            ],
 /*============= รายงานผลการปฏิบัติราชการตามตัวชี้วัด/ เกณฑ์การประเมิน =============*/
                 DialogAdd: false,
                 text_edtP03: null,

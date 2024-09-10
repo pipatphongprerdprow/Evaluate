@@ -132,31 +132,31 @@
                                             <div v-if="subIitem.ind_no==0"><b>{{ subIitem.ind_Items }}</b></div>
                                         </p>
                                     </td>
-                                    <td class="text-center"> 
+                                    <td style=" vertical-align: middle;" class="text-center"> 
                                         <b v-if="subP01.p_target==1">&#10003;</b> 
                                         <b v-if="subP01.p_target!=1"></b> 
                                     </td>
-                                    <td class="text-center"> 
+                                    <td style=" vertical-align: middle;" class="text-center"> 
                                         <b v-if="subP01.p_target==2">&#10003;</b> 
                                         <b v-if="subP01.p_target!=2"></b> 
                                     </td>
-                                    <td class="text-center"> 
+                                    <td style=" vertical-align: middle;" class="text-center"> 
                                         <b v-if="subP01.p_target==3">&#10003;</b> 
                                         <b v-if="subP01.p_target!=3"></b> 
                                     </td>
-                                    <td class="text-center"> 
+                                    <td style=" vertical-align: middle;" class="text-center">
                                         <b v-if="subP01.p_target==4">&#10003;</b> 
                                         <b v-if="subP01.p_target!=4"></b> 
                                     </td>  
-                                    <td class="text-center"> 
+                                    <td style=" vertical-align: middle;" class="text-center"> 
                                         <b v-if="subP01.p_target==5">&#10003;</b> 
                                         <b v-if="subP01.p_target!=5"></b> 
                                     </td>
-                                    <td class="text-center">{{ subP01.p_score }}</td>
-                                    <td class="text-center">{{ subP01.p_weight }}%</td> 
-                                    <td class="text-center">{{ (subP01.p_score * subP01.p_weight / 100).toFixed(2) }}</td>
+                                    <td style=" vertical-align: middle;" class="text-center">{{ subP01.p_score }}</td>
+                                    <td style=" vertical-align: middle;" class="text-center">{{ subP01.p_weight }}%</td> 
+                                    <td style=" vertical-align: middle;" class="text-center">{{ (subP01.p_score * subP01.p_weight / 100).toFixed(2) }}</td>
                                     
-                                    <td class="text-center">
+                                    <td style=" vertical-align: middle;" class="text-center">
                                         <SplitButton label="เลือก" :model="itemsBtu(subP01)" severity="warning" class="mb-2 mr-2"></SplitButton>
                                     </td> 
                                 </tr> 

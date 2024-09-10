@@ -235,7 +235,11 @@
                                                         <th rowspan="2" style="width: 25%;">ตัวชี้วัด / เกณฑ์การประเมิน</th>
                                                         <th rowspan="2" style="width: 20%;">รางานการปฏิบัติราชการ<br> ตามตัวชี้วัด/เกณฑ์การประเมิน</th>
                                                         <th rowspan="2" style="width: 25%;">หลักฐานที่แสดงถึงผลการปฏิบัติราชการตามเกณฑ์การประเมิน(หลักฐานเชิงประจักษ์)</th>
-                                                        <th colspan="5" style="width: 15%;">ระดับการประเมินตนเอง<br> (ค่าคะแนนที่ได้)</th> 
+                                                        <th colspan="5" style="width: 15%;">ระดับค่าเป้าหมาย</th> 
+                                                        <th rowspan="2" style="width: 10%;">ค่าคะแนนที่ได้</th>
+                                                        <th rowspan="2" style="width: 10%;">น้ำหนัก(ความสำคัญ/ความยากง่ายของงาน)</th>
+                                                        <th rowspan="2" style="width: 10%;">ค่าคะแนนถ่วงน้ำหนัก<br>(4) X (5)<br> 100</th>
+                                                        
                                                     </tr>
                                                     <tr>
                                                         <th>1</th>
@@ -248,7 +252,7 @@
                                                 <tbody>
                                                     <template v-for="(h, ind) in products_Tab2" :key="ind">
                                                         <tr>
-                                                            <td style="text-align: left;" colspan="9">
+                                                            <td style="text-align: left;" colspan="12">
                                                                 <b style="color: blue;">{{ h.id }}. {{ h.nameH }}</b> 
                                                             </td> 
                                                         </tr> 
@@ -287,33 +291,55 @@
                                                                     <b style="color: red;">- ไม่มีข้อมูล -</b>
                                                                 </p>
                                                             </td>  
-                                                            <td class="text-center"> 
-                                                                    <b v-if="subP01.p01_score==1">&#10003;</b>
-                                                                    <b v-if="subP01.p01_score!=1"></b>
-                                                                </td>
-                                                                <td class="text-center">
-                                                                    <b v-if="subP01.p01_score==2">&#10003;</b>
-                                                                    <b v-if="subP01.p01_score!=2"></b>
-                                                                </td>
-                                                                <td class="text-center">
-                                                                    <b v-if="subP01.p01_score==3">&#10003;</b>
-                                                                    <b v-if="subP01.p01_score!=3"></b>
-                                                                </td>
-                                                                <td class="text-center">
-                                                                    <b v-if="subP01.p01_score==4">&#10003;</b>
-                                                                    <b v-if="subP01.p01_score!=4"></b>
-                                                                </td>
-                                                                <td class="text-center">
-                                                                    <b v-if="subP01.p01_score==5">&#10003;</b>
-                                                                    <b v-if="subP01.p01_score!=5"></b>
-                                                                </td> 
+                                                            <td style=" vertical-align: middle;" class="text-center">
+                                                                <b v-if="subP01.p01_target==1">&#10003;</b> 
+                                                                <b v-if="subP01.p01_target!=1"></b> 
+                                                            </td>
+                                                            <td style=" vertical-align: middle;" class="text-center">
+                                                                <b v-if="subP01.p01_target==2">&#10003;</b> 
+                                                                <b v-if="subP01.p01_target!=2"></b> 
+                                                            </td>
+                                                            <td style=" vertical-align: middle;" class="text-center">
+                                                                <b v-if="subP01.p01_target==3">&#10003;</b> 
+                                                                <b v-if="subP01.p01_target!=3"></b> 
+                                                            </td>
+                                                            <td style=" vertical-align: middle;" class="text-center"> 
+                                                                <b v-if="subP01.p01_target==4">&#10003;</b> 
+                                                                <b v-if="subP01.p01_target!=4"></b> 
+                                                            </td>  
+                                                            <td style=" vertical-align: middle;" class="text-center"> 
+                                                                <b v-if="subP01.p01_target==5">&#10003;</b> 
+                                                                <b v-if="subP01.p01_target!=5"></b> 
+                                                            </td>
+                                                                <!-- เพิ่มตารางช่องค่าคะแนน -->
+                                                            <td style=" vertical-align: middle;" class="text-center">{{ subP01.p01_score }}</td>
+                                                            <td style=" vertical-align: middle;" class="text-center">{{ subP01.p01_weight }}%</td> 
+                                                            <td style=" vertical-align: middle;" class="text-center">{{ (subP01.p01_score * subP01.p01_weight / 100).toFixed(2) }}</td>
                                                         </tr>
-                                                    </template>
-                                                </tbody>
-                                            </table> 
-
+                                                        </template>
+                                                        <tr>
+                                                            <td style="text-align: right" colspan="9">
+                                                                <b style="color: blue;">(7) ผลรวม</b>
+                                                            </td>
+                                                            <td class="text-center" style="color: blue;"><b>15%</b></td> 
+                                                            <td></td>
+                                                            <td></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="text-align: right; vertical-align: middle;" colspan="9">
+                                                                <b style="color: blue;">(8) สรุปคะแนนส่วนผลสัมฤทธิ์ของงาน = </b>
+                                                            </td>
+                                                            <td colspan="2" class="text-center" style="vertical-align: middle;line-height: 1.5;">
+                                                                <b style="color: blue;">ผลรวมของค่าคะแนนถ่วงน้ำหนัก</b>
+                                                                <hr style="border: 1px solid black; width: 100%; ">
+                                                                <b style="color: blue;">จำนวนระดับค่าเป้าหมาย = 5 </b>
+                                                            </td>
+                                                            <td></td>
+                                                            <td></td>
+                                                        </tr>  
+                                                    </tbody>
+                                                </table>
                                             <hr>
-
                                             <div class="p-fluid formgrid grid">
                                                 <!-- ตาราง ก. สมรรถนะหลัก -->
                                                 <div class="field col-12 md:col-4"> 
@@ -380,21 +406,81 @@
                                                 </div>
                                             </div>
 
-                                            <div class="p-fluid formgrid grid"> 
-                                                <B><h4>ความเห็นเพิ่มเติมของผู้ประเมิน (ระบุข้อมูลเมื่อสิ้นรอบการประเมิน)</h4></B>
-                                                <div class="field col-12 md:col-12">  
-                                                    <label for="improvements">1) จุดเด่น และ/หรือ สิ่งที่ควรปรับปรุงแก้ไข</label>
-                                                    <p style="margin-left: 20px;">{{ improvements??'- ไม่มีข้อมูล -' }}</p>
-                                                </div>
-                                                <div class="field col-12 md:col-12">  
-                                                    <label for="suggestions">2) ข้อเสนอแนะเกี่ยวกับวิธีส่งเสริมและพัฒนา</label>
-                                                    <p style="margin-left: 20px;">{{ suggestions??'- ไม่มีข้อมูล -' }}</p> 
-                                                </div>
-                                                
-                                            </div>   
+                                           <!-- เกณฑ์การประเมิน -->
+                                            
+                                           <thead>
+                                                    <tr>                                                       
+                                                        <th rowspan="9" style="width: 90%;">เกณฑ์การประเมิน</th>
+                                                        <th colspan="3" style="width: 10%;">การประเมิน</th> 
+                                                    </tr>
+                                                    <tr>
+                                                        <th>จำนวนสมรรถนะ</th>
+                                                        <th>คูณด้วย</th>
+                                                        <th>คะแนน</th>
+                                                    </tr>
+                                            </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td style=" vertical-align: middle;" class="text-left">จำนวนสมรรถนะหลัก /สมรรถนะเฉพาะตามลักษณะงานที่ปฏิบัติ /สมรรถนะทางการบริหาร ที่มีระดับสมรรถนะที่แสดงออก สูงกว่าหรือเท่ากับ ระดับสมรรถนะที่คาดหวัง X 3 คะแนน</td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>                                                      
+                                                    </tr>
+                                                    <tr>
+                                                        <td style=" vertical-align: middle;" class="text-left">จำนวนสมรรถนะหลัก /สมรรถนะเฉพาะตามลักษณะงานที่ปฏิบัติ /สมรรถนะทางการบริหาร ที่มีระดับสมรรถนะที่แสดงออก ต่ำกว่า ระดับสมรรถนะที่คาดหวัง 1 ระดับ X 2 คะแนน</td>
+                                                        <td></td>
+                                                        <td></td>
+                                                        <td></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style=" vertical-align: middle;" class="text-left">จำนวนสมรรถนะหลัก /สมรรถนะเฉพาะตามลักษณะงานที่ปฏิบัติ /สมรรถนะทางการบริหาร ที่มีระดับสมรรถนะที่แสดงออก ต่ำกว่า ระดับสมรรถนะที่คาดหวัง 2 ระดับ X 1 คะแนน</td>
+                                                        <td></td>
+                                                        <td></td>
+                                                        <td></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style=" vertical-align: middle;" class="text-left">จำนวนสมรรถนะหลัก /สมรรถนะเฉพาะตามลักษณะงานที่ปฏิบัติ /สมรรถนะทางการบริหาร ที่มีระดับสมรรถนะที่แสดงออก ต่ำกว่า ระดับสมรรถนะที่คาดหวัง 3 ระดับ X 0 คะแนน</td>
+                                                        <td></td>
+                                                        <td></td>
+                                                        <td></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style="text-align: right" colspan="1">
+                                                            <b style="color: blue;"> (8) ผลรวม</b>
+                                                        </td>
+                                                        <td></td>
+                                                        <td></td>
+                                                        <td></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td colspan="1" class="text-right" style="vertical-align: middle;line-height: 1.5;">
+                                                            <b style="color: blue;">สรุปคะแนนส่วนพฤติกรรมการปฏิบัติราชการ   (สมรรถนะ) =	</b>
+                                                        </td>  
+                                                        <td>
+                                                            <b style="color: blue;">ผลรวมคะแนน ใน (8)</b>
+                                                            <hr style="border: 1px solid black; width: 100%; ">
+                                                            <b style="color: blue;">จำนวนสมรรถนะที่ใช้ในการประเมิน X 3 คะแนน </b>
+                                                        </td>
+                                                        <td></td>
+                                                        <td></td>
+                                                    </tr>  
+                                                </tbody>
+                                                    <br>
+                                                    <div class="p-fluid formgrid grid"> 
+                                                        <B><h4>ความเห็นเพิ่มเติมของผู้ประเมิน (ระบุข้อมูลเมื่อสิ้นรอบการประเมิน)</h4></B>
+                                                        <div class="field col-12 md:col-12">  
+                                                            <label for="improvements">1) จุดเด่น และ/หรือ สิ่งที่ควรปรับปรุงแก้ไข</label>
+                                                            <p style="margin-left: 20px;">{{ improvements??'- ไม่มีข้อมูล -' }}</p>
+                                                        </div>
+                                                        <div class="field col-9 md:col-9">  
+                                                            <label for="suggestions">2) ข้อเสนอแนะเกี่ยวกับวิธีส่งเสริมและพัฒนา</label>
+                                                            <p style="margin-left: 20px;">{{ suggestions??'- ไม่มีข้อมูล -' }}</p> 
+                                                    </div>
+                                                </div>   
+                                            </div>
                                         </div>
-                                    </div>
-                                </div>
+                                        
+                                 </div>
                             </TabPanel>
                             <!-- Tab 3 -->
                             <TabPanel header="แผนพัฒนาการปฏิบัติราชการรายบุคคล" >
@@ -536,8 +622,7 @@
                                                         <tr>
                                                         <td>
                                                             <b>ผู้รับการประเมิน</b><br>
-                                                            <input type="checkbox" id="receiver-acknowledgment">
-                                                            <label for="receiver-acknowledgment">ได้รับทราบผลการประเมินและแผนพัฒนาการปฏิบัติราชการ รายบุคคลแล้ว</label><br>
+                                                            <label for="receiver-acknowledgment">[ &nbsp;&nbsp; ] ได้รับทราบผลการประเมินและแผนพัฒนาการปฏิบัติราชการ รายบุคคลแล้ว</label><br>
                                                         </td>
                                                             <td class="center-align"><br><br>
                                                                 ลงชื่อ .................................................................<br>
@@ -549,20 +634,18 @@
                                                         <tr>
                                                             <td>
                                                                 <b>ผู้ประเมิน</b><br>
-                                                                <input type="checkbox" id="evaluator-acknowledgment-1">
-                                                                <label for="evaluator-acknowledgment-1">ได้แจ้งผลการประเมินและผู้รับการประเมินได้ลงนามรับทราบ รายบุคคลแล้ว</label><br>
-                                                                <input type="checkbox" id="evaluator-acknowledgment-2">
-                                                                <label for="evaluator-acknowledgment-2">ได้แจ้งผลการประเมินเมื่อวันที่ ..............................แต่ผู้รับการประเมินไม่ลงนามรับทราบผลการประเมิน โดยมี .......................... เป็นพยาน</label><br>
+                                                                <label for="evaluator-acknowledgment-1">[ &nbsp;&nbsp; ] ได้แจ้งผลการประเมินและผู้รับการประเมินได้ลงนามรับทราบ รายบุคคลแล้ว</label><br>
+                                                                <label for="evaluator-acknowledgment-2">[ &nbsp;&nbsp; ] ได้แจ้งผลการประเมินเมื่อวันที่ ..............................แต่ผู้รับการประเมินไม่ลงนามรับทราบผลการประเมิน โดยมี .......................... เป็นพยาน</label><br>
                                                                 ลงชื่อ .................................................................<br>
-                                                                ชื่อ นายพิพัฒน์พงษ์ เพริดพราว<br>
+                                                                ชื่อ <br>
                                                                 ตำแหน่ง ผู้อำนวยการกองแผนงาน<br>
-                                                                วันที่ .......... เดือน .......................... พ.ศ.
+                                                                วันที่ .......... เดือน .......................... พ.ศ...........
                                                             </td>
                                                         <td class="center-align"><br><br>
                                                             ลงชื่อ .................................................................<br>
-                                                            ชื่อ นายพิพัฒน์พงษ์ เพริดพราว<br>
+                                                            ชื่อ <br>
                                                             ตำแหน่ง ผู้อำนวยการกองแผนงาน<br>
-                                                            วันที่ .......... เดือน .......................... พ.ศ.
+                                                            วันที่ .......... เดือน .......................... พ.ศ...........
                                                         </td>
                                                         </tr>
                                                     </tbody>
@@ -573,10 +656,8 @@
                                                         <tr>
                                                         <td>
                                                             <b>ผู้บังคับบัญชาเหนือขึ้นไป</b><br>
-                                                            <input type="checkbox" id="evaluator-acknowledgment-3">
-                                                            <label for="evaluator-acknowledgment-3">เห็นด้วยกับผลการประเมิน</label><br>
-                                                            <input type="checkbox" id="evaluator-acknowledgment-4">
-                                                            <label for="evaluator-acknowledgment-3">มีความเห็นต่าง ดังนี้<br>..............................................................................................................</label><br>
+                                                            <label for="evaluator-acknowledgment-3">[ &nbsp;&nbsp;] เห็นด้วยกับผลการประเมิน</label><br>
+                                                            <label for="evaluator-acknowledgment-3">[ &nbsp;&nbsp;] มีความเห็นต่าง ดังนี้<br>..............................................................................................................</label><br>
                                                             .....................................................................................................................................<br>
                                                             .....................................................................................................................................
                                                         </td>
@@ -584,24 +665,24 @@
                                                             ลงชื่อ : .................................................................<br>
                                                             ชื่อ : นายพิพัฒน์พงษ์ เพริดพราว<br>
                                                             ตำแหน่ง : นักวิชาการคอมพิวเตอร์<br>
-                                                            วันที่ : .......... เดือน .......................... พ.ศ.
+                                                            วันที่ : .......... เดือน .......................... พ.ศ.............
                                                         </td>
                                                         </tr>
                                                         <tr>
                                                             <td>
                                                                 <b>ผู้บังคับบัญชาเหนือขึ้นไปอีกชั้นหนึ่ง (ถ้ามี)</b><br>
-                                                                <input type="checkbox" id="evaluator-acknowledgment-5">
-                                                                <label for="evaluator-acknowledgment-5">เห็นด้วยกับผลการประเมิน</label><br>
-                                                                <input type="checkbox" id="evaluator-acknowledgment-6">
-                                                                <label for="evaluator-acknowledgment-6">มีความเห็นต่าง ดังนี้<br>...............................................................................................................</label><br>
+                                                               
+                                                                <label for="evaluator-acknowledgment-5">[ &nbsp;&nbsp;] เห็นด้วยกับผลการประเมิน</label><br>
+                                                                
+                                                                <label for="evaluator-acknowledgment-6">[ &nbsp;&nbsp;] มีความเห็นต่าง ดังนี้<br>...............................................................................................................</label><br>
                                                                 .......................................................................................................................................<br>
                                                                 .......................................................................................................................................
                                                             </td>
                                                             <td class="center-align"><br><br>
                                                                 ลงชื่อ .................................................................<br>
-                                                                ชื่อ นายพิพัฒน์พงษ์ เพริดพราว<br>
+                                                                ชื่อ <br>
                                                                 ตำแหน่ง ผู้อำนวยการกองแผนงาน<br>
-                                                                วันที่ .......... เดือน .......................... พ.ศ.
+                                                                วันที่ .......... เดือน .......................... พ.ศ...........
                                                             </td>
                                                         </tr>
                                                     </tbody>

@@ -58,35 +58,55 @@
                                         <div v-if="subIitem.ind_no==0"><b>{{ subIitem.ind_Items }}</b></div>
                                     </p>
                                 </td>
-                                <td class="text-center"> 
+                                <td style=" vertical-align: middle;" class="text-center">
                                     <b v-if="subP01.p01_target==1">&#10003;</b> 
                                     <b v-if="subP01.p01_target!=1"></b> 
                                 </td>
-                                <td class="text-center"> 
+                                <td style=" vertical-align: middle;" class="text-center"> 
                                     <b v-if="subP01.p01_target==2">&#10003;</b> 
                                     <b v-if="subP01.p01_target!=2"></b> 
                                 </td>
-                                <td class="text-center"> 
+                                <td style=" vertical-align: middle;" class="text-center">
                                     <b v-if="subP01.p01_target==3">&#10003;</b> 
                                     <b v-if="subP01.p01_target!=3"></b> 
                                 </td>
-                                <td class="text-center"> 
+                                <td style=" vertical-align: middle;" class="text-center"> 
                                     <b v-if="subP01.p01_target==4">&#10003;</b> 
                                     <b v-if="subP01.p01_target!=4"></b> 
                                 </td>  
-                                <td class="text-center"> 
+                                <td style=" vertical-align: middle;" class="text-center"> 
                                     <b v-if="subP01.p01_target==5">&#10003;</b> 
                                     <b v-if="subP01.p01_target!=5"></b> 
                                 </td>
-                                <td class="text-center">{{ subP01.p01_score }}</td>
-                                <td class="text-center">{{ subP01.p01_weight }}%</td> 
-                                <td class="text-center">{{ (subP01.p01_score * subP01.p01_weight / 100).toFixed(2) }}</td>
+                                <td style=" vertical-align: middle;" class="text-center">{{ subP01.p01_score }}</td>
+                                <td style=" vertical-align: middle;" class="text-center">{{ subP01.p01_weight }}%</td> 
+                                <td style=" vertical-align: middle;" class="text-center">{{ (subP01.p01_score * subP01.p01_weight / 100).toFixed(2) }}</td>
                                 
-                                <td class="text-center">
+                                <td style=" vertical-align: middle;" class="text-center">
                                     <SplitButton label="เลือก" :model="itemsBtu(subP01)" severity="warning" class="mb-2 mr-2"></SplitButton>
                                 </td> 
-                            </tr>  
+                            </tr>
                         </template>
+                        <tr>
+                            <td style="text-align: right" colspan="8">
+                                <b style="color: blue;">(7) ผลรวม</b>
+                            </td>
+                            <td class="text-center" style="color: blue;"><b>15%</b></td> 
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: right; vertical-align: middle;" colspan="7">
+                                <b style="color: blue;">(8) สรุปคะแนนส่วนผลสัมฤทธิ์ของงาน = </b>
+                            </td>
+                            <td colspan="2" class="text-center" style="vertical-align: middle;line-height: 1.5;">
+                                <b style="color: blue;">ผลรวมของค่าคะแนนถ่วงน้ำหนัก</b>
+                                <hr style="border: 1px solid black; width: 100%; ">
+                                <b style="color: blue;">จำนวนระดับค่าเป้าหมาย = 5 </b>
+                            </td>
+                            <td></td>
+                            <td></td>
+                        </tr>  
                     </tbody>
                 </table>   
             </div> 
