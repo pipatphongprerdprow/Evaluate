@@ -66,7 +66,7 @@
             </h3>
             <div class="card">
               <div style="display: flex; justify-content: center;">
-                <img src="@/public/layout/images/kongkang.jpg" alt="Description of image" class="contract-image" />
+                <img src="~/assets/layout/images/kongkang.jpg" alt="Description of image" class="contract-image" />
               </div>
               <h4 style="text-align: center;">
                 แบบข้อตกลงภาระงานและพฤติกรรมการปฏิบัติราชการ (Term of Refernce : TOR)ข้าราชการและพนักงาน สังกัดมหาวิทยาลัยมหาสารคาม
