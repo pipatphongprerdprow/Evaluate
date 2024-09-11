@@ -1,7 +1,7 @@
 <template>
     <div class="container">
         <div class="profile">
-            <img id="IMG_PICTURE" :src="profileImageUrl" alt="Profile Picture" />
+            <img id="IMG_PICTURE" :src="pImage" alt="Profile Picture" />
             <div class="details">
             <p><span>ชื่อ:</span> {{ profile.name }}</p>
             <p><span>ตำแหน่ง:</span> {{ profile.position }}</p>
@@ -74,13 +74,17 @@
             </div>
         </div>
 </template>
+
+<script setup>
+    import pImage from '~/assets/layout/images/pipatphong.jpg'
+</script>
                             
  <script>
      import profileImage from '@/public/layout/images/pipatphong.jpg';                   
     export default {
         data() {
             return {
-                profileImageUrl:"/public/layout/images/pipatphong.jpg",
+                profileImageUrl:"@/assets/layout/images/pipatphong.jpg",
                 profile: {
                 name: 'ชื่อ',
                 position: 'ตำแหน่ง',
