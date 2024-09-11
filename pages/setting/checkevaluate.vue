@@ -50,6 +50,9 @@
                         </template>
                                 <TabView>
                                     <TabPanel header="แบบใบปะหน้า">
+                                        <div class="col md:col-12 text-right">
+                                            <Button label="Export" icon="pi pi-file-word" class="mr-2 mb-2 "></Button>
+                                        </div>
                                         <h3 class="mb-4" style="text-align: right;">
                                             <i class="pi pi-folder-open" style="font-size: x-large;"></i> แบบ ป01-02
                                         </h3>
@@ -95,6 +98,9 @@
                                     </TabPanel>
 
                                     <TabPanel header="แบบ ป01">
+                                        <div class="col md:col-12 text-right">
+                                            <Button label="Export" icon="pi pi-file-word" class="mr-2 mb-2 "></Button>
+                                        </div>
                                         <div class="card">
                                             <h3 class="mb-4" style="text-align: right;">
                                                 <i class="pi pi-folder-open" style="font-size: x-large;"></i> แบบ ป01
@@ -108,7 +114,7 @@
                                                                 <h3 class="mb-4 card-header">
                                                                     <i class="pi pi-fw pi-folder-open" style="font-size: x-large;"></i> แบบ ป01
                                                                 </h3>
-                                                            </div>
+                                                            </div>                                                           
                                                             <div class="col md:col-12 text-right">
                                                                 <label for="dropdownItemYear">ปีงบประมาณ :</label>
                                                                 <Dropdown id="dropdownItemYear" v-model="dropdownItemYear" :options="dropdownItemsYear" optionLabel="name" placeholder="เลือกปีงบประมาณ"></Dropdown>
@@ -230,6 +236,9 @@
                                     </TabPanel>
 
                                     <TabPanel header="แบบ ป02">
+                                        <div class="col md:col-12 text-right">
+                                            <Button label="Export" icon="pi pi-file-word" class="mr-2 mb-2 "></Button>
+                                        </div>
                                     <div class="card">
                                         <h3 class="mb-4" style="text-align: right;">
                                         <i class="pi pi-folder-open" style="font-size: x-large;"></i> แบบ ป02
@@ -406,6 +415,9 @@
                                     </TabPanel>
 
                                     <TabPanel header="แบบ ป03">
+                                        <div class="col md:col-12 text-right">
+                                            <Button label="Export" icon="pi pi-file-word" class="mr-2 mb-2 "></Button>
+                                        </div>
                                         <div class="grid">
                                             <div class="col-12 lg:col-12 xl:col-12">
                                                 <div class="card mb-0">
@@ -587,6 +599,9 @@
                                     </TabPanel>
 
                                     <TabPanel header="แบบ ป04">
+                                        <div class="col md:col-12 text-right">
+                                        <Button label="Export" icon="pi pi-file-word" class="mr-2 mb-2 "></Button>
+                                    </div>
                                     <div class="card">
                                         <h3 class="mb-4" style="text-align: right;">
                                         <i class="pi pi-folder-open" style="font-size: x-large;"></i> แบบ ป04

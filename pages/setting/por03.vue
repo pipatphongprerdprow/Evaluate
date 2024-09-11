@@ -1,6 +1,9 @@
 <template>
     <div class="grid">
         <div class="col-12 lg:col-12 xl:col-12">
+            <div class="col md:col-12 text-right">
+                <Button label="Export" icon="pi pi-file-word" class="mr-2 mb-2 "></Button>
+            </div>
             <div class="card mb-0">
                 <div class="formgroup-inline mb-1">
                     <div class="col md:col-9">
@@ -278,7 +281,7 @@
                             </Column>  
                             <Column field="options" header="ตัวเลือก" style="text-align: center; width: 15%">
                                 <template #body="Item"> 
-                                    <Button severity="danger" icon="pi pi-trash" class="p-button-text" outlined rounded @click="delDataDoc(Item.data)"></Button>
+                                    <Button severity="danger" icon="pi pi-trash" class="p-button-text" outlined rounded @click="delDataDocX(Item.data)"></Button>
                                 </template>
                             </Column>
                         </DataTable>  
@@ -545,6 +548,7 @@ import Swal from 'sweetalert2'
             },
             async saveDataDoc() {
                 const file = this.selectedFiles[0];
+                console.log(file);
                 try {
                     if (this.radioValue === 'doc') {
                         if (!this.doc_no) {
@@ -570,14 +574,9 @@ import Swal from 'sweetalert2'
 
                             instance_x.post('http://localhost:8000/api/saveDocP03', formData)
                                 .then(res => {
-                                   // console.log('Response from server:', res); 
-                                   this.showDataP03();
-                                    this.Data_Doc(); 
-                                    this.radioValue = 'doc';
-                                    this.doc_no = null;
-                                    this.doc_name = null;
-                                    this.doc_link = null;
-                                    this.$refs.upload.value = null;
+                                    this.showDataP03();
+                                    this.Data_Doc();
+                                    this.resetFormFields();  // รีเซ็ตฟิลด์หลังจากบันทึกสำเร็จ
                                 })
                                 .catch(error => {
                                     console.error('Error:', error);
@@ -606,14 +605,9 @@ import Swal from 'sweetalert2'
 
                             instance_x.post('http://localhost:8000/api/saveDocP03', formData)
                                 .then(res => {
-                                    //console.log(res.data); 
                                     this.showDataP03();
                                     this.Data_Doc();
-                                    this.radioValue = 'doc';
-                                    this.doc_no = null;
-                                    this.doc_name = null;
-                                    this.doc_link = null;
-                                    this.$refs.upload.value = null;
+                                    this.resetFormFields();  // รีเซ็ตฟิลด์หลังจากบันทึกสำเร็จ
                                 })
                                 .catch(error => {
                                     console.error('Error:', error);
@@ -623,9 +617,19 @@ import Swal from 'sweetalert2'
                         Swal.fire("error", "กรุณาตรวจสอบ ประเภทการแนปเอกสาร!", "error");
                     }
                 } catch (error) {
-                    console.error('Error: ', error);
+                    console.error('Error processing file:', error);
                 }
             },
+            resetFormFields() {
+                this.radioValue = 'doc';
+                this.doc_no = null;
+                this.doc_name = null;
+                this.doc_link = null;
+                this.selectedFiles = [];  // เคลียร์ selected files
+                this.$refs.upload.value = '';  // รีเซ็ตฟิลด์อัปโหลดไฟล์
+            },
+
+
             Data_Doc(){
                 axios.post('http://localhost:8000/api/sheachDataDoc', {
                     p_id: this.text_edtDoc
@@ -639,7 +643,7 @@ import Swal from 'sweetalert2'
                 });
             },
              // หลักฐานที่แสดงถึงผลการปฏิบัติราชการตามเกณฑ์การประเมิน(หลักฐานเชิงประจักษ์)
-            delDataDoc(data){  
+            delDataDocX(data){  
                 axios.post('http://localhost:8000/api/deleteDocP03', {
                     doc_id: data.doc_id, 
                     doc_file: data.doc_file??null
@@ -651,8 +655,7 @@ import Swal from 'sweetalert2'
                 .catch((error) => {
                     // console.error('Error:', error);
                     Swal.fire("error","เกิดข้อผิดพลาดในการลบข้อมูล!","error");
-                });
-                
+                }); 
             },
             // ลบรายงานผลการปฏิบัติราชการตามตัวชี้วัด/ เกณฑ์การประเมิน
             async delDataDoc(data) {        
@@ -676,6 +679,7 @@ import Swal from 'sweetalert2'
                         this.doc_name = null;
                         this.doc_link = null;
                         this.$refs.upload.value = null;
+
                         Swal.fire({
                             title: "ลบข้อมูลเสร็จสิ้น!",
                             text: "ข้อมูลของคุณถูกลบแล้ว",
@@ -686,10 +690,8 @@ import Swal from 'sweetalert2'
                     }); 
                 }
             }); 
-        },
-
-
-
+            },
+          
 
 
 /*============= ค่าคะแนนที่ได้ =============*/

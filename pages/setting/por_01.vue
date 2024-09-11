@@ -1,18 +1,25 @@
 <template>
     <div class="grid">
         <div class="col-12 lg:col-12 xl:col-12">
+            <div class="col md:col-12 text-right">
+                <Button label="Export" icon="pi pi-file-word" class="mr-2 mb-2 " @click="exportToWord" ></Button>
+            </div>
             <div class="card mb-0">
                 <div class="formgroup-inline mb-1">
-                    <div class="col md:col-4">
+                    <div class="col md:col-3">
                         <h3 class="mb-4 card-header">
                             <i class="pi pi-fw pi-folder-open" style="font-size: x-large;"></i> แบบ ป01
                         </h3>
                     </div>
-                    <div class="col md:col-3 text-right">
+                    <div class="col md:col-3 text-left">
+                        <label for="dropdownProportion">สัดส่วน :</label>
+                        <Dropdown id="dropdownProportion" v-model="dropdownProportion" :options="dropdownProportions" optionLabel="name" placeholder="เลือกสัดส่วน"></Dropdown>
+                    </div>
+                    <div class="col md:col-3 text-left">
                         <label for="dropdownItemYear">ปีงบประมาณ :</label>
                         <Dropdown id="dropdownItemYear" v-model="dropdownItemYear" :options="dropdownItemsYear" optionLabel="name" placeholder="เลือกปีงบประมาณ"></Dropdown>
                     </div>
-                    <div class="col md:col-5 text-right">
+                    <div class="col md:col-3 text-right">
                         <Button icon="pi pi-search" severity="help" class="mb-2 mr-2" label="เลือกข้อมูลแบบประเมิน ป.01" @click="OpenDialogP01" /> 
                         <Button icon="pi pi-plus" severity="info" class="mb-2 mr-2" label="เพิ่มข้อมูลแบบประเมิน" @click="OpenDialogAdd" /> 
                     </div> 
@@ -283,6 +290,7 @@
 import { ref } from 'vue';
 import axios from 'axios';  
 import Swal from 'sweetalert2'
+import { saveAs } from 'file-saver';
 
 export default {
     data() {
@@ -291,7 +299,13 @@ export default {
             year_Main: 2568,
             facid_Main: 201092704000,
             groupid_Main: '01',
-            dropdownItemYear: { name: 'ปีงบประมาณ 2568', value: 2568 },
+            dropdownProportion: {name: 'สัดส่วน 70:30'},
+            dropdownProportions: [
+                { name: 'สัดส่วน 50:50', value: 50/50 },
+                { name: 'สัดส่วน 70:30', value: 70/30 },
+                
+            ],
+            dropdownItemYear: { name: 'ปีงบประมาณ 2568'},
             dropdownItemsYear: [
                 { name: 'ปีงบประมาณ 2569', value: 2569 },
                 { name: 'ปีงบประมาณ 2568', value: 2568 },
@@ -555,6 +569,31 @@ export default {
             this.DialogAdd = false;
         },
 //*================== End เพิ่มข้อมูลแบบประเมิน ==================*//
+
+        // Export File
+        exportToWord() {
+            // สร้างเนื้อหาในไฟล์ Word เป็น HTML
+            const content = `
+                <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
+                <head><meta charset="utf-8"><title>Exported Word</title></head>
+                <body>
+                    <h1>รายงานการปฏิบัติงาน</h1>
+                    <p>นี่คือเนื้อหาที่จะส่งออกไปเป็นไฟล์ Word</p>
+                    <p>ข้อมูลเพิ่มเติมสามารถแทรกได้ที่นี่</p>
+                </body>
+                </html>
+            `;
+
+            // สร้าง Blob สำหรับไฟล์ Word
+            const blob = new Blob(['\ufeff', content], {
+                type: 'application/msword',
+            });
+
+            // ดาวน์โหลดไฟล์โดยใช้ file-saver
+            saveAs(blob, 'report.doc');
+            },
+
+
  
     } 
 } 
