@@ -7,7 +7,7 @@
                      <i class="pi pi-folder-open" style="font-size: x-large;"></i> แบบ ป01-02
               </h3>
             <div style="display: flex; justify-content: center;">
-                <img src="@/public/layout/images/kongkang.jpg" alt="Description of image" class="contract-image" />
+                <img src="~/assets/layout/images/kongkang.jpg" alt="Description of image" class="contract-image" />
             </div>
             <h4 style="text-align: center;">
                 แบบข้อตกลงภาระงานและพฤติกรรมการปฏิบัติราชการ (Term of Reference : TOR) ข้าราชการและพนักงาน สังกัดมหาวิทยาลัยมหาสารคาม

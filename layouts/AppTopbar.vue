@@ -14,7 +14,7 @@ onBeforeUnmount(() => {
     unbindOutsideClickListener();
 });
 const logoUrl = computed(() => {
-    return `/_nuxt/public/layout/images/${layoutConfig.darkTheme.value ? 'logo-white' : 'kongkang'}.jpg`;
+    return `/layout/images/${layoutConfig.darkTheme.value ? 'logo-white' : 'kongkang'}.jpg`;
 });
 
 const onTopBarMenuButton = () => {
@@ -58,12 +58,17 @@ const isOutsideClicked = (event) => {
 
     return !(sidebarEl.isSameNode(event.target) || sidebarEl.contains(event.target) || topbarEl.isSameNode(event.target) || topbarEl.contains(event.target));
 };
+
+
+const { signIn, getSession, signOut } = await useAuth()
+const x = await getSession()
+
 </script>
 
 <template>
     <div class="layout-topbar">
         <router-link to="/" class="layout-topbar-logo">
-            <img :src="logoUrl" alt="logo" />
+            <img src="~/assets/layout/images/kongkang.jpg" alt="logo" />
             <span>Evaluate Personnel Msu</span>
         </router-link>
 
@@ -76,18 +81,26 @@ const isOutsideClicked = (event) => {
         </button>
 
         <div class="layout-topbar-menu" :class="topbarMenuClasses">
-            <button @click="onTopBarMenuButton()" class="p-link layout-topbar-button">
-                <i class="pi pi-calendar"></i>
-                <span>Calendar</span>
-            </button>
-            <button @click="onTopBarMenuButton()" class="p-link layout-topbar-button">
+            <template v-if="Object.keys(x).length === 0">
+                <button @click="signIn('custom-oauth')" class="p-link layout-topbar-button pr-4">
+                    <i class="pi pi-sign-in"></i>
+                    <i style="font-size: 1.25em;margin-left: 0.25em;margin-right: 1em;text-wrap: nowrap;">เข้าสู่ระบบ</i>
+                </button>
+            </template>
+            <template v-else>
+                <button @click="signOut()" class="p-link layout-topbar-button pr-4">
+                    <i class="pi pi-sign-out"></i>
+                    <i style="font-size: 1.25em;margin-left: 0.25em;margin-right: 1em;text-wrap: nowrap;">ออกจาระบบ</i>
+                </button>
+            </template>
+            <!-- <button @click="onTopBarMenuButton()" class="p-link layout-topbar-button">
                 <i class="pi pi-user"></i>
                 <span>Profile</span>
             </button>
             <button @click="onSettingsClick()" class="p-link layout-topbar-button">
                 <i class="pi pi-cog"></i>
                 <span>Settings</span>
-            </button>
+            </button> -->
         </div>
     </div>
 </template>
