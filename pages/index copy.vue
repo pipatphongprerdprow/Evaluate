@@ -1,8 +1,8 @@
 <template>
     <div class="container">
-        {{ user.user }} 
+        {{ user }}
         <div class="profile">
-            <img id="IMG_PICTURE" :src="`${profileImageUrl}`" alt="Profile Picture" />
+            <img id="IMG_PICTURE" :src="pImage" alt="Profile Picture" />
             <div class="details">
             <p><span>ชื่อ:</span> {{ profile.name }}</p>
             <p><span>ตำแหน่ง:</span> {{ profile.position }}</p>
@@ -11,46 +11,108 @@
             <p><span>ประเภทบุคลากร:</span> {{ profile.staffType }}</p>
             <p><span>สังกัด:</span> {{ profile.department }}</p>
             </div>
-        </div> 
-    </div>
+        </div>
+        <div class="main-content">
+            <div class="note-section">
+                <p class="title">งานที่ได้รับมอบหมาย (ล่าสุด)</p>
+                <p>{{ assignments }}</p>
+            </div>
+            <br />
+            <div class="note-section">
+                <p class="title">การประชุม/ฝึกอบรม/สัมมนา/ศึกษาดูงาน (ล่าสุด)</p>
+                <p>{{ meetings }}</p>
+            </div>
+            <div class="table-section">
+                <p>สรุปภาระงานประจำปี</p>
+                <table>
+                    <thead>
+                    <tr>
+                        <th>ลำดับ</th>
+                        <th>รายละเอียดงานปฏิบัติงาน</th>
+                        <th>ภาระงานที่ได้</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr v-for="(task, index) in tasks" :key="index">
+                        <td>{{ index + 1 }}</td>
+                        <td>{{ task.description }}</td>
+                        <td>{{ task.workload }}</td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">รวมภาระงานเทียบ/ปี</td>
+                        <td>{{ totalWorkload }}</td>
+                    </tr> 
+                    </tbody>
+                </table>
+            </div>
+            <div class="container">
+                <!-- <router-link class="link-button" to="setting/home">
+                    เพิ่มแบบข้อตกลงภาระงานและพฤติกรรมการปฎิบัติราชการ (Term of Reference : TOR)
+                    </router-link> -->
+                    <!-- <table>
+                        <thead>
+                            <tr>
+                                <th>ประจำปี</th>
+                                <th>รอบประเมิน</th>
+                                <th>สัดส่วนคะแนน</th>
+                                <th>ผู้ประเมิน</th>
+                                <th>รายละเอียด</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                             <tr>
+                                <td>-</td>
+                                <td>-</td>
+                                <td>-</td>
+                                <td>-</td>
+                                <td>-</td>
+                                <td><Button label="ลบ" severity="danger" icon="pi pi-trash" class="p-button-text" @click="deleteData(slotProps.data)" /></td>
+                             </tr>
+                        </tbody>
+                    </table> -->
+                 </div>
+            </div>
+        </div>
 </template>
 
-<script setup> 
+<script setup>
+    import pImage from '~/assets/layout/images/pipatphong.jpg'
     const { signIn, getSession, signOut } = await useAuth()
     const user = await getSession();
 </script>
                             
  <script>
-    import profileImage from '@/public/layout/images/pipatphong.jpg';                   
+     import profileImage from '@/public/layout/images/pipatphong.jpg';                   
     export default {
         data() {
-            return { 
-                profileImageUrl:"https://pd.msu.ac.th/staff/picture/5009942.jpg",
+            return {
+                profileImageUrl:"@/assets/layout/images/pipatphong.jpg",
                 profile: {
-                    name: '-',
-                    position: 'ตำแหน่ง',
-                    level: 'ระดับตำแหน่ง',
-                    qualification: 'คุณวุฒิ',
-                    staffType: 'ประเภทบุคลากร',
-                    department: 'สังกัด',
-                },
+                name: 'ชื่อ',
+                position: 'ตำแหน่ง',
+                level: 'ระดับตำแหน่ง',
+                qualification: 'คุณวุฒิ',
+                staffType: 'ประเภทบุคลากร',
+                department: 'สังกัด',
+                 },
                 assignments: 'ไม่มีรายการ',
                 meetings: 'ไม่มีรายการ',
                 tasks: [
-                    { description: 'งานที่ต้องศึกษาวิเคราะห์', workload: '' },
-                    { description: 'งานที่ต้องตรวจสอบ', workload: '' },
-                    { description: 'งานพัฒนาตนเอง', workload: '' },
-                    { description: 'ภาระงานอื่นๆ', workload: '' },
-                ],
-            };
-        },
-        computed: {
-            totalWorkload() {
-                // การคำนวณรวมภาระงานที่นี่
-                return this.tasks.reduce((total, task) => total + (parseFloat(task.workload) || 0), 0);
-            },
-        },
-    };
+                { description: 'งานที่ต้องศึกษาวิเคราะห์', workload: '' },
+                { description: 'งานที่ต้องตรวจสอบ', workload: '' },
+                { description: 'งานพัฒนาตนเอง', workload: '' },
+                { description: 'ภาระงานอื่นๆ', workload: '' },
+                        ],
+                    };
+                 },
+                computed: {
+                totalWorkload() {
+                 // การคำนวณรวมภาระงานที่นี่
+                    return this.tasks.reduce((total, task) => total + (parseFloat(task.workload) || 0), 0);
+                        },
+                    },
+                };
 </script>
                             
     <style scoped>

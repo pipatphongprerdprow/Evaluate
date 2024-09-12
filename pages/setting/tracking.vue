@@ -326,12 +326,12 @@
                                                             <td></td>
                                                         </tr>
                                                         <tr>
-                                                            <td style="text-align: right; vertical-align: middle;" colspan="9">
-                                                                <b style="color: blue;">(8) สรุปคะแนนส่วนผลสัมฤทธิ์ของงาน = </b>
-                                                            </td>
-                                                            <td colspan="2" class="text-center" style="vertical-align: middle;line-height: 1.5;">
+                                                            <td style="text-align: right; vertical-align: middle;" colspan="10">
+                                                                <b style="color: blue;">(8) สรุปคะแนนส่วนผลสัมฤทธิ์ของงาน =&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </b>
                                                                 <b style="color: blue;">ผลรวมของค่าคะแนนถ่วงน้ำหนัก</b>
-                                                                <hr style="border: 1px solid black; width: 100%; ">
+                                                                <div style="display: flex; justify-content: flex-end;">
+                                                                    <hr style="border: 1px solid black; width: 16%;">
+                                                                </div>
                                                                 <b style="color: blue;">จำนวนระดับค่าเป้าหมาย = 5 </b>
                                                             </td>
                                                             <td></td>
@@ -414,7 +414,7 @@
                                                         <th colspan="3" style="width: 10%;">การประเมิน</th> 
                                                     </tr>
                                                     <tr>
-                                                        <th>จำนวนสมรรถนะ</th>
+                                                        <th>จำนวน <br>สมรรถนะ</th>
                                                         <th>คูณด้วย</th>
                                                         <th>คะแนน</th>
                                                     </tr>
@@ -445,25 +445,24 @@
                                                         <td></td>
                                                     </tr>
                                                     <tr>
-                                                        <td style="text-align: right" colspan="1">
+                                                        <td style="text-align: right" colspan="3">
                                                             <b style="color: blue;"> (8) ผลรวม</b>
                                                         </td>
                                                         <td></td>
-                                                        <td></td>
-                                                        <td></td>
+                                                        
                                                     </tr>
                                                     <tr>
-                                                        <td colspan="1" class="text-right" style="vertical-align: middle;line-height: 1.5;">
-                                                            <b style="color: blue;">สรุปคะแนนส่วนพฤติกรรมการปฏิบัติราชการ   (สมรรถนะ) =	</b>
-                                                        </td>  
-                                                        <td>
-                                                            <b style="color: blue;">ผลรวมคะแนน ใน (8)</b>
-                                                            <hr style="border: 1px solid black; width: 100%; ">
-                                                            <b style="color: blue;">จำนวนสมรรถนะที่ใช้ในการประเมิน X 3 คะแนน </b>
-                                                        </td>
-                                                        <td></td>
-                                                        <td></td>
-                                                    </tr>  
+                                                    <td style="text-align: right; vertical-align: middle;" colspan="3">
+                                                        <b style="color: blue;">(9) สรุปคะแนนส่วนพฤติกรรมการปฏิบัติราชการ   (สมรรถนะ) =	 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </b>
+                                                        <b style="color: blue;">  ผลรวมคะแนน ใน (8)</b>
+                                                        <div style="display: flex; justify-content: flex-end;">
+                                                            <hr style="border: 1px solid black; width: 20%;">
+                                                        </div>
+                                                        <b style="color: blue;">จำนวนสมรรถนะที่ใช้ในการประเมิน X 3 คะแนน</b>
+                                                    </td>
+                                                    <td></td>
+                                                    
+                                                </tr>  
                                                 </tbody>
                                                     <br>
                                                     <div class="p-fluid formgrid grid"> 

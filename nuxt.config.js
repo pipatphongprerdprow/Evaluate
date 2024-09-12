@@ -64,7 +64,7 @@ export default defineNuxtConfig({
                 url: 'https://erp.msu.ac.th/authen/oauth/token',
             },
             userInfo: {
-                url: 'https://erp.msu.ac.th/authen/api/authuser?progcode=budget01',
+                url: 'https://erp.msu.ac.th/authen/api/authuser',
             },
             clientId: '9cfc597a-f7ce-477c-8a72-56b40bba6dc6',
             clientSecret: 'smGEGF6PuNIqFatazayEKH3X8s3nEfzc5GKnIuPK',

@@ -29,11 +29,11 @@ export default NuxtAuthHandler({
           client_id: '9cfc597a-f7ce-477c-8a72-56b40bba6dc6',
           response_type: 'code',
           redirect_uri: 'http://localhost:3000/evaluate/api/auth/callback/custom-oauth',
-          scope: 'budget01',
+          scope: '',
         }
       },
       token: 'https://erp.msu.ac.th/authen/oauth/token',  // Token endpoint
-      userinfo: 'https://erp.msu.ac.th/authen/api/authuser?progcode=budget01',  // User info endpoint
+      userinfo: 'https://erp.msu.ac.th/authen/api/authuser',  // User info endpoint
 
       // Client ID and secret for the custom provider, from environment variables
       clientId: '9cfc597a-f7ce-477c-8a72-56b40bba6dc6',
@@ -47,7 +47,8 @@ export default NuxtAuthHandler({
           id: profile.STAFFID,           // Unique identifier
           name: `${profile.PREFIXFULLNAME}${profile.STAFFNAME} ${profile.STAFFSURNAME}`,        // User's name
           email: (profile.STAFFEMAIL1??profile.STAFFEMAIL2)??'',      // User's email
-          image: profile.STAFFID     // User's profile picture (if available)
+          image: profile.STAFFID ,
+          staffid: profile.STAFFID  
         }
       }
     }

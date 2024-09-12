@@ -28,10 +28,18 @@ const model = ref([
             // { label: 'แผนพัฒนาการปฎิบัติราชการรายบุคคล', icon: 'pi pi-fw pi-card', to: '/setting/assessment' }
         ]
     },
+    {
+        label: 'รายงาน',
+        items: [
+            { label: 'รายงานการประเมิน', icon: 'pi pi-credit-card', to: '/setting/record' }, 
+            { label: 'รายงานการประเมิน (ส่วนบุคคล)', icon: 'pi pi-credit-card', to: '/setting/recordpersonal' },
+             
+        ]
+    },
     // {
-    //     label: 'ประวิติ',
+    //     label: 'รายงานการประเมิน (ส่วนบุคคล)',
     //     items: [
-    //         { label: 'ประวัติการประเมิน', icon: 'pi pi-credit-card', to: '/setting/record' }, 
+    //         { label: 'รายงานการประเมิน (ส่วนบุคคล)', icon: 'pi pi-credit-card', to: '/setting/recordpersonal' }, 
              
     //     ]
     // },

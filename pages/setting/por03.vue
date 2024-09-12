@@ -629,7 +629,6 @@ import Swal from 'sweetalert2'
                 this.$refs.upload.value = '';  // รีเซ็ตฟิลด์อัปโหลดไฟล์
             },
 
-
             Data_Doc(){
                 axios.post('http://localhost:8000/api/sheachDataDoc', {
                     p_id: this.text_edtDoc
@@ -651,6 +650,7 @@ import Swal from 'sweetalert2'
                 .then((res) => {  
                     this.products_doc_p03 = this.products_doc_p03.filter(item => item.doc_id !== data.doc_id);
                     Swal.fire("success","ลบข้อมูลสำเร็จ!","success");
+                    this.showDataP03();
                 })
                 .catch((error) => {
                     // console.error('Error:', error);

@@ -1,5 +1,6 @@
       <template>
          <div class="col md:col-12 text-right">
+         
                 <Button label="Export" icon="pi pi-file-word" class="mr-2 mb-2 "></Button>
             </div>
             <div class="card">
@@ -14,12 +15,12 @@
             </h4><br>
             <!-- ตาราง ก. สมรรถนะหลัก -->
             <div class="employee-info">
-                <p><strong>ผู้ปฏิบัติงาน:</strong> </p>
+                <p><strong>ผู้ปฏิบัติงาน:</strong></p>
                 <p><strong>สังกัด:</strong> </p>
                 <p><strong>ตำแหน่ง:</strong> </p>
                 <p><strong>ประเภทตำแหน่ง:</strong> </p>
-                <p><strong>ประเภทบุคลากร:</strong> </p>
-                <p><strong>รายละเอียดข้อตกลง:</strong> </p>
+                <p><strong>ประเภทบุคลากร:</strong></p>
+                <p><strong>รายละเอียดข้อตกลง ระหว่าง วันที่ :</strong> </p>
             </div>
 
             <div class="explanation">
@@ -62,6 +63,8 @@
         </div>
       </template>
 
+
+   
 <script>
 export default {
   name: "ContractDetails",

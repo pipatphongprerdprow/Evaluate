@@ -6,23 +6,23 @@
             </div>
             <div class="card mb-0">
                 <div class="formgroup-inline mb-1">
-                    <div class="col md:col-3">
+                    <div class="d-flex align-items-center">
                         <h3 class="mb-4 card-header">
                             <i class="pi pi-fw pi-folder-open" style="font-size: x-large;"></i> แบบ ป01
                         </h3>
+                        <div class="ml-4 mr-4">
+                            <label for="dropdownProportion">สัดส่วน :</label>
+                            <Dropdown id="dropdownProportion" v-model="dropdownProportion" :options="dropdownProportions" optionLabel="name" placeholder="เลือกสัดส่วน"></Dropdown>
+                        </div>
+                        <div class="mr-4">
+                            <label for="dropdownItemYear">ปีงบประมาณ :</label>
+                            <Dropdown id="dropdownItemYear" v-model="dropdownItemYear" :options="dropdownItemsYear" optionLabel="name" placeholder="เลือกปีงบประมาณ"></Dropdown>
+                        </div>
+                        <div class="ml-auto">
+                            <Button icon="pi pi-search" severity="help" class="mb-2 mr-2" label="เลือกข้อมูลแบบประเมิน ป.01" @click="OpenDialogP01" /> 
+                            <Button icon="pi pi-plus" severity="info" class="mb-2 mr-2" label="เพิ่มข้อมูลแบบประเมิน" @click="OpenDialogAdd" />
+                        </div>
                     </div>
-                    <div class="col md:col-3 text-left">
-                        <label for="dropdownProportion">สัดส่วน :</label>
-                        <Dropdown id="dropdownProportion" v-model="dropdownProportion" :options="dropdownProportions" optionLabel="name" placeholder="เลือกสัดส่วน"></Dropdown>
-                    </div>
-                    <div class="col md:col-3 text-left">
-                        <label for="dropdownItemYear">ปีงบประมาณ :</label>
-                        <Dropdown id="dropdownItemYear" v-model="dropdownItemYear" :options="dropdownItemsYear" optionLabel="name" placeholder="เลือกปีงบประมาณ"></Dropdown>
-                    </div>
-                    <div class="col md:col-3 text-right">
-                        <Button icon="pi pi-search" severity="help" class="mb-2 mr-2" label="เลือกข้อมูลแบบประเมิน ป.01" @click="OpenDialogP01" /> 
-                        <Button icon="pi pi-plus" severity="info" class="mb-2 mr-2" label="เพิ่มข้อมูลแบบประเมิน" @click="OpenDialogAdd" /> 
-                    </div> 
                 </div>
                 <!-- แสดงข้อมูลบันทึก -->
                 <table class="table">
@@ -103,12 +103,12 @@
                             <td></td>
                         </tr>
                         <tr>
-                            <td style="text-align: right; vertical-align: middle;" colspan="7">
-                                <b style="color: blue;">(8) สรุปคะแนนส่วนผลสัมฤทธิ์ของงาน = </b>
-                            </td>
-                            <td colspan="2" class="text-center" style="vertical-align: middle;line-height: 1.5;">
+                            <td style="text-align: right; vertical-align: middle;" colspan="9">
+                                <b style="color: blue;">(8) สรุปคะแนนส่วนผลสัมฤทธิ์ของงาน =&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </b>
                                 <b style="color: blue;">ผลรวมของค่าคะแนนถ่วงน้ำหนัก</b>
-                                <hr style="border: 1px solid black; width: 100%; ">
+                                <div style="display: flex; justify-content: flex-end;">
+                                    <hr style="border: 1px solid black; width: 25%;">
+                                </div>
                                 <b style="color: blue;">จำนวนระดับค่าเป้าหมาย = 5 </b>
                             </td>
                             <td></td>
@@ -203,6 +203,7 @@
                 <Button label="ยกเลิก" icon="pi pi-times" class="mb-2 mr-2" severity="danger" @click="cancelDialogs" />
             </template>
         </Dialog>
+
         <!-- เพิ่มข้อมูลแบบประเมิน -->
         <Dialog header="จัดการแบบ ป01" maximizable v-model:visible="DialogAdd" :breakpoints="{ '960px': '75vw' }" :style="{ width: '100vw' }" :modal="true" position="top">
             <form>
@@ -299,13 +300,13 @@ export default {
             year_Main: 2568,
             facid_Main: 201092704000,
             groupid_Main: '01',
-            dropdownProportion: {name: 'สัดส่วน 70:30'},
+            dropdownProportion: {name: 'สัดส่วน 70:30', value: '2'},
             dropdownProportions: [
-                { name: 'สัดส่วน 50:50', value: 50/50 },
-                { name: 'สัดส่วน 70:30', value: 70/30 },
+                { name: 'สัดส่วน 50:50', value: '1' },
+                { name: 'สัดส่วน 70:30', value: '2' },
                 
             ],
-            dropdownItemYear: { name: 'ปีงบประมาณ 2568'},
+            dropdownItemYear: { name: 'ปีงบประมาณ 2568', value: 2568},
             dropdownItemsYear: [
                 { name: 'ปีงบประมาณ 2569', value: 2569 },
                 { name: 'ปีงบประมาณ 2568', value: 2568 },
@@ -313,7 +314,6 @@ export default {
                 { name: 'ปีงบประมาณ 2566', value: 2566 }
             ],
             products_personX: [],
-            //products_person: [],
             checkboxValue: [],
             selectedItems: [],
             DialogAdd: false,
@@ -505,12 +505,12 @@ export default {
             this.selectDataH(this.dropdownItemYear,this.facid_Main);
         },
         // ดึงข้อมูลภาระงาน
-        selectDataH(year,fac){   
+        selectDataH(year,fac){  
             axios.post('http://localhost:8000/api/selectDataPersonH',{
                 year: year.value,
                 fac: fac,
             }).then(res => {     
-                // console.log(res.data); 
+                //console.log(res.data); 
                 this.dropdownItemsH=res.data;  
             })
             .catch(error => {
@@ -601,29 +601,45 @@ export default {
  </script>
 
 <style scoped> 
-  label{
-      font-size: medium;
-      font-weight: 500;
-  }
-  .card-header {
-      text-align: left; /* Aligns text to the left */
-      margin: 0; /* Removes default margins */
-      padding: 0; /* Removes default padding */
-  }
-  .table {
-      width: 100%;
-      border-collapse: collapse;
-  }
-  .table th, .table td {
-      border: 1px solid #ddd;
-      padding: 8px;
-      text-align: center;
-  }
-  .table th {
-      background-color: #f4f4f4;
-      font-weight: bold;
-  }
-  .table td {
-      vertical-align: top;
-  }
+    label{
+        font-size: medium;
+        font-weight: 500;
+    }
+    .card-header {
+        text-align: left; /* Aligns text to the left */
+        margin: 0; /* Removes default margins */
+        padding: 0; /* Removes default padding */
+    }
+    .table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    .table th, .table td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: center;
+    }
+    .table th {
+        background-color: #f4f4f4;
+        font-weight: bold;
+    }
+    .table td {
+        vertical-align: top;
+    }
+    .d-flex {
+    display: flex;
+    flex-wrap: nowrap;
+    }
+    .align-items-center {
+        align-items: center;
+    }
+    .ml-auto {
+        margin-left: auto;
+    }
+    .ml-4 {
+        margin-left: 1rem;
+    }
+    .mr-4 {
+        margin-right: 1rem;
+    }
 </style>

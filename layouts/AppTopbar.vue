@@ -90,7 +90,7 @@ const x = await getSession()
             <template v-else>
                 <button @click="signOut()" class="p-link layout-topbar-button pr-4">
                     <i class="pi pi-sign-out"></i>
-                    <i style="font-size: 1.25em;margin-left: 0.25em;margin-right: 1em;text-wrap: nowrap;">ออกจาระบบ</i>
+                    <i style="font-size: 1.25em;margin-left: 0.25em;margin-right: 1em;text-wrap: nowrap;">ออกจากระบบ</i>
                 </button>
             </template>
             <!-- <button @click="onTopBarMenuButton()" class="p-link layout-topbar-button">
