@@ -50,7 +50,7 @@
                 <div class="col md:col-5 text-right">   
                     <Dialog header="จัดการแบบ ป01" maximizable v-model:visible="DialogAdd" :breakpoints="{ '960px': '75vw' }" :style="{ width: '100vw' }" :modal="true" position="top">
                         <template v-slot:header>
-                            <h3>รายงานแบบข้อตกลงภาระงานและพฤติกรรมการปฏิบัติราชการ (Term of Reference: TOR)</h3>
+                            <h3>รายงานการประเมิน (ส่วนบุคคล)</h3>
                         </template>
                                 <TabView>
                                     <TabPanel header="แบบใบปะหน้า">
@@ -74,7 +74,7 @@
                                     </TabPanel>
                                 </TabView>
                                      <template #footer>
-                                    <Button label="ตกลง" icon="pi pi-check" class="mb-2 mr-2" @click="Dialogclose" />
+                                    <Button label="ตกลง" icon="pi pi-check" class="mb-2 mr-2" @click="DialogAdd = false" />
                         </template>
                     </Dialog>
                 </div>

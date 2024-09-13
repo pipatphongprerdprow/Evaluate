@@ -39,7 +39,7 @@
 
                 <Dialog maximizable v-model:visible="DialogAdd" :breakpoints="{ '960px': '75vw' }" :style="{ width: '100vw' }" :modal="true" position="top">
                     <template v-slot:header>
-                        <h3>รายงานแบบข้อตกลงภาระงานและพฤติกรรมการปฏิบัติราชการ (Term of Reference: TOR)</h3>
+                        <h3>รายงานการประเมิน</h3>
                     </template> 
                     <div class="row">
                         <div class="p-fluid formgrid grid">
