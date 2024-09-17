@@ -21,8 +21,8 @@
                             <td style="text-align: left;">{{ row1.activity }}</td> 
                             <td>{{ row1.indicator }}</td>
                             <td>  
-                                <b v-if="row1.data_table1 == '' " style="color: red;">0</b> 
-                                <b v-if="row1.data_table1 != 0 " >{{ row1.data_table1 }}</b> 
+                                <!-- <b v-if="row1.data_table1 == '' " style="color: red;">0</b> 
+                                <b v-if="row1.data_table1 != 0 " >{{ row1.data_table1 }}</b>  -->
                             </td>
                         </tr>
                     </tbody>
@@ -43,8 +43,8 @@
                             <td style="text-align: left;">{{ row2.activity }}</td> 
                             <td>{{ row2.indicator }}</td>
                             <td>
-                                <b v-if="row2.data_table2 == '' " style="color: red;">0</b> 
-                                <b v-if="row2.data_table2 != 0 " >{{ row2.data_table2 }}</b> 
+                                <!-- <b v-if="row2.data_table2 == '' " style="color: red;">0</b> 
+                                <b v-if="row2.data_table2 != 0 " >{{ row2.data_table2 }}</b>  -->
                             </td>
                         </tr>
                     </tbody>
@@ -108,6 +108,10 @@ export default {
         };
         
     }, 
+    async mounted() {
+                const  { signIn, getSession, signOut } = await useAuth()
+                const user = await getSession();
+            },
 }
 </script>
 
@@ -181,7 +185,7 @@ td:nth-child(2), td:nth-child(3) {
     color: #dc3545;
 }
 th {
-    background-color: #efefee;
+    background-color: #edf2bb;
     color: rgb(5, 5, 5);
 }
 </style>

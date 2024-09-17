@@ -15,10 +15,10 @@
             </h4><br>
             <!-- ตาราง ก. สมรรถนะหลัก -->
             <div class="employee-info">
-                <p><strong>ผู้ปฏิบัติงาน:</strong></p>
-                <p><strong>สังกัด:</strong> </p>
+                <p><strong>ผู้ปฏิบัติงาน:</strong> {{ user.user.name.PREFIXFULLNAME }} {{ user.user.name.STAFFNAME }} {{ user.user.name.STAFFSURNAME }}  </p>
+                <p><strong>สังกัด:</strong> {{ user.user.name.SCOPES?.staffdepartmentname }}  </p>
                 <p><strong>ตำแหน่ง:</strong> </p>
-                <p><strong>ประเภทตำแหน่ง:</strong> </p>
+                <p><strong>ระดับตำแหน่ง:</strong> </p>
                 <p><strong>ประเภทบุคลากร:</strong></p>
                 <p><strong>รายละเอียดข้อตกลง ระหว่าง วันที่ :</strong> </p>
             </div>
@@ -62,12 +62,22 @@
             </div>
         </div>
       </template>
+<script setup> 
+const { signIn, getSession, signOut } = await useAuth()
+const user = await getSession();
+console.log(user);
 
+</script>
 
    
 <script>
 export default {
   name: "ContractDetails",
+  
+  async mounted() {
+                const  { signIn, getSession, signOut } = await useAuth()
+                const user = await getSession();
+            },
 
   
 };

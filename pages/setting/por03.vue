@@ -123,8 +123,8 @@
                                     <td style="text-align: left;">{{ row1.activity }}</td> 
                                     <td>{{ row1.indicator }}</td>
                                     <td>  
-                                        <b v-if="row1.data_table1 == '' " style="color: red;">0</b> 
-                                        <b v-if="row1.data_table1 != 0 " >{{ row1.data_table1 }}</b> 
+                                        <!-- <b v-if="row1.data_table1 == '' " style="color: red;">0</b> 
+                                        <b v-if="row1.data_table1 != 0 " >{{ row1.data_table1 }}</b>  -->
                                     </td>
                                 </tr>
                             </tbody>
@@ -145,8 +145,8 @@
                                     <td style="text-align: left;">{{ row2.activity }}</td> 
                                     <td>{{ row2.indicator }}</td>
                                     <td>
-                                        <b v-if="row2.data_table2 == '' " style="color: red;">0</b> 
-                                        <b v-if="row2.data_table2 != 0 " >{{ row2.data_table2 }}</b> 
+                                        <!-- <b v-if="row2.data_table2 == '' " style="color: red;">0</b> 
+                                        <b v-if="row2.data_table2 != 0 " >{{ row2.data_table2 }}</b>  -->
                                     </td>
                                 </tr>
                             </tbody>
@@ -445,6 +445,10 @@ import Swal from 'sweetalert2'
                     console.error('Error:', error);
                 });
             },
+            async mounted() {
+                const  { signIn, getSession, signOut } = await useAuth()
+                const user = await getSession();
+            },
 /*============= รายงานผลการปฏิบัติราชการตามตัวชี้วัด/ เกณฑ์การประเมิน =============*/
             // เปิดหน้าต่างสำหรับบันทึก P03
             OpenDialogAdd(item){ 
@@ -691,6 +695,10 @@ import Swal from 'sweetalert2'
                 }
             }); 
             },
+              async mounted() {
+                const  { signIn, getSession, signOut } = await useAuth()
+                const user = await getSession();
+            },
           
 
 
@@ -737,6 +745,7 @@ import Swal from 'sweetalert2'
                 }
             },
         }
+        
 
     }
 
@@ -762,7 +771,7 @@ import Swal from 'sweetalert2'
         text-align: center;
     }
     .table th {
-        background-color: #f4f4f4;
+        background-color: #edf2bb;
         font-weight: bold;
     }
     .table td {
@@ -804,9 +813,10 @@ import Swal from 'sweetalert2'
   }
 
   th {
-    background-color: #f2f2f2;
+    background-color: #edf2bb;
     font-weight: bold;
-  }
+  }​
+  
 
   td {
     text-align: center;

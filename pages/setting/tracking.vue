@@ -535,10 +535,10 @@
                                                 <!-- ตาราง ก. สมรรถนะหลัก -->
                                                 <div class="employee-info"> 
                                                     <p><strong>รอบการประเมิน:</strong> </p>
-                                                    <p><strong>ชื่อผู้รับการประเมิน:</strong> </p>
-                                                    <p><strong>ตำแหน่ง:</strong> </p>
-                                                    <p><strong>ประเภทตำแหน่ง:</strong> </p>
-                                                    <p><strong>สังกัด:</strong> </p>
+                                                    <p><strong>ชื่อผู้รับการประเมิน:</strong> {{ user.user.name.PREFIXFULLNAME }} {{ user.user.name.STAFFNAME }} {{ user.user.name.STAFFSURNAME }} </p>
+                                                    <p><strong>ตำแหน่ง:</strong> {{ user.user.name.POSITIONNAME }} </p>
+                                                    <p><strong>ระดับตำแหน่ง:</strong> </p>
+                                                    <p><strong>สังกัด:</strong> {{ user.user.name.SCOPES?.staffdepartmentname }} </p>
                                                     <p><strong>ชื่อผู้ประเมิน:</strong> </p>
                                                 </div><br>
                                                 <div class="employee-info" style="border: groove;padding: 15px;">
@@ -699,6 +699,12 @@
         </div>
     </div>     
 </template>
+
+<script setup> 
+    const { signIn, getSession, signOut } = await useAuth()
+    const user = await getSession();
+    console.log(user);
+</script>
 <script> 
 import { ref } from 'vue';
 import axios from 'axios';  
@@ -1185,9 +1191,10 @@ export default {
                 console.error('Error:', error);
             });
         },
-
-
- 
+        async mounted() {
+                const  { signIn, getSession, signOut } = await useAuth()
+                const user = await getSession();
+            },
     }
 } 
 
@@ -1300,7 +1307,7 @@ th {
       text-align: center;
   }
   .table th {
-      background-color: #f4f4f4;
+      background-color: #edf2bb;
       font-weight: bold;
   }
   .table td {

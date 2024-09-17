@@ -25,7 +25,7 @@
                     </div>
                 </div>
                 <!-- แสดงข้อมูลบันทึก -->
-                <table class="table">
+                <table class="table" >
                     <thead>
                         <tr>
                             <th rowspan="2" style="width: 20%;">(1) <br> กิจกรรม / โครงการ / งาน</th>
@@ -86,7 +86,7 @@
                                     <b v-if="subP01.p01_target!=5"></b> 
                                 </td>
                                 <td style=" vertical-align: middle;" class="text-center">{{ subP01.p01_score }}</td>
-                                <td style=" vertical-align: middle;" class="text-center">{{ subP01.p01_weight }}%</td> 
+                                <td style="vertical-align: middle;" class="text-center">{{ subP01.p01_weight }}%</td> 
                                 <td style=" vertical-align: middle;" class="text-center">{{ (subP01.p01_score * subP01.p01_weight / 100).toFixed(2) }}</td>
                                 
                                 <td style=" vertical-align: middle;" class="text-center">
@@ -98,7 +98,9 @@
                             <td style="text-align: right" colspan="8">
                                 <b style="color: blue;">(7) ผลรวม</b>
                             </td>
-                            <td class="text-center" style="color: blue;"><b>15%</b></td> 
+                            <td class="text-center" style="color: blue;">
+                                <b>{{ totalWeight }}%</b> <!-- แสดงผลรวมคะแนนที่คำนวณ -->
+                            </td>
                             <td></td>
                             <td></td>
                         </tr>
@@ -337,6 +339,7 @@ export default {
                         }
                     }
                 ],
+                
              // Dialog
             text_edt: null,
             dropdownItemH: null ,
@@ -360,6 +363,7 @@ export default {
     mounted(){ 
         this.showDataPerson(); 
     },
+    
     methods: {  
         // ดึงข้อมูลเข้าตาราง
         showDataPerson(){
@@ -593,10 +597,13 @@ export default {
             saveAs(blob, 'report.doc');
             },
 
-
- 
+            // async mounted() {
+            //     const  { signIn, getSession, signOut } = await useAuth()
+            //     const user = await getSession();
+            // }, 
+                       
+        } 
     } 
-} 
 
  </script>
 
@@ -620,7 +627,7 @@ export default {
         text-align: center;
     }
     .table th {
-        background-color: #f4f4f4;
+        background-color: #edf2bb;
         font-weight: bold;
     }
     .table td {

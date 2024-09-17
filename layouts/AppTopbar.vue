@@ -69,7 +69,7 @@ const x = await getSession()
     <div class="layout-topbar">
         <router-link to="/" class="layout-topbar-logo">
             <img src="~/assets/layout/images/kongkang.jpg" alt="logo" />
-            <span>Evaluate Personnel Msu</span>
+            <span>Evaluate Personnel MSU</span>
         </router-link>
 
         <button class="p-link layout-menu-button layout-topbar-button" @click="onMenuToggle()">

@@ -427,5 +427,9 @@
       margin: 0; /* Removes default margins */
       padding: 0; /* Removes default padding */
   }
+  .table th {
+      background-color: #edf2bb;
+      font-weight: bold;
+  }
   
   </style>

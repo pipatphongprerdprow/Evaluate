@@ -41,14 +41,13 @@ export default NuxtAuthHandler({
 
       // Function to extract the profile information from the userinfo response
       profile(profile) {
-        console.log(profile.STAFFID);
+        console.log(profile);
         
         return {
           id: profile.STAFFID,           // Unique identifier
-          name: `${profile.PREFIXFULLNAME}${profile.STAFFNAME} ${profile.STAFFSURNAME}`,        // User's name
+          name: profile,//`${profile.PREFIXFULLNAME}${profile.STAFFNAME} ${profile.STAFFSURNAME}`,        // User's name
           email: (profile.STAFFEMAIL1??profile.STAFFEMAIL2)??'',      // User's email
-          image: profile.STAFFID ,
-          staffid: profile.STAFFID  
+          //image: profile ,
         }
       }
     }
@@ -64,8 +63,10 @@ export default NuxtAuthHandler({
           access_token: account?.access_token,
           expire_at: account?.expires_at,
           refresh_token: account?.refresh_token,
-          ...user
+          //...user
         }
+
+        token.name = profile
       }
 
       return Promise.resolve(token);

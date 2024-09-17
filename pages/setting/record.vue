@@ -16,7 +16,7 @@
                 </div>   
                 <table class="table">
                     <thead> 
-                        <tr style="height: 40px;background-color: #9efff1;">
+                        <tr style="height: 40px;background-color: #edf2bb;">
                             <th>ปีงบประมาณ</th>   
                             <th>รอบการประเมิน</th>  
                             <th>คะแนน</th>   
@@ -296,17 +296,15 @@
                                                     </div>
                                                 </div>   
                                             </div>
-                                        </div>
-                                        
-                                 </div>
+                                        </div> 
+                                    </div>
+                                </div>  
                             </div>  
                         </div>  
-                    </div>  
                     <template #footer>
                         <Button label="ตกลง" icon="pi pi-check" class="mb-2 mr-2" @click="DialogAdd = false " />
                     </template>
-                </Dialog> 
-
+                </Dialog>  
               </div>
             </div>
         </div>     
@@ -320,7 +318,7 @@
     onMounted(async () => { 
         staffidData.value = user ? user.user.image : ''; 
     });
-
+    
 </script>
 <script> 
     import { ref } from 'vue';
@@ -377,7 +375,11 @@
             },
            
         
-        } 
+        },
+        // async mounted() {
+        //         const  { signIn, getSession, signOut } = await useAuth()
+        //         const user = await getSession();
+        //     }, 
     }  
 </script>
 

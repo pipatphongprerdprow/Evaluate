@@ -10,9 +10,8 @@ const { layoutConfig } = useLayout();
 
 <template>
     <div class="layout-footer">
-        <img src="~/assets/layout/images/logo-white.svg" alt="Logo" height="20" class="mr-2" />
-        
-        <span class="font-medium ml-2">Evaluate Personal MSU</span>
+        <img src="~/assets/layout/images/kongkang.jpg" alt="logo" height="40" class="mr-2"  />
+        <span class="font-medium ml-2">Evaluate Personnel MSU</span>
     </div>
 </template>
 <style lang="scss" scoped></style>

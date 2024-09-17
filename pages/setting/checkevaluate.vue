@@ -46,7 +46,7 @@
                 <div class="col md:col-5 text-right">   
                     <Dialog header="จัดการแบบ ป01" maximizable v-model:visible="DialogAdd" :breakpoints="{ '960px': '75vw' }" :style="{ width: '100vw' }" :modal="true" position="top">
                         <template v-slot:header>
-                            <h3>รายงานแบบข้อตกลงภาระงานและพฤติกรรมการปฏิบัติราชการ (Term of Reference: TOR)</h3>
+                            <h3>รายงานแบบแบบประเมิน ป01-ป04</h3>
                         </template>
                                 <TabView>
                                     <TabPanel header="แบบใบปะหน้า">
@@ -65,10 +65,10 @@
                                             </h4><br>
                                             <!-- ตาราง ก. สมรรถนะหลัก -->
                                             <div class="employee-info">
-                                                <p><strong>ผู้ปฏิบัติงาน:</strong></p>
-                                                <p><strong>สังกัด:</strong> </p>
-                                                <p><strong>ตำแหน่ง:</strong> </p>
-                                                <p><strong>ประเภทตำแหน่ง:</strong> </p>
+                                                <p><strong>ผู้ปฏิบัติงาน:</strong> {{ user.user.name.PREFIXFULLNAME }} {{ user.user.name.STAFFNAME }} {{ user.user.name.STAFFSURNAME }}</p>
+                                                <p><strong>สังกัด:</strong> {{ user.user.name.SCOPES?.staffdepartmentname }} </p>
+                                                <p><strong>ตำแหน่ง:</strong> {{ user.user.name.POSITIONNAME }}  </p>
+                                                <p><strong>ระดับตำแหน่ง:</strong> </p>
                                                 <p><strong>ประเภทบุคลากร:</strong></p>
                                                 <p><strong>รายละเอียดข้อตกลง ระหว่าง วันที่ :</strong> </p>
                                             </div><br>
@@ -220,7 +220,7 @@
                                                             </div>
                                                         <div>
                                                             <p>ลายมือชื่อ ................................................. (ผู้รับการประเมิน)</p>
-                                                            <p>()</p>
+                                                            <p>({{ user.user.name.PREFIXFULLNAME }} {{ user.user.name.STAFFNAME }} {{ user.user.name.STAFFSURNAME }})</p>
                                                             <p>วันที่ ............ เดือน ........................ พ.ศ. ................</p>
                                                         </div>
                                                         </div>
@@ -243,7 +243,7 @@
                                                     </div>
                                                 <div>
                                                     <p>ลายมือชื่อ ................................................. (ผู้รับการประเมิน)</p>
-                                                    <p>()</p>
+                                                    <p>({{ user.user.name.PREFIXFULLNAME }} {{ user.user.name.STAFFNAME }} {{ user.user.name.STAFFSURNAME }})</p>
                                                     <p>วันที่ ............ เดือน ........................ พ.ศ. ................</p>
                                                     </div>
                                                 </div>
@@ -383,7 +383,7 @@
                                                         </div>
                                                     <div>
                                                         <p>ลายมือชื่อ ................................................. (ผู้รับการประเมิน)</p>
-                                                        <p>()</p>
+                                                        <p>({{ user.user.name.PREFIXFULLNAME }} {{ user.user.name.STAFFNAME }} {{ user.user.name.STAFFSURNAME }})</p>
                                                         <p>วันที่ ............ เดือน ........................ พ.ศ. ................</p>
                                                     </div>
                                                     </div>
@@ -404,7 +404,7 @@
                                                 </div>
                                             <div>
                                                 <p>ลายมือชื่อ ................................................. (ผู้รับการประเมิน)</p>
-                                                <p>()</p>
+                                                <p>({{ user.user.name.PREFIXFULLNAME }} {{ user.user.name.STAFFNAME }} {{ user.user.name.STAFFSURNAME }})</p>
                                                 <p>วันที่ ............ เดือน ........................ พ.ศ. ................</p>
                                                 </div>
                                             </div>
@@ -608,10 +608,10 @@
                                                         <!-- ตาราง ก. สมรรถนะหลัก -->
                                                         <div class="employee-info"> 
                                                             <p><strong>รอบการประเมิน:</strong> </p>
-                                                            <p><strong>ชื่อผู้รับการประเมิน:</strong> </p>
-                                                            <p><strong>ตำแหน่ง:</strong> </p>
-                                                            <p><strong>ประเภทตำแหน่ง:</strong> </p>
-                                                            <p><strong>สังกัด:</strong> </p>
+                                                            <p><strong>ชื่อผู้รับการประเมิน:</strong> {{ user.user.name.PREFIXFULLNAME }} {{ user.user.name.STAFFNAME }} {{ user.user.name.STAFFSURNAME }} </p>
+                                                            <p><strong>ตำแหน่ง:</strong> {{ user.user.name.POSITIONNAME }} </p>
+                                                            <p><strong>ระดับตำแหน่ง:</strong> </p>
+                                                            <p><strong>สังกัด:</strong> {{ user.user.name.SCOPES?.staffdepartmentname }} </p>
                                                             <p><strong>ชื่อผู้ประเมิน:</strong> </p>
                                                         </div><br>
                                                         <div class="employee-info" style="border: groove;padding: 15px;">
@@ -699,8 +699,8 @@
                                                                         </td>
                                                                             <td class="center-align"><br><br>
                                                                                 ลงชื่อ .................................................................<br>
-                                                                                ชื่อ นายพิพัฒน์พงษ์ เพริดพราว<br>
-                                                                                ตำแหน่ง นักวิชาการคอมพิวเตอร์<br>
+                                                                                ชื่อ: {{ user.user.name.PREFIXFULLNAME }} {{ user.user.name.STAFFNAME }} {{ user.user.name.STAFFSURNAME }}ว<br>
+                                                                                ตำแหน่ง: {{ user.user.name.POSITIONNAME }} <br>
                                                                                 วันที่ .......... เดือน .......................... พ.ศ.
                                                                             </td>
                                                                         </tr>
@@ -717,7 +717,7 @@
                                                                         <td class="center-align"><br><br>
                                                                             ลงชื่อ .................................................................<br>
                                                                             ชื่อ <br>
-                                                                            ตำแหน่ง ผู้อำนวยการกองแผนงาน<br>
+                                                                            ตำแหน่ง: {{ user.user.name.POSITIONNAME }}  <br>
                                                                             วันที่ .......... เดือน .......................... พ.ศ...........
                                                                         </td>
                                                                         </tr>
@@ -736,8 +736,8 @@
                                                                         </td>
                                                                         <td class="center-align"><br><br>
                                                                             ลงชื่อ : .................................................................<br>
-                                                                            ชื่อ : นายพิพัฒน์พงษ์ เพริดพราว<br>
-                                                                            ตำแหน่ง : นักวิชาการคอมพิวเตอร์<br>
+                                                                            ชื่อ : {{ user.user.name.PREFIXFULLNAME }} {{ user.user.name.STAFFNAME }} {{ user.user.name.STAFFSURNAME }}<br>
+                                                                            ตำแหน่ง : {{ user.user.name.POSITIONNAME }} <br>
                                                                             วันที่ : .......... เดือน .......................... พ.ศ.............
                                                                         </td>
                                                                         </tr>
@@ -773,7 +773,14 @@
                 </div>
             </div>
         </div>     
-    </template>
+    </template> 
+
+<script setup> 
+    const { signIn, getSession, signOut } = await useAuth()
+    const user = await getSession();
+    console.log(user);
+</script>
+
 <script> 
 import { ref } from 'vue';
 import axios from 'axios';  
@@ -944,6 +951,10 @@ export default {
         closeCallback(){
             this.DialogAdd = false; 
         },
+        async mounted() {
+            const  { signIn, getSession, signOut } = await useAuth()
+            const user = await getSession();
+        },
     }
 }
 
@@ -1093,7 +1104,7 @@ th {
       text-align: center;
   }
   .table th {
-      background-color: #f4f4f4;
+      background-color: #edf2bb;
       font-weight: bold;
   }
   .table td {
@@ -1144,7 +1155,7 @@ th, td {
   font-size: 14px; /* Smaller font size */
 }
 th {
-  background-color: #ffffff;
+  background-color: #edf2bb;
 }
 th, td:first-child {
   width: 35%; /* Adjusted width for first column */

@@ -186,8 +186,11 @@ export default {
             const { data } = await useFetch('/api/test');
             console.log(data);
             this.xx1 = data;
-        }
-      
+        },
+        async mounted() {
+            const  { signIn, getSession, signOut } = await useAuth()
+            const user = await getSession();
+        },
     }
 }
 </script>
@@ -196,4 +199,5 @@ export default {
 .text-center {
   text-align: center;
 }
+
 </style>
