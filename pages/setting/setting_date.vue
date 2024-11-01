@@ -3,9 +3,12 @@
         <div class="col-12 lg:col-12 xl:col-12">
             <div class="card mb-0">  
                 <div class="formgroup-inline mb-1"> 
-                    <div class="col md:col-6"> 
-                        <h3 class="mb-4 card-header"><i class="pi pi-calendar" style="font-size: x-large;"></i> จัดการ รอบประเมิน</h3>   
+                    <div class="col md:col-6">  
+                        <h3 class="mb-4 card-header"><i class="pi pi-calendar" style="font-size: x-large;"></i> จัดการ รอบประเมิน</h3>
                     </div> 
+                    <!-- {{ user }} -->
+                    <br>
+                     <!-- {{ por01Data }}  -->
                     <div class="col md:col-16 text-right"> 
                         <Button icon="pi pi-plus" severity="info" class="mb-2 mr-2" label="เพิ่มข้อมูลรอบประเมิน" @click="OpenDialogAdd" /> 
                         <!-- เพิ่มข้อมูลรอบประเมิน -->
@@ -42,64 +45,103 @@
                                 <Button label="ยกเลิก" icon="pi pi-times" class="mb-2 mr-2" severity="danger" @click="resetDialog" />
                             </template>
                         </Dialog> 
+                        <Dialog header="จัดการ ป.01" v-model:visible="DialogDetail" :breakpoints="{ '960px': '90vw' }" :style="{ width: '90vw' }" :modal="true" position="top">
+                            <!-- {{ dataP01 }} -->
+                            <P01 :dataP01="dataP01"></P01>
+                            <template #footer>
+                                <Button label="ตกลง" icon="pi pi-check" class="mb-2 mr-2" @click="DialogDetail = false " />
+                            </template>
+                        </Dialog> 
                     </div> 
                 </div>   
                 <DataTable :value="products_date" :rows="10" :paginator="true" responsiveLayout="scroll" dataKey="id">  
-                    <Column field="Tb_name" header="ปีงบประมาณ" style="width: 12%">
-                        <template #body="Item">  
-                            <b>{{ Item.data.d_date }}</b>
+                    <Column field="Tb_name" header="สังกัด" style="width: 16%; text-align: center;">
+                        <template #body="">  
+                            <div style="display: flex; justify-content: center; align-items: center;">
+                                <b>{{ user.user.name.SCOPES?.staffdepartmentname }}</b>
+                            </div>
                         </template>
                     </Column>
-                    <Column field="Tb_ind" header="รอบประเมิน" style="width: 17%">
+                    <Column field="Tb_name" header="ปีงบประมาณ" style="width: 10%; text-align: center;">
+                        <template #body="Item">  
+                            <div style="display: flex; justify-content: center; align-items: center;">
+                                <b>{{ Item.data.d_date }}</b>
+                            </div>
+                        </template>
+                    </Column>
+                    <Column field="Tb_ind" header="รอบประเมิน" style="width: 20%; text-align: center;">
                         <template #body="Item">   
-                            {{ Item.data.d_evaluationround }}
+                            <div style="display: flex; justify-content: center; align-items: center;">
+                                {{ Item.data.d_evaluationround }}
+                            </div>
                         </template>
                     </Column>
-                    <Column field="Tb_target" header="วันที่กำหนด" style="width: 17%">
+                    <Column field="Tb_target" header="วันที่กำหนด" style="width: 12%; text-align: center;">
                         <template #body="Item"> 
-                            {{ Item.data.d_recordingday }}   
+                            <div style="display: flex; justify-content: center; align-items: center;">
+                                {{ Item.data.d_recordingday }}   
+                            </div>
                         </template>
                     </Column>
-                    <Column field="Tb_score" header="วันที่ครบกำหนด" style="width: 17%;">
+                    <Column field="Tb_score" header="วันที่ครบกำหนด" style="width: 12%; text-align: center;">
                         <template #body="Item">  
-                            <em style="color: red;">{{ Item.data.d_enddate }}</em> 
+                            <div style="display: flex; justify-content: center; align-items: center;">
+                                <em style="color: red;">{{ Item.data.d_enddate }}</em>
+                            </div>
                         </template>
                     </Column>
-                    <Column field="Tb_weight" header="วันที่ประกาศคะแนน" style="width: 17%">
+                    <Column field="Tb_weight" header="วันที่ประกาศคะแนน" style="width: 10%; text-align: center;">
                         <template #body="Item"> 
-                            <b style="color: blue;">{{ Item.data.d_scoringday }} </b>
+                            <div style="display: flex; justify-content: center; align-items: center;">
+                                <b style="color: blue;">{{ Item.data.d_scoringday }}</b>
+                            </div>
                         </template>
                     </Column>
-                    <Column field="Tb_balance" hidden="จัดการประเมิน" style="width: 10%">
+                    <Column field="Tb_balance" header="จัดการแบบประเมิน" style="width: 10%; text-align: center;">
                         <template #body="Item"> 
-                            {{ Item.data.id }}
+                            <div style="display: flex; justify-content: center; align-items: center;">
+                                <Button icon="pi pi-list" severity="warning" class="mb-2 mr-2" @click="por01Data(Item.data)"  />
+                            </div>
+                        </template>
+                    </Column>
+                    <Column field="options" header="ตัวเลือก" style="width: 14%; text-align: center;">
+                        <template #body="Item">   
+                            <div style="display: flex; justify-content: center; align-items: center;"> 
+                                <Button icon="pi pi-pencil" severity="success" class="mb-2 mr-2" @click="editData(Item.data)" />
+                                <Button icon="pi pi-trash" severity="danger" class="mb-2 mr-2" v-if="Item.data.chk_btn == 0" @click="delData(Item.data)" />  
+                            </div>
                         </template>
                     </Column> 
-                    <Column field="options" header="ตัวเลือก" style="width: 10%">
-                        <template #body="Item">   
-                            <Button icon="pi pi-pencil" severity="success" class="mb-2 mr-2" @click="editData(Item.data)" />
-                            <Button icon="pi pi-trash" severity="danger" class="mb-2 mr-2" @click="delData(Item.data)" /> 
-                        </template>
-                    </Column> 
-                </DataTable>
+                </DataTable> 
             </div> 
         </div> 
     </div>  
 </template>
+<script setup> 
+    const { signIn, getSession, signOut } = await useAuth()
+    const user = await getSession();
+    // console.log(user); 
+</script> 
 
 <script> 
 import { ref } from 'vue';
 import axios from 'axios';  
-import Swal from 'sweetalert2' 
-export default {
+import Swal from 'sweetalert2'  
+import P01 from "./pages/setting/setting_assessment.vue";
+
+export default {    
+    components : {
+        P01
+    },
     data() {
         return {  
-            staffid_Main: 5009942,
-            facid_Main: 201092704000,
+            staffid_Main: '',
+            facid_Main: '',
             groupid_Main: '01',
             products_date: [],  
             // Dialog
             DialogAdd: false, 
+            DialogDetail: false, 
             text_edt: null, 
             dropdownItemYear: null,
             dropdownItemsYear: [
@@ -111,26 +153,39 @@ export default {
             ],
             dropdownItemEvalua: null,
             dropdownItemsEvalua: [
-                { name: 'รอบที่ 1 วันที่ 1 กันยายน  ถึง วันที่ 28 กุมภาพันธ์', code: '1' },
+                { name: 'รอบที่ 1 วันที่ 1 กันยายน  ถึง วันที่ 28/29 กุมภาพันธ์', code: '1' },
                 { name: 'รอบที่ 2 วันที่ 1 มีนาคม ถึง วันที่ 31 สิงหาคม', code: '2' },
             ], 
             dateStart: null,
             dateEnd: null, 
             dateAnnounce: null, 
-
+            dataP01:{}, 
         }
     },
-    mounted(){
-        this.showDataSet(); 
+    async mounted(){
+        const { signIn, getSession, signOut } = await useAuth()
+        const user = await getSession();
+       // console.log(user.user.name);
+        const {STAFFID, SCOPES} = user.user.name
+        const {staffdepartment, groupid, staffdepartmentname, groupname} = SCOPES
+        
+        await this.setSession(STAFFID,staffdepartment,groupid);
+        await this.showDataSet(STAFFID,staffdepartment,groupid); 
     },
     methods: {
+        setSession (staffid_Main,facid_Main,groupid_Main) {
+           // console.log('setSession');  
+            this.staffid_Main = staffid_Main
+            this.facid_Main = facid_Main
+            this.groupid_Main = groupid_Main
+        },
         showDataSet(){  
             axios.post('http://localhost:8000/api/showDateSet',{
                 staff_id: this.staffid_Main,
                 fac_id: this.facid_Main,
                 group_id: this.groupid_Main,
             }).then(res => {     
-                // console.log(res.data);  
+                 //console.log(res.data);  
                 this.products_date = res.data;
             })
             .catch(error => {
@@ -138,6 +193,19 @@ export default {
 
             });
         },
+        por01Data(data){ 
+            // console.log('data: ',data); 
+            this.DialogDetail = true;  
+            this.dataP01 = {
+                staffid:this.staffid_Main,
+                year:data.d_date,
+                evalua:data.evalua,
+                d_evaluationround:data.d_evaluationround, 
+                //  staffdepartment: user.name.staffdepartment
+                staffdepartment:this.facid_Main
+            }
+        },
+
         editData(data){ 
             // console.log(data);
             this.DialogAdd = true;  
@@ -167,7 +235,7 @@ export default {
                     axios.post('http://localhost:8000/api/delDateSet',{
                         data: data
                     }).then(res => { 
-                        // console.log(res);   
+                        // console.log(res.data);   
                         this.showDataSet();
                         Swal.fire({
                         title: "ลบข้อมูลเสร็จสิ้น!",
@@ -192,6 +260,7 @@ export default {
         },
         resetDialog(){
             this.DialogAdd = false; 
+            this.DialogDetail = false; 
         },
         saveDataset(){
             // console.log(this.dropdownItemYear.code); 
@@ -205,8 +274,9 @@ export default {
                 dateStart: this.dateStart,
                 dateEnd: this.dateEnd,
                 dateAnnounce: this.dateAnnounce,  
+ 
             }).then(res => {     
-                // console.log(res.data); 
+                 //console.log(res.data); 
                 Swal.fire({
                     position: "top-center",
                     icon: "success",

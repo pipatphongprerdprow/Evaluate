@@ -18,7 +18,7 @@ const logoUrl = computed(() => {
 });
 
 const onTopBarMenuButton = () => {
-    topbarMenuActive.value = !topbarMenuActive.value;s
+    topbarMenuActive.value = !topbarMenuActive.value;
 };
 
 const onSettingsClick = () => {

@@ -1,14 +1,15 @@
-<template>
+<template> 
     <div class="flex flex-column align-items-center justify-content-center" style="width: 100%; max-width: 1200px;"> 
         <div style="border-radius: 56px; padding: 0.3rem; background: linear-gradient(180deg, rgba(33, 150, 243, 0.5) 40%, rgba(33, 150, 243, 0) 60%);width: 70%;">  
             <div class="w-full surface-card py-6 px-5 sm:px-8 flex flex-column align-items-center" style="border-radius: 53px;">
                 <span class="text-blue-500 font-bold text-3xl">ระบบประเมินบุคลากรสายสนับสนุน</span> 
+                <!-- {{ user }} -->
                 <div class="mb-3 mt-3">
                   <img id="IMG_PICTURE" :src="`${profileImageUrl}${user.user.name.STAFFID}.jpg`" alt="Profile Picture" style="border-radius: 70px;width: 200px;height: auto;" />   
-                </div> 
+                </div>   
                 <h3 class="text-900 font-bold text-3xl lg:text-2xl mb-2"> 
                     {{ user.user.name.PREFIXFULLNAME }} {{ user.user.name.STAFFNAME }} {{ user.user.name.STAFFSURNAME }}  
-                </h3>  
+                </h3>   
                 <router-link to="/" class="w-full flex align-items-center py-5 border-300 border-bottom-1"> 
                     <span class="flex justify-content-center align-items-center border-round" 
                         style="height: 3.5rem; width: 3.5rem; background-color: #299ea3;">
@@ -35,7 +36,7 @@
                     </span> 
                     <span class="ml-4 flex flex-column" style="flex: 1;">
                         <span class="text-900 lg:text-xl font-medium mb-0 block">ระดับตำแหน่ง</span>
-                        <span class="text-600 lg:text-xl">-</span>
+                        <span class="text-600 lg:text-xl">{{ user.user.name.POSTYPENAME }}</span>
                     </span>  
 
                     <span class="flex justify-content-center align-items-center border-round" 
@@ -44,10 +45,10 @@
                     </span> 
                     <span class="ml-4 flex flex-column" style="flex: 1;">
                         <span class="text-900 lg:text-xl font-medium mb-0 block">ประเภทบุคลากร</span>
-                        <span class="text-600 lg:text-xl">-</span>
+                        <span class="text-600 lg:text-xl">{{ user.user.name.GROUPTYPENAME }} </span>
                     </span>
                 </router-link>
-                <router-link to="/" class="w-full flex align-items-center py-5 border-300 border-bottom-1"> 
+                <!-- <router-link to="/" class="w-full flex align-items-center py-5 border-300 border-bottom-1"> 
                     <span class="flex justify-content-center align-items-center border-round" 
                         style="height: 3.5rem; width: 3.5rem; background-color: #299ea3;">
                         <i class="text-50 pi pi-fw pi-credit-card text-2xl"></i>
@@ -65,7 +66,7 @@
                         <span class="text-900 lg:text-xl font-medium mb-0 block">ระดับตำแหน่ง</span>
                         <span class="text-600 lg:text-xl">-</span>
                     </span>
-                </router-link> 
+                </router-link>  -->
             </div> 
         </div> 
     </div> 

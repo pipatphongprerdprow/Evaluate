@@ -1,9 +1,11 @@
 <template>
     <div class="grid">
         <div class="col-12 lg:col-12 xl:col-12">
-            <div class="col md:col-12 text-right">
+            <!-- <div class="col md:col-12 text-right">
                 <Button label="Export" icon="pi pi-file-word" class="mr-2 mb-2 "></Button>
-            </div>
+            </div>   -->
+            <!-- {{ dataPor }} -->
+              <!-- {{ user }} -->​  
             <div class="card mb-0">
                 <div class="formgroup-inline mb-1">
                     <div class="col md:col-9">
@@ -11,20 +13,15 @@
                             <i class="pi pi-fw pi-folder-open" style="font-size: x-large;"></i> แบบ ป03
                         </h3>
                         <B><h4>1.ผลสัมฤทธิ์ของงาน</h4></B>
-                    </div>
-                    <div class=" col md:col3 text-right">
-                      <label for="dropdownItemYear" class="label">ปีงบประมาณ :</label>
-                      <Dropdown id="dropdownItemYear" v-model="dropdownItemYear" :options="dropdownItemsYear" optionLabel="name" placeholder="เลือกปีงบประมาณ"></Dropdown>
-                  </div>
+                    </div> 
                 </div>
-                <!-- แสดงข้อมูลบันทึก -->
-                 
+                <!-- แสดงข้อมูลบันทึก --> 
                 <table class="table">
                     <thead>
                         <tr>
                             <th rowspan="2" style="width: 17%;">กิจกรรม / โครงการ / งาน</th>
                             <th rowspan="2" style="width: 26%;">ตัวชี้วัด / เกณฑ์การประเมิน</th>
-                            <th rowspan="2" style="width: 25%;">รางานการปฏิบัติราชการ<br> ตามตัวชี้วัด/เกณฑ์การประเมิน</th>
+                            <th rowspan="2" style="width: 25%;">รายงานการปฏิบัติราชการ<br> ตามตัวชี้วัด/เกณฑ์การประเมิน</th>
                             <th rowspan="2" style="width: 20%;">หลักฐานที่แสดงถึง<br> ผลการปฏิบัติราชการ<br>ตามเกณฑ์การประเมิน<br>(หลักฐานเชิงประจักษ์)</th>
                             <th colspan="5" style="width: 11%;">ระดับการประเมินตนเอง<br> (ค่าคะแนนที่ได้)</th>
                             <th rowspan="2" style="width: 19%;"><br> ตัวเลือก <br></th>
@@ -38,7 +35,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <template v-for="(h, ind) in products_personP03" :key="ind">
+                        <template v-for="(h, ind) in products_personP03" :key="ind"> 
                             <tr>
                                 <td style="text-align: left;" colspan="9">
                                     <b style="color: blue;">{{ h.id }}. {{ h.nameH }}</b>
@@ -66,10 +63,9 @@
                                     </p> 
                                 </td>
                                 <td style="text-align: left;"> 
-                                    <p v-for="(subIitemDoc, inDoc) in subP01.subITemP03doc" :key="inDoc" style="padding-left: 8px;margin-bottom: 5px;">
-                                        <!-- {{ subIitemDoc }} --> 
-                                        <a v-if="subIitemDoc.doc_file!=null" :href="'http://localhost:8000/storage/uploadsP03/'+subIitemDoc.doc_file" target="_blank"><b>ระดับ</b> <b>{{subIitemDoc.doc_no }}</b> {{ subIitemDoc.doc_name }}</a> 
-                                        <a v-if="subIitemDoc.doc_link!=null" :href="subIitemDoc.doc_link" target="_blank"><b>ระดับ</b> <b>{{ subIitemDoc.p03ind_no }}</b> {{ subIitemDoc.doc_name }}</a> 
+                                    <p v-for="(subIitemDoc, inDoc) in subP01.subITemP03doc" :key="inDoc" style="padding-left: 8px;margin-bottom: 5px;"> 
+                                        <a v-if="subIitemDoc.doc_file!=null && subIitemDoc.doc_link==null" :href="'http://localhost:8000/storage/uploadsP03/'+subIitemDoc.doc_file" target="_blank"><b>ระดับ</b> <b>{{subIitemDoc.doc_no }}</b> {{ subIitemDoc.doc_name }}</a> 
+                                        <a v-if="subIitemDoc.doc_link!=null && subIitemDoc.doc_file==null" :href="subIitemDoc.doc_link" target="_blank"><b>ระดับ</b> <b>{{ subIitemDoc.doc_no }}</b> {{ subIitemDoc.doc_name }}</a> 
                                     </p>
                                     <p v-if="subP01.subITemP03doc.length == 0" style="padding-left: 8px;margin-bottom: 5px;">
                                         <b style="color: red;">- ไม่มีข้อมูล -</b>
@@ -101,14 +97,14 @@
                             </tr>
                         </template>
                     </tbody>
-                </table> 
-                <br>
-            </div>
+                </table>  
+            </div> 
             <br>
-            <!-- พฤติกรรมการปฏิบัติราชการ -->
-            <B><h4>2.พฤติกรรมการปฏิบัติราชการ</h4></B>
-            <div class="p-fluid formgrid grid">
-                <!-- ตาราง ก. สมรรถนะหลัก -->
+            <div class="card mb-0">
+                <!-- พฤติกรรมการปฏิบัติราชการ -->
+                <B><h4>2.พฤติกรรมการปฏิบัติราชการ</h4></B>
+                <div class="p-fluid formgrid grid">
+                    <!-- ตาราง ก. สมรรถนะหลัก -->
                     <div class="field col-12 md:col-4"> 
                         <table id="ratingTable">
                             <thead>
@@ -123,8 +119,8 @@
                                     <td style="text-align: left;">{{ row1.activity }}</td> 
                                     <td>{{ row1.indicator }}</td>
                                     <td>  
-                                        <!-- <b v-if="row1.data_table1 == '' " style="color: red;">0</b> 
-                                        <b v-if="row1.data_table1 != 0 " >{{ row1.data_table1 }}</b>  -->
+                                        <b v-if="row1.data_table1 == '' " style="color: red;">0</b> 
+                                        <b v-if="row1.data_table1 != 0 " >{{ row1.data_table1 }}</b> 
                                     </td>
                                 </tr>
                             </tbody>
@@ -145,8 +141,8 @@
                                     <td style="text-align: left;">{{ row2.activity }}</td> 
                                     <td>{{ row2.indicator }}</td>
                                     <td>
-                                        <!-- <b v-if="row2.data_table2 == '' " style="color: red;">0</b> 
-                                        <b v-if="row2.data_table2 != 0 " >{{ row2.data_table2 }}</b>  -->
+                                        <b v-if="row2.data_table2 == '' " style="color: red;">0</b> 
+                                        <b v-if="row2.data_table2 != 0 " >{{ row2.data_table2 }}</b> 
                                     </td>
                                 </tr>
                             </tbody>
@@ -172,9 +168,48 @@
                         </table>
                     </div>
                 </div>
+            </div> 
+            <br>
+            <!-- เพิ่มทักษะที่ต้องการพัฒนา -->
+            <div class="card mb-0"> 
+                <div class="p-fluid formgrid grid">
+                    <div class="field col-12 md:col-12"> 
+                        <label for="list_no_p03">ความรู้/ทักษะ/สมรรถนะ ที่ต้องการพัฒนา<em style="color: red;">*</em></label>
+                        <InputGroup style="text-align: center;">
+                            <Textarea v-model="p04_re1" rows="4" placeholder="ความรู้/ทักษะ/สมรรถนะ ที่ต้องการพัฒนา" />
+                            <Textarea v-model="p04_re2" rows="4" placeholder="วิธีการพัฒนา" />
+                            <Textarea v-model="p04_re3" rows="4" placeholder="ช่วงเวลาที่ต้องการพัฒนา" /> 
+                            <Button label="เพิ่ม" severity="info" @click="AddDatap04" />
+                        </InputGroup>
+                    </div>
+                </div>
+                <DataTable :value="products_Tab3" :rows="10" :paginator="true" responsiveLayout="scroll" dataKey="id">
+                    <Column field="p04_re1" header="ความรู้/ทักษะ/สมรรถนะ ที่ต้องการพัฒนา" style="width: 35%">
+                        <template #body="slotProps">
+                            {{ slotProps.data.p04_re1 }}
+                        </template>
+                    </Column>
+                    <Column field="p04_re2" header="วิธีการพัฒนา" style="width: 35%">
+                        <template #body="slotProps">
+                            {{ slotProps.data.p04_re2 }}
+                        </template>
+                    </Column> 
+                    <Column field="p04_re3" header="ช่วงเวลาที่ต้องการพัฒนา" style="text-align: center; width: 30%">
+                        <template #body="slotProps">
+                            {{ slotProps.data.p04_re3 }}
+                        </template>
+                    </Column>
+                    <Column style="text-align: center; width: 10%">
+                        <template #body="slotProps">
+                            <Button severity="danger" icon="pi pi-trash" class="p-button-text" outlined rounded @click="DeleteRegislick(slotProps.data.id)" />
+                        </template>
+                    </Column>
+                </DataTable>  
             </div>
-        </div>
 
+        </div>
+    </div>
+       
         <!-- รางานการปฏิบัติราชการตามตัวชี้วัด/เกณฑ์การประเมิน -->
         <Dialog header="จัดการ รางานการปฏิบัติราชการตามตัวชี้วัด/เกณฑ์การประเมิน" maximizable v-model:visible="DialogAdd" :breakpoints="{ '960px': '75vw' }" :style="{ width: '100vw' }" :modal="true" position="top">
             <form> 
@@ -219,7 +254,9 @@
                 <InputText v-model="text_edtDoc" type="hidden" style="display: none;" /> 
                 <div class="p-fluid formgrid"> 
                     <div class="field col-12 md:col-6">
-                        <label for="radioValueDoc">เลือกประเภทการแนปเอกสาร</label>
+                        <label for="radioValueDoc">เลือกประเภทการแนปเอกสาร</label> 
+                        <!-- <b style="color: red;"> (รองรับขนาดไฟล์ไม่เกิน 2 Mb) </b> -->
+
                         <!-- <Dropdown v-model="radioValueDoc" :options="radioValueDocs" optionLabel="name" placeholder="เลือกระดับการประเมินตนเอง"></Dropdown>  -->
                         <div class="grid">
                             <div class="col-12 md:col-4">
@@ -309,61 +346,64 @@
                     <Button label="ยกเลิก" icon="pi pi-times" class="mb-2 mr-2" severity="danger" @click="DialogScore = false" />
                 </template>
         </Dialog>
-</template>
-
-
+</template> 
 <script>
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
 import Swal from 'sweetalert2'
-
-    export default {
+import { saveAs } from 'file-saver'; 
+    export default { 
+        props: {
+            dataPor: {
+                type: Object,
+                required: true
+            },
+                 ////พี่บอยแก้
+            tabd: {
+                type: String,
+                default: '0'
+            }
+            //------------------------
+        },
         data() {
-            return {
-                staffid_Main: 5009942,
-                year_Main: 2568,
-                facid_Main: 201092704000,
-                groupid_Main: '01',
-                dropdownItemYear: { name: 'ปีงบประมาณ 2568', value: 2568 },
-                dropdownItemsYear: [
-                    { name: 'ปีงบประมาณ 2569', value: 2569 },
-                    { name: 'ปีงบประมาณ 2568', value: 2568 },
-                    { name: 'ปีงบประมาณ 2567', value: 2567 },
-                    { name: 'ปีงบประมาณ 2566', value: 2566 }
-                ],
+            return { 
+                staffid_Main: null,
+                year_Main: null,
+                facid_Main: null,
+                groupid_Main: null, 
 /*=========== 1.ผลสัมฤทธิ์ของงาน =============*/                
-                products_personP03: [], 
-                itemsBtu: (item) => [
-                    {
-                        label: 'รางานการปฏิบัติราชการ',
-                        icon: 'pi pi-sort-amount-down',
-                        command: () => {
-                            this.OpenDialogAdd(item);
-                        }
-                    },
-                    {
-                        label: '(หลักฐาน)รางานการปฏิบัติราชการ',
-                        icon: 'pi pi-file',
-                        command: () => {
-                            this.OpenDialogDoc(item);
-                        }
-                    },
-                    {
-                        label: 'ระดับคะแนนประเมินตนเอง',
-                        icon: 'pi pi-thumbs-up',
-                        command: () => {
-                            this.OpenDialogScore(item);
-                        }
-                    },
-                    {
-                        label: 'ลบข้อมูล',
-                        icon: 'pi pi-times',
-                        command: () => {
-                            this.delDataDoc(item);
-
-                        }
+            products_personP03: [], 
+            itemsBtu: (item) => [
+                {
+                    label: 'รางานการปฏิบัติราชการ',
+                    icon: 'pi pi-sort-amount-down',
+                    command: () => {
+                        this.OpenDialogAdd(item);
                     }
-                ],
+                },
+                {
+                    label: '(หลักฐาน)รางานการปฏิบัติราชการ',
+                    icon: 'pi pi-file',
+                    command: () => {
+                        this.OpenDialogDoc(item);
+                    }
+                },
+                {
+                    label: 'ระดับคะแนนประเมินตนเอง',
+                    icon: 'pi pi-thumbs-up',
+                    command: () => {
+                        this.OpenDialogScore(item);
+                    }
+                },
+                {
+                    label: 'ลบข้อมูล',
+                    icon: 'pi pi-times',
+                    command: () => {
+                        this.delDataDoc(item);
+
+                    }
+                }
+            ],
 /*=========== 2.พฤติกรรมการปฏิบัติราชการ =============*/ 
                 //ตาราง ก. สมรรถนะหลัก
            coreCompetencies: [
@@ -421,34 +461,79 @@ import Swal from 'sweetalert2'
                     { name: 'ค่าคะแนนที่ 3', value: 3 },
                     { name: 'ค่าคะแนนที่ 4', value: 4 },
                     { name: 'ค่าคะแนนที่ 5', value: 5 }
-                ],
- 
-
+                ], 
+/*============= ?? =============*/ 
+                products_TabP03: [],  
+/*============= ความรู้/ทักษะ/สมรรถนะ ที่ต้องการพัฒนา =============*/ 
+                p04_re1: null,
+                p04_re2: null,
+                p04_re3: null,
+                products_Tab3: [],
             }
         }, 
-        mounted(){
-            this.showDataP03(); 
+        async mounted(){
+           // console.log("por03 mount..",this.dataPor);
+
+            this.showDataP03();
+            this.showdataPo();
+            this.chkp03data();
+            
+            const { signIn, getSession, signOut } = await useAuth()
+            const user = await getSession(); 
+            //console.log(user.user.name); 
+            const {STAFFID, SCOPES} = user.user.name
+            const {staffdepartment, groupid, staffdepartmentname, groupname} = SCOPES
+            await this.setSession(STAFFID,staffdepartment,groupid);  
+            // this.showDataP03(); 
+            // this.showdataPo();
+        },
+
+        ////พี่บอยแก้
+        watch: {
+            tabd (v) {
+
+                //console.log("por03 tabd",v);
+                this.showDataP03();
+                this.showdataPo();
+                this.chkp03data();
+            },
+            //--------------------------------
+
+
+            // เฝ้าดูการเปลี่ยนแปลงของ dataPor
+            dataPor: {
+                handler(newVal, oldVal) {
+                    // console.log('dataPor changed:', newVal);
+                    this.showDataP03();
+                    this.showdataPo();
+                    this.chkp03data();
+                        // ทำสิ่งที่ต้องการเมื่อ dataPor เปลี่ยนแปลง
+                },
+                deep: true // ใช้ deep: true เพื่อดูการเปลี่ยนแปลงภายใน object
+            }
         },
         methods: { 
+            setSession (staffid_Main,facid_Main,groupid_Main) { 
+                this.staffid_Main = staffid_Main
+                this.facid_Main = facid_Main
+                this.groupid_Main = groupid_Main  
+                // console.log('setSession: ',staffid_Main,facid_Main,groupid_Main);  
+            },
             // ดึงข้อมูลเข้าตาราง
             async showDataP03(){
                 await axios.post('http://localhost:8000/api/showDataP03New',{
                     staff_id: this.staffid_Main,
-                    fac_id: this.facid_Main,
-                    year_id: this.dropdownItemYear.value,
-                    group_id: this.groupid_Main,
+                    fac_id: this.dataPor.fac_id,
+                    year_id: this.dataPor.d_date, 
+                    evalua: this.dataPor.evalua  
                 }).then(res => {
-                    // console.log(res.data);
+                   // console.log('showDataP03',res.data);
                     this.products_personP03=res.data;
                 })
                 .catch(error => {
                     console.error('Error:', error);
                 });
-            },
-            async mounted() {
-                const  { signIn, getSession, signOut } = await useAuth()
-                const user = await getSession();
-            },
+            }, 
 /*============= รายงานผลการปฏิบัติราชการตามตัวชี้วัด/ เกณฑ์การประเมิน =============*/
             // เปิดหน้าต่างสำหรับบันทึก P03
             OpenDialogAdd(item){ 
@@ -695,13 +780,10 @@ import Swal from 'sweetalert2'
                 }
             }); 
             },
-              async mounted() {
+            async mounted() {
                 const  { signIn, getSession, signOut } = await useAuth()
                 const user = await getSession();
-            },
-          
-
-
+            }, 
 /*============= ค่าคะแนนที่ได้ =============*/
             OpenDialogScore(item){ 
                 // console.log(item); 
@@ -743,10 +825,148 @@ import Swal from 'sweetalert2'
                         console.error('Error:', error);
                     });
                 }
-            },
-        }
-        
+            }, 
+            showdataPo(){  
+                    // ตั้งค่า coreCompetencies กลับไปเป็นค่าเริ่มต้น
+                    this.coreCompetencies = [
+                        { id: 1, activity: 'ก. 1 การมุ่งผลสัมฤทธิ์', indicator: '1', data_table1: '' },
+                        { id: 2, activity: 'ก. 2 การบริการที่ดี', indicator: '1', data_table1: '' },
+                        { id: 3, activity: 'ก. 3 การสั่งสมความเชี่ยวชาญในงานอาชีพ', indicator: '1', data_table1: '' },
+                        { id: 4, activity: 'ก. 4 การยึดมั่นในความถูกต้องชอบธรรมและจริยธรรม', indicator: '1', data_table1: '' },
+                        { id: 5, activity: 'ก. 5 การทำงานเป็นทีม', indicator: '1', data_table1: '' }
+                    ];  
+                    
+                    // ตั้งค่า jobSpecificCompetencies กลับไปเป็นค่าเริ่มต้น
+                    this.jobSpecificCompetencies = [
+                        { id: 6, activity: 'ข. 1 การคิดวิเคราะห์', indicator: '1', data_table2: '' },
+                        { id: 7, activity: 'ข. 2 การดำเนินการเชิงรุก', indicator: '1', data_table2: '' },
+                        { id: 8, activity: 'ข. 3 ความผูกพันที่มีต่อส่วนราชการ', indicator: '1', data_table2: '' },
+                        { id: 9, activity: 'ข. 4 การมองภาพองค์รวม', indicator: '1', data_table2: '' },
+                        { id: 10, activity: 'ข. 5 การสืบเสาะหาข้อมูล', indicator: '1', data_table2: '' },
+                        { id: 11, activity: 'ข. 6 การตรวจสอบความถูกต้องตามกระบวนงาน', indicator: '1', data_table2: '' }
+                    ]; 
+                    
+                    axios.post('http://localhost:8000/api/showDataPo',{
+                        staff_id: this.staffid_Main,
+                        fac_id: this.facid_Main,
+                        year_id: this.dataPor.d_date,
+                        record: this.dataPor.evalua,
+                    }).then(res => {     
+                         //console.log(res.data);    
+                        if(res.data.length > 0){
+                            const data = res.data[0];
+                            this.coreCompetencies.forEach(item => {
+                                if (item.id === 1) {
+                                    item.data_table1 = data.p1;  // Update based on the API response
+                                } else if (item.id === 2) {
+                                    item.data_table1 = data.p2;  // Update based on the API response
+                                } else if (item.id === 3) {
+                                    item.data_table1 = data.p3;  // Add more conditions if necessary
+                                } else if (item.id === 4) {
+                                    item.data_table1 = data.p4;  // Add more conditions if necessary
+                                } else if (item.id === 5) {
+                                    item.data_table1 = data.p5;  // Add more conditions if necessary
+                                }
+                            });
 
+                            this.jobSpecificCompetencies.forEach(item => {
+                                if (item.id === 6) {
+                                    item.data_table2 = data.p6;  // Update based on the API response
+                                } else if (item.id === 7) {
+                                    item.data_table2 = data.p7;  // Update based on the API response
+                                } else if (item.id === 8) {
+                                    item.data_table2 = data.p8;  // Add more conditions if necessary
+                                } else if (item.id === 9) {
+                                    item.data_table2 = data.p9;  // Add more conditions if necessary
+                                } else if (item.id === 10) {
+                                    item.data_table2 = data.p10;  // Add more conditions if necessary
+                                } else if (item.id === 11) {
+                                    item.data_table2 = data.p11;  // Add more conditions if necessary
+                                }
+                            });
+                        } 
+                    })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+            }, 
+/*============= ความรู้/ทักษะ/สมรรถนะ ที่ต้องการพัฒนา =============*/ 
+            chkp03data(){ 
+                this.products_Tab3 = [];
+                axios.post('http://localhost:8000/api/showData04Tab3',{
+                    staff_id: this.staffid_Main,
+                    fac_id: this.facid_Main,
+                    year_id: this.dataPor.d_date,
+                    record: this.dataPor.evalua, 
+                }).then(res => {     
+                    // console.log('chkp03data',res.data);     
+                    if(res.data.length > 0){
+                        res.data.forEach(p04 => {
+                            const newData = {
+                                p04_re1: p04.p04_re1,
+                                p04_re2: p04.p04_re2,
+                                p04_re3: p04.p04_re3,
+                                id:p04.p02_id
+                            };
+                            this.products_Tab3.push(newData); 
+                        });  
+                    }
+                    this.p04_re1 = '';
+                    this.p04_re2 = '';
+                    this.p04_re3 = '';
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+            },  
+            AddDatap04(){ 
+                axios.post('http://localhost:8000/api/saveEvaTab03xx',{
+                    staff_id: this.staffid_Main,
+                    fac_id: this.facid_Main,
+                    year_id: this.dataPor.d_date,
+                    record: this.dataPor.evalua,
+                    p04_re1: this.p04_re1,
+                    p04_re2: this.p04_re2,
+                    p04_re3: this.p04_re3
+                }).then(res => {     
+                    // console.log(res.data);    
+                    const newData = {
+                        p04_re1: this.p04_re1,
+                        p04_re2: this.p04_re2,
+                        p04_re3: this.p04_re3,
+                        id: res.data
+                    };
+                    this.products_Tab3.push(newData); 
+                    this.p04_re1 = '';
+                    this.p04_re2 = '';
+                    this.p04_re3 = '';
+
+                    Swal.fire({
+                        position: "top-end",
+                        icon: "success",
+                        title: "บันทึก แผนพัฒนาการปฏิบัติราชการรายบุคคล เสร็จสิ้น",
+                        showConfirmButton: false,
+                        timer: 1000
+                    });
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                }); 
+            },
+            DeleteRegislick(item) { 
+                // Add logic to remove the selected item  
+                axios.post('http://localhost:8000/api/delEvaTab03xx',{
+                    id: item
+                }).then(res => {  
+                    // console.log(res);
+                    this.products_Tab3 = this.products_Tab3.filter(item => item.id !== res.data);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });   
+
+            }, 
+        } 
     }
 
     </script>
@@ -836,4 +1056,25 @@ import Swal from 'sweetalert2'
   table + table {
     margin-top: 20px;
   }
+  .custom-textarea {
+    width: 100%;
+    max-width: 600px;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    font-size: 1rem;
+    }
+
+    .field {
+        margin-bottom: 20px;
+    }
+
+    .button-container {
+        text-align: center;
+    }
+
+    .p-button {
+        margin: 10px 0;
+    }
+  
     </style>

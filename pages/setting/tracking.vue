@@ -3,53 +3,66 @@
         <div  class="col-12 lg:col-12 xl:col-12">
             <div class="card mb-0"> 
                 <div class="formgroup-inline mb-1">
-                    <div class="col md:col-4"> 
-                        <h3 class="mb-4 card-header"><i class="pi pi-credit-card" style="font-size: x-large;"></i> ประวัติการประเมิน</h3>    
+                    <div class="col md:col-6"> 
+                        <h3 class="mb-4 card-header"><i class="pi pi-credit-card" style="font-size: x-large;"></i> ตรวจติดตามแบบประเมิน</h3>    
                     </div> 
-                   
-                    <div class="col md:col-4"> 
-                        <label for="year_text">ปีงบประมาณ: </label> 
-                        <Dropdown id="year_text" v-model="dropdownItemYear" :options="dropdownItemsYear" optionLabel="name" placeholder="เลือกปีงบประมาณ" style="width: 60%;"></Dropdown> 
-                    </div>  
-                    <div class="col md:col-4"> 
-                        <label for="year_text">รอบประเมิน: </label> 
-                        <Dropdown id="evaluation_text" v-model="dropdownItemRecord" :options="dropdownItemRecords" optionLabel="name" placeholder="รอบประเมิน" style="width: 70%;"></Dropdown> 
-                    </div>   
-                </div>   
+                    <div class="col md:col-5" >  
+                        <label for="tracking_date"></label>
+                        <Dropdown v-model="tracking_date" :options="tracking_dates" optionLabel="d_evaluationround" placeholder="กรุณาเลือกรอบการประเมิน" style=" max-width: 500px; width: 100%"></Dropdown>
+                        <!-- {{ tracking_date }} -->   
+                    </div> 
+                    <div class="col md:col-1" >  
+                        <Button class="mb-2 mr-2" icon="pi pi-search" @click="xxr" /> 
+                    </div>
+                </div>  
+                <!-- {{ user }}  --> 
+                <!-- {{   user.user.name.STAFFID }} --> 
                 <table class="table">
                     <thead> 
                         <tr style="height: 40px;background-color: blanchedalmond;">
                             <th>ผู้รับการประเมิน</th>  
                             <th>สัดส่วน</th>  
-                            <th>คะแนน ป.01</th>  
-                            <th>คะแนน ป.02</th>  
-                            <th>ผลรวม</th>  
-                            <th>ประเมิน</th>
-
+                            <th>ผลสัมฤทธิ์ของงาน</th>  
+                            <th>พฤติกรรมการปฏิบัติราชการ</th>  
+                            <th>ผลคะแนน</th>  
+                            <th>ประเมิน</th> 
                         </tr>
                     </thead>
                     <tbody>
                         <tr v-for="(Item, index) in products" :key="index">
-                            <td style="padding-left: 5px;width: 20%;text-align: left;">
+                            <td style="padding-left: 5px;width: 20%;text-align: left;">  
                                 <b style="color: blue;">{{ Item.prefixfullname }} {{ Item.namefully }} </b>
                             </td> 
-                            <td style="text-align: center;width: 20%;"><b>{{ }}</b></td>
-                            <td style="text-align: center;width: 20%;"><b>{{ }}</b></td>
-                            <td style="text-align: center;width: 20%;"><b>{{ }}</b></td> 
-                            <td style="text-align: center;width: 10%;"><b>{{ }}</b></td> 
+                            <td class="text-center" style="color: blue;"><b>{{ Item.tb_tor?Item.tb_tor.persen: '' }}</b></td> 
+                            <!-- <td class="text-center" style="color: blue;"><b> {{displayScore}} </b></td> --> 
+                            <!-- <td class="text-center" style="color: blue;"><b> {{calculatedScore}}</b></td>     -->
+                            <!-- {{calculatedScore}} --> 
+                            <td class="text-center" style="color: blue;"><b>{{ ((totalScoreSum + totalScoreZeroSum) / 33*70).toFixed(2)  }}</b></td>    
+                            <td class="text-center" style="color: blue;"><b>{{ (WeightedScoreSumXT * 30).toFixed(2) }}</b></td>
+                            <td class="text-center" style="color: blue;"><b>{{ (((totalScoreSum + totalScoreZeroSum) / 33 * 70) + (WeightedScoreSumXT * 30)).toFixed(2) }} </b></td>  
                             <td style="text-align: center;width: 10%;">
-                                <Button  label="ประเมิน" class="mb-2 mr-2" icon="pi pi-plus" @click="openDataEvalu(Item.staffid)" />  
-                            </td>
-                        </tr> 
-                    </tbody>
-                </table>
+                                <Button label="ประเมิน" class="mb-2 mr-2" icon="pi pi-list" @click="openDataEvalu(Item.staffid)" />  
+                            </td> 
+                        </tr>  
+                    </tbody> 
+                </table>  
+
+                <!-- <div style="text-align: center;">
+                    <Button 
+                        label="บันทึกผลคะแนน" 
+                        class="mb-2 mr-2" 
+                        icon="pi pi-save" 
+                        style="background-color:orangered; color: white;" 
+                        @click="saveScore"/>
+                </div>  -->
+
                 <div class="col md:col-5 text-right">   
                     <Dialog header="จัดการแบบ ป01" maximizable v-model:visible="DialogAdd" :breakpoints="{ '960px': '75vw' }" :style="{ width: '100vw',height: '100vh' }" :modal="true" position="top">
                         <template v-slot:header>
                             <h3 style="text-align: left;">แบบรายงานผลการปฏิบัติราชการของข้าราชการและพนักงาน</h3> 
                             <InputText v-model="dataStaffid" type="hidden" autocomplete="off" style="display: none;"/>    
-                        </template>
-                        <TabView :activeIndex="activeIndex" @tabChange="onTabChange">
+                        </template> 
+                        <TabView :activeIndex="activeIndex" @tabChange="onTabChange"> 
                             <!-- Tab 1 -->
                             <TabPanel header="ผลสัมฤทธิ์ของงาน">
                                 <div class="grid">
@@ -58,24 +71,25 @@
                                             <table class="table">
                                                 <thead>
                                                     <tr>
-                                                        <th rowspan="2" style="width: 19%;">กิจกรรม / โครงการ / งาน</th>
-                                                        <th rowspan="2" style="width: 25%;">ตัวชี้วัด / เกณฑ์การประเมิน</th>
+                                                        <th rowspan="2" style="width: 15%;">กิจกรรม / โครงการ / งาน</th>
+                                                        <th rowspan="2" style="width: 20%;">ตัวชี้วัด / เกณฑ์การประเมิน</th>
                                                         <th rowspan="2" style="width: 20%;">รางานการปฏิบัติราชการ<br> ตามตัวชี้วัด/เกณฑ์การประเมิน</th>
-                                                        <th rowspan="2" style="width: 25%;">หลักฐานที่แสดงถึงผลการปฏิบัติราชการตามเกณฑ์การประเมิน(หลักฐานเชิงประจักษ์)</th>
-                                                        <th colspan="5" style="width: 15%;">ระดับการประเมินตนเอง<br> (ค่าคะแนนที่ได้)</th> 
-                                                    </tr>
+                                                        <th rowspan="2" style="width: 20%;">หลักฐานที่แสดงถึงผลการปฏิบัติราชการตามเกณฑ์การประเมิน(หลักฐานเชิงประจักษ์)</th> 
+                                                         <th rowspan="2" style="width: 10%;">ค่าคะแนนประเมินตนเอง</th>  
+                                                        <th colspan="5" style="width: 15%;">ค่าคะแนนที่ได้</th>  
+                                                    </tr> 
                                                     <tr>
                                                         <th>1</th>
                                                         <th>2</th>
                                                         <th>3</th>
                                                         <th>4</th>
                                                         <th>5</th>
-                                                    </tr>
+                                                    </tr> 
                                                 </thead>
                                                 <tbody>
                                                     <template v-for="(h, ind) in products_Tab1" :key="ind">
                                                         <tr>
-                                                            <td style="text-align: left;" colspan="9">
+                                                            <td style="text-align: left;" colspan="10">
                                                                 <b style="color: blue;">{{ h.id }}. {{ h.nameH }}</b> 
                                                             </td> 
                                                         </tr> 
@@ -84,8 +98,8 @@
                                                             <td style="text-align: left;">
                                                                 <b>ตัวชี้วัดที่ {{ idx+1 }} {{ subP01.p01_subject }}</b>
                                                                 <p v-for="(subIitem, idI) in subP01.subITems" :key="idI" style="padding-left: 8px;margin-bottom: 5px;">
-                                                                    <div v-if="subIitem.ind_no!=0"><b>ระดับ {{ subIitem.ind_no }}</b> {{ subIitem.ind_Items }}</div>
-                                                                    <div v-if="subIitem.ind_no==0"><b>{{ subIitem.ind_Items }}</b></div>
+                                                                    <div v-if="subIitem.ind_no!=0" ><b>ระดับ {{ subIitem.ind_no }}</b> {{ subIitem.ind_Items }}</div>
+                                                                    <div v-if="subIitem.ind_no==0" ><b>{{ subIitem.ind_Items }}</b></div>
                                                                 </p>
                                                             </td>
 
@@ -108,6 +122,9 @@
                                                                     <b style="color: red;">- ไม่มีข้อมูล -</b>
                                                                 </p>
                                                             </td>  
+                                                            <td style=" vertical-align: middle;" class="text-center">{{ subP01.p01_target }}</td>
+                                                            
+
                                                             <td class="text-center" colspan="5">  
                                                                 <Dropdown 
                                                                     class="mb-1" 
@@ -117,7 +134,12 @@
                                                                     optionValue="code" 
                                                                     placeholder="เลือกคะแนน" 
                                                                     :value="subP01.p01_score || p01_scores[0]" 
-                                                                />
+                                                                /> 
+
+                                                                <!-- <div class="mb-1">
+                                                                    <InputText v-model="subP01.p01_score" :options="p01_scores"  optionLabel="name" optionValue="code"  :value="subP01.p01_score || p01_scores[0]"></InputText>
+                                                                </div> -->
+
                                                                 <textarea v-model="subP01.p01_detail" rows="3" class="custom-textarea" ></textarea> 
                                                                 <Button label="บันทึกผล" icon="pi pi-save" class="mb-2 mr-2" @click="saveEvaTab1(subP01)" />  
                                                             </td> 
@@ -149,7 +171,7 @@
                                                                         type="text" 
                                                                         placeholder="0" 
                                                                         autocomplete="off"
-                                                                        @input="(event) => event.target.value = event.target.value.replace(/[^0-9]/g, '')" 
+                                                                        @input="(event) => event.target.value = event.target.value.replace(/[^0-9]/g, '') " 
                                                                     /> 
                                                                 </td>
                                                             </tr>
@@ -176,7 +198,7 @@
                                                                         type="text" 
                                                                         placeholder="0" 
                                                                         autocomplete="off"
-                                                                        @input="(event) => event.target.value = event.target.value.replace(/[^0-9]/g, '')" 
+                                                                        @input="(event) => event.target.value = event.target.value.replace(/[^0-9]/g, '') " 
                                                                     />  
                                                                 </td>
                                                             </tr>
@@ -213,8 +235,7 @@
                                                 <div class="field col-12 md:col-12">  
                                                     <label for="suggestions">2) ข้อเสนอแนะเกี่ยวกับวิธีส่งเสริมและพัฒนา</label>
                                                     <textarea v-model="suggestions" rows="4" class="custom-textarea" ></textarea> 
-                                                </div>
-                                                
+                                                </div> 
                                             </div>  
                                             <div class="button-container">
                                                 <Button label="บันทึกข้อมูลสมรรถนะ / ความเห็นเพิ่มเติม" icon="pi pi-save" class="mb-2 mr-2" @click="saveEvaTab1_1" /> 
@@ -238,8 +259,7 @@
                                                         <th colspan="5" style="width: 15%;">ระดับค่าเป้าหมาย</th> 
                                                         <th rowspan="2" style="width: 10%;">ค่าคะแนนที่ได้</th>
                                                         <th rowspan="2" style="width: 10%;">น้ำหนัก(ความสำคัญ/ความยากง่ายของงาน)</th>
-                                                        <th rowspan="2" style="width: 10%;">ค่าคะแนนถ่วงน้ำหนัก<br>(4) X (5)<br> 100</th>
-                                                        
+                                                        <th rowspan="2" style="width: 10%;">ค่าคะแนนถ่วงน้ำหนัก<br>(4) X (5)<br> 100</th> 
                                                     </tr>
                                                     <tr>
                                                         <th>1</th>
@@ -248,7 +268,7 @@
                                                         <th>4</th>
                                                         <th>5</th>
                                                     </tr>
-                                                </thead>
+                                                </thead> 
                                                 <tbody>
                                                     <template v-for="(h, ind) in products_Tab2" :key="ind">
                                                         <tr>
@@ -270,8 +290,7 @@
                                                                     <br>
                                                                     <em style="color: red;">{{ subP01.p01_detail }}</em>
                                                                 </p>
-                                                            </td>
-
+                                                            </td> 
                                                             <td style="text-align: left;">
                                                                 <p v-for="(subIitemInd, inD) in subP01.subITemP03ind" :key="inD" style="padding-left: 8px;margin-bottom: 5px;">
                                                                     <div v-if="subIitemInd.p03ind_no!=0"><b>ระดับ {{ subIitemInd.p03ind_no }}</b> {{ subIitemInd.p03ind_Items }}</div>
@@ -280,8 +299,7 @@
                                                                 <p v-if="subP01.subITemP03ind.length == 0" style="padding-left: 8px;margin-bottom: 5px;">
                                                                     <b style="color: red;">- ไม่มีข้อมูล -</b>
                                                                 </p>  
-                                                            </td>
-                                                            
+                                                            </td> 
                                                             <td style="text-align: left;"> 
                                                                 <p v-for="(subIitemDoc, inDoc) in subP01.subITemP03doc" :key="inDoc" style="padding-left: 8px;margin-bottom: 5px;"> 
                                                                     <a v-if="subIitemDoc.doc_file!=null" :href="'http://localhost:8000/storage/uploadsP03/'+subIitemDoc.doc_file" target="_blank"><b>ระดับ</b> <b>{{subIitemDoc.doc_no }}</b> {{ subIitemDoc.doc_name }}</a> 
@@ -319,11 +337,17 @@
                                                         </template>
                                                         <tr>
                                                             <td style="text-align: right" colspan="9">
-                                                                <b style="color: blue;">(7) ผลรวม</b>
+                                                                <b style="color: blue;">(7) ผลรวม</b> 
                                                             </td>
-                                                            <td class="text-center" style="color: blue;"><b>15%</b></td> 
-                                                            <td></td>
-                                                            <td></td>
+                                                            <td class="text-center" style="color: blue;">
+                                                                <b>{{ totalscoretrack }}</b> <!-- แสดงผลรวม p01_weight -->
+                                                            </td>
+                                                            <td class="text-center" style="color: blue;">
+                                                                <b>{{ totalWeighttrack }}%</b> <!-- แสดงผลรวม p01_weight -->
+                                                            </td>
+                                                            <td class="text-center" style="color: blue;">
+                                                                <b>{{ WeightedScoreSumtrack }}</b> <!-- แสดงผลรวมคะแนนที่คำนวณ -->
+                                                            </td> 
                                                         </tr>
                                                         <tr>
                                                             <td style="text-align: right; vertical-align: middle;" colspan="10">
@@ -334,8 +358,12 @@
                                                                 </div>
                                                                 <b style="color: blue;">จำนวนระดับค่าเป้าหมาย = 5 </b>
                                                             </td>
-                                                            <td></td>
-                                                            <td></td>
+                                                            <td class="text-center" style="color: blue;  vertical-align: middle;">
+                                                                <b>{{ WeightedScoreSumX }}</b> <!-- แสดงผลรวม/จำนวนระดับเป้าหมาย -->
+                                                            </td>
+                                                            <td class="text-center" style="color: blue;  vertical-align: middle;">
+                                                                <b>{{ WeightedScoreSumXT }}</b> <!-- แสดงผลรวม/จำนวนระดับเป้าหมาย -->
+                                                            </td>
                                                         </tr>  
                                                     </tbody>
                                                 </table>
@@ -422,34 +450,43 @@
                                                 <tbody>
                                                     <tr>
                                                         <td style=" vertical-align: middle;" class="text-left">จำนวนสมรรถนะหลัก /สมรรถนะเฉพาะตามลักษณะงานที่ปฏิบัติ /สมรรถนะทางการบริหาร ที่มีระดับสมรรถนะที่แสดงออก สูงกว่าหรือเท่ากับ ระดับสมรรถนะที่คาดหวัง X 3 คะแนน</td>
-                                                            <td></td>
-                                                            <td></td>
-                                                            <td></td>                                                      
+                                                            <td class="text-center" style="color: blue;">
+                                                                <b>{{ totalCoreCompetencies }}</b>  
+                                                            </td>
+                                                            <td class="text-center" style="color: blue;"><b>3</b></td>   
+                                                            <td class="text-center" style="color: blue;">
+                                                                <b>{{ totalScoreSum }}</b>  
+                                                            </td>                                                    
                                                     </tr>
                                                     <tr>
                                                         <td style=" vertical-align: middle;" class="text-left">จำนวนสมรรถนะหลัก /สมรรถนะเฉพาะตามลักษณะงานที่ปฏิบัติ /สมรรถนะทางการบริหาร ที่มีระดับสมรรถนะที่แสดงออก ต่ำกว่า ระดับสมรรถนะที่คาดหวัง 1 ระดับ X 2 คะแนน</td>
-                                                        <td></td>
-                                                        <td></td>
-                                                        <td></td>
+                                                            <td class="text-center" style="color: blue;">
+                                                                <b>{{ totalZeroScores }}</b> 
+                                                            </td>
+                                                            <td class="text-center" style="color: blue;"><b>2</b></td> 
+                                                            <td class="text-center" style="color: blue;">
+                                                                <b>{{ totalScoreZeroSum }}</b>  
+                                                            </td>
                                                     </tr>
                                                     <tr>
                                                         <td style=" vertical-align: middle;" class="text-left">จำนวนสมรรถนะหลัก /สมรรถนะเฉพาะตามลักษณะงานที่ปฏิบัติ /สมรรถนะทางการบริหาร ที่มีระดับสมรรถนะที่แสดงออก ต่ำกว่า ระดับสมรรถนะที่คาดหวัง 2 ระดับ X 1 คะแนน</td>
-                                                        <td></td>
-                                                        <td></td>
-                                                        <td></td>
+                                                            <td class="text-center" style="color: blue;"><b>0</b></td> 
+                                                            <td class="text-center" style="color: blue;"><b>1</b></td> 
+                                                            <td class="text-center" style="color: blue;"><b>0</b></td> 
                                                     </tr>
                                                     <tr>
                                                         <td style=" vertical-align: middle;" class="text-left">จำนวนสมรรถนะหลัก /สมรรถนะเฉพาะตามลักษณะงานที่ปฏิบัติ /สมรรถนะทางการบริหาร ที่มีระดับสมรรถนะที่แสดงออก ต่ำกว่า ระดับสมรรถนะที่คาดหวัง 3 ระดับ X 0 คะแนน</td>
-                                                        <td></td>
-                                                        <td></td>
-                                                        <td></td>
+                                                            <td class="text-center" style="color: blue;"><b>0</b></td> 
+                                                            <td class="text-center" style="color: blue;"><b>0</b></td> 
+                                                            <td class="text-center" style="color: blue;"><b>0</b></td> 
                                                     </tr>
                                                     <tr>
                                                         <td style="text-align: right" colspan="3">
                                                             <b style="color: blue;"> (8) ผลรวม</b>
                                                         </td>
-                                                        <td></td>
-                                                        
+                                                            <td class="text-center" style="color: blue;"> 
+                                                                <b>{{ totalScoreSum+totalScoreZeroSum }}</b>  
+                                                            </td> 
                                                     </tr>
                                                     <tr>
                                                     <td style="text-align: right; vertical-align: middle;" colspan="3">
@@ -460,7 +497,9 @@
                                                         </div>
                                                         <b style="color: blue;">จำนวนสมรรถนะที่ใช้ในการประเมิน X 3 คะแนน</b>
                                                     </td>
-                                                    <td></td>
+                                                    <td class="text-center" style="color: blue;"> 
+                                                         <b>{{ ((totalScoreSum + totalScoreZeroSum) / 33).toFixed(2) }}</b>  
+                                                    </td> 
                                                 </tr>  
                                                 </tbody>
                                                     <br>
@@ -476,9 +515,8 @@
                                                     </div>
                                                 </div>   
                                             </div>
-                                        </div>
-                                        
-                                 </div>
+                                        </div>    
+                                    </div>
                             </TabPanel>
                             <!-- Tab 3 -->
                             <TabPanel header="แผนพัฒนาการปฏิบัติราชการรายบุคคล" >
@@ -488,12 +526,12 @@
                                             <div class="p-fluid formgrid grid">
                                                 <div class="field col-12 md:col-12"> 
                                                     <label for="list_no_p03">ความรู้/ทักษะ/สมรรถนะ ที่ต้องการพัฒนา<em style="color: red;">*</em></label>
-                                                    <InputGroup style="text-align: center;">
+                                                    <!-- <InputGroup style="text-align: center;">
                                                         <Textarea v-model="p04_re1" rows="4" placeholder="ความรู้/ทักษะ/สมรรถนะ ที่ต้องการพัฒนา" :disabled="chkP04 === 1" />
                                                         <Textarea v-model="p04_re2" rows="4" placeholder="วิธีการพัฒนา" :disabled="chkP04 === 1" />
                                                         <Textarea v-model="p04_re3" rows="4" placeholder="ช่วงเวลาที่ต้องการพัฒนา" :disabled="chkP04 === 1" /> 
                                                         <Button label="เพิ่ม" severity="info" @click="AddDatap04" :disabled="chkP04 === 1" />
-                                                    </InputGroup>
+                                                    </InputGroup> -->
                                                 </div>
                                             </div>
                                             <DataTable :value="products_Tab3" :rows="10" :paginator="true" responsiveLayout="scroll" dataKey="id">
@@ -512,15 +550,15 @@
                                                         {{ slotProps.data.p04_re3 }}
                                                     </template>
                                                 </Column>
-                                                <Column style="text-align: center; width: 10%">
+                                                <!-- <Column style="text-align: center; width: 10%">
                                                     <template #body="slotProps">
                                                         <Button severity="danger" icon="pi pi-trash" class="p-button-text" outlined rounded @click="DeleteRegislick(slotProps.data)" />
                                                     </template>
-                                                </Column>
+                                                </Column> -->
                                             </DataTable>  
-                                            <div class="button-container">
+                                            <!-- <div class="button-container">
                                                 <Button label="ความรู้/ทักษะ/สมรรถนะ ที่ต้องการพัฒนา" icon="pi pi-save" class="mb-2 mr-2" @click="saveEvaTab3" :disabled="chkP04 === 1" /> 
-                                            </div>
+                                            </div> -->
                                         </div>
                                     </div>
                                 </div>
@@ -537,9 +575,9 @@
                                                     <p><strong>รอบการประเมิน:</strong> </p>
                                                     <p><strong>ชื่อผู้รับการประเมิน:</strong> {{ user.user.name.PREFIXFULLNAME }} {{ user.user.name.STAFFNAME }} {{ user.user.name.STAFFSURNAME }} </p>
                                                     <p><strong>ตำแหน่ง:</strong> {{ user.user.name.POSITIONNAME }} </p>
-                                                    <p><strong>ระดับตำแหน่ง:</strong> </p>
+                                                    <p><strong>ระดับตำแหน่ง:</strong>{{ user.user.name.POSTYPENAME }} </p>
                                                     <p><strong>สังกัด:</strong> {{ user.user.name.SCOPES?.staffdepartmentname }} </p>
-                                                    <p><strong>ชื่อผู้ประเมิน:</strong> </p>
+                                                    <p><strong>ชื่อผู้ประเมิน:</strong> {{  }}</p> 
                                                 </div><br>
                                                 <div class="employee-info" style="border: groove;padding: 15px;">
                                                     <h4>คำชี้แจง</h4>
@@ -564,17 +602,29 @@
                                                         </tr>
                                                     </thead>
                                                     <tbody>
-                                                        <tr>
+                                                        <tr> 
                                                             <td>องค์ประกอบที่ 1 ผลสัมฤทธิ์ของงาน</td>
-                                                            <td></td>
-                                                            <td></td>
-                                                            <td></td>
+                                                            <td class="text-center" style="color: blue;"> 
+                                                                <b>{{ ((totalScoreSum + totalScoreZeroSum) / 33).toFixed(2) }}</b>  
+                                                            </td> 
+                                                            <td class="text-center" style="color: blue;"> 
+                                                                <b>{{ 70 }}</b>  
+                                                            </td> 
+                                                            <td class="text-center" style="color: blue;"> 
+                                                                <b>{{ ((totalScoreSum + totalScoreZeroSum) / 33*70).toFixed(2) }}</b>  
+                                                            </td> 
                                                         </tr>
                                                         <tr>
                                                             <td>องค์ประกอบที่ 2 พฤติกรรมการปฏิบัติราชการ</td>
-                                                            <td></td>
-                                                            <td></td>
-                                                            <td></td>
+                                                            <td class="text-center" style="color: blue;"> 
+                                                                <b>{{ WeightedScoreSumXT }}</b>  
+                                                            </td> 
+                                                            <td class="text-center" style="color: blue;"> 
+                                                                <b>{{ 30 }}</b>  
+                                                            </td> 
+                                                            <td class="text-center" style="color: blue;"> 
+                                                                <b>{{ (WeightedScoreSumXT *30).toFixed(2) }}</b>  
+                                                            </td> 
                                                         </tr>
                                                         <tr>
                                                             <td>องค์ประกอบอื่นๆ (ถ้ามี)</td>
@@ -584,19 +634,24 @@
                                                         </tr>
                                                         <tr style="font-weight: bold;">
                                                             <td colspan="2" style="text-align: right;">รวม</td>
-                                                            <td>100%</td>
-                                                            <td></td>
+                                                            <td class="text-center" style="color: blue;"> 
+                                                                <b>{{ 100 }}%</b>  
+                                                            </td> 
+                                                            <td class="text-center" style="color: blue;"> 
+                                                                <b>{{ (((totalScoreSum + totalScoreZeroSum) / 33 * 70) + (WeightedScoreSumXT * 30)).toFixed(2) }}</b> 
+                                                            </td>
                                                         </tr>
                                                     </tbody>
                                                 </table>
                                                 <div class="employee-info">
-                                                    <h4>ระดับผลการประเมินที่ได้</h4>
-                                                    <p><strong>[ &nbsp;&nbsp;&nbsp; ] ดีเด่น (90-100)</strong></p>
-                                                    <p><strong>[ &nbsp;&nbsp;&nbsp; ] ดีมาก (80-89)</strong></p>
-                                                    <p><strong>[ &nbsp;&nbsp;&nbsp; ] ดี (70-79)</strong></p>
-                                                    <p><strong>[ &nbsp;&nbsp;&nbsp; ] พอใช้ (60-69)</strong></p> 
-                                                    <p><strong>[ <b>&#10003;</b> ] ต้องปรับปรุง (ต่ำกว่า 60)</strong></p>
+                                                <h4>ระดับผลการประเมินที่ได้</h4>
+                                                    <p><strong>[&nbsp;&nbsp; <b v-if="(((totalScoreSum + totalScoreZeroSum) / 33 * 70) + (WeightedScoreSumXT * 30)) >= 90">&#10003;</b> &nbsp;&nbsp;] ดีเด่น (90-100)</strong></p>
+                                                    <p><strong>[&nbsp;&nbsp; <b v-if="(((totalScoreSum + totalScoreZeroSum) / 33 * 70) + (WeightedScoreSumXT * 30)) >= 80 && (((totalScoreSum + totalScoreZeroSum) / 33 * 70) + (WeightedScoreSumXT * 30)) < 90">&#10003;</b> &nbsp;&nbsp;] ดีมาก (80-89)</strong></p>
+                                                    <p><strong>[&nbsp;&nbsp; <b v-if="(((totalScoreSum + totalScoreZeroSum) / 33 * 70) + (WeightedScoreSumXT * 30)) >= 70 && (((totalScoreSum + totalScoreZeroSum) / 33 * 70) + (WeightedScoreSumXT * 30)) < 80">&#10003;</b> &nbsp;&nbsp;] ดี (70-79)</strong></p>
+                                                    <p><strong>[&nbsp;&nbsp; <b v-if="(((totalScoreSum + totalScoreZeroSum) / 33 * 70) + (WeightedScoreSumXT * 30)) >= 60 && (((totalScoreSum + totalScoreZeroSum) / 33 * 70) + (WeightedScoreSumXT * 30)) < 70">&#10003;</b> &nbsp;&nbsp;] พอใช้ (60-69)</strong></p> 
+                                                    <p><strong>[&nbsp;&nbsp; <b v-if="(((totalScoreSum + totalScoreZeroSum) / 33 * 70) + (WeightedScoreSumXT * 30)) < 60">&#10003;</b> &nbsp;&nbsp;] ต้องปรับปรุง (ต่ำกว่า 60)</strong></p>
                                                 </div>
+
                                                 <h5 class="mb-4"><i class="" style="font-size: x-large;"></i> ส่วนที่ 3 แผนพัฒนาการปฏิบัติราชการรายบุคคล</h5>
                                                 <table border="1" cellspacing="0" cellpadding="5">
                                                     <thead>
@@ -624,8 +679,8 @@
                                                         </td>
                                                             <td class="center-align"><br><br>
                                                                 ลงชื่อ .................................................................<br>
-                                                                ชื่อ นายพิพัฒน์พงษ์ เพริดพราว<br>
-                                                                ตำแหน่ง นักวิชาการคอมพิวเตอร์<br>
+                                                                ชื่อ {{ user.user.name.PREFIXFULLNAME }} {{ user.user.name.STAFFNAME }} {{ user.user.name.STAFFSURNAME }}<br>
+                                                                ตำแหน่ง {{ user.user.name.POSITIONNAME }} <br>
                                                                 วันที่ .......... เดือน .......................... พ.ศ.
                                                             </td>
                                                         </tr>
@@ -633,15 +688,16 @@
                                                             <td>
                                                                 <b>ผู้ประเมิน</b><br>
                                                                 <label for="evaluator-acknowledgment-1">[ &nbsp;&nbsp; ] ได้แจ้งผลการประเมินและผู้รับการประเมินได้ลงนามรับทราบ รายบุคคลแล้ว</label><br>
-                                                                <label for="evaluator-acknowledgment-2">[ &nbsp;&nbsp; ] ได้แจ้งผลการประเมินเมื่อวันที่ ..............................แต่ผู้รับการประเมินไม่ลงนามรับทราบผลการประเมิน โดยมี .......................... เป็นพยาน</label><br>
+                                                                <label for="evaluator-acknowledgment-2">[ &nbsp;&nbsp; ] ได้แจ้งผลการประเมินเมื่อวันที่ ..............................แต่ผู้รับการประเมินไม่ลงนามรับทราบผลการประเมิน 
+                                                                    โดยมี ....................................... เป็นพยาน และ....................................... เป็นพยาน</label><br>
                                                                 ลงชื่อ .................................................................<br>
-                                                                ชื่อ <br>
+                                                                ชื่อ นางสาวพนมพร ปัจจวงษ์<br>
                                                                 ตำแหน่ง ผู้อำนวยการกองแผนงาน<br>
                                                                 วันที่ .......... เดือน .......................... พ.ศ...........
                                                             </td>
                                                         <td class="center-align"><br><br>
                                                             ลงชื่อ .................................................................<br>
-                                                            ชื่อ <br>
+                                                            ชื่อ นางสาวพนมพร ปัจจวงษ์<br>
                                                             ตำแหน่ง ผู้อำนวยการกองแผนงาน<br>
                                                             วันที่ .......... เดือน .......................... พ.ศ...........
                                                         </td>
@@ -661,8 +717,8 @@
                                                         </td>
                                                         <td class="center-align"><br><br>
                                                             ลงชื่อ : .................................................................<br>
-                                                            ชื่อ : นายพิพัฒน์พงษ์ เพริดพราว<br>
-                                                            ตำแหน่ง : นักวิชาการคอมพิวเตอร์<br>
+                                                            ชื่อ : {{ user.user.name.PREFIXFULLNAME }} {{ user.user.name.STAFFNAME }} {{ user.user.name.STAFFSURNAME }}<br>
+                                                            ตำแหน่ง : {{ user.user.name.POSITIONNAME }}<br>
                                                             วันที่ : .......... เดือน .......................... พ.ศ.............
                                                         </td>
                                                         </tr>
@@ -678,7 +734,7 @@
                                                             </td>
                                                             <td class="center-align"><br><br>
                                                                 ลงชื่อ .................................................................<br>
-                                                                ชื่อ <br>
+                                                                ชื่อ นางสาวพนมพร ปัจจวงษ์<br>
                                                                 ตำแหน่ง ผู้อำนวยการกองแผนงาน<br>
                                                                 วันที่ .......... เดือน .......................... พ.ศ...........
                                                             </td>
@@ -703,7 +759,7 @@
 <script setup> 
     const { signIn, getSession, signOut } = await useAuth()
     const user = await getSession();
-    console.log(user);
+    // console.log(user);
 </script>
 <script> 
 import { ref } from 'vue';
@@ -711,13 +767,14 @@ import axios from 'axios';
 import Swal from 'sweetalert2' 
 import TabView from 'primevue/tabview';
 import TabPanel from 'primevue/tabpanel';
+import { LogarithmicScale } from 'chart.js';
 export default {
     data() { 
         return {  
             staffid_po: 130102,
-            staffid_Main: 5009942,
-            facid_Main: 201092704000,
-            groupid_Main: '01', 
+            staffid_Main: '',
+            facid_Main: '',
+            groupid_Main: '', 
             // ปีงบประมาณ
             dropdownItemYear: { name: 'ปีงบประมาณ 2568', code: 2568 },
             dropdownItemsYear: [
@@ -732,10 +789,13 @@ export default {
             dropdownItemRecords: [
                 { name: 'รอบที่ 1 วันที่ 1 กันยายน  ถึง วันที่ 28 กุมภาพันธ์', code: '1' },
                 { name: 'รอบที่ 2 วันที่ 1 มีนาคม ถึง วันที่ 31 สิงหาคม', code: '2' },
-            ],
-           
+            ], 
+            tracking_date: '',
+            tracking_dates: null, 
+             
             // ตารางรายชื่อ
-            products: [],
+            products: [], 
+
             // เพิ่มคะแนนประเมิน 
             DialogAdd: false, 
             activeIndex: 0,
@@ -778,7 +838,7 @@ export default {
                 { id: 16, activity: 'ค. 5 การสอนงานและการมอบหมายงาน', indicator: '0', data_table3: '' }
             ],
             improvements: null,
-            suggestions: null,
+            suggestions: null,  
             //Tab 2 
             products_Tab2: [],
             //Tab 3
@@ -789,97 +849,282 @@ export default {
             chkP04: 0,
             //Tab 4
             products_Tab3T4: [],
+            //total weight
+            totalscoretrack:{},
+            totalWeighttrack: {}, 
+            WeightedScoreSumtrack:{},
+            WeightedScoreSumX :{},
+            WeightedScoreSumXT: {},
+            //รวมคะแนน เกณฑ์การประเมิน
+            totalCoreCompetencies:{},
+            totalZeroScores:{},
+            totalScoreSum:{},
+            totalScoreZeroSum:{},
+            totalScoreFinalSum:{}, 
+            //ชื่อผู้ประเมิน 
+            assessor:'',
+            //รวมคะแนน
+            //totalScore: 0
         }
-    },
+    }, 
     components: {
         TabView,
         TabPanel
     }, 
-    mounted(){ 
-        this.showDataEvalu();  
-    },
+    async mounted(){ 
+        const { signIn, getSession, signOut } = await useAuth()
+        const user = await getSession();
+       // console.log(user.user.name);
+        const {STAFFID, SCOPES} = user.user.name
+        const {staffdepartment, groupid, staffdepartmentname, groupname} = SCOPES
+        await this.setSession(STAFFID,staffdepartment,groupid); 
+        // this.showDataEvalu();  
+        this.showDataSet();
+    },  
+    computed: {
+        totalscoretrack() {
+            // ใช้ reduce เพื่อคำนวณค่ารวมของ p_weight(รวมค่าคะแนนที่ได้)
+            return this.products_Tab2.reduce((total, h) => {
+                return total + h.subP01sX.reduce((subTotal, subP01) => {
+                    return subTotal + subP01.p01_score ; // เพิ่ม p01_weight ของแต่ละ subP01
+                }, 0);
+            }, 0);
+        },
+        totalWeighttrack() {
+            // ใช้ reduce เพื่อคำนวณค่ารวมของ p_weight*(รวมน้ำหนักความยากง่ายของงาน)
+            return this.products_Tab2.reduce((total, h) => {
+                return total + h.subP01sX.reduce((subTotal, subP01) => {
+                    return subTotal + subP01.p01_weight; // เพิ่ม p01_weight ของแต่ละ subP01
+                }, 0);
+            }, 0);
+        },
+        WeightedScoreSumtrack() {
+            // คำนวณค่ารวมของคะแนนที่คำนวณ และหารด้วย 5(รวมค่าคะแนนถ่วงน้ำหนัก)
+            return this.products_Tab2.reduce((total, h) => {
+                return total + h.subP01sX.reduce((subTotal, subP01) => {
+                    // คำนวณคะแนนรวม (subP01.p01_score * subP01.p01_weight / 100) แล้วหารด้วย 5
+                    return subTotal + ((subP01.p01_score * subP01.p01_weight / 100));
+                }, 0);
+            }, 0).toFixed(3); // ใช้ toFixed(3) เพื่อแสดงทศนิยม 3 ตำแหน่ง
+        },
+        WeightedScoreSumX() {
+            // คำนวณค่ารวมของคะแนนที่คำนวณ(รวมน้ำหนักความยากง่ายของงาน/5)
+            return this.products_Tab2.reduce((total, h) => {
+                return total + h.subP01sX.reduce((subTotal, subP01) => {
+                    return subTotal + (subP01.p01_weight/5 );
+                }, 0);
+            }, 0).toFixed(2); // ใช้ toFixed(2) เพื่อให้มีทศนิยม 2 ตำแหน่ง
+        },
+        WeightedScoreSumXT() {
+            // คำนวณค่ารวมของคะแนนที่คำนวณ (รวมค่าคะแนนถ่วงน้ำหนัก/5)
+            return this.products_Tab2.reduce((total, h) => {
+                return total + h.subP01sX.reduce((subTotal, subP01) => {
+                    return subTotal + ((subP01.p01_score * subP01.p01_weight / 100) / 5);
+                }, 0);
+            }, 0).toFixed(2); // ใช้ toFixed(2) เพื่อให้มีทศนิยม 2 ตำแหน่ง
+        },
+        //รวมคะแนน เกณฑ์การประเมิน
+        //รวมช่องสมรรถนะ
+        totalCoreCompetencies() { 
+            return this.coreCompetencies.reduce((sum, row, index) => { 
+                const dataTable1Value = parseFloat(row.data_table1) || 0;
+                const dataTable2Value = parseFloat(this.jobSpecificCompetencies[index]?.data_table2) || 0; 
+                return sum + dataTable1Value + dataTable2Value;
+            }, 0);
+        },
+            //รวมช่องค่า0
+        totalZeroScores() { 
+            let zeroScoreCount = 0; 
+            this.coreCompetencies.forEach(row => {
+            if (parseFloat(row.data_table1) === 0) {
+                zeroScoreCount++;
+            }
+            });  
+            this.jobSpecificCompetencies.forEach(row => {
+            if (parseFloat(row.data_table2) === 0) {
+                zeroScoreCount++;
+            }
+            }); 
+            return zeroScoreCount;
+        },
+        //รวมคะแนนจำนวนสมรรถนะ*3
+        totalScoreSum(staffid) {
+            return this.coreCompetencies.reduce((sum, row, index) => { 
+            const dataTable1Value = parseFloat(row.data_table1) || 0;
+            const dataTable2Value = parseFloat(this.jobSpecificCompetencies[index]?.data_table2) || 0;  
+            return sum + (dataTable1Value * 3) + (dataTable2Value * 3); 
+            }, 0);
+        }, 
+        totalScoreSumX() {     
+            return this.coreCompetencies.reduce((sum, row, index) => { 
+                const dataTable1Value = parseFloat(row.data_table1) || 0;
+                const dataTable2Value = parseFloat(this.jobSpecificCompetencies[index]?.data_table2) || 0;  
+                return sum + (dataTable1Value * 3) + (dataTable2Value * 3);
+            }, 0);
+        },  
+        totalScoreZeroSum() { 
+            let zeroScoreCount = 0;  
+            this.coreCompetencies.forEach(row => { 
+                if (parseFloat(row.data_table1) === 0) {
+                    zeroScoreCount++;
+                }
+            });  
+            this.jobSpecificCompetencies.forEach(row => { 
+                if (parseFloat(row.data_table2) === 0) {
+                    zeroScoreCount++;
+                }
+            });  
+            return zeroScoreCount * 2;
+        }, 
+        //รวมคะแนนทั้งหมด30/10/67
+        // calculatedScore() {
+        //     // ใช้ค่า totalScoreSum จาก computed property
+        //     const totalScoreSum = this.totalScoreSum;
+        //     const totalScoreZeroSum = Number(this.totalScoreZeroSum) || 0;
+            
+        //     console.log("totalScoreSum:", totalScoreSum);
+        //     console.log("totalScoreZeroSum:", totalScoreZeroSum); 
+
+        //     this.totalScore = ((totalScoreSum + totalScoreZeroSum) / 33 * 70).toFixed(2);
+        //     return this.totalScore;
+        // }
+    }, 
     methods: { 
+        setSession (staffid_Main,facid_Main,groupid_Main) {
+           // console.log('setSession');  
+            this.staffid_Main = staffid_Main
+            this.facid_Main = facid_Main
+            this.groupid_Main = groupid_Main  
+        },
+        showDataSet() {
+            axios
+                .post('http://localhost:8000/api/showDateSet', {
+                    staff_id: this.staffid_Main,
+                    fac_id: this.facid_Main,
+                    group_id: this.groupid_Main
+                })
+                .then((res) => {
+                    // console.log(res.data); 
+                    this.tracking_dates = res.data;
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                });
+        },
         // ตารางรายชื่อ
-        async showDataEvalu(){
-            await axios.get('http://localhost:8000/api/showDataEvalu',{
+        xxr(){ 
+            if(this.tracking_date.evalua === undefined){
+                Swal.fire({
+                    title: "แจ้งเตือนจากระบบ!",
+                    text: "กรุณาเลือก รอบประเมิน ก่อน!",
+                    icon: "error"
+                });
+            }else{
+                this.showDataEvalu();
+            } 
+        }, 
+        async showDataEvalu() {
+            try {
+                const res = await axios.get('http://localhost:8000/api/showDataEvalu', {
                 params: {
                     staff_id: this.staffid_Main,
-                    fac_id: this.facid_Main, 
+                    fac_id: this.facid_Main,
                     group_id: this.groupid_Main,
-                    year: this.dropdownItemYear,
-                },
-            }).then(res => {     
-                // console.log(res.data);  
-                this.products=res.data;   
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
+                    evalua: this.tracking_date.evalua,
+                    p_year: this.tracking_date.d_date,
+                }
+                });
+                this.products = res.data; 
+                //console.log(res.data);
+                
+                // ใช้ Promise.all เพื่อทำการเรียก cvb พร้อมกันหลายๆ รายการ
+                //await Promise.all(res.data.map(item => this.cvb(item)));
+            } catch (error) {
+                console.error('Error fetching evaluation data:', error);
+            }
+        }, 
+        async cvb(item) {
+            // console.log(this.tracking_date.evalua); 
+            try {
+                const response = await axios.post('http://localhost:8000/api/showdatator', {
+                    p_year: this.tracking_date.d_date,
+                    evalua: this.tracking_date.evalua,
+                    p_staffid: item.staffid
+                });  
+                //console.log(response.data); 
+                // อัปเดตค่า persen ใน item แทนการใช้ this.persen
+                item.persenGetData = response.data[0]?.persen ?? 0;
+            } catch (error) {
+                console.error('Error fetching data for staff:', error);
+            }
         },
         // เพิ่มคะแนนประเมิน
-        openDataEvalu(staff_id){   
-            this.dataStaffid = staff_id
-            this.products_Tab1 = [];  
-            this.p01_scores = [
-                { name: '- ไม่ระบุ -', code: 0 },
-                { name: '1 คะแนน', code: 1 },
-                { name: '2 คะแนน', code: 2 },
-                { name: '3 คะแนน', code: 3 },
-                { name: '4 คะแนน', code: 4 },
-                { name: '5 คะแนน', code: 5 },
-            ];
+        openDataEvalu(staff_id){     
+            if(this.tracking_date.d_date === undefined){
+                Swal.fire("แจ้งเตือนจากระบบ","กรุณาเลือกรอบประเมิน","error");
+            }else{  
+                this.dataStaffid = staff_id
+                this.products_Tab1 = [];  
+                this.p01_scores = [
+                    { name: '- ไม่ระบุ -', code: 0 },
+                    { name: '1 คะแนน', code: 1 },
+                    { name: '2 คะแนน', code: 2 },
+                    { name: '3 คะแนน', code: 3 },
+                    { name: '4 คะแนน', code: 4 },
+                    { name: '5 คะแนน', code: 5 },
+                ];
 
-            // ตั้งค่า coreCompetencies กลับไปเป็นค่าเริ่มต้น
-            this.coreCompetencies = [
-                { id: 1, activity: 'ก. 1 การมุ่งผลสัมฤทธิ์', indicator: '1', data_table1: '' },
-                { id: 2, activity: 'ก. 2 การบริการที่ดี', indicator: '1', data_table1: '' },
-                { id: 3, activity: 'ก. 3 การสั่งสมความเชี่ยวชาญในงานอาชีพ', indicator: '1', data_table1: '' },
-                { id: 4, activity: 'ก. 4 การยึดมั่นในความถูกต้องชอบธรรมและจริยธรรม', indicator: '1', data_table1: '' },
-                { id: 5, activity: 'ก. 5 การทำงานเป็นทีม', indicator: '1', data_table1: '' }
-            ];  
-            
-            // ตั้งค่า jobSpecificCompetencies กลับไปเป็นค่าเริ่มต้น
-            this.jobSpecificCompetencies = [
-                { id: 6, activity: 'ข. 1 การคิดวิเคราะห์', indicator: '1', data_table2: '' },
-                { id: 7, activity: 'ข. 2 การดำเนินการเชิงรุก', indicator: '1', data_table2: '' },
-                { id: 8, activity: 'ข. 3 ความผูกพันที่มีต่อส่วนราชการ', indicator: '1', data_table2: '' },
-                { id: 9, activity: 'ข. 4 การมองภาพองค์รวม', indicator: '1', data_table2: '' },
-                { id: 10, activity: 'ข. 5 การสืบเสาะหาข้อมูล', indicator: '1', data_table2: '' },
-                { id: 11, activity: 'ข. 6 การตรวจสอบความถูกต้องตามกระบวนงาน', indicator: '1', data_table2: '' }
-            ];
+                // ตั้งค่า coreCompetencies กลับไปเป็นค่าเริ่มต้น
+                this.coreCompetencies = [
+                    { id: 1, activity: 'ก. 1 การมุ่งผลสัมฤทธิ์', indicator: '1', data_table1: '' },
+                    { id: 2, activity: 'ก. 2 การบริการที่ดี', indicator: '1', data_table1: '' },
+                    { id: 3, activity: 'ก. 3 การสั่งสมความเชี่ยวชาญในงานอาชีพ', indicator: '1', data_table1: '' },
+                    { id: 4, activity: 'ก. 4 การยึดมั่นในความถูกต้องชอบธรรมและจริยธรรม', indicator: '1', data_table1: '' },
+                    { id: 5, activity: 'ก. 5 การทำงานเป็นทีม', indicator: '1', data_table1: '' }
+                ];  
+                
+                // ตั้งค่า jobSpecificCompetencies กลับไปเป็นค่าเริ่มต้น
+                this.jobSpecificCompetencies = [
+                    { id: 6, activity: 'ข. 1 การคิดวิเคราะห์', indicator: '1', data_table2: '' },
+                    { id: 7, activity: 'ข. 2 การดำเนินการเชิงรุก', indicator: '1', data_table2: '' },
+                    { id: 8, activity: 'ข. 3 ความผูกพันที่มีต่อส่วนราชการ', indicator: '1', data_table2: '' },
+                    { id: 9, activity: 'ข. 4 การมองภาพองค์รวม', indicator: '1', data_table2: '' },
+                    { id: 10, activity: 'ข. 5 การสืบเสาะหาข้อมูล', indicator: '1', data_table2: '' },
+                    { id: 11, activity: 'ข. 6 การตรวจสอบความถูกต้องตามกระบวนงาน', indicator: '1', data_table2: '' }
+                ];
 
-            this.improvements = null;
-            this.suggestions = null;
+                this.improvements = null;
+                this.suggestions = null;
 
-            this.showdataPo(staff_id,this.facid_Main,this.dropdownItemYear.code,this.dropdownItemRecord.code);
-            axios.post('http://localhost:8000/api/showDataP03New',{
-                staff_id: staff_id,
-                fac_id: this.facid_Main,
-                year_id: this.dropdownItemYear.code,
-                record: this.dropdownItemRecord.code,
-            }).then(res => {     
-                // console.log(res.data);    
-                if (res.data && Array.isArray(res.data)) {
-                    this.products_Tab1 = res.data; 
-                    this.products_Tab1.forEach(h => {
-                        h.subP01sX.forEach(subP01 => {
-                            // ตรวจสอบว่าค่า p01_score นั้นถูกต้องหรือไม่
-                            const foundScore = this.p01_scores.find(score => score.code === subP01.p01_score);
-                            if (foundScore) {
-                                subP01.p01_score = foundScore.code; // ใช้ค่าที่ถูกต้อง
-                            } else {
-                                subP01.p01_score = this.p01_scores[0].code; // ใช้ค่าเริ่มต้น "- ไม่ระบุ -"
-                            }
+                this.showdataPo(staff_id,this.facid_Main,this.tracking_date.d_date,this.tracking_date.evalua );
+                    axios.post('http://localhost:8000/api/showDataP03New',{
+                        staff_id: staff_id,
+                        fac_id: this.tracking_date.fac_id,
+                        year_id: this.tracking_date.d_date, 
+                        evalua: this.tracking_date.evalua  
+                    }).then(res => {     
+                    // console.log('openDataEvalu: ',res.data);    
+                    if (res.data && Array.isArray(res.data)) {
+                        this.products_Tab1 = res.data; 
+                        this.products_Tab1.forEach(h => {
+                            h.subP01sX.forEach(subP01 => {
+                                // ตรวจสอบว่าค่า p01_score นั้นถูกต้องหรือไม่
+                                const foundScore = this.p01_scores.find(score => score.code === subP01.p01_score);
+                                if (foundScore) {
+                                    subP01.p01_score = foundScore.code; // ใช้ค่าที่ถูกต้อง
+                                } else {
+                                    subP01.p01_score = this.p01_scores[0].code; // ใช้ค่าเริ่มต้น "- ไม่ระบุ -"
+                                }
+                            });
                         });
-                    });
-                } 
-                this.DialogAdd = true; 
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
-        },
-
+                    } 
+                    this.DialogAdd = true; 
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+            }
+        }, 
         showdataPo(staff_id,fac_id,year_id,record){  
             axios.post('http://localhost:8000/api/showDataPo',{
                 staff_id: staff_id,
@@ -929,8 +1174,7 @@ export default {
             .catch(error => {
                 console.error('Error:', error);
             });
-        },
-
+        }, 
         saveEvaTab1(subP01) {  
             if(subP01.p01_score === 0){
                 Swal.fire("แจ้งเตือน","กรุณาเลือกคะแนน !","error");
@@ -941,7 +1185,7 @@ export default {
                     p01_score: subP01.p01_score,
                     p01_detail: subP01.p01_detail,
                 }).then(res => {     
-                    // console.log(res.data);   
+                     //console.log(res.data);   
                     Swal.fire({
                         position: "top-end",
                         icon: "success",
@@ -955,15 +1199,14 @@ export default {
                 });
             }
  
-        },
-
+        }, 
         async saveEvaTab1_1() { 
             const payload = {
-                staffid_po: this.staffid_po,
+                staffid_po: this.staffid_po, 
                 staff_id: this.staffid_Main, 
                 fac_id: this.facid_Main, 
-                year: this.dropdownItemYear.code,
-                record: this.dropdownItemRecord.code,
+                year: this.tracking_date.d_date,
+                record: this.tracking_date.evalua, 
                 coreCompetencies: this.coreCompetencies,
                 jobSpecificCompetencies: this.jobSpecificCompetencies,
                 otherCompetencies: this.otherCompetencies,
@@ -971,7 +1214,7 @@ export default {
                 suggestions: this.suggestions
             }; 
             const res = await axios.post('http://localhost:8000/api/saveP03PoTab1', payload);
-                // console.log(res.data);  
+                 //console.log(res.data);  
                 Swal.fire({
                     position: "top-end",
                     icon: "success",
@@ -979,36 +1222,34 @@ export default {
                     showConfirmButton: false,
                     timer: 1500
                 }); 
-        },
-
+        }, 
         onTabChange(event) { 
             // console.log(event.index);
             if (event.index==0) {
-                console.log('ผลสัมฤทธิ์ของงาน -',event.index); 
+                //console.log('ผลสัมฤทธิ์ของงาน -',event.index); 
             }
             if(event.index==1){
-                console.log('รายงาน ป.01 - ป.03 -',event.index); 
-
+                //console.log('รายงาน ป.01 - ป.03 -',event.index);  
                 this.tab2Data(this.dataStaffid);  
-                this.showdataPoText(this.dataStaffid,this.facid_Main,this.dropdownItemYear.code,this.dropdownItemRecord.code); 
+                this.showdataPoText(this.dataStaffid,this.facid_Main,this.tracking_date.d_date,this.tracking_date.evalua); 
             }
             if (event.index==2) {
-                console.log('แผนพัฒนาการปฏิบัติราชการรายบุคคล -',event.index); 
+                //console.log('แผนพัฒนาการปฏิบัติราชการรายบุคคล -',event.index); 
                 this.products_Tab3 =[];
-                this.chkp04(this.dataStaffid,this.facid_Main,this.dropdownItemYear.code,this.dropdownItemRecord.code); 
-                this.chkp04data(this.dataStaffid,this.facid_Main,this.dropdownItemYear.code,this.dropdownItemRecord.code);  
+                this.chkp04(this.dataStaffid,this.facid_Main,this.tracking_date.d_date,this.tracking_date.evalua); 
+                this.chkp04data(this.dataStaffid,this.facid_Main,this.tracking_date.d_date,this.tracking_date.evalua);  
             }
             if (event.index==3) {
-                console.log('รายงาน ป.04 -',event.index);
-                this.chkp04dataT4(this.dataStaffid,this.facid_Main,this.dropdownItemYear.code,this.dropdownItemRecord.code);   
+                //console.log('รายงาน ป.04 -',event.index);
+                this.chkp04dataT4(this.dataStaffid,this.facid_Main,this.tracking_date.d_date,this.tracking_date.evalua);   
             }
         },  
         tab2Data(staff_id){  
             axios.post('http://localhost:8000/api/showDataP03New',{
-                staff_id: staff_id,
-                fac_id: this.facid_Main,
-                year_id: this.dropdownItemYear.code,
-                record: this.dropdownItemRecord.code,
+                staff_id: staff_id, 
+                fac_id: this.tracking_date.fac_id,
+                year_id: this.tracking_date.d_date, 
+                evalua: this.tracking_date.evalua   
             }).then(res => {     
                 // console.log(res.data);   
                 if (res.data && Array.isArray(res.data)) {
@@ -1018,8 +1259,7 @@ export default {
             .catch(error => {
                 console.error('Error:', error);
             });
-        },
-
+        }, 
         showdataPoText(staff_id,fac_id,year_id,record){ 
             axios.post('http://localhost:8000/api/showDataPo',{
                 staff_id: staff_id,
@@ -1027,7 +1267,7 @@ export default {
                 year_id: year_id,
                 record: record,
             }).then(res => {     
-                // console.log(res.data);    
+                 //console.log(res.data);    
                 if(res.data.length > 0){
                     const data = res.data[0];
                     this.coreCompetencies.forEach(item => {
@@ -1069,8 +1309,7 @@ export default {
             .catch(error => {
                 console.error('Error:', error);
             });
-        },
-
+        }, 
         chkp04(staff_id,fac_id,year_id,record){
             axios.post('http://localhost:8000/api/showDataPo',{
                 staff_id: staff_id,
@@ -1088,8 +1327,7 @@ export default {
             .catch(error => {
                 console.error('Error:', error);
             });
-        },
-
+        }, 
         AddDatap04(){ 
             const newData = {
                 p04_re1: this.p04_re1,
@@ -1100,20 +1338,20 @@ export default {
             this.p04_re1 = '';
             this.p04_re2 = '';
             this.p04_re3 = '';
-        },
+        }, 
         DeleteRegislick(item) {
             // Add logic to remove the selected item
             this.products_Tab3 = this.products_Tab3.filter((product) => product !== item);
-        },
+        }, 
         saveEvaTab3(){  
             axios.post('http://localhost:8000/api/saveEvaTab3',{
                 staff_id: this.dataStaffid,
                 fac_id: this.facid_Main,
-                year_id: this.dropdownItemYear.code,
-                record: this.dropdownItemRecord.code,
+                year_id: this.tracking_date.d_date,
+                record: this.tracking_date.evalua,
                 products_Tab3: this.products_Tab3
             }).then(res => {     
-                console.log(res.data);    
+                 //console.log(res.data);    
                 Swal.fire({
                     position: "top-end",
                     icon: "success",
@@ -1151,30 +1389,7 @@ export default {
             .catch(error => {
                 console.error('Error:', error);
             });
-        },
-        chkp04data(staff_id,fac_id,year_id,record){
-            axios.post('http://localhost:8000/api/showData04Tab3',{
-                staff_id: staff_id,
-                fac_id: fac_id,
-                year_id: year_id,
-                record: record,
-            }).then(res => {     
-                // console.log(res.data);     
-                if(res.data.length > 0){
-                    res.data.forEach(p04 => {
-                        const newData = {
-                            p04_re1: p04.p04_re1,
-                            p04_re2: p04.p04_re2,
-                            p04_re3: p04.p04_re3
-                        };
-                        this.products_Tab3.push(newData); 
-                    });  
-                } 
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
-        },
+        }, 
         chkp04dataT4(staff_id,fac_id,year_id,record){
             axios.post('http://localhost:8000/api/showData04Tab3',{
                 staff_id: staff_id,
@@ -1192,12 +1407,115 @@ export default {
             });
         },
         async mounted() {
-                const  { signIn, getSession, signOut } = await useAuth()
-                const user = await getSession();
-            },
-    }
-} 
+            const  { signIn, getSession, signOut } = await useAuth()
+            const user = await getSession();
+        }, 
+        //รายชื่อผู้ประเมิน
+        showdatator() { 
+            axios.post('http://localhost:8000/api/showdatator', {
+                p_year: this.product_date.d_date,
+                evalua: this.product_date.evalua,
+                p_staffid: this.staffid_Main
+            })
+            .then(response => {
+                //console.log('Response',response.data);  
+                const dataSet = response.data[0];
+                this.assessor = dataSet.assessor;
+                this.assessor_position = dataSet.assessor_position; 
 
+                const persen = this.dropdownProportions.filter(f=>f.value==dataSet.persen)
+                this.dropdownProportion = persen.length > 0 ? persen[0] : null;  
+            })
+            .catch(error => {
+                console.error('Error fetching data:', error);
+            });
+        },  
+        mounted() {
+            this.showdatator(); // เรียกฟังก์ชันเมื่อหน้าโหลด
+        },
+        //29/10/67
+        saveScore() {
+             axios.post('http://localhost:8000/api/saveDatator', {
+            score: this.totalScore
+            })
+            .then(response => {
+            console.log('บันทึกคะแนนสำเร็จ:', response.data); 
+            })
+            .catch(error => {
+            console.error('เกิดข้อผิดพลาดในการบันทึกคะแนน:', error); 
+            });
+        },
+        //แก้
+        saveDatatorScore() {
+            //console.log(res.data); 
+                if (!this.assessor || !this.assessor_position) {
+                    Swal.fire({
+                    icon: 'warning',
+                    title: 'กรุณากรอกข้อมูล',
+                    text: 'กรุณากรอกชื่อและตำแหน่งผู้ประเมินให้ครบถ้วน',
+                    });
+                } else { 
+                    Swal.fire({
+                        title: "บันทึกสำเร็จ!",
+                        text: "ข้อมูล ระดับการประเมินตนเอง ถูกบันทึกเรียบร้อย!",
+                        icon: "success"
+                    });
+                    this.DialogScore = false; 
+                } 
+            if(this.product_date.d_date == null || this.product_date.d_date == undefined){
+                Swal.fire({
+                    icon: 'error',  
+                    title: 'เกิดข้อผิดพลาด',  
+                    text: 'กรุณาเลือก รอบการประเมิน'  
+                }); 
+            }else if(this.dropdownProportion == null || this.dropdownProportion == undefined){
+                Swal.fire({
+                    icon: 'error',  
+                    title: 'เกิดข้อผิดพลาด',  
+                    text: 'กรุณาเลือก สัดส่วน'  
+                }); 
+                
+            }else{
+                 
+            // console.log({
+            //     p_year: this.product_date.d_date,
+            //     evalua: this.product_date.evalua,
+            //     p_staffid: this.staffid_Main,
+            //     staffid_name: this.staffid_name,
+            //     pos_id: this.pos_id,
+            //     postype_id: this.postype_id,
+            //     fac_id: this.facid_Main,  
+            //     dropdownProportion: this.dropdownProportion.value,
+            //     assessor: this.assessor,
+            //     assessor_position: this. assessor_position
+            // });
+        
+                const formData = {
+                    p_year: this.product_date.d_date,
+                    evalua: this.product_date.evalua,
+                    p_staffid: this.staffid_Main,
+                    staffid_name: this.staffid_name,
+                    pos_id: this.pos_id,
+                    postype_id: this.postype_id,
+                    fac_id: this.facid_Main,
+                    dropdownProportion: this.dropdownProportion.value,
+                    assessor: this.assessor,
+                    assessor_position: this. assessor_position
+                };
+
+                axios.post('http://localhost:8000/api/saveDatator', 
+                    formData
+                ).then(response => { 
+                        this.DialogScore = false; 
+                   // console.log('showDataP03',res.data);
+                })
+                .catch(error => {
+                    console.error('Error saving data:', error);
+                });
+            }
+            },
+    } 
+}
 </script>
 
 <style scoped> 

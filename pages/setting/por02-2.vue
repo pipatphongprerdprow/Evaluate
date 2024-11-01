@@ -3,9 +3,7 @@
         <div  class="col-12 lg:col-12 xl:col-12">
             <div class="card mb-0"> 
                 <div class="formgroup-inline mb-1">
-                    <div class="col md:col-6"> 
-                        <h3 class="mb-4 card-header"><i class="pi pi-star" style="font-size: x-large;"></i> ตรวจสอบ แบบประเมิน</h3>    
-                    </div> 
+                    
                     <div class="col md:col-6" >  
                         <label for="examine_date"></label>
                         <Dropdown id="examine_date" v-model="examine_date" :options="examine_dates" optionLabel="d_evaluationround" placeholder="กรุณาเลือกรอบการประเมิน" style=" max-width: 500px; width: 100%" ></Dropdown>
@@ -52,185 +50,11 @@
                         <h3>รายงานแบบแบบประเมิน ป01-ป04</h3>
                         <InputText v-model="dataStaffid" type="hidden" autocomplete="off" style="display: none;"/>   
                     </template>
-                    <TabView :activeIndex="activeIndex" @tabChange="onTabChange"> 
-
-                        <TabPanel header="แบบใบปะหน้า">
-                            <!-- <div class="col md:col-12 text-right">
-                                <Button label="Export" icon="pi pi-file-word" class="mr-2 mb-2 "></Button>
-                            </div> -->
-                                <div class="card">
-                                    <h3 class="mb-4" style="text-align: right;">
-                                        <i class="pi pi-folder-open" style="font-size: x-large;"></i> แบบ ป01-02
-                                </h3>
-                                <div style="display: flex; justify-content: center;">
-                                    <img src="~/assets/layout/images/kongkang.jpg" alt="Description of image" class="contract-image" />
-                                </div>
-                                <h4 style="text-align: center;">
-                                    แบบข้อตกลงภาระงานและพฤติกรรมการปฏิบัติราชการ (Term of Reference : TOR) ข้าราชการและพนักงาน สังกัดมหาวิทยาลัยมหาสารคาม
-                                </h4><br>
-                                <!-- ตาราง ก. สมรรถนะหลัก -->
-                                <div class="employee-info">
-                                    <p><strong>ผู้ปฏิบัติงาน:</strong> {{ user.user.name.PREFIXFULLNAME }} {{ user.user.name.STAFFNAME }} {{ user.user.name.STAFFSURNAME }}</p>
-                                    <p><strong>สังกัด:</strong> {{ user.user.name.SCOPES?.staffdepartmentname }} </p>
-                                    <p><strong>ตำแหน่ง:</strong> {{ user.user.name.POSITIONNAME }}  </p>
-                                    <p><strong>ระดับตำแหน่ง:</strong>{{ user.user.name.POSTYPENAME }} </p>
-                                    <!-- <p><strong>ประเภทบุคลากร:</strong></p> -->
-                                    <p><strong>ชื่อผู้ประเมิน:</strong></p> 
-                                    <p><strong>ตำแหน่งผู้ประเมิน :</strong></p> 
-                                    <p><strong>รายละเอียดข้อตกลง ระหว่าง วันที่ :</strong> {{ examine_date.d_evaluationround }} </p>
-                                </div><br>
-
-                                <div class="explanation">
-                                    <h4>คำชี้แจง</h4>
-                                    <p>
-                                        1. แบบข้อตกลงภาระงานและพฤติกรรมการปฏิบัติราชการ  (Term of Reference : TOR) ข้าราชการและพนักงาน  สังกัดมหาวิทยาลัยมหาสารคามนี้ เป็นการกำหนด
-                                            แผนการปฏิบัติงานของผู้ปฏิบัติงานในมหาวิทยาลัยมหาสารคาม ซึ่งเป็นข้อตกลงร่วมกับผู้บังคับบัญชาก่อนเริ่มปฏิบัติงาน
-                                    </p>
-                                    <p>
-                                        2. การกำหนดข้อตกลงร่วม ผู้ปฏิบัติงานจะต้องกรอกรายละเอียดภาระงานโดยสังเขปในส่วนของภาระงานตามหน้าที่ความรับผิดชอบของตำแหน่ง และ/หรือภาระงาน
-                                            ด้านอื่นๆ พร้อมกำหนดตัวชี้วัดความสำเร็จของภาระงานแต่ละรายการ  ตลอดจนค่าเป้าหมาย และค่านำหนักร้อยละ สำหรับในส่วนของพฤติกรรมการปฏิบัติราชการ
-                                            (สมรรถนะ) ให้ระบุระดับสมรรถนะค่ามาตรฐาน
-                                    </p>
-                                    <p>
-                                        3. สำหรับการกรอกรายละเอียดภาระเอียดภาระงานตามภารกิจ  ให้อ้างอิงการคำนวณภาระงานขั้นต่ำตามหลักเกณฑ์กรอบมาตรฐานภาระงานที่แนบท้ายประกาศ ก.บ.ม. 
-                                            มหาวิทยาลัยมหาสารคาม ที่บังคับใช้สำหรับการประเมินผลการปฏิบัติราชการ
-
-                                    </p>
-                                    <p>
-                                        4. การกำหนดตัวชี้วัดความสำเร็จของงาน  ทั้งในส่วนของเชิงปริมาณและเชิงคุณภาพ  ให้เป็นการกำหนดข้อตกลงภายในหน่วยงานนั้นๆ 
-                                    </p>
-                                    <p>
-                                        5. การจัดทำข้อตกลงภาระงานดังกล่าวนี้  เพื่อใช้เป็นกรอบในการประเมินผลการปฏิบัติราชการ  เพื่อประกอบการเลื่อนเงินเดือนและค่าจ้างในแต่ละรอบการประเมิน
-                                    </p>
-                                </div> 
-                            </div>
-                        </TabPanel>
-
+                    <TabView :activeIndex="activeIndex" @tabChange="onTabChange">  
                         <TabPanel header="รายงาน ป.01 - ป.03" >
                             <div class="grid">
                                 <div class="col-12 lg:col-12 xl:col-12">
-                                    <div class="card mb-0"> 
-                                        <table class="table">
-                                            <thead>
-                                                <tr>
-                                                    <th rowspan="2" style="width: 19%;">กิจกรรม / โครงการ / งาน</th>
-                                                    <th rowspan="2" style="width: 25%;">ตัวชี้วัด / เกณฑ์การประเมิน</th>
-                                                    <th rowspan="2" style="width: 20%;">รางานการปฏิบัติราชการ<br> ตามตัวชี้วัด/เกณฑ์การประเมิน</th>
-                                                    <th rowspan="2" style="width: 25%;">หลักฐานที่แสดงถึงผลการปฏิบัติราชการตามเกณฑ์การประเมิน(หลักฐานเชิงประจักษ์)</th>
-                                                    <th colspan="5" style="width: 15%;">ระดับค่าเป้าหมาย</th> 
-                                                    <th rowspan="2" style="width: 10%;">ค่าคะแนนที่ได้</th>
-                                                    <th rowspan="2" style="width: 10%;">น้ำหนัก(ความสำคัญ/ความยากง่ายของงาน)</th>
-                                                    <th rowspan="2" style="width: 10%;">ค่าคะแนนถ่วงน้ำหนัก<br>(4) X (5)<br> 100</th>
-                                                    
-                                                </tr>
-                                                <tr>
-                                                    <th>1</th>
-                                                    <th>2</th>
-                                                    <th>3</th>
-                                                    <th>4</th>
-                                                    <th>5</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <template v-for="(h, ind) in products_Tab2" :key="ind">
-                                                    <tr>
-                                                        <td style="text-align: left;" colspan="12">
-                                                            <b style="color: blue;">{{ h.id }}. {{ h.nameH }}</b> 
-                                                        </td> 
-                                                    </tr> 
-                                                    <tr v-for="(subP01, idx) in h.subP01sX" :key="idx" style="vertical-align: baseline;">
-                                                        <td style="text-align: left;">{{ subP01.p01_no }} {{ subP01.p01_subject }}</td>
-                                                        <td style="text-align: left;">
-                                                            <b>ตัวชี้วัดที่ {{ idx+1 }} {{ subP01.p01_subject }}</b>
-                                                            <p v-for="(subIitem, idI) in subP01.subITems" :key="idI" style="padding-left: 8px;margin-bottom: 5px;">
-                                                                <div v-if="subIitem.ind_no!=0" ><b>ระดับ {{ subIitem.ind_no }}</b> {{ subIitem.ind_Items }}</div>
-                                                                <div v-if="subIitem.ind_no==0" ><b>{{ subIitem.ind_Items }}</b></div>
-                                                            </p>
-                                                            <p v-if="subP01.p01_detail != null">
-                                                                
-                                                                <b style="color: red;">ข้อเสนอแนะ</b>
-                                                                <br>
-                                                                <em style="color: red;">{{ subP01.p01_detail }}</em>
-                                                            </p>
-                                                        </td>
-
-                                                        <td style="text-align: left;">
-                                                            <p v-for="(subIitemInd, inD) in subP01.subITemP03ind" :key="inD" style="padding-left: 8px;margin-bottom: 5px;">
-                                                                <div v-if="subIitemInd.p03ind_no!=0"><b>ระดับ {{ subIitemInd.p03ind_no }}</b> {{ subIitemInd.p03ind_Items }}</div>
-                                                                <div v-if="subIitemInd.p03ind_no==0"><b>{{ subIitemInd.p03ind_Items }}</b></div> 
-                                                            </p>
-                                                            <p v-if="subP01.subITemP03ind.length == 0" style="padding-left: 8px;margin-bottom: 5px;">
-                                                                <b style="color: red;">- ไม่มีข้อมูล -</b>
-                                                            </p>  
-                                                        </td>
-                                                        
-                                                        <td style="text-align: left;"> 
-                                                            <p v-for="(subIitemDoc, inDoc) in subP01.subITemP03doc" :key="inDoc" style="padding-left: 8px;margin-bottom: 5px;"> 
-                                                                <a v-if="subIitemDoc.doc_file!=null" :href="'http://localhost:8000/storage/uploadsP03/'+subIitemDoc.doc_file" target="_blank"><b>ระดับ</b> <b>{{subIitemDoc.doc_no }}</b> {{ subIitemDoc.doc_name }}</a> 
-                                                                <a v-if="subIitemDoc.doc_link!=null" :href="subIitemDoc.doc_link" target="_blank"><b>ระดับ</b> <b>{{ subIitemDoc.p03ind_no }}</b> {{ subIitemDoc.doc_name }}</a> 
-                                                            </p>
-                                                            <p v-if="subP01.subITemP03doc.length == 0" style="padding-left: 8px;margin-bottom: 5px;">
-                                                                <b style="color: red;">- ไม่มีข้อมูล -</b>
-                                                            </p>
-                                                        </td>  
-                                                        <td style=" vertical-align: middle;" class="text-center">
-                                                            <b v-if="subP01.p01_target==1">&#10003;</b> 
-                                                            <b v-if="subP01.p01_target!=1"></b> 
-                                                        </td>
-                                                        <td style=" vertical-align: middle;" class="text-center">
-                                                            <b v-if="subP01.p01_target==2">&#10003;</b> 
-                                                            <b v-if="subP01.p01_target!=2"></b> 
-                                                        </td>
-                                                        <td style=" vertical-align: middle;" class="text-center">
-                                                            <b v-if="subP01.p01_target==3">&#10003;</b> 
-                                                            <b v-if="subP01.p01_target!=3"></b> 
-                                                        </td>
-                                                        <td style=" vertical-align: middle;" class="text-center"> 
-                                                            <b v-if="subP01.p01_target==4">&#10003;</b> 
-                                                            <b v-if="subP01.p01_target!=4"></b> 
-                                                        </td>  
-                                                        <td style=" vertical-align: middle;" class="text-center"> 
-                                                            <b v-if="subP01.p01_target==5">&#10003;</b> 
-                                                            <b v-if="subP01.p01_target!=5"></b> 
-                                                        </td>
-                                                            <!-- เพิ่มตารางช่องค่าคะแนน -->
-                                                        <td style=" vertical-align: middle;" class="text-center">{{ subP01.p01_score }}</td>
-                                                        <td style=" vertical-align: middle;" class="text-center">{{ subP01.p01_weight }}%</td> 
-                                                        <td style=" vertical-align: middle;" class="text-center">{{ (subP01.p01_score * subP01.p01_weight / 100).toFixed(2) }}</td>
-                                                    </tr>
-                                                    </template>
-                                                    <tr>
-                                                        <td style="text-align: right" colspan="9">
-                                                            <b style="color: blue;">(7) ผลรวม</b>
-                                                        </td>
-                                                        <td class="text-center" style="color: blue;">
-                                                                <b>{{ totalscoretrack }}</b> <!-- แสดงผลรวม p01_weight -->
-                                                            </td>
-                                                            <td class="text-center" style="color: blue;">
-                                                                <b>{{ totalWeighttrack }}%</b> <!-- แสดงผลรวม p01_weight -->
-                                                            </td>
-                                                            <td class="text-center" style="color: blue;">
-                                                                <b>{{ WeightedScoreSumtrack }}</b> <!-- แสดงผลรวมคะแนนที่คำนวณ -->
-                                                            </td> 
-                                                    </tr>
-                                                    <tr>
-                                                        <td style="text-align: right; vertical-align: middle;" colspan="10">
-                                                            <b style="color: blue;">(8) สรุปคะแนนส่วนผลสัมฤทธิ์ของงาน =&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </b>
-                                                            <b style="color: blue;">ผลรวมของค่าคะแนนถ่วงน้ำหนัก</b>
-                                                            <div style="display: flex; justify-content: flex-end;">
-                                                                <hr style="border: 1px solid black; width: 16%;">
-                                                            </div>
-                                                            <b style="color: blue;">จำนวนระดับค่าเป้าหมาย = 5 </b>
-                                                        </td>
-                                                        <td class="text-center" style="color: blue;  vertical-align: middle;">
-                                                            <b>{{ WeightedScoreSumX }}</b> <!-- แสดงผลรวม/จำนวนระดับเป้าหมาย -->
-                                                        </td>
-                                                        <td class="text-center" style="color: blue;  vertical-align: middle;">
-                                                            <b>{{ WeightedScoreSumXT }}</b> <!-- แสดงผลรวม/จำนวนระดับเป้าหมาย -->
-                                                        </td>
-                                                    </tr>  
-                                                </tbody>
-                                            </table>
+                                    <div class="card mb-0">  
                                         <hr>
                                         <div class="p-fluid formgrid grid">
                                             <!-- ตาราง ก. สมรรถนะหลัก -->
@@ -296,93 +120,10 @@
                                                     </tbody>
                                                 </table>
                                             </div>
-                                        </div>
-
-                                        <!-- เกณฑ์การประเมิน -->
-                                        
-                                        <thead>
-                                                <tr>                                                       
-                                                    <th rowspan="9" style="width: 90%;">เกณฑ์การประเมิน</th>
-                                                    <th colspan="3" style="width: 10%;">การประเมิน</th> 
-                                                </tr>
-                                                <tr>
-                                                    <th>จำนวน <br>สมรรถนะ</th>
-                                                    <th>คูณด้วย</th>
-                                                    <th>คะแนน</th>
-                                                </tr>
-                                        </thead>
-                                            <tbody>
-                                                <tr>
-                                                    <td style=" vertical-align: middle;" class="text-left">จำนวนสมรรถนะหลัก /สมรรถนะเฉพาะตามลักษณะงานที่ปฏิบัติ /สมรรถนะทางการบริหาร ที่มีระดับสมรรถนะที่แสดงออก สูงกว่าหรือเท่ากับ ระดับสมรรถนะที่คาดหวัง X 3 คะแนน</td>
-                                                        <td class="text-center" style="color: blue;"> 
-                                                            <b>{{ totalCoreCompetencies }}</b>  
-                                                        </td> 
-                                                        <td class="text-center" style="color: blue;"><b>3</b></td>   
-                                                        <td class="text-center" style="color: blue;">
-                                                            <b>{{ totalScoreSum }}</b>  
-                                                        </td>                                                      
-                                                </tr>
-                                                <tr>
-                                                    <td style=" vertical-align: middle;" class="text-left">จำนวนสมรรถนะหลัก /สมรรถนะเฉพาะตามลักษณะงานที่ปฏิบัติ /สมรรถนะทางการบริหาร ที่มีระดับสมรรถนะที่แสดงออก ต่ำกว่า ระดับสมรรถนะที่คาดหวัง 1 ระดับ X 2 คะแนน</td>
-                                                        <td class="text-center" style="color: blue;">
-                                                            <b>{{ totalZeroScores }}</b> 
-                                                        </td>
-                                                        <td class="text-center" style="color: blue;"><b>2</b></td> 
-                                                        <td class="text-center" style="color: blue;">
-                                                            <b>{{ totalScoreZeroSum }}</b>  
-                                                        </td>
-                                                </tr>
-                                                <tr>
-                                                    <td style=" vertical-align: middle;" class="text-left">จำนวนสมรรถนะหลัก /สมรรถนะเฉพาะตามลักษณะงานที่ปฏิบัติ /สมรรถนะทางการบริหาร ที่มีระดับสมรรถนะที่แสดงออก ต่ำกว่า ระดับสมรรถนะที่คาดหวัง 2 ระดับ X 1 คะแนน</td>
-                                                        <td class="text-center" style="color: blue;"><b>0</b></td> 
-                                                        <td class="text-center" style="color: blue;"><b>1</b></td> 
-                                                        <td class="text-center" style="color: blue;"><b>0</b></td>
-                                                </tr>
-                                                <tr>
-                                                    <td style=" vertical-align: middle;" class="text-left">จำนวนสมรรถนะหลัก /สมรรถนะเฉพาะตามลักษณะงานที่ปฏิบัติ /สมรรถนะทางการบริหาร ที่มีระดับสมรรถนะที่แสดงออก ต่ำกว่า ระดับสมรรถนะที่คาดหวัง 3 ระดับ X 0 คะแนน</td>
-                                                        <td class="text-center" style="color: blue;"><b>0</b></td> 
-                                                        <td class="text-center" style="color: blue;"><b>0</b></td> 
-                                                        <td class="text-center" style="color: blue;"><b>0</b></td> 
-                                                </tr>
-                                                <tr>
-                                                    <td style="text-align: right" colspan="3">
-                                                        <b style="color: blue;"> (8) ผลรวม</b>
-                                                    </td>
-                                                        <td class="text-center" style="color: blue;"> 
-                                                            <b>{{ totalScoreSum+totalScoreZeroSum }}</b>  
-                                                        </td>
-                                                    
-                                                </tr>
-                                                <tr>
-                                                <td style="text-align: right; vertical-align: middle;" colspan="3">
-                                                    <b style="color: blue;">(9) สรุปคะแนนส่วนพฤติกรรมการปฏิบัติราชการ   (สมรรถนะ) =	 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </b>
-                                                    <b style="color: blue;">  ผลรวมคะแนน ใน (8)</b>
-                                                    <div style="display: flex; justify-content: flex-end;">
-                                                        <hr style="border: 1px solid black; width: 20%;">
-                                                    </div>
-                                                    <b style="color: blue;">จำนวนสมรรถนะที่ใช้ในการประเมิน X 3 คะแนน</b>
-                                                </td>
-                                                <td class="text-center" style="color: blue;"> 
-                                                    <b>{{ ((totalScoreSum + totalScoreZeroSum) / 33).toFixed(2) }}</b>  
-                                                </td> 
-                                            </tr>  
-                                            </tbody>
-                                                <br>
-                                                <div class="p-fluid formgrid grid"> 
-                                                    <B><h4>ความเห็นเพิ่มเติมของผู้ประเมิน (ระบุข้อมูลเมื่อสิ้นรอบการประเมิน)</h4></B>
-                                                    <div class="field col-12 md:col-12">  
-                                                        <label for="improvements">1) จุดเด่น และ/หรือ สิ่งที่ควรปรับปรุงแก้ไข</label>
-                                                        <p style="margin-left: 20px;">{{ improvements??'- ไม่มีข้อมูล -' }}</p>
-                                                    </div>
-                                                    <div class="field col-9 md:col-9">  
-                                                        <label for="suggestions">2) ข้อเสนอแนะเกี่ยวกับวิธีส่งเสริมและพัฒนา</label>
-                                                        <p style="margin-left: 20px;">{{ suggestions??'- ไม่มีข้อมูล -' }}</p> 
-                                                </div>
-                                            </div>   
-                                        </div>
+                                        </div> 
                                     </div>
-                                    
-                                </div>
+                                </div> 
+                            </div>
                         </TabPanel>
 
                         <TabPanel header="รายงาน ป.04" >
@@ -459,19 +200,19 @@
                                                                 <b>{{ 100}}%</b>  
                                                             </td> 
                                                             <td class="text-center" style="color: blue;"> 
-                                                                 <b>{{ (((totalScoreSum + totalScoreZeroSum) / 33 * 70) + (WeightedScoreSumXT * 30)).toFixed(2) }}</b>
+                                                                <b>{{ (((totalScoreSum + totalScoreZeroSum) / 33 * 70) + (WeightedScoreSumXT * 30)).toFixed(2) }}</b>
                                                             </td>
                                                         </tr>
                                                     </tbody>
                                             </table>
                                             <div class="employee-info">
                                                 <h4>ระดับผลการประเมินที่ได้</h4>
-                                                    <p><strong>[&nbsp;&nbsp; <b v-if="(((totalScoreSum + totalScoreZeroSum) / 33 * 70) + (WeightedScoreSumXT * 30)) >= 90">&#10003;</b> &nbsp;&nbsp;] ดีเด่น (90-100)</strong></p>
-                                                    <p><strong>[&nbsp;&nbsp; <b v-if="(((totalScoreSum + totalScoreZeroSum) / 33 * 70) + (WeightedScoreSumXT * 30)) >= 80 && (((totalScoreSum + totalScoreZeroSum) / 33 * 70) + (WeightedScoreSumXT * 30)) < 90">&#10003;</b> &nbsp;&nbsp;] ดีมาก (80-89)</strong></p>
-                                                    <p><strong>[&nbsp;&nbsp; <b v-if="(((totalScoreSum + totalScoreZeroSum) / 33 * 70) + (WeightedScoreSumXT * 30)) >= 70 && (((totalScoreSum + totalScoreZeroSum) / 33 * 70) + (WeightedScoreSumXT * 30)) < 80">&#10003;</b> &nbsp;&nbsp;] ดี (70-79)</strong></p>
-                                                    <p><strong>[&nbsp;&nbsp; <b v-if="(((totalScoreSum + totalScoreZeroSum) / 33 * 70) + (WeightedScoreSumXT * 30)) >= 60 && (((totalScoreSum + totalScoreZeroSum) / 33 * 70) + (WeightedScoreSumXT * 30)) < 70">&#10003;</b> &nbsp;&nbsp;] พอใช้ (60-69)</strong></p> 
-                                                    <p><strong>[&nbsp;&nbsp; <b v-if="(((totalScoreSum + totalScoreZeroSum) / 33 * 70) + (WeightedScoreSumXT * 30)) < 60">&#10003;</b> &nbsp;&nbsp;] ต้องปรับปรุง (ต่ำกว่า 60)</strong></p>
-                                                </div>
+                                                <p><strong>[ &nbsp;&nbsp;&nbsp; ] ดีเด่น (90-100)</strong></p>
+                                                <p><strong>[ &nbsp;&nbsp;&nbsp; ] ดีมาก (80-89)</strong></p>
+                                                <p><strong>[ &nbsp;&nbsp;&nbsp; ] ดี (70-79)</strong></p>
+                                                <p><strong>[ &nbsp;&nbsp;&nbsp; ] พอใช้ (60-69)</strong></p> 
+                                                <p><strong>[ &nbsp;&nbsp;&nbsp; ] ต้องปรับปรุง (ต่ำกว่า 60)</strong></p> <!--<b>&#10003;</b>-->
+                                            </div>
                                             <h5 class="mb-4"><i class="" style="font-size: x-large;"></i> ส่วนที่ 3 แผนพัฒนาการปฏิบัติราชการรายบุคคล</h5>
                                             <table border="1" cellspacing="0" cellpadding="5">
                                                 <thead>
@@ -774,10 +515,7 @@ export default {
                 }
             });  
             return zeroScoreCount * 2;
-        },
-        totalScoreT() {
-    return (((this.totalScoreSum + this.totalScoreZeroSum) / 33 * 70) + (this.WeightedScoreSumXT * 30)).toFixed(2);
-  }
+        }  
     }, 
     methods: { 
         setSession (staffid_Main,facid_Main,groupid_Main) {
@@ -1012,7 +750,6 @@ export default {
                 console.error('Error:', error);
             });
         },
-
     }
 }
 
@@ -1269,6 +1006,6 @@ td:nth-child(2), td:nth-child(3) {
   .left-align {
     text-align: left;
   }
-  
+
 
 </style>

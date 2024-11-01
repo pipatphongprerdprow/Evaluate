@@ -1,29 +1,19 @@
 <template>
     <div class="grid">
-        <div class="col-12 lg:col-12 xl:col-12">
-            <div class="col md:col-12 text-right">
-                <Button label="Export" icon="pi pi-file-word" class="mr-2 mb-2 " @click="exportToWord" ></Button>
-            </div>
+        <div class="col-12 lg:col-12 xl:col-12"> 
             <div class="card mb-0">
-                <div class="formgroup-inline mb-1">
-                    <div class="d-flex align-items-center">
+                <!-- {{ dataPor }} -->
+                <div class="formgroup-inline mb-1"> 
+                    <div class="col md:col-6">
                         <h3 class="mb-4 card-header">
                             <i class="pi pi-fw pi-folder-open" style="font-size: x-large;"></i> แบบ ป01
                         </h3>
-                        <div class="ml-4 mr-4">
-                            <label for="dropdownProportion">สัดส่วน :</label>
-                            <Dropdown id="dropdownProportion" v-model="dropdownProportion" :options="dropdownProportions" optionLabel="name" placeholder="เลือกสัดส่วน"></Dropdown>
-                        </div>
-                        <div class="mr-4">
-                            <label for="dropdownItemYear">ปีงบประมาณ :</label>
-                            <Dropdown id="dropdownItemYear" v-model="dropdownItemYear" :options="dropdownItemsYear" optionLabel="name" placeholder="เลือกปีงบประมาณ"></Dropdown>
-                        </div>
-                        <div class="ml-auto">
-                            <Button icon="pi pi-search" severity="help" class="mb-2 mr-2" label="เลือกข้อมูลแบบประเมิน ป.01" @click="OpenDialogP01" /> 
-                            <Button icon="pi pi-plus" severity="info" class="mb-2 mr-2" label="เพิ่มข้อมูลแบบประเมิน" @click="OpenDialogAdd" />
-                        </div>
                     </div>
-                </div>
+                    <div class="col md:col-6">
+                        <Button icon="pi pi-search" severity="help" class="mb-2 mr-6" label="เลือกข้อมูลแบบประเมิน ป.01" @click="OpenDialogP01" /> 
+                        <Button icon="pi pi-plus" severity="info" class="mb-2 mr-6" label="เพิ่มข้อมูลแบบประเมิน" @click="OpenDialogAdd" />
+                    </div>  
+                </div>  
                 <!-- แสดงข้อมูลบันทึก -->
                 <table class="table" >
                     <thead>
@@ -97,12 +87,14 @@
                         <tr>
                             <td style="text-align: right" colspan="8">
                                 <b style="color: blue;">(7) ผลรวม</b>
+                            </td> 
+                            <td class="text-center" style="color: blue;">
+                                <b>{{ totalWeight }}%</b> <!-- แสดงผลรวม p01_weight -->
                             </td>
                             <td class="text-center" style="color: blue;">
-                                <b>{{ totalWeight }}%</b> <!-- แสดงผลรวมคะแนนที่คำนวณ -->
+                                <b>{{ totalCalculatedScore }}</b> <!-- แสดงผลรวมคะแนนที่คำนวณ -->
                             </td>
-                            <td></td>
-                            <td></td>
+                            <td></td> 
                         </tr>
                         <tr>
                             <td style="text-align: right; vertical-align: middle;" colspan="9">
@@ -113,7 +105,9 @@
                                 </div>
                                 <b style="color: blue;">จำนวนระดับค่าเป้าหมาย = 5 </b>
                             </td>
-                            <td></td>
+                            <td class="text-center" style="color: blue;  vertical-align: middle;">
+                                <b>{{ WeightedScoreSum }}</b> <!-- แสดงผลรวม/จำนวนระดับเป้าหมาย -->
+                            </td>
                             <td></td>
                         </tr>  
                     </tbody>
@@ -122,14 +116,14 @@
         </div> 
 
         <!-- เลือกข้อมูลแบบประเมิน ป.01 -->
-        <Dialog header="จัดการแบบ ป01" maximizable v-model:visible="DialogAddP01" :breakpoints="{ '960px': '75vw' }" :style="{ width: '90vw' }" :modal="true" position="top">
+        <Dialog header="จัดการแบบ ป01" maximizable v-model:visible="DialogAddP01" :breakpoints="{ '960px': '75vw' }" :style="{ width: '90vw' }" :modal="true" position="top"> 
             <form>
                 <div class="p-fluid formgrid grid">
                     <div class="field col-12 md:col-12">
                         <table class="table">
                             <thead>
                                 <tr>
-                                    <th rowspan="2" style="width: 9%;"><br> ตัวเลือก <br></th>
+                                    <th rowspan="2" style="width: 9%;"><br> ตัวเลือก <br> <Checkbox v-model="selectAll" @change="toggleSelectAll" /></th>
                                     <th rowspan="2" style="width: 20%;">(1) <br> กิจกรรม / โครงการ / งาน</th>
                                     <th rowspan="2" style="width: 24%;">
                                         (2) <br> ตัวชี้วัด / เกณฑ์การประเมิน <br>
@@ -286,9 +280,7 @@
             </template>
         </Dialog>
     </div>  
-</template>
-
-
+</template> 
 <script> 
 import { ref } from 'vue';
 import axios from 'axios';  
@@ -296,28 +288,23 @@ import Swal from 'sweetalert2'
 import { saveAs } from 'file-saver';
 
 export default {
+    props: {
+        // กำหนด props ที่จะรับข้อมูลจาก parent
+        dataPor: {
+            type: Object,
+            required: true
+        }
+    },
     data() {
         return { 
-            staffid_Main: 5009942,
-            year_Main: 2568,
-            facid_Main: 201092704000,
-            groupid_Main: '01',
-            dropdownProportion: {name: 'สัดส่วน 70:30', value: '2'},
-            dropdownProportions: [
-                { name: 'สัดส่วน 50:50', value: '1' },
-                { name: 'สัดส่วน 70:30', value: '2' },
-                
-            ],
-            dropdownItemYear: { name: 'ปีงบประมาณ 2568', value: 2568},
-            dropdownItemsYear: [
-                { name: 'ปีงบประมาณ 2569', value: 2569 },
-                { name: 'ปีงบประมาณ 2568', value: 2568 },
-                { name: 'ปีงบประมาณ 2567', value: 2567 },
-                { name: 'ปีงบประมาณ 2566', value: 2566 }
-            ],
+            staffid_Main: null,
+            year_Main: null,
+            facid_Main: null,
+            groupid_Main: null, 
             products_personX: [],
             checkboxValue: [],
             selectedItems: [],
+            selectAll: false,
             DialogAdd: false,
             DialogAddP01: false,
             //เพิ่มมา
@@ -357,21 +344,76 @@ export default {
             text_weight: null,
             text_search_no: null,
             text_search: null,
-            products_list: [],
+            products_list: [], 
+            dataP01: {}, 
+            totalWeight: {},
+            totalCalculatedScore: {},
+            WeightedScoreSum :{},
+        } 
+    }, 
+    async mounted(){ 
+        const { signIn, getSession, signOut } = await useAuth()
+        const user = await getSession();
+       // console.log(user.user.name);
+        const {STAFFID, SCOPES} = user.user.name
+        const {staffdepartment, groupid, staffdepartmentname, groupname} = SCOPES
+        await this.setSession(STAFFID,staffdepartment,groupid); 
+        // this.showDataPerson();
+    }, 
+    watch: {
+        // เฝ้าดูการเปลี่ยนแปลงของ dataPor
+        dataPor: {
+            handler(newVal, oldVal) {
+                // console.log('dataPor changed:', newVal);
+                this.showDataPerson();
+                    // ทำสิ่งที่ต้องการเมื่อ dataPor เปลี่ยนแปลง
+            },
+            deep: true // ใช้ deep: true เพื่อดูการเปลี่ยนแปลงภายใน object
+        }
+    },
+    computed: {
+        totalWeight() {
+            // ใช้ reduce เพื่อคำนวณค่ารวมของ p_weight
+            return this.products_personX.reduce((total, h) => {
+                return total + h.subP01sX.reduce((subTotal, subP01) => {
+                    return subTotal + subP01.p01_weight; // เพิ่ม p01_weight ของแต่ละ subP01
+                }, 0);
+            }, 0);
+        },
+        totalCalculatedScore() {
+            // คำนวณค่ารวมของคะแนนที่คำนวณ
+            return this.products_personX.reduce((total, h) => {
+                return total + h.subP01sX.reduce((subTotal, subP01) => {
+                    return subTotal + (subP01.p01_score * subP01.p01_weight / 100);
+                }, 0);
+            }, 0).toFixed(2); // ใช้ toFixed(2) เพื่อให้มีทศนิยม 2 ตำแหน่ง
+        },
+        WeightedScoreSum() {
+            // คำนวณค่ารวมของคะแนนที่คำนวณ และหารด้วย 5
+            return this.products_personX.reduce((total, h) => {
+                return total + h.subP01sX.reduce((subTotal, subP01) => {
+                    // คำนวณคะแนนรวม (subP01.p01_score * subP01.p01_weight / 100) แล้วหารด้วย 5
+                    return subTotal + ((subP01.p01_score * subP01.p01_weight / 100) / 5);
+                }, 0);
+            }, 0).toFixed(2); // ใช้ toFixed(3) เพื่อแสดงทศนิยม 3 ตำแหน่ง
         }
     }, 
-    mounted(){ 
-        this.showDataPerson(); 
-    },
-    
     methods: {  
-        // ดึงข้อมูลเข้าตาราง
-        showDataPerson(){
+        setSession (staffid_Main,facid_Main,groupid_Main) {
+           // console.log('setSession');  
+            this.staffid_Main = staffid_Main
+            this.facid_Main = facid_Main
+            this.groupid_Main = groupid_Main  
+        }, 
+        // ดึงข้อมูลเข้าตาราง 
+        showDataPerson(){  
+            //console.log('dataPor: ',this.dataPor); 
             axios.post('http://localhost:8000/api/showDataPersonX',{
             staff_id: this.staffid_Main,
-            fac_id: this.facid_Main,
-            year_id: this.year_Main, 
-            group_id: this.groupid_Main,
+            fac_id: this.dataPor.fac_id,
+            year_id: this.dataPor.d_date, 
+            evalua: this.dataPor.evalua 
+            // group_id: this.groupid_Main,  
             }).then(res => {     
                 // console.log(res.data);  
                 this.products_personX=res.data;
@@ -379,38 +421,35 @@ export default {
             .catch(error => {
                 console.error('Error:', error);
             });
-        }, 
+        },
+      
         // ดึงข้อมูลมาแก้ไข
         async editDatax(data){    
           await axios.post('http://localhost:8000/api/edtDataPersonx',{
               p01_id: data.p01_id
           }).then(res => { 
-                 //console.log(data);   
-                    this.DialogAdd = true; 
-                    this.text_edt = res.data[0].p01_id;   
-                    this.text_no = res.data[0].p01_no; 
-                    this.text_name = res.data[0].p01_subject;  
-                    const target_f = this.dropdownItemsTarget.filter(f=>f.value==res.data[0].p01_target)
-                    this.dropdownItemTarget = target_f.length > 0 ? target_f[0] : null;    
-                    this.text_weight = res.data[0].p01_weight;  
-                    this.products_list = res.data[0].sub_ITem; 
-                    this.selectDataHEdt(res.data[0].p01_year,res.data[0].p01_facid,res.data[0].p01_h); 
+                // console.log(data);   
+                this.DialogAdd = true; 
+                this.text_edt = res.data[0].p01_id;   
+                this.text_no = res.data[0].p01_no; 
+                this.text_name = res.data[0].p01_subject;  
+                const target_f = this.dropdownItemsTarget.filter(f=>f.value==res.data[0].p01_target)
+                this.dropdownItemTarget = target_f.length > 0 ? target_f[0] : null;    
+                this.text_weight = res.data[0].p01_weight;  
+                this.products_list = res.data[0].sub_ITem; 
+                this.selectDataHEdt(res.data[0].p01_h); 
           })
           .catch(error => {
               console.error('Error:', error);
           });
-        },
+        }, 
         // ดึงข้อมูลภาระงาน
-        selectDataHEdt(year,fac,he){  
-            axios.post('http://localhost:8000/api/selectDataPersonH',{
-                year: year,
-                fac: fac,
-            }).then(res => {     
+        selectDataHEdt(he){  
+            axios.post('http://localhost:8000/api/selectDataPersonH').then(res => {     
                 // console.log(res.data); 
                 this.dropdownItemsH=res.data;  
                 const h_f = res.data.filter(f=>f.id==he); 
                 this.dropdownItemH = h_f.length > 0 ? h_f[0] : null;    
-
             })
             .catch(error => {
                 console.error('Error:', error);
@@ -448,9 +487,12 @@ export default {
         // เปิดหน้าต่างสำหรับบันทึก *ดึงข้อมูล
         OpenDialogP01(){ 
             axios.post('http://localhost:8000/api/showDataPerson', { 
-                fac_id: this.facid_Main,
-                year_id: this.year_Main
+                fac_id: this.dataPor.fac_id,
+                year_id: this.dataPor.d_date,
+                evalua: this.dataPor.evalua 
             }).then(res => {     
+                //console.log(res.data);
+                
                 this.DialogAddP01 = true; 
                 this.products_person = res.data;
             })
@@ -470,9 +512,10 @@ export default {
                 Swal.fire("ไม่มีข้อมูล","กรุณาเลือกข้อคำถามจาก ตัวจัดการ !","error");
             }else{
             await axios.post('http://localhost:8000/api/savePushDataP01',{
-                data: x
+                data: x,
+                staffid_Main: this.staffid_Main,
             }).then(res => { 
-                // console.log(res.data);  
+                console.log(res.data);  
                 this.showDataPerson(); 
                 this.DialogAddP01 = false; 
                 Swal.fire({
@@ -506,14 +549,11 @@ export default {
             this.text_search_no = null;
             this.text_search = null;
             this.products_list = []; 
-            this.selectDataH(this.dropdownItemYear,this.facid_Main);
-        },
+            this.selectDataH();
+        }, 
         // ดึงข้อมูลภาระงาน
-        selectDataH(year,fac){  
-            axios.post('http://localhost:8000/api/selectDataPersonH',{
-                year: year.value,
-                fac: fac,
-            }).then(res => {     
+        selectDataH(){  
+            axios.post('http://localhost:8000/api/selectDataPersonH').then(res => {     
                 //console.log(res.data); 
                 this.dropdownItemsH=res.data;  
             })
@@ -543,8 +583,9 @@ export default {
         async saveDatax() {
             await axios.post('http://localhost:8000/api/saveDataP01User',{
                 staff_id: this.staffid_Main,
-                fac_id: this.facid_Main,
-                year_id: this.dropdownItemYear.value,  
+                fac_id: this.dataPor.fac_id,
+                year_id: this.dataPor.d_date, 
+                evalua: this.dataPor.evalua,
                 text_edt: this.text_edt,
                 dropdownItemH: this.dropdownItemH.id,
                 text_no: this.text_no,
@@ -553,7 +594,7 @@ export default {
                 text_weight: this.text_weight, 
                 products_list: this.products_list
             }).then(res => {  
-                // console.log(res.data); 
+                //  console.log(res.data); 
                 this.DialogAdd = false;
                 this.showDataPerson(); 
                 Swal.fire({
@@ -601,7 +642,18 @@ export default {
             //     const  { signIn, getSession, signOut } = await useAuth()
             //     const user = await getSession();
             // }, 
-                       
+             
+            toggleSelectAll() {
+                if (this.selectAll) {
+                    // เลือก checkbox ทั้งหมด
+                    this.checkboxValue = this.products_person.flatMap(item => 
+                        item.subP01s.map(subP01 => subP01.p_id)
+                    );
+                } else {
+                    // ยกเลิก checkbox ทั้งหมด
+                    this.checkboxValue = [];
+                }
+            }                
         } 
     } 
 

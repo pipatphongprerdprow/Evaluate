@@ -3,14 +3,19 @@
         <div class="col-12 lg:col-12 xl:col-12">
             <div class="card mb-0"> 
                 <div class="formgroup-inline mb-1">
-                    <div class="col md:col-6"> 
-                        <h3 class="mb-4 card-header"><i class="pi pi-fw pi-sliders-h" style="font-size: x-large;"></i> จัดการ แบบประเมิน</h3> 
-                    </div> 
-                    <div class="ol md:col-3 text-right">
-                        <label for="dropdownItemYear">ปีงบประมาณ : </label> 
-                        <Dropdown id="dropdownItemYear" v-model="dropdownItemYear" :options="dropdownItemsYear" optionLabel="name" placeholder="เลือกปีงบประมาณ"></Dropdown>
-                        
-                    </div> 
+                   
+                    <div class="col md:col-9"> 
+                        <h3 class="mb-4 card-header"><i class="pi pi-fw pi-sliders-h" style="font-size: x-large;"></i>  
+                            จัดการ แบบประเมิน {{ dataP01.d_evaluationround }} ปีงบประมาณ : {{ dataP01.year }}  
+                            <!-- {{ dataP01 }} -->
+                        </h3> 
+                    </div>
+                    <!-- <div class="col md:col-4 text-left"> 
+                        <label for="dropdownItemYear">รอบประเมิน : {{ dataP01.evalua }} </label> 
+                    </div>
+                    <div class="col md:col-3 text-left"> 
+                        <label for="dropdownItemYear">ปีงบประมาณ : {{ dataP01.year }}  {{ user.user.name.SCOPES?.staffdepartment }}</label> 
+                    </div>     -->
                     <div class="col md:col-3 text-right"> 
                         <Button icon="pi pi-plus" severity="info" class="mb-2 mr-2" label="เพิ่มข้อมูลแบบประเมิน" @click="OpenDialogAdd" /> 
                         <Dialog header="จัดการแบบ ป01" maximizable v-model:visible="DialogAdd" :breakpoints="{ '960px': '75vw' }" :style="{ width: '100vw' }" :modal="true" position="top">
@@ -167,17 +172,30 @@
         </div> 
     </div> 
 </template>
+<script setup> 
+    const { signIn, getSession, signOut } = await useAuth()
+    const user = await getSession();
+    // console.log(user); 
+</script> 
   
   <script> 
   import { ref } from 'vue';
   import axios from 'axios';  
   import Swal from 'sweetalert2'
     export default {
+        props: {
+            // กำหนด props ที่จะรับข้อมูลจาก parent
+            dataP01: {
+            type: Object,
+            required: true
+            }
+        },
         data() {
             return { 
-                staffid_Main: 5009942,
-                year_Main: 2568,
-                facid_Main: 201092704000,
+                staffid_Main: '',
+                year_Main: '',
+                facid_Main: '',
+                evalua: '',
                 groupid_Main: '01',
                 dropdownItemYear: null ,
                 dropdownItemsYear: [
@@ -231,24 +249,30 @@
             this.dropdownItemYear = this.dropdownItemsYear.find(f => f.value === 2568);
         },
         mounted(){ 
-            this.showDataPerson();
+            // this.staffid_Main: '',
+            this.staffid_Main = this.dataP01.staffid,
+            this.year_Main = this.dataP01.year,
+            this.facid_Main = this.dataP01.staffdepartment,
+            this.evalua = this.dataP01.evalua,
+            this.showDataPerson(this.dataP01.year,this.dataP01.staffdepartment,this.dataP01.evalua);
         },
+
       methods: { 
         // ดึงข้อมูลเข้าตาราง
-        showDataPerson(){
-            axios.post('http://localhost:8000/api/showDataPerson',{
-            staff_id: this.staffid_Main,
-            fac_id: this.facid_Main,
-            year_id: this.year_Main, 
-            group_id: this.groupid_Main,
+        showDataPerson(year_id,fac_id,evalua){
+            axios.post('http://localhost:8000/api/showDataPerson',{  
+            fac_id: fac_id,
+            evalua: evalua,
+            year_id: year_id
             }).then(res => {     
-            //   console.log(res.data);  
+               // console.log(res.data);  
                 this.products_person=res.data;
             })
             .catch(error => {
                 console.error('Error:', error);
             });
         },
+        
         // เปิดหน้าต่างสำหรับบันทึก 
         OpenDialogAdd(){
             this.DialogAdd = true; 
@@ -265,11 +289,10 @@
         },
         // ดึงข้อมูลภาระงาน
         selectDataH(year,fac){  
-            axios.post('http://localhost:8000/api/selectDataPersonH',{
-                year: year.value,
-                fac: fac,
-            }).then(res => {     
-                // console.log(res.data); 
+            //console.log('ดึงข้อมูลภาระงาน',year,fac);
+            
+            axios.post('http://localhost:8000/api/selectDataPersonH',{}).then(res => {     
+                // console.log('selectDataH',res.data); 
                 this.dropdownItemsH=res.data;  
             })
             .catch(error => {
@@ -301,87 +324,76 @@
             this.products_list = this.products_list.filter(product => product.ind_no !== data); 
         },
         // บันทึกแบบจัดการ ป.1 
-        async saveData() {
-    // ตรวจสอบว่าช่องที่จำเป็นถูกกรอกครบหรือไม่
-    if (!this.staffid_Main || !this.facid_Main || !this.dropdownItemYear.value || 
-        !this.text_no || !this.text_name || !this.dropdownItemTarget.value || !this.text_weight) {
-        // แสดงข้อความแจ้งเตือนหากกรอกข้อมูลไม่ครบ
-        Swal.fire({
-            title: "กรุณากรอกข้อมูลให้ครบถ้วน!",
-            text: "กรุณาตรวจสอบและกรอกข้อมูลในช่องที่จำเป็น",
-            icon: "warning"
-        });
-        return; // ยุติการทำงานของฟังก์ชันหากข้อมูลไม่ครบ
-    }
-
-    await axios.post('http://localhost:8000/api/saveDataPerson', {
-        staff_id: this.staffid_Main,
-        fac_id: this.facid_Main,
-        year_id: this.dropdownItemYear.value,  
-        text_edt: this.text_edt,
-        dropdownItemH: this.dropdownItemH.id,
-        text_no: this.text_no,
-        text_name: this.text_name,
-        text_target: this.dropdownItemTarget.value,
-        text_weight: this.text_weight, 
-        products_list: this.products_list
-    })
-    .then(res => {  
-        Swal.fire({
-            title: "เรียบร้อย!",
-            text: "บันทึกข้อมูล แบบ ป01 เรียบร้อย!",
-            icon: "success"
-        });
-        this.DialogAdd = false; 
-        this.showDataPerson();
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        Swal.fire("เกิดข้อผิดพลาด!", "ไม่สามารถบันทึกข้อมูลได้", "error");
-    });
-},
-
-        // ปิดหน้าต่างบันทึก
-        resetDialog(){
-            this.DialogAdd = false; 
-        },
-        // แก้ไขข้อมูล
-        async editData(data){    
-          await axios.post('http://localhost:8000/api/edtDataPerson',{
-              p_id: data.p_id
-          }).then(res => { 
-                // console.log(res.data);   
-                this.DialogAdd = true; 
-                this.text_edt = res.data[0].p_id;   
-                this.text_no = res.data[0].p_no; 
-                this.text_name = res.data[0].p_subject;  
-                const target_f = this.dropdownItemsTarget.filter(f=>f.value==res.data[0].p_target)
-                this.dropdownItemTarget = target_f.length > 0 ? target_f[0] : null;    
-                this.text_weight = res.data[0].p_weight;  
-                this.products_list = res.data[0].sub_ITem; 
-                this.selectDataHEdt(res.data[0].p_year,res.data[0].p_facid,res.data[0].h_id);
-                 
-          })
-          .catch(error => {
-              console.error('Error:', error);
-          });
-        },
-        // ดึงข้อมูลภาระงาน
-        selectDataHEdt(year,fac,he){  
-            axios.post('http://localhost:8000/api/selectDataPersonH',{
-                year: year,
-                fac: fac,
-            }).then(res => {     
+        async saveData() {  
+            await axios.post('http://localhost:8000/api/saveDataPerson', {
+                staff_id: this.staffid_Main,
+                fac_id: this.facid_Main,
+                year_id: this.year_Main,  
+                evalua: this.evalua,
+                text_edt: this.text_edt,
+                dropdownItemH: this.dropdownItemH.id,
+                text_no: this.text_no,
+                text_name: this.text_name,
+                text_target: this.dropdownItemTarget.value,
+                text_weight: this.text_weight, 
+                products_list: this.products_list, 
+            }).then(res => {  
                 // console.log(res.data); 
-                this.dropdownItemsH=res.data;  
-                const h_f = res.data.filter(f=>f.id==he); 
-                this.dropdownItemH = h_f.length > 0 ? h_f[0] : null;    
+                Swal.fire({
+                    title: "เรียบร้อย!",
+                    text: "บันทึกข้อมูล แบบ ป01 เรียบร้อย!",
+                    icon: "success"
+                });
+                this.DialogAdd = false; 
+                this.showDataPerson(this.dataP01.year,this.dataP01.staffdepartment,this.dataP01.evalua);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                Swal.fire("เกิดข้อผิดพลาด!", "ไม่สามารถบันทึกข้อมูลได้", "error");
+                });
+            },
 
+            // ปิดหน้าต่างบันทึก
+            resetDialog(){
+                this.DialogAdd = false; 
+            },
+            // แก้ไขข้อมูล
+            async editData(data){    
+            await axios.post('http://localhost:8000/api/edtDataPerson',{
+                p_id: data.p_id
+            }).then(res => { 
+                    // console.log(res.data);   
+                    this.DialogAdd = true; 
+                    this.text_edt = res.data[0].p_id;   
+                    this.text_no = res.data[0].p_no; 
+                    this.text_name = res.data[0].p_subject;  
+                    const target_f = this.dropdownItemsTarget.filter(f=>f.value==res.data[0].p_target)
+                    this.dropdownItemTarget = target_f.length > 0 ? target_f[0] : null;    
+                    this.text_weight = res.data[0].p_weight;  
+                    this.products_list = res.data[0].sub_ITem; 
+                    this.selectDataHEdt(res.data[0].p_year,res.data[0].p_facid,res.data[0].h_id);
+                    
             })
             .catch(error => {
                 console.error('Error:', error);
             });
-        },
+            },
+            // ดึงข้อมูลภาระงาน
+            selectDataHEdt(year,fac,he){  
+                axios.post('http://localhost:8000/api/selectDataPersonH',{
+                    year: year,
+                    fac: fac,
+                }).then(res => {     
+                    // console.log(res.data); 
+                    this.dropdownItemsH=res.data;  
+                    const h_f = res.data.filter(f=>f.id==he); 
+                    this.dropdownItemH = h_f.length > 0 ? h_f[0] : null;    
+
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+            },
         // ลบข้อมูล
         async delData(data){  
             Swal.fire({
@@ -398,7 +410,7 @@
                         p_id: data.p_id
                     }).then(res => { 
                         // console.log(res);   
-                        this.showDataPerson();
+                        this.showDataPerson(this.dataP01.year,this.dataP01.staffdepartment,this.dataP01.evalua);
                         Swal.fire({
                         title: "ลบข้อมูลเสร็จสิ้น!",
                         text: "ข้อมูลของคุณถูกลบแล้ว",

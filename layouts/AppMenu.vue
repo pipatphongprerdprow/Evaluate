@@ -17,25 +17,26 @@ const model = ref([
     //     ]
     // },
     {
-        label: 'แบบบันทึกข้อตกลง(TOR)ป.01-ป.04',
+        label: 'แบบบันทึกข้อตกลง(TOR)ป.01-ป.03',
         items: [ 
-            { label: 'แบบใบปะหน้า', icon: 'pi pi-fw pi-calendar', to: '/setting/coversheet' },
-            { label: 'แบบประเมิน ป.01', icon: 'pi pi-fw pi-folder-open', to: '/setting/por_01' },
+            { label: 'แบบบันทึกข้อตกลง', icon: 'pi pi-fw pi-calendar', to: '/setting/coversheet' },
+            // { label: 'การจัดการภายใน', icon: 'pi pi-fw pi-user', to: '/setting/management' },
+            // { label: 'แบบประเมิน ป.01', icon: 'pi pi-fw pi-folder-open', to: '/setting/por_01' },
             // { label: 'บุคลากรสายสนับสนุน', icon: 'pi pi-fw pi-user', to: '/setting/home' },       
             // { label: 'แบบประเมิน ป.01', icon: 'pi pi-fw pi-folder-open', to: '/setting/por01' },
-             { label: 'แบบประเมิน ป.02', icon: 'pi pi-fw pi-folder-open', to: '/setting/por02' },
-            { label: 'แบบประเมิน ป.03', icon: 'pi pi-fw pi-folder-open', to: '/setting/por03' },
+            //  { label: 'แบบประเมิน ป.02', icon: 'pi pi-fw pi-folder-open', to: '/setting/por02' },
+            // { label: 'แบบประเมิน ป.03', icon: 'pi pi-fw pi-folder-open', to: '/setting/por03' },
             // { label: 'แผนพัฒนาการปฎิบัติราชการรายบุคคล', icon: 'pi pi-fw pi-card', to: '/setting/assessment' }
         ]
     },
-    {
-        label: 'รายงาน',
-        items: [
-            { label: 'รายงานการประเมิน', icon: 'pi pi-credit-card', to: '/setting/record' }, 
-            { label: 'รายงานการประเมิน (ส่วนบุคคล)', icon: 'pi pi-credit-card', to: '/setting/recordpersonal' },
+    // {
+    //     label: 'รายงาน',
+    //     items: [
+    //         { label: 'รายงานการประเมิน', icon: 'pi pi-credit-card', to: '/setting/record' }, 
+    //         // { label: 'รายงานการประเมิน (ส่วนบุคคล)', icon: 'pi pi-credit-card', to: '/setting/recordpersonal' },
              
-        ]
-    },
+    //     ]
+    // },
     // {
     //     label: 'รายงานการประเมิน (ส่วนบุคคล)',
     //     items: [
@@ -103,10 +104,16 @@ const model = ref([
         label: 'เจ้าหน้าที่บุคคล',
         items: [
             { label: 'จัดการ รอบประเมิน', icon: 'pi pi-fw pi-calendar', to: '/setting/setting_date' }, 
-            { label: 'จัดการ แบบประเมิน', icon: 'pi pi-fw pi-sliders-h', to: '/setting/setting_assessment' }, 
+            // { label: 'จัดการ แบบประเมิน', icon: 'pi pi-fw pi-sliders-h', to: '/setting/setting_assessment' }, 
             { label: 'ตรวจสอบ แบบประเมิน', icon: 'pi pi-fw pi-star', to: '/setting/checkevaluate' }, 
+            
         ]
     },
+    // {
+    //     label: 'คู่มือการใช้งานระบบ',
+    //     items: [{ label: 'คู่มือการใช้งาน', icon: 'pi pi-fw pi-book', to: '/' }]
+    // }, 
+    ]);
     // {
     //     label: 'ผู้บริหาร',
     //     items: [
@@ -117,21 +124,7 @@ const model = ref([
     //         { label: 'จัดการด้านการประเมิน', icon: 'pi pi-fw pi-sliders-v', to: '/setting/executivepor03' }
     //     ]
     // },
-    // {
-    //     label: 'คู่มือการใช้งานระบบ',
-    //     items: [{ label: 'คู่มือการใช้งาน', icon: 'pi pi-fw pi-book', to: '/' }]
-    // },
-    // {
-    //     label: 'UI Components',
-    //     items: [
-    //         {
-    //             label: 'Form Layout',
-    //             icon: 'pi pi-fw pi-id-card',
-    //             to: '/uikit/formlayout'
-    //         },
-    //     ]
-    // }
-    ]);
+     
 
     //         { label: 'Input', icon: 'pi pi-fw pi-check-square', to: '/uikit/input' },
     //         {

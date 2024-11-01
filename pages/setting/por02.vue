@@ -1,7 +1,7 @@
 <template>
-     <div class="col md:col-12 text-right">
+     <!-- <div class="col md:col-12 text-right">
         <Button label="Export" icon="pi pi-file-word" class="mr-2 mb-2 "></Button>
-    </div>
+    </div> --> 
     <div class="card">
         <h3 class="mb-4" style="text-align: left;"><i class="pi pi-folder-open" style="font-size: x-large;"></i> แบบ ป02</h3>
         <h4>ข้อตกลงและแบบการประเมินผลสัมฤทธิ์ของงานของข้าราชการและพนักงาน สังกัดมหาวิทยาลัยมหาสารคาม (องค์ประกอบที่ 2)</h4><br>
@@ -21,8 +21,8 @@
                             <td style="text-align: left;">{{ row1.activity }}</td> 
                             <td>{{ row1.indicator }}</td>
                             <td>  
-                                <!-- <b v-if="row1.data_table1 == '' " style="color: red;">0</b> 
-                                <b v-if="row1.data_table1 != 0 " >{{ row1.data_table1 }}</b>  -->
+                                <b v-if="row1.data_table1 == '' " style="color: red;">0</b> 
+                                <b v-if="row1.data_table1 != 0 " >{{ row1.data_table1 }}</b> 
                             </td>
                         </tr>
                     </tbody>
@@ -43,8 +43,8 @@
                             <td style="text-align: left;">{{ row2.activity }}</td> 
                             <td>{{ row2.indicator }}</td>
                             <td>
-                                <!-- <b v-if="row2.data_table2 == '' " style="color: red;">0</b> 
-                                <b v-if="row2.data_table2 != 0 " >{{ row2.data_table2 }}</b>  -->
+                                <b v-if="row2.data_table2 == '' " style="color: red;">0</b> 
+                                <b v-if="row2.data_table2 != 0 " >{{ row2.data_table2 }}</b> 
                             </td>
                         </tr>
                     </tbody>
@@ -72,9 +72,24 @@
         </div>
     </div>
 </template>
-
+<!-- <script setup> 
+    const { signIn, getSession, signOut } = await useAuth()
+    const user = await getSession();
+    // console.log(user);
+</script>  -->
 <script>
+import { ref } from 'vue';
+import axios from 'axios';  
+import Swal from 'sweetalert2'
+import { saveAs } from 'file-saver';
 export default {
+    props: {
+        // กำหนด props ที่จะรับข้อมูลจาก parent
+        dataPor: {
+            type: Object,
+            required: true
+        }
+    },
     data() {
         return {
            //ตาราง ก. สมรรถนะหลัก
@@ -101,19 +116,110 @@ export default {
                 { id: 14, activity: 'ค. 3 การวางกลยุทธ์ภาครัฐ', indicator: '0', data_table3: '' },
                 { id: 15, activity: 'ค. 4 ศักยภาพเพื่อนำการปรับเปลี่ยน', indicator: '0', data_table3: '' },
                 { id: 16, activity: 'ค. 5 การสอนงานและการมอบหมายงาน', indicator: '0', data_table3: '' }
-            ],
-            //Tab 2 
-            products_Tab2: []
-          
-        };
-        
+            ], 
+             
+        };   
     }, 
-    async mounted() {
-                const  { signIn, getSession, signOut } = await useAuth()
-                const user = await getSession();
+    async mounted(){ 
+        const { signIn, getSession, signOut } = await useAuth()
+        const user = await getSession();
+       // console.log(user.user.name);
+        const {STAFFID, SCOPES} = user.user.name
+        const {staffdepartment, groupid, staffdepartmentname, groupname} = SCOPES
+        await this.setSession(STAFFID,staffdepartment,groupid); 
+ 
+        // this.showdataPo(STAFFID,staffdepartment,this.dataPor.d_date,this.dataPor.evalua);
+        // console.log(this.dataPor.d_date); 
+        // this.showdataPo(staff_id,this.facid_Main,this.tracking_date.d_date,this.tracking_date.evalua );
+    },  
+    watch: {
+        // เฝ้าดูการเปลี่ยนแปลงของ dataPor
+        dataPor: {
+            handler(newVal, oldVal) {
+                // console.log('dataPor changed:', newVal);
+                this.showdataPo();
+                    // ทำสิ่งที่ต้องการเมื่อ dataPor เปลี่ยนแปลง
             },
+            deep: true // ใช้ deep: true เพื่อดูการเปลี่ยนแปลงภายใน object
+        }
+    },
+    methods: {  
+        setSession (staffid_Main,facid_Main,groupid_Main) {
+            // console.log('staffid_Main:',staffid_Main);  
+            this.staffid_Main = staffid_Main
+            this.facid_Main = facid_Main
+            this.groupid_Main = groupid_Main  
+        }, 
+        showdataPo(){  
+            // ตั้งค่า coreCompetencies กลับไปเป็นค่าเริ่มต้น
+            this.coreCompetencies = [
+                { id: 1, activity: 'ก. 1 การมุ่งผลสัมฤทธิ์', indicator: '1', data_table1: '' },
+                { id: 2, activity: 'ก. 2 การบริการที่ดี', indicator: '1', data_table1: '' },
+                { id: 3, activity: 'ก. 3 การสั่งสมความเชี่ยวชาญในงานอาชีพ', indicator: '1', data_table1: '' },
+                { id: 4, activity: 'ก. 4 การยึดมั่นในความถูกต้องชอบธรรมและจริยธรรม', indicator: '1', data_table1: '' },
+                { id: 5, activity: 'ก. 5 การทำงานเป็นทีม', indicator: '1', data_table1: '' }
+            ];  
+            
+            // ตั้งค่า jobSpecificCompetencies กลับไปเป็นค่าเริ่มต้น
+            this.jobSpecificCompetencies = [
+                { id: 6, activity: 'ข. 1 การคิดวิเคราะห์', indicator: '1', data_table2: '' },
+                { id: 7, activity: 'ข. 2 การดำเนินการเชิงรุก', indicator: '1', data_table2: '' },
+                { id: 8, activity: 'ข. 3 ความผูกพันที่มีต่อส่วนราชการ', indicator: '1', data_table2: '' },
+                { id: 9, activity: 'ข. 4 การมองภาพองค์รวม', indicator: '1', data_table2: '' },
+                { id: 10, activity: 'ข. 5 การสืบเสาะหาข้อมูล', indicator: '1', data_table2: '' },
+                { id: 11, activity: 'ข. 6 การตรวจสอบความถูกต้องตามกระบวนงาน', indicator: '1', data_table2: '' }
+            ]; 
+            
+            axios.post('http://localhost:8000/api/showDataPo',{
+                staff_id: this.staffid_Main,
+                fac_id: this.facid_Main,
+                year_id: this.dataPor.d_date,
+                record: this.dataPor.evalua,
+            }).then(res => {     
+                // console.log(res.data);    
+                if(res.data.length > 0){
+                    const data = res.data[0];
+                    this.coreCompetencies.forEach(item => {
+                        if (item.id === 1) {
+                            item.data_table1 = data.p1;  // Update based on the API response
+                        } else if (item.id === 2) {
+                            item.data_table1 = data.p2;  // Update based on the API response
+                        } else if (item.id === 3) {
+                            item.data_table1 = data.p3;  // Add more conditions if necessary
+                        } else if (item.id === 4) {
+                            item.data_table1 = data.p4;  // Add more conditions if necessary
+                        } else if (item.id === 5) {
+                            item.data_table1 = data.p5;  // Add more conditions if necessary
+                        }
+                    });
+
+                    this.jobSpecificCompetencies.forEach(item => {
+                        if (item.id === 6) {
+                            item.data_table2 = data.p6;  // Update based on the API response
+                        } else if (item.id === 7) {
+                            item.data_table2 = data.p7;  // Update based on the API response
+                        } else if (item.id === 8) {
+                            item.data_table2 = data.p8;  // Add more conditions if necessary
+                        } else if (item.id === 9) {
+                            item.data_table2 = data.p9;  // Add more conditions if necessary
+                        } else if (item.id === 10) {
+                            item.data_table2 = data.p10;  // Add more conditions if necessary
+                        } else if (item.id === 11) {
+                            item.data_table2 = data.p11;  // Add more conditions if necessary
+                        }
+                    });
+                } 
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        },  
+          
+
+    }  
 }
 </script>
+
 
 <style scoped>
 body {
