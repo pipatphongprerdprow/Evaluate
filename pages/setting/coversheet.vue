@@ -39,7 +39,8 @@
             <!-- {{ user }} --> 
 
             <!-- //พี่บอยแก้ -->
-            <TabView @click="xyz">
+            <TabView :activeIndex="activeIndex" @tabChange="onTabChange">
+                <!-- <TabView @click="xyz"> -->
                 <TabPanel header="แบบ ใบปะหน้า" value="0">
                     <div class="card"> 
                         <div style="display: flex; justify-content: center">
@@ -93,11 +94,11 @@
                 </TabPanel>
 
                 <TabPanel header="แบบ ป03" value="3">
-                    <Por03 :dataPor="product_date" :tabd="por03key+''"></Por03>
+                    <Por03 :dataPor="product_date" :tab3Reload="por03key"></Por03> 
                     <!-- รอข้อมูล -->
                 </TabPanel> 
                 <TabPanel header="แบบ ป04" value="4">
-                    <Por04 :dataPor="product_date"></Por04>
+                    <Por04 :dataPor="product_date" :tab4Reload="por04key"></Por04>
                     <!-- รอข้อมูล -->
                 </TabPanel>
             </TabView>
@@ -133,8 +134,12 @@ export default {
             //พี่บอยแก้
             p01x: '',
             xxx: '2',
-//----------------------------
             por03key: 0,
+            por04key: 0,
+            // Anurak
+            activeIndex: 0,
+//----------------------------
+            
             staffid_Main: '',
             staffid_name: '',
             year_Main: '',
@@ -209,10 +214,7 @@ export default {
         await this.setSession(STAFFID, staffdepartment, groupid ,user);
         await this.showDataSet(STAFFID, staffdepartment, groupid);
         //this.showDataEvalu();   
-    },
-    computed: {
-         
-    },
+    }, 
     methods: {
         setSession(staffid_Main, facid_Main, groupid_Main ,user) {
             // console.log('user: ',user.user.name);
@@ -222,7 +224,7 @@ export default {
             this.staffid_name = user.user.name.PREFIXFULLNAME+user.user.name.STAFFNAME+" "+user.user.name.STAFFSURNAME ;
             this.pos_id = user.user.name.POSID ;
             this.postype_id = user.user.name.POSTYPEID ;
-            },
+        },
         por01Data(data) {
             //console.log('data: ',data);
             this.dataP01 = {
@@ -231,24 +233,22 @@ export default {
                 evalua: data.evalua,
                 d_evaluationround: data.d_evaluationround,
                 staffdepartment: this.facid_Main
-                };
-            },
+            };
+        },
         showDataSet() {
-            axios
-                .post('http://localhost:8000/api/showDateSet', {
-                    staff_id: this.staffid_Main,
-                    fac_id: this.facid_Main,
-                    group_id: this.groupid_Main
-                    
-                })
-                .then((res) => {
-                    // console.log(res.data); 
-                    this.products_date = res.data;
-                })
-                .catch((error) => {
-                    console.error('Error:', error);
-                });
-            }, 
+            axios.post('http://localhost:8000/api/showDateSet', {
+                staff_id: this.staffid_Main,
+                fac_id: this.facid_Main,
+                group_id: this.groupid_Main 
+            })
+            .then((res) => {
+                // console.log(res.data); 
+                this.products_date = res.data;
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+        }, 
         saveDatator() {
             //console.log(res.data); 
             if(this.product_date.d_date == null || this.product_date.d_date == undefined){
@@ -348,22 +348,27 @@ export default {
         //         this.evaluator = data.fullname      
         //         this.evaluator_val = data.staffid 
         //     },
-        xyz () {
-            //console.log("xyz",this.por03key);
-            this.por03key++
-        }
-    },
-    watch: {
-        xxx (v) {
-            //console.log("xxx",v);
-            
-        },
-        p01x (v) {
-            //console.log("p01x",v);
-            
-        }
-    }  
-    }
+
+        // พี่บอย
+        // xyz () {
+        //     //console.log("xyz",this.por03key);
+        //     this.por03key++
+        // },
+        // Anurak
+        onTabChange(event) { 
+            // console.log(event.index);
+            if(this.product_date.d_date == null || this.product_date.d_date == undefined){
+                Swal.fire("error","กรุณาเลือก รอบการประเมิน ก่อน !","error"); 
+            }else{
+                if(event.index==3) {   
+                    this.por03key++; 
+                }else if(event.index==4) {   
+                    this.por04key++; 
+                }
+            }
+        },  
+    },  
+}
 </script>
 
 <style scoped>

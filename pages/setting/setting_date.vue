@@ -79,21 +79,23 @@
                     <Column field="Tb_target" header="วันที่กำหนด" style="width: 12%; text-align: center;">
                         <template #body="Item"> 
                             <div style="display: flex; justify-content: center; align-items: center;">
-                                {{ Item.data.d_recordingday }}   
+                                <!-- {{ Item.data.d_recordingday }}    -->
+                                {{ formatDateToThai(Item.data.d_recordingday) }}
                             </div>
                         </template>
                     </Column>
                     <Column field="Tb_score" header="วันที่ครบกำหนด" style="width: 12%; text-align: center;">
                         <template #body="Item">  
                             <div style="display: flex; justify-content: center; align-items: center;">
-                                <em style="color: red;">{{ Item.data.d_enddate }}</em>
+                                <em style="color: red;">{{ formatDateToThai(Item.data.d_enddate) }}</em>
+                                 
                             </div>
                         </template>
                     </Column>
                     <Column field="Tb_weight" header="วันที่ประกาศคะแนน" style="width: 10%; text-align: center;">
                         <template #body="Item"> 
                             <div style="display: flex; justify-content: center; align-items: center;">
-                                <b style="color: blue;">{{ Item.data.d_scoringday }}</b>
+                                <b style="color: blue;">{{ formatDateToThai(Item.data.d_scoringday) }}</b>
                             </div>
                         </template>
                     </Column>
@@ -291,6 +293,17 @@ export default {
                 console.error('Error:', error);
             });
         }, 
+        formatDateToThai(date) {
+            if (!date) return '';
+            
+            const options = {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+            };
+
+            return new Intl.DateTimeFormat('th-TH', options).format(new Date(date));
+        },
     }
 
 }

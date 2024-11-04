@@ -8,8 +8,7 @@
                     </div> 
                     <div class="col md:col-5" >  
                         <label for="tracking_date"></label>
-                        <Dropdown v-model="tracking_date" :options="tracking_dates" optionLabel="d_evaluationround" placeholder="กรุณาเลือกรอบการประเมิน" style=" max-width: 500px; width: 100%"></Dropdown>
-                        <!-- {{ tracking_date }} -->   
+                        <Dropdown v-model="tracking_date" :options="tracking_dates" optionLabel="d_evaluationround" placeholder="กรุณาเลือกรอบการประเมิน" style=" max-width: 500px; width: 100%"></Dropdown> 
                     </div> 
                     <div class="col md:col-1" >  
                         <Button class="mb-2 mr-2" icon="pi pi-search" @click="xxr" /> 
@@ -571,13 +570,14 @@
                                             <div class="card">                      
                                                 <h5 class="mb-4"><i class="" style="font-size: x-large;"></i> ส่วนที่ 1 ข้อมูลของผู้รับการประเมิน</h5>
                                                 <!-- ตาราง ก. สมรรถนะหลัก -->
+                                                 
                                                 <div class="employee-info"> 
-                                                    <p><strong>รอบการประเมิน:</strong> </p>
+                                                    <p><strong>รอบการประเมิน:</strong> {{ tracking_date.d_evaluationround }} </p>
                                                     <p><strong>ชื่อผู้รับการประเมิน:</strong> {{ user.user.name.PREFIXFULLNAME }} {{ user.user.name.STAFFNAME }} {{ user.user.name.STAFFSURNAME }} </p>
                                                     <p><strong>ตำแหน่ง:</strong> {{ user.user.name.POSITIONNAME }} </p>
                                                     <p><strong>ระดับตำแหน่ง:</strong>{{ user.user.name.POSTYPENAME }} </p>
                                                     <p><strong>สังกัด:</strong> {{ user.user.name.SCOPES?.staffdepartmentname }} </p>
-                                                    <p><strong>ชื่อผู้ประเมิน:</strong> {{  }}</p> 
+                                                    <p><strong>ชื่อผู้ประเมิน:</strong>  {{ assessorText??'-' }}</p> 
                                                 </div><br>
                                                 <div class="employee-info" style="border: groove;padding: 15px;">
                                                     <h4>คำชี้แจง</h4>
@@ -691,14 +691,14 @@
                                                                 <label for="evaluator-acknowledgment-2">[ &nbsp;&nbsp; ] ได้แจ้งผลการประเมินเมื่อวันที่ ..............................แต่ผู้รับการประเมินไม่ลงนามรับทราบผลการประเมิน 
                                                                     โดยมี ....................................... เป็นพยาน และ....................................... เป็นพยาน</label><br>
                                                                 ลงชื่อ .................................................................<br>
-                                                                ชื่อ นางสาวพนมพร ปัจจวงษ์<br>
-                                                                ตำแหน่ง ผู้อำนวยการกองแผนงาน<br>
+                                                                ชื่อ {{assessorText}}<br>
+                                                                ตำแหน่ง {{assessor_positionText}}<br>
                                                                 วันที่ .......... เดือน .......................... พ.ศ...........
                                                             </td>
                                                         <td class="center-align"><br><br>
                                                             ลงชื่อ .................................................................<br>
-                                                            ชื่อ นางสาวพนมพร ปัจจวงษ์<br>
-                                                            ตำแหน่ง ผู้อำนวยการกองแผนงาน<br>
+                                                            ชื่อ {{assessorText}}<br>
+                                                            ตำแหน่ง {{assessor_positionText}}<br>
                                                             วันที่ .......... เดือน .......................... พ.ศ...........
                                                         </td>
                                                         </tr>
@@ -734,8 +734,8 @@
                                                             </td>
                                                             <td class="center-align"><br><br>
                                                                 ลงชื่อ .................................................................<br>
-                                                                ชื่อ นางสาวพนมพร ปัจจวงษ์<br>
-                                                                ตำแหน่ง ผู้อำนวยการกองแผนงาน<br>
+                                                                ชื่อ {{assessorText}}<br>
+                                                                ตำแหน่ง {{assessor_positionText}}<br>
                                                                 วันที่ .......... เดือน .......................... พ.ศ...........
                                                             </td>
                                                         </tr>
@@ -769,6 +769,16 @@ import TabView from 'primevue/tabview';
 import TabPanel from 'primevue/tabpanel';
 import { LogarithmicScale } from 'chart.js';
 export default {
+    // props: {
+    //     dataPor: {
+    //         type: Object,
+    //         required: true
+    //     }, 
+    //     tab4Tracking: {
+    //         type: String,
+    //         default: '0'
+    //     } 
+    // },
     data() { 
         return {  
             staffid_po: 130102,
@@ -861,16 +871,22 @@ export default {
             totalScoreSum:{},
             totalScoreZeroSum:{},
             totalScoreFinalSum:{}, 
-            //ชื่อผู้ประเมิน 
-            assessor:'',
-            //รวมคะแนน
-            //totalScore: 0
+            
+            assessorText: null,
+            assessor_positionText: null,
         }
     }, 
     components: {
         TabView,
         TabPanel
     }, 
+    // watch: { 
+    //     tab4Tracking(v) { 
+    //         // console.log("por04 tab4Reload",v);
+    //         //this.chkp04dataXr(); 
+    //         this.showdatator();  
+    //     },  
+    // },
     async mounted(){ 
         const { signIn, getSession, signOut } = await useAuth()
         const user = await getSession();
@@ -879,7 +895,8 @@ export default {
         const {staffdepartment, groupid, staffdepartmentname, groupname} = SCOPES
         await this.setSession(STAFFID,staffdepartment,groupid); 
         // this.showDataEvalu();  
-        this.showDataSet();
+        this.showDataSet(); 
+        
     },  
     computed: {
         totalscoretrack() {
@@ -1242,6 +1259,7 @@ export default {
             if (event.index==3) {
                 //console.log('รายงาน ป.04 -',event.index);
                 this.chkp04dataT4(this.dataStaffid,this.facid_Main,this.tracking_date.d_date,this.tracking_date.evalua);   
+                this.showdatator();
             }
         },  
         tab2Data(staff_id){  
@@ -1405,34 +1423,25 @@ export default {
             .catch(error => {
                 console.error('Error:', error);
             });
-        },
-        async mounted() {
-            const  { signIn, getSession, signOut } = await useAuth()
-            const user = await getSession();
         }, 
-        //รายชื่อผู้ประเมิน
-        showdatator() { 
+        /*============= ผู้ประเมิน ==============*/
+        showdatator() {   
             axios.post('http://localhost:8000/api/showdatator', {
-                p_year: this.product_date.d_date,
-                evalua: this.product_date.evalua,
+                p_year: this.tracking_date.d_date,
+                evalua: this.tracking_date.evalua,
                 p_staffid: this.staffid_Main
             })
-            .then(response => {
-                //console.log('Response',response.data);  
-                const dataSet = response.data[0];
-                this.assessor = dataSet.assessor;
-                this.assessor_position = dataSet.assessor_position; 
-
-                const persen = this.dropdownProportions.filter(f=>f.value==dataSet.persen)
-                this.dropdownProportion = persen.length > 0 ? persen[0] : null;  
+            .then(res => {
+                 //console.log('Response',res.data);  
+                this.assessorText = res.data[0].assessor; 
+                this.assessor_positionText = res.data[0].assessor_position; 
             })
             .catch(error => {
                 console.error('Error fetching data:', error);
             });
-        },  
-        mounted() {
-            this.showdatator(); // เรียกฟังก์ชันเมื่อหน้าโหลด
-        },
+        }, 
+
+
         //29/10/67
         saveScore() {
              axios.post('http://localhost:8000/api/saveDatator', {
@@ -1444,8 +1453,7 @@ export default {
             .catch(error => {
             console.error('เกิดข้อผิดพลาดในการบันทึกคะแนน:', error); 
             });
-        },
-        //แก้
+        },  
         saveDatatorScore() {
             //console.log(res.data); 
                 if (!this.assessor || !this.assessor_position) {
@@ -1513,7 +1521,7 @@ export default {
                     console.error('Error saving data:', error);
                 });
             }
-            },
+        }, 
     } 
 }
 </script>

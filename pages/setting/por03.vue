@@ -357,13 +357,11 @@ import { saveAs } from 'file-saver';
             dataPor: {
                 type: Object,
                 required: true
-            },
-                 ////พี่บอยแก้
-            tabd: {
+            }, 
+            tab3Reload: {
                 type: String,
                 default: '0'
-            }
-            //------------------------
+            } 
         },
         data() {
             return { 
@@ -471,35 +469,19 @@ import { saveAs } from 'file-saver';
                 products_Tab3: [],
             }
         }, 
-        async mounted(){
-           // console.log("por03 mount..",this.dataPor);
-
-            this.showDataP03();
-            this.showdataPo();
-            this.chkp03data();
-            
+        async mounted(){  
             const { signIn, getSession, signOut } = await useAuth()
             const user = await getSession(); 
             //console.log(user.user.name); 
             const {STAFFID, SCOPES} = user.user.name
             const {staffdepartment, groupid, staffdepartmentname, groupname} = SCOPES
-            await this.setSession(STAFFID,staffdepartment,groupid);  
-            // this.showDataP03(); 
-            // this.showdataPo();
-        },
-
-        ////พี่บอยแก้
-        watch: {
-            tabd (v) {
-
-                //console.log("por03 tabd",v);
-                this.showDataP03();
-                this.showdataPo();
-                this.chkp03data();
-            },
-            //--------------------------------
-
-
+            await this.setSession(STAFFID,staffdepartment,groupid);   
+        }, 
+        watch: { 
+            tab3Reload(v) { 
+                // console.log("por03 tab3Reload",v);
+                this.showDataP03(); 
+            }, 
             // เฝ้าดูการเปลี่ยนแปลงของ dataPor
             dataPor: {
                 handler(newVal, oldVal) {
@@ -507,7 +489,7 @@ import { saveAs } from 'file-saver';
                     this.showDataP03();
                     this.showdataPo();
                     this.chkp03data();
-                        // ทำสิ่งที่ต้องการเมื่อ dataPor เปลี่ยนแปลง
+                    // ทำสิ่งที่ต้องการเมื่อ dataPor เปลี่ยนแปลง
                 },
                 deep: true // ใช้ deep: true เพื่อดูการเปลี่ยนแปลงภายใน object
             }
