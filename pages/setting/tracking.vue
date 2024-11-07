@@ -5,7 +5,7 @@
                 <div class="formgroup-inline mb-1">
                     <div class="col md:col-6"> 
                         <h3 class="mb-4 card-header"><i class="pi pi-credit-card" style="font-size: x-large;"></i> ตรวจติดตามแบบประเมิน</h3>    
-                    </div> 
+                    </div>  
                     <div class="col md:col-5" >  
                         <label for="tracking_date"></label>
                         <Dropdown v-model="tracking_date" :options="tracking_dates" optionLabel="d_evaluationround" placeholder="กรุณาเลือกรอบการประเมิน" style=" max-width: 500px; width: 100%"></Dropdown> 
@@ -14,8 +14,6 @@
                         <Button class="mb-2 mr-2" icon="pi pi-search" @click="xxr" /> 
                     </div>
                 </div>  
-                <!-- {{ user }}  --> 
-                <!-- {{   user.user.name.STAFFID }} --> 
                 <table class="table">
                     <thead> 
                         <tr style="height: 40px;background-color: blanchedalmond;">
@@ -30,22 +28,19 @@
                     <tbody>
                         <tr v-for="(Item, index) in products" :key="index">
                             <td style="padding-left: 5px;width: 20%;text-align: left;">  
-                                <b style="color: blue;">{{ Item.prefixfullname }} {{ Item.namefully }} </b>
+                                <!-- {{ Item }} -->
+                                <b style="color: blue;">{{ Item.prefixfullname }} {{ Item.namefully }} </b> 
                             </td> 
-                            <td class="text-center" style="color: blue;"><b>{{ Item.tb_tor?Item.tb_tor.persen: '' }}</b></td> 
-                            <!-- <td class="text-center" style="color: blue;"><b> {{displayScore}} </b></td> --> 
-                            <!-- <td class="text-center" style="color: blue;"><b> {{calculatedScore}}</b></td>     -->
-                            <!-- {{calculatedScore}} --> 
-                            <td class="text-center" style="color: blue;"><b>{{ ((totalScoreSum + totalScoreZeroSum) / 33*70).toFixed(2)  }}</b></td>    
-                            <td class="text-center" style="color: blue;"><b>{{ (WeightedScoreSumXT * 30).toFixed(2) }}</b></td>
-                            <td class="text-center" style="color: blue;"><b>{{ (((totalScoreSum + totalScoreZeroSum) / 33 * 70) + (WeightedScoreSumXT * 30)).toFixed(2) }} </b></td>  
+                            <td class="text-center" style="color: blue;"><b>{{ Item.tb_tor?Item.tb_tor.persen: '' }}</b></td>  
+                            <td class="text-center" style="color: blue;"><b>{{ Item.tb_tor?Item.tb_tor.achievement_score:'' }}</b></td>    
+                            <td class="text-center" style="color: blue;"><b>{{ Item.tb_tor?Item.tb_tor.behavior:'' }}</b></td>
+                            <td class="text-center" style="color: blue;"><b>{{ Item.tb_tor?Item.tb_tor.sum_score:'' }} </b></td>  
                             <td style="text-align: center;width: 10%;">
                                 <Button label="ประเมิน" class="mb-2 mr-2" icon="pi pi-list" @click="openDataEvalu(Item.staffid)" />  
                             </td> 
                         </tr>  
                     </tbody> 
-                </table>  
-
+                </table>   
                 <!-- <div style="text-align: center;">
                     <Button 
                         label="บันทึกผลคะแนน" 
@@ -165,13 +160,23 @@
                                                                 <td style="text-align: left;">{{ row1.activity }}</td> 
                                                                 <td>{{ row1.indicator }}</td>
                                                                 <td>
-                                                                    <InputText 
+                                                                    <InputNumber 
+                                                                        v-model.number="row1.data_table1" 
+                                                                        type="text" 
+                                                                        placeholder="0" 
+                                                                        autocomplete="off"
+                                                                         :min="0" :max="row1.indicator" 
+                                                                         showButtons
+                                                                    />   
+<!--                                                                     
+                                                                    <InputNumber 
                                                                         v-model.number="row1.data_table1" 
                                                                         type="text" 
                                                                         placeholder="0" 
                                                                         autocomplete="off"
                                                                         @input="(event) => event.target.value = event.target.value.replace(/[^0-9]/g, '') " 
-                                                                    /> 
+                                                                        showButtons
+                                                                    />  -->
                                                                 </td>
                                                             </tr>
                                                         </tbody>
@@ -188,17 +193,27 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
+                                                            <!-- {{ row2jobSpecificCompetencies }} -->
                                                             <tr v-for="(row2, index) in jobSpecificCompetencies" :key="index">
-                                                                <td style="text-align: left;">{{ row2.activity }}</td> 
-                                                                <td>{{ row2.indicator }}</td>
+                                                                <td style="text-align: left;"> ข. {{ index+6 }} {{ row2.WORK_NAME }}</td> 
+                                                                <td> {{ row2.COMPLEVEL }}</td>
+                                                               
                                                                 <td>
-                                                                    <InputText 
+                                                                    <!-- <InputText 
                                                                         v-model.number="row2.data_table2" 
                                                                         type="text" 
                                                                         placeholder="0" 
                                                                         autocomplete="off"
                                                                         @input="(event) => event.target.value = event.target.value.replace(/[^0-9]/g, '') " 
-                                                                    />  
+                                                                    /> -->
+                                                                    <InputNumber 
+                                                                        v-model.number="row2.SCORE" 
+                                                                        type="text" 
+                                                                        placeholder="0" 
+                                                                        autocomplete="off"
+                                                                         :min="0" :max="row2.COMPLEVEL" 
+                                                                         showButtons
+                                                                    />    
                                                                 </td>
                                                             </tr>
                                                         </tbody>
@@ -402,13 +417,13 @@
                                                         </thead>
                                                         <tbody>
                                                             <tr v-for="(row2, index) in jobSpecificCompetencies" :key="index">
-                                                                <td style="text-align: left;">{{ row2.activity }}</td> 
-                                                                <td>{{ row2.indicator }}</td>
+                                                                <td style="text-align: left;"> ข. {{ index+6 }} {{ row2.WORK_NAME }}</td> 
+                                                                <td> {{ row2.COMPLEVEL }}</td> 
                                                                 <td>
-                                                                    <b v-if="row2.data_table2 == '' " style="color: red;">0</b> 
-                                                                    <b v-if="row2.data_table2 != 0 " >{{ row2.data_table2 }}</b> 
+                                                                    <b v-if="row2.SCORE == '' " style="color: red;">0</b> 
+                                                                    <b v-if="row2.SCORE != 0 " >{{ row2.SCORE }}</b> 
                                                                 </td>
-                                                            </tr>
+                                                            </tr> 
                                                         </tbody>
                                                     </table>
                                                 </div>
@@ -562,22 +577,22 @@
                                     </div>
                                 </div>
                             </TabPanel>
-                            <!-- Tab 4 -->
+                            <!-- Tab 4 --> 
                             <TabPanel header="รายงาน ป.04" >
                                 <div class="card">
                                     <h4 style="text-align: left">แบบสรุปการประเมินผล</h4>
                                         <div class="p-fluid formgrid grid">
                                             <div class="card">                      
                                                 <h5 class="mb-4"><i class="" style="font-size: x-large;"></i> ส่วนที่ 1 ข้อมูลของผู้รับการประเมิน</h5>
-                                                <!-- ตาราง ก. สมรรถนะหลัก -->
-                                                 
-                                                <div class="employee-info"> 
+                                                <!-- ตาราง ก. สมรรถนะหลัก --> 
+                                                <div class="employee-info">  
                                                     <p><strong>รอบการประเมิน:</strong> {{ tracking_date.d_evaluationround }} </p>
-                                                    <p><strong>ชื่อผู้รับการประเมิน:</strong> {{ user.user.name.PREFIXFULLNAME }} {{ user.user.name.STAFFNAME }} {{ user.user.name.STAFFSURNAME }} </p>
-                                                    <p><strong>ตำแหน่ง:</strong> {{ user.user.name.POSITIONNAME }} </p>
-                                                    <p><strong>ระดับตำแหน่ง:</strong>{{ user.user.name.POSTYPENAME }} </p>
-                                                    <p><strong>สังกัด:</strong> {{ user.user.name.SCOPES?.staffdepartmentname }} </p>
-                                                    <p><strong>ชื่อผู้ประเมิน:</strong>  {{ assessorText??'-' }}</p> 
+                                                    <p><strong>ชื่อผู้รับการประเมิน:</strong>  {{ currentstaff[0].prefixfullname }} {{ currentstaff[0].staffname }} {{   currentstaff[0].staffsurname }}</p>
+                                                    <p><strong>ตำแหน่ง:</strong> {{ currentstaff[0].posnameth }} </p>
+                                                    <p><strong>ระดับตำแหน่ง:</strong>{{ currentstaff[0].postypenameth }} </p>
+                                                    <p v-if="currentstaff[0].facultyid==201092700000"><strong>สังกัด:</strong> {{ currentstaff[0].departmentname }} </p>
+                                                    <p v-else><strong>สังกัด:</strong> {{ currentstaff[0].facultyname }} </p>
+                                                    <p><strong>ชื่อผู้ประเมิน:</strong>  {{ assessorText??'-' }}</p>  
                                                 </div><br>
                                                 <div class="employee-info" style="border: groove;padding: 15px;">
                                                     <h4>คำชี้แจง</h4>
@@ -591,7 +606,7 @@
                                                     <p><strong>ส่วนที่ 4 การรับทราบผลการประเมิน</strong> ผู้รับการประเมินลงนามรับทราบผลการประเมิน</p>
                                                     <p><strong>ส่วนที่ 5 ความเห็นของผู้บังคับบัญชาเหนือขึ้นไป</strong> ผู้บังคับบัญชาเหนือขึ้นไปกลั่นกรองผลการประเมิน แผนพัฒนาผลการปฏิบัติราชการ และให้ความเห็น</p>
                                                 </div>                                                       
-                                                <h5 class="mb-4"><i class="" style="font-size: x-large;"></i> ส่วนที่ 2 ข้อมูลของผู้รับการประเมิน</h5>
+                                                <h5 class="mb-4"><i class="" style="font-size: x-large;"></i> ส่วนที่ 2 ข้อมูลของผู้รับการประเมิน</h5> 
                                                 <table border="1" cellspacing="0" cellpadding="5">
                                                     <thead>
                                                         <tr style="background-color: #F4B366;">
@@ -601,31 +616,36 @@
                                                             <th rowspan="2">สรุปคะแนน (ก) X (ข)</th>
                                                         </tr>
                                                     </thead>
-                                                    <tbody>
-                                                        <tr> 
+                                                    <tbody> 
+                                                        <template v-for="(Item, index) in products" :key="index"> 
+                                                        <tr v-if="dataStaffid==Item.staffid">  
                                                             <td>องค์ประกอบที่ 1 ผลสัมฤทธิ์ของงาน</td>
                                                             <td class="text-center" style="color: blue;"> 
-                                                                <b>{{ ((totalScoreSum + totalScoreZeroSum) / 33).toFixed(2) }}</b>  
+                                                                <b id="sumX">{{ ((totalScoreSum + totalScoreZeroSum) / 33).toFixed(2) }}</b> 
+                                                                {{ insert1(((totalScoreSum + totalScoreZeroSum) / 33).toFixed(2)) }} 
                                                             </td> 
-                                                            <td class="text-center" style="color: blue;"> 
-                                                                <b>{{ 70 }}</b>  
+                                                            <td class="text-center" style="color: blue;">  
+                                                                <b>{{ Item.tb_tor?Item.tb_tor.persen.split(':')[0]: '' }}</b>
                                                             </td> 
-                                                            <td class="text-center" style="color: blue;"> 
-                                                                <b>{{ ((totalScoreSum + totalScoreZeroSum) / 33*70).toFixed(2) }}</b>  
+                                                            <td class="text-center" style="color: blue;">  
+                                                                <b>{{ (((totalScoreSum + totalScoreZeroSum) / 33).toFixed(2) *(Item.tb_tor?Item.tb_tor.persen.split(':')[0]:0)).toFixed(2) }}</b>  
                                                             </td> 
-                                                        </tr>
-                                                        <tr>
+                                                        </tr> 
+                                                        <tr v-if="dataStaffid==Item.staffid"> 
                                                             <td>องค์ประกอบที่ 2 พฤติกรรมการปฏิบัติราชการ</td>
-                                                            <td class="text-center" style="color: blue;"> 
-                                                                <b>{{ WeightedScoreSumXT }}</b>  
+                                                            <td class="text-center" style="color: blue;">
+                                                                {{ insert2(WeightedScoreSumXT) }} 
+                                                                <b>{{ WeightedScoreSumXT }}</b>
+
+                                                            </td>  
+                                                            <td class="text-center" style="color: blue;">  
+                                                                <b>{{ Item.tb_tor?Item.tb_tor.persen.split(':')[1]: '' }}</b>
                                                             </td> 
                                                             <td class="text-center" style="color: blue;"> 
-                                                                <b>{{ 30 }}</b>  
-                                                            </td> 
-                                                            <td class="text-center" style="color: blue;"> 
-                                                                <b>{{ (WeightedScoreSumXT *30).toFixed(2) }}</b>  
-                                                            </td> 
+                                                                <b>{{ (WeightedScoreSumXT *(Item.tb_tor?Item.tb_tor.persen.split(':')[1]:0)).toFixed(2) }}</b>  
+                                                            </td>  
                                                         </tr>
+                                                        </template>  
                                                         <tr>
                                                             <td>องค์ประกอบอื่นๆ (ถ้ามี)</td>
                                                             <td></td>
@@ -638,7 +658,8 @@
                                                                 <b>{{ 100 }}%</b>  
                                                             </td> 
                                                             <td class="text-center" style="color: blue;"> 
-                                                                <b>{{ (((totalScoreSum + totalScoreZeroSum) / 33 * 70) + (WeightedScoreSumXT * 30)).toFixed(2) }}</b> 
+                                                                {{ insert3 ((((totalScoreSum + totalScoreZeroSum) / 33 * 70) + (WeightedScoreSumXT * 30)).toFixed(2)) }} 
+                                                                      {{ (((totalScoreSum + totalScoreZeroSum) / 33 * 70) + (WeightedScoreSumXT * 30)).toFixed(2) }}
                                                             </td>
                                                         </tr>
                                                     </tbody>
@@ -768,6 +789,7 @@ import Swal from 'sweetalert2'
 import TabView from 'primevue/tabview';
 import TabPanel from 'primevue/tabpanel';
 import { LogarithmicScale } from 'chart.js';
+import InputNumber from 'primevue/inputnumber';
 export default {
     // props: {
     //     dataPor: {
@@ -831,14 +853,15 @@ export default {
                 { id: 5, activity: 'ก. 5 การทำงานเป็นทีม', indicator: '1', data_table1: '' }
             ],
             //ตาราง ข. สมรรถนะเฉพาะตามลักษณะงานที่ปฏิบัติ
-            jobSpecificCompetencies: [
-                { id: 6, activity: 'ข. 1 การคิดวิเคราะห์', indicator: '1', data_table2: '' },
-                { id: 7, activity: 'ข. 2 การดำเนินการเชิงรุก', indicator: '1', data_table2: '' },
-                { id: 8, activity: 'ข. 3 ความผูกพันที่มีต่อส่วนราชการ', indicator: '1', data_table2: '' },
-                { id: 9, activity: 'ข. 4 การมองภาพองค์รวม', indicator: '1', data_table2: '' },
-                { id: 10, activity: 'ข. 5 การสืบเสาะหาข้อมูล', indicator: '1', data_table2: '' },
-                { id: 11, activity: 'ข. 6 การตรวจสอบความถูกต้องตามกระบวนงาน', indicator: '1', data_table2: '' }
-            ],
+            jobSpecificCompetencies: [],
+            // jobSpecificCompetencies: [
+            //     { id: 6, activity: 'ข. 1 การคิดวิเคราะห์', indicator: '1', data_table2: '' },
+            //     { id: 7, activity: 'ข. 2 การดำเนินการเชิงรุก', indicator: '1', data_table2: '' },
+            //     { id: 8, activity: 'ข. 3 ความผูกพันที่มีต่อส่วนราชการ', indicator: '1', data_table2: '' },
+            //     { id: 9, activity: 'ข. 4 การมองภาพองค์รวม', indicator: '1', data_table2: '' },
+            //     { id: 10, activity: 'ข. 5 การสืบเสาะหาข้อมูล', indicator: '1', data_table2: '' },
+            //     { id: 11, activity: 'ข. 6 การตรวจสอบความถูกต้องตามกระบวนงาน', indicator: '1', data_table2: '' }
+            // ],
             //ตาราง ค. สมรรถนะอื่นๆ
             otherCompetencies: [
                 { id: 12, activity: 'ค. 1 สภาวะผู้นำ', indicator: '0', data_table3: '' },
@@ -874,28 +897,24 @@ export default {
             
             assessorText: null,
             assessor_positionText: null,
+            currentstaff:{},
         }
     }, 
     components: {
         TabView,
         TabPanel
     }, 
-    // watch: { 
-    //     tab4Tracking(v) { 
-    //         // console.log("por04 tab4Reload",v);
-    //         //this.chkp04dataXr(); 
-    //         this.showdatator();  
-    //     },  
-    // },
+    
     async mounted(){ 
         const { signIn, getSession, signOut } = await useAuth()
         const user = await getSession();
        // console.log(user.user.name);
         const {STAFFID, SCOPES} = user.user.name
         const {staffdepartment, groupid, staffdepartmentname, groupname} = SCOPES
-        await this.setSession(STAFFID,staffdepartment,groupid); 
+        await this.setSession(STAFFID,staffdepartment,groupid,user.user.name.POSTYPENAME,user.user.name.POSITIONNAMEID); 
         // this.showDataEvalu();  
         this.showDataSet(); 
+        this.getjobSpecificCompetencies();
         
     },  
     computed: {
@@ -933,6 +952,8 @@ export default {
             }, 0).toFixed(2); // ใช้ toFixed(2) เพื่อให้มีทศนิยม 2 ตำแหน่ง
         },
         WeightedScoreSumXT() {
+           // console.log( this.products_Tab2);
+            
             // คำนวณค่ารวมของคะแนนที่คำนวณ (รวมค่าคะแนนถ่วงน้ำหนัก/5)
             return this.products_Tab2.reduce((total, h) => {
                 return total + h.subP01sX.reduce((subTotal, subP01) => {
@@ -942,12 +963,19 @@ export default {
         },
         //รวมคะแนน เกณฑ์การประเมิน
         //รวมช่องสมรรถนะ
-        totalCoreCompetencies() { 
-            return this.coreCompetencies.reduce((sum, row, index) => { 
-                const dataTable1Value = parseFloat(row.data_table1) || 0;
-                const dataTable2Value = parseFloat(this.jobSpecificCompetencies[index]?.data_table2) || 0; 
-                return sum + dataTable1Value + dataTable2Value;
-            }, 0);
+        totalCoreCompetencies() {   
+            const maxLength = Math.max(this.coreCompetencies.length, this.jobSpecificCompetencies.length);
+            
+            let total = 0; 
+            for (let i = 0; i < maxLength; i++) {
+                const dataTable1Value = parseFloat(this.coreCompetencies[i]?.data_table1) ?1: 0;
+                const dataTable2Value = parseFloat(this.jobSpecificCompetencies[i]?.SCORE) ?1: 0;
+                
+               // console.log(`Row ${i + 1}: data_table1 = ${dataTable1Value}, data_table2 = ${dataTable2Value}`);
+                
+                total += dataTable1Value + dataTable2Value;
+            } 
+            return total;
         },
             //รวมช่องค่า0
         totalZeroScores() { 
@@ -958,7 +986,7 @@ export default {
             }
             });  
             this.jobSpecificCompetencies.forEach(row => {
-            if (parseFloat(row.data_table2) === 0) {
+            if (parseFloat(row.SCORE) === 0) {
                 zeroScoreCount++;
             }
             }); 
@@ -966,16 +994,26 @@ export default {
         },
         //รวมคะแนนจำนวนสมรรถนะ*3
         totalScoreSum(staffid) {
-            return this.coreCompetencies.reduce((sum, row, index) => { 
-            const dataTable1Value = parseFloat(row.data_table1) || 0;
-            const dataTable2Value = parseFloat(this.jobSpecificCompetencies[index]?.data_table2) || 0;  
-            return sum + (dataTable1Value * 3) + (dataTable2Value * 3); 
-            }, 0);
-        }, 
+            let sum = 0;
+
+            // คำนวณคะแนนจาก coreCompetencies
+            this.coreCompetencies.forEach(row => {
+                const dataTable1Value = parseFloat(row.data_table1) || 0;
+                sum += dataTable1Value * 3;
+            });
+
+            // คำนวณคะแนนจาก jobSpecificCompetencies
+            this.jobSpecificCompetencies.forEach(row => {
+                const dataTable2Value = parseFloat(row.SCORE) ?1: 0;
+                sum += dataTable2Value * 3;
+            });
+
+            return sum;
+        },
         totalScoreSumX() {     
             return this.coreCompetencies.reduce((sum, row, index) => { 
                 const dataTable1Value = parseFloat(row.data_table1) || 0;
-                const dataTable2Value = parseFloat(this.jobSpecificCompetencies[index]?.data_table2) || 0;  
+                const dataTable2Value = parseFloat(this.jobSpecificCompetencies[index]?.SCORE) || 0;  
                 return sum + (dataTable1Value * 3) + (dataTable2Value * 3);
             }, 0);
         },  
@@ -987,31 +1025,62 @@ export default {
                 }
             });  
             this.jobSpecificCompetencies.forEach(row => { 
-                if (parseFloat(row.data_table2) === 0) {
+                if (parseFloat(row.SCORE) === 0) {
                     zeroScoreCount++;
                 }
             });  
             return zeroScoreCount * 2;
-        }, 
-        //รวมคะแนนทั้งหมด30/10/67
-        // calculatedScore() {
-        //     // ใช้ค่า totalScoreSum จาก computed property
-        //     const totalScoreSum = this.totalScoreSum;
-        //     const totalScoreZeroSum = Number(this.totalScoreZeroSum) || 0;
-            
-        //     console.log("totalScoreSum:", totalScoreSum);
-        //     console.log("totalScoreZeroSum:", totalScoreZeroSum); 
-
-        //     this.totalScore = ((totalScoreSum + totalScoreZeroSum) / 33 * 70).toFixed(2);
-        //     return this.totalScore;
-        // }
-    }, 
+        },  
+    },  
     methods: { 
-        setSession (staffid_Main,facid_Main,groupid_Main) {
-           // console.log('setSession');  
+        insert1(scoreA) { 
+        //console.log(scoreA); 
+        //console.log(this.dataStaffid,scoreA); 
+            axios.post('http://localhost:8000/api/savepersentor',{
+                    p_staffid: this.dataStaffid, 
+                    p_year: this.tracking_date.d_date, 
+                    evalua: this.tracking_date.evalua, 
+                    score: scoreA, 
+                    insert:"achievement_score"
+                }).then(res => {     
+                    //console.log(res.data); 
+            });
+        },
+        insert2(scoreB) { 
+        //console.log(scoreB); 
+        //console.log(this.dataStaffid); 
+            axios.post('http://localhost:8000/api/savepersentor',{
+                    p_staffid: this.dataStaffid, 
+                    p_year: this.tracking_date.d_date, 
+                    evalua: this.tracking_date.evalua, 
+                    score: scoreB,
+                    insert:"behavior" 
+
+                }).then(res => {     
+                    console.log(res.data); 
+            });
+        },
+        insert3(scoreS) { 
+        //console.log(scoreB); 
+        //console.log(this.dataStaffid); 
+            axios.post('http://localhost:8000/api/savepersentor',{
+                    p_staffid: this.dataStaffid, 
+                    p_year: this.tracking_date.d_date, 
+                    evalua: this.tracking_date.evalua, 
+                    score: scoreS,
+                    insert:"sum_score" 
+
+                }).then(res => {     
+                    console.log(res.data); 
+            });
+        },
+        setSession (staffid_Main,facid_Main,groupid_Main,postypename,postypenameid) {
+            // console.log('postypename:',postypename);  
             this.staffid_Main = staffid_Main
             this.facid_Main = facid_Main
-            this.groupid_Main = groupid_Main  
+            this.groupid_Main = groupid_Main   
+            this.postypename = postypename    
+            this.postypenameid = postypenameid    
         },
         showDataSet() {
             axios
@@ -1076,11 +1145,13 @@ export default {
             }
         },
         // เพิ่มคะแนนประเมิน
-        openDataEvalu(staff_id){     
+       async  openDataEvalu(staff_id){     
             if(this.tracking_date.d_date === undefined){
                 Swal.fire("แจ้งเตือนจากระบบ","กรุณาเลือกรอบประเมิน","error");
             }else{  
                 this.dataStaffid = staff_id
+               await this.showDataEvalu();
+                this.currentstaff = this.products.filter(product => product.staffid === this.dataStaffid);
                 this.products_Tab1 = [];  
                 this.p01_scores = [
                     { name: '- ไม่ระบุ -', code: 0 },
@@ -1102,12 +1173,12 @@ export default {
                 
                 // ตั้งค่า jobSpecificCompetencies กลับไปเป็นค่าเริ่มต้น
                 this.jobSpecificCompetencies = [
-                    { id: 6, activity: 'ข. 1 การคิดวิเคราะห์', indicator: '1', data_table2: '' },
-                    { id: 7, activity: 'ข. 2 การดำเนินการเชิงรุก', indicator: '1', data_table2: '' },
-                    { id: 8, activity: 'ข. 3 ความผูกพันที่มีต่อส่วนราชการ', indicator: '1', data_table2: '' },
-                    { id: 9, activity: 'ข. 4 การมองภาพองค์รวม', indicator: '1', data_table2: '' },
-                    { id: 10, activity: 'ข. 5 การสืบเสาะหาข้อมูล', indicator: '1', data_table2: '' },
-                    { id: 11, activity: 'ข. 6 การตรวจสอบความถูกต้องตามกระบวนงาน', indicator: '1', data_table2: '' }
+                    // { id: 6, activity: 'ข. 1 การคิดวิเคราะห์', indicator: '1', data_table2: '' },
+                    // { id: 7, activity: 'ข. 2 การดำเนินการเชิงรุก', indicator: '1', data_table2: '' },
+                    // { id: 8, activity: 'ข. 3 ความผูกพันที่มีต่อส่วนราชการ', indicator: '1', data_table2: '' },
+                    // { id: 9, activity: 'ข. 4 การมองภาพองค์รวม', indicator: '1', data_table2: '' },
+                    // { id: 10, activity: 'ข. 5 การสืบเสาะหาข้อมูล', indicator: '1', data_table2: '' },
+                    // { id: 11, activity: 'ข. 6 การตรวจสอบความถูกต้องตามกระบวนงาน', indicator: '1', data_table2: '' }
                 ];
 
                 this.improvements = null;
@@ -1143,6 +1214,9 @@ export default {
             }
         }, 
         showdataPo(staff_id,fac_id,year_id,record){  
+
+            this.showPostype(this.postypename,this.postypenameid);
+
             axios.post('http://localhost:8000/api/showDataPo',{
                 staff_id: staff_id,
                 fac_id: fac_id,
@@ -1166,25 +1240,26 @@ export default {
                         }
                     });
 
-                    this.jobSpecificCompetencies.forEach(item => {
-                        if (item.id === 6) {
-                            item.data_table2 = data.p6;  // Update based on the API response
-                        } else if (item.id === 7) {
-                            item.data_table2 = data.p7;  // Update based on the API response
-                        } else if (item.id === 8) {
-                            item.data_table2 = data.p8;  // Add more conditions if necessary
-                        } else if (item.id === 9) {
-                            item.data_table2 = data.p9;  // Add more conditions if necessary
-                        } else if (item.id === 10) {
-                            item.data_table2 = data.p10;  // Add more conditions if necessary
-                        } else if (item.id === 11) {
-                            item.data_table2 = data.p11;  // Add more conditions if necessary
-                        }
-                    });
+                    // this.jobSpecificCompetencies.forEach(item => {
+                    //     if (item.id === 6) {
+                    //         item.data_table2 = data.p6;  // Update based on the API response
+                    //     } else if (item.id === 7) {
+                    //         item.data_table2 = data.p7;  // Update based on the API response
+                    //     } else if (item.id === 8) {
+                    //         item.data_table2 = data.p8;  // Add more conditions if necessary
+                    //     } else if (item.id === 9) {
+                    //         item.data_table2 = data.p9;  // Add more conditions if necessary
+                    //     } else if (item.id === 10) {
+                    //         item.data_table2 = data.p10;  // Add more conditions if necessary
+                    //     } else if (item.id === 11) {
+                    //         item.data_table2 = data.p11;  // Add more conditions if necessary
+                    //     }
+                    // });
 
                     // Update other fields
                     this.improvements = data.improvements;
                     this.suggestions = data.suggestions;
+                    
                 }
                 
             })
@@ -1192,15 +1267,19 @@ export default {
                 console.error('Error:', error);
             });
         }, 
-        saveEvaTab1(subP01) {  
+       async saveEvaTab1(subP01) {  
             if(subP01.p01_score === 0){
                 Swal.fire("แจ้งเตือน","กรุณาเลือกคะแนน !","error");
             }else{
-                axios.post('http://localhost:8000/api/saveP03Po',{
+               await axios.post('http://localhost:8000/api/saveP03Po',{
                     staffid_po: this.staffid_po,
                     p01_id: subP01.p01_id,
                     p01_score: subP01.p01_score,
                     p01_detail: subP01.p01_detail,
+                    p01_evalua:this.tracking_date.evalua,
+                    p01_staffid:this.staffid_Main,
+                    p01_year:this.tracking_date.d_date 
+
                 }).then(res => {     
                      //console.log(res.data);   
                     Swal.fire({
@@ -1214,10 +1293,41 @@ export default {
                 .catch(error => {
                     console.error('Error:', error);
                 });
+                await this.showDataEvalu();
             }
- 
+            
         }, 
         async saveEvaTab1_1() { 
+            this.coreCompetencies.forEach((item,index) => {
+                        if (index === 0) {
+                            item.data_table1 = item.data_table1??0;  // Update based on the API response
+                        } else if (index === 1) {
+                            item.data_table1 = item.data_table1??0;  // Update based on the API response
+                        } else if (index === 2) {
+                            item.data_table1 = item.data_table1??0;  // Add more conditions if necessary
+                        } else if (index === 3) {
+                            item.data_table1 = item.data_table1??0;  // Add more conditions if necessary
+                        } else if (index === 4) {
+                            item.data_table1 = item.data_table1??0;  // Add more conditions if necessary
+                        } else if (index === 5) {
+                            item.data_table1 = item.data_table1??0;  // Add more conditions if necessary
+                        }
+                    }); 
+            this.jobSpecificCompetencies.forEach((item,index) => {
+                        if (index === 0) {
+                            item.SCORE = item.SCORE??0;  // Update based on the API response
+                        } else if (index === 1) {
+                            item.SCORE = item.SCORE??0;  // Update based on the API response
+                        } else if (index === 2) {
+                            item.SCORE = item.SCORE??0;  // Add more conditions if necessary
+                        } else if (index === 3) {
+                            item.SCORE = item.SCORE??0;  // Add more conditions if necessary
+                        } else if (index === 4) {
+                            item.SCORE = item.SCORE??0;  // Add more conditions if necessary
+                        } else if (index === 5) {
+                            item.SCORE = item.SCORE??0;  // Add more conditions if necessary
+                        }
+                    });
             const payload = {
                 staffid_po: this.staffid_po, 
                 staff_id: this.staffid_Main, 
@@ -1238,9 +1348,10 @@ export default {
                     title: "บันทึกข้อมูลสมรรถนะ / ความเห็นเพิ่มเติม เสร็จสิ้น",
                     showConfirmButton: false,
                     timer: 1500
-                }); 
+                });
+                await this.showDataEvalu();
         }, 
-        onTabChange(event) { 
+       async onTabChange(event) { 
             // console.log(event.index);
             if (event.index==0) {
                 //console.log('ผลสัมฤทธิ์ของงาน -',event.index); 
@@ -1257,9 +1368,11 @@ export default {
                 this.chkp04data(this.dataStaffid,this.facid_Main,this.tracking_date.d_date,this.tracking_date.evalua);  
             }
             if (event.index==3) {
-                //console.log('รายงาน ป.04 -',event.index);
-                this.chkp04dataT4(this.dataStaffid,this.facid_Main,this.tracking_date.d_date,this.tracking_date.evalua);   
-                this.showdatator();
+                //console.log('รายงาน ป.04 -',event.index); 
+                this.tab2Data(this.dataStaffid);     
+                await  this.chkp04dataT4(this.dataStaffid,this.facid_Main,this.tracking_date.d_date,this.tracking_date.evalua);  
+                await  this.showdatator();
+               
             }
         },  
         tab2Data(staff_id){  
@@ -1425,14 +1538,16 @@ export default {
             });
         }, 
         /*============= ผู้ประเมิน ==============*/
-        showdatator() {   
+        showdatator() { 
+            this.assessorText = null,
+            this.assessor_positionText = null,
             axios.post('http://localhost:8000/api/showdatator', {
                 p_year: this.tracking_date.d_date,
                 evalua: this.tracking_date.evalua,
-                p_staffid: this.staffid_Main
+                p_staffid: this.dataStaffid,
             })
             .then(res => {
-                 //console.log('Response',res.data);  
+                 //console.log('Response',res.data);   
                 this.assessorText = res.data[0].assessor; 
                 this.assessor_positionText = res.data[0].assessor_position; 
             })
@@ -1440,6 +1555,60 @@ export default {
                 console.error('Error fetching data:', error);
             });
         }, 
+       async showPostype(postypename,postypenameid){
+            // console.log(postypename); 
+            var postypetext = `ระดับ`+postypename;
+            await axios.post('http://localhost:8000/api/showdatapostypename', {
+                postypename: postypetext,
+                postypenameid: postypenameid
+            })
+            .then(res => {
+                //console.log('Response',res.data);  
+                if (res.data.length > 0) { 
+                    this.jobSpecificCompetencies = res.data;
+                }
+                // } else {
+                //     // Fallback to default data if response doesn't contain expected data
+                //     this.jobSpecificCompetencies = [
+                //         { id: 6, activity: 'ข. 1 การคิดวิเคราะห์', indicator: '1', data_table2: '' },
+                //         { id: 7, activity: 'ข. 2 การดำเนินการเชิงรุก', indicator: '1', data_table2: '' },
+                //         { id: 8, activity: 'ข. 3 ความผูกพันที่มีต่อส่วนราชการ', indicator: '1', data_table2: '' },
+                //         { id: 9, activity: 'ข. 4 การมองภาพองค์รวม', indicator: '1', data_table2: '' },
+                //         { id: 10, activity: 'ข. 5 การสืบเสาะหาข้อมูล', indicator: '1', data_table2: '' },
+                //         { id: 11, activity: 'ข. 6 การตรวจสอบความถูกต้องตามกระบวนงาน', indicator: '1', data_table2: '' }
+                //     ];
+                // }  
+                
+            })
+            .catch(error => {
+                console.error('Error fetching data:', error);
+            }); 
+            await this.getjobSpecificCompetencies();
+        },
+        getjobSpecificCompetencies(){
+            //console.log(this.staffid_Main,this.dataPor);
+            
+            axios.post('http://localhost:8000/api/showdataposp02', { 
+               p_year: this.tracking_date.d_date,
+                evalua: this.tracking_date.evalua,
+                p_staffid: this.staffid_Main
+            })
+            .then(res => {
+                for(let i=0;i<=this.jobSpecificCompetencies.length;i++){
+                    //console.log(this.jobSpecificCompetencies[i]);
+                     
+                    this.jobSpecificCompetencies[i]['SCORE'] = res.data[0][`p${i+6}`];
+                    
+                }
+                 //console.log('Response',res.data);  
+                // this.assessorText = res.data[0].assessor; 
+                // this.assessor_positionText = res.data[0].assessor_position;
+                // this.showscoresum = res.data[0] 
+            })
+            .catch(error => {
+                console.error('Error fetching data:', error);
+            });
+        },
 
 
         //29/10/67
@@ -1521,7 +1690,13 @@ export default {
                     console.error('Error saving data:', error);
                 });
             }
-        }, 
+        },  
+    },
+    filters:{
+        removeC:function (value){
+            if (!value) return ''
+           return value.split(':')[0]
+        }
     } 
 }
 </script>

@@ -8,11 +8,9 @@
                     </div> 
                     <div class="col md:col-6" >  
                         <label for="examine_date"></label>
-                        <Dropdown id="examine_date" v-model="examine_date" :options="examine_dates" optionLabel="d_evaluationround" placeholder="กรุณาเลือกรอบการประเมิน" style=" max-width: 500px; width: 100%" ></Dropdown>
-                        <!-- {{ tracking_date }} --> 
+                        <Dropdown id="examine_date" v-model="examine_date" :options="examine_dates" optionLabel="d_evaluationround" placeholder="กรุณาเลือกรอบการประเมิน" style=" max-width: 500px; width: 100%" ></Dropdown> 
                     </div>     
                 </div>  
-
                 <table class="table">
                     <thead> 
                         <tr style="height: 40px;background-color: blanchedalmond;">
@@ -38,7 +36,7 @@
                                 <div v-if="Item.countchk==''">
                                     <Button icon="pi pi-bookmark" severity="secondary" label="ไม่มีข้อมูล" rounded class="mb-2 mr-2"/>
                                 </div> 
-                                {{ Item.countchk }}
+                                <!-- {{ Item.countchk }} -->
                             </td>
                             <td style="text-align: center;width: 15%;">
                                 <Button severity="info" label="รายละเอียด" class="mb-2 mr-2" icon="pi pi-plus" @click="openDataEvalu(Item.staffid)" />  
@@ -75,8 +73,8 @@
                                     <p><strong>ตำแหน่ง:</strong> {{ user.user.name.POSITIONNAME }}  </p>
                                     <p><strong>ระดับตำแหน่ง:</strong>{{ user.user.name.POSTYPENAME }} </p>
                                     <!-- <p><strong>ประเภทบุคลากร:</strong></p> -->
-                                    <p><strong>ชื่อผู้ประเมิน:</strong></p> 
-                                    <p><strong>ตำแหน่งผู้ประเมิน :</strong></p> 
+                                    <p><strong>ชื่อผู้ประเมิน:</strong> {{ assessorText }}</p> 
+                                    <p><strong>ตำแหน่งผู้ประเมิน :</strong>{{ assessor_positionText }}</p> 
                                     <p><strong>รายละเอียดข้อตกลง ระหว่าง วันที่ :</strong> {{ examine_date.d_evaluationround }} </p>
                                 </div><br>
 
@@ -398,7 +396,7 @@
                                                 <p><strong>ตำแหน่ง:</strong> {{ user.user.name.POSITIONNAME }} </p>
                                                 <p><strong>ระดับตำแหน่ง:</strong>{{ user.user.name.POSTYPENAME }} </p>
                                                 <p><strong>สังกัด:</strong> {{ user.user.name.SCOPES?.staffdepartmentname }} </p>
-                                                <p><strong>ชื่อผู้ประเมิน:</strong> นางสาวพนมพร ปัจจวงษ์</p>
+                                                <p><strong>ชื่อผู้ประเมิน:</strong> {{ assessorText??'-' }}</p>
                                             </div><br>
                                             <div class="employee-info" style="border: groove;padding: 15px;">
                                                 <h4>คำชี้แจง</h4>
@@ -426,25 +424,25 @@
                                                         <tr> 
                                                             <td>องค์ประกอบที่ 1 ผลสัมฤทธิ์ของงาน</td>
                                                             <td class="text-center" style="color: blue;"> 
-                                                                <b>{{ ((totalScoreSum + totalScoreZeroSum) / 33).toFixed(2) }}</b>  
+                                                                <b>  {{ showscoresum.achievement_score  }} </b>  
                                                             </td> 
                                                             <td class="text-center" style="color: blue;"> 
-                                                                <b>{{ 70 }}</b>  
+                                                                <b v-if="showscoresum.persen">{{showscoresum.persen.split(':')[0]}}</b>  
                                                             </td> 
                                                             <td class="text-center" style="color: blue;"> 
-                                                                <b>{{ ((totalScoreSum + totalScoreZeroSum) / 33*70).toFixed(2) }}</b>  
+                                                                <b v-if="showscoresum.persen">{{ ((showscoresum.achievement_score )*showscoresum.persen.split(':')[0]).toFixed(2) }} </b>  
                                                             </td> 
                                                         </tr>
                                                         <tr>
                                                             <td>องค์ประกอบที่ 2 พฤติกรรมการปฏิบัติราชการ</td>
                                                             <td class="text-center" style="color: blue;"> 
-                                                                <b>{{ WeightedScoreSumXT }}</b>  
+                                                                <b>{{ showscoresum.behavior  }}</b>  
                                                             </td> 
                                                             <td class="text-center" style="color: blue;"> 
-                                                                <b>{{ 30 }}</b>  
+                                                                <b v-if="showscoresum.persen">{{showscoresum.persen.split(':')[1]}}</b>  
                                                             </td> 
                                                             <td class="text-center" style="color: blue;"> 
-                                                                <b>{{ (WeightedScoreSumXT *30).toFixed(2) }}</b>  
+                                                                <b v-if="showscoresum.persen">{{ ((showscoresum.behavior )*showscoresum.persen.split(':')[1]).toFixed(2) }} </b>  
                                                             </td> 
                                                         </tr>
                                                         <tr>
@@ -459,18 +457,18 @@
                                                                 <b>{{ 100}}%</b>  
                                                             </td> 
                                                             <td class="text-center" style="color: blue;"> 
-                                                                 <b>{{ (((totalScoreSum + totalScoreZeroSum) / 33 * 70) + (WeightedScoreSumXT * 30)).toFixed(2) }}</b>
+                                                                {{ showscoresum.sum_score }}
                                                             </td>
                                                         </tr>
                                                     </tbody>
                                             </table>
                                             <div class="employee-info">
                                                 <h4>ระดับผลการประเมินที่ได้</h4>
-                                                    <p><strong>[&nbsp;&nbsp; <b v-if="(((totalScoreSum + totalScoreZeroSum) / 33 * 70) + (WeightedScoreSumXT * 30)) >= 90">&#10003;</b> &nbsp;&nbsp;] ดีเด่น (90-100)</strong></p>
-                                                    <p><strong>[&nbsp;&nbsp; <b v-if="(((totalScoreSum + totalScoreZeroSum) / 33 * 70) + (WeightedScoreSumXT * 30)) >= 80 && (((totalScoreSum + totalScoreZeroSum) / 33 * 70) + (WeightedScoreSumXT * 30)) < 90">&#10003;</b> &nbsp;&nbsp;] ดีมาก (80-89)</strong></p>
-                                                    <p><strong>[&nbsp;&nbsp; <b v-if="(((totalScoreSum + totalScoreZeroSum) / 33 * 70) + (WeightedScoreSumXT * 30)) >= 70 && (((totalScoreSum + totalScoreZeroSum) / 33 * 70) + (WeightedScoreSumXT * 30)) < 80">&#10003;</b> &nbsp;&nbsp;] ดี (70-79)</strong></p>
-                                                    <p><strong>[&nbsp;&nbsp; <b v-if="(((totalScoreSum + totalScoreZeroSum) / 33 * 70) + (WeightedScoreSumXT * 30)) >= 60 && (((totalScoreSum + totalScoreZeroSum) / 33 * 70) + (WeightedScoreSumXT * 30)) < 70">&#10003;</b> &nbsp;&nbsp;] พอใช้ (60-69)</strong></p> 
-                                                    <p><strong>[&nbsp;&nbsp; <b v-if="(((totalScoreSum + totalScoreZeroSum) / 33 * 70) + (WeightedScoreSumXT * 30)) < 60">&#10003;</b> &nbsp;&nbsp;] ต้องปรับปรุง (ต่ำกว่า 60)</strong></p>
+                                                    <p><strong>[&nbsp;&nbsp; <b v-if="(showscoresum.sum_score) >= 90">&#10003;</b> &nbsp;&nbsp;] ดีเด่น (90-100)</strong></p>
+                                                    <p><strong>[&nbsp;&nbsp; <b v-if="(showscoresum.sum_score) >= 80 && (showscoresum.sum_score) < 90">&#10003;</b> &nbsp;&nbsp;] ดีมาก (80-89)</strong></p>
+                                                    <p><strong>[&nbsp;&nbsp; <b v-if="(showscoresum.sum_score) >= 70 && (showscoresum.sum_score) < 80">&#10003;</b> &nbsp;&nbsp;] ดี (70-79)</strong></p>
+                                                    <p><strong>[&nbsp;&nbsp; <b v-if="(showscoresum.sum_score) >= 60 && (showscoresum.sum_score) < 70">&#10003;</b> &nbsp;&nbsp;] พอใช้ (60-69)</strong></p> 
+                                                    <p><strong>[&nbsp;&nbsp; <b v-if="(showscoresum.sum_score) < 60">&#10003;</b> &nbsp;&nbsp;] ต้องปรับปรุง (ต่ำกว่า 60)</strong></p>
                                                 </div>
                                             <h5 class="mb-4"><i class="" style="font-size: x-large;"></i> ส่วนที่ 3 แผนพัฒนาการปฏิบัติราชการรายบุคคล</h5>
                                             <table border="1" cellspacing="0" cellpadding="5">
@@ -499,8 +497,8 @@
                                                     </td>
                                                         <td class="center-align"><br><br>
                                                             ลงชื่อ .................................................................<br>
-                                                            ชื่อ นายพิพัฒน์พงษ์ เพริดพราว<br>
-                                                            ตำแหน่ง นักวิชาการคอมพิวเตอร์<br>
+                                                            ชื่อ {{ user.user.name.PREFIXFULLNAME }} {{ user.user.name.STAFFNAME }} {{ user.user.name.STAFFSURNAME }}<br>
+                                                            ตำแหน่ง {{ user.user.name.POSITIONNAME }}<br>
                                                             วันที่ .......... เดือน .......................... พ.ศ.
                                                         </td>
                                                     </tr>
@@ -510,14 +508,14 @@
                                                             <label for="evaluator-acknowledgment-1">[ &nbsp;&nbsp; ] ได้แจ้งผลการประเมินและผู้รับการประเมินได้ลงนามรับทราบ รายบุคคลแล้ว</label><br>
                                                             <label for="evaluator-acknowledgment-2">[ &nbsp;&nbsp; ] ได้แจ้งผลการประเมินเมื่อวันที่ ..............................แต่ผู้รับการประเมินไม่ลงนามรับทราบผลการประเมิน โดยมี .......................... เป็นพยาน</label><br>
                                                             ลงชื่อ .................................................................<br>
-                                                            ชื่อ นางสาวพนมพร ปัจจวงษ์<br>
-                                                            ตำแหน่ง ผู้อำนวยการกองแผนงาน<br>
+                                                            ชื่อ {{assessorText}}<br>
+                                                            ตำแหน่ง {{assessor_positionText}}<br>
                                                             วันที่ .......... เดือน .......................... พ.ศ...........
                                                         </td>
                                                     <td class="center-align"><br><br>
                                                         ลงชื่อ .................................................................<br>
-                                                        ชื่อ นางสาวพนมพร ปัจจวงษ์<br>
-                                                        ตำแหน่ง ผู้อำนวยการกองแผนงาน<br>
+                                                        ชื่อ {{assessorText}}<br>
+                                                        ตำแหน่ง {{assessor_positionText}}<br>
                                                         วันที่ .......... เดือน .......................... พ.ศ...........
                                                     </td>
                                                     </tr>
@@ -536,8 +534,8 @@
                                                     </td>
                                                     <td class="center-align"><br><br>
                                                         ลงชื่อ : .................................................................<br>
-                                                        ชื่อ : นายพิพัฒน์พงษ์ เพริดพราว<br>
-                                                        ตำแหน่ง : นักวิชาการคอมพิวเตอร์<br>
+                                                        ชื่อ : {{ user.user.name.PREFIXFULLNAME }} {{ user.user.name.STAFFNAME }} {{ user.user.name.STAFFSURNAME }}<br>
+                                                        ตำแหน่ง : {{ user.user.name.POSITIONNAME }}<br>
                                                         วันที่ : .......... เดือน .......................... พ.ศ.............
                                                     </td>
                                                     </tr>
@@ -553,8 +551,8 @@
                                                         </td>
                                                         <td class="center-align"><br><br>
                                                             ลงชื่อ .................................................................<br>
-                                                            ชื่อ นางสาวพนมพร ปัจจวงษ์<br>
-                                                            ตำแหน่ง ผู้อำนวยการกองแผนงาน<br>
+                                                            ชื่อ {{assessorText}}<br>
+                                                            ตำแหน่ง {{assessor_positionText}}<br>
                                                             วันที่ .......... เดือน .......................... พ.ศ...........
                                                         </td>
                                                     </tr>
@@ -646,7 +644,7 @@ export default {
  /// New
             dataStaffid: null,
             examine_date: '',
-            examine_dates: [], 
+            examine_dates: null, 
             activeIndex: 0,
             //Tab 2 
             products_Tab2: [],
@@ -666,6 +664,10 @@ export default {
             totalScoreSum:{},
             totalScoreZeroSum:{},
             totalScoreFinalSum:{},
+            //ชื่อผู้ประเมิน ตำแหน่งผู้ประเมิน
+            assessorText: null,
+            assessor_positionText: null,
+            showscoresum:{}
           
         };
     },
@@ -776,8 +778,8 @@ export default {
             return zeroScoreCount * 2;
         },
         totalScoreT() {
-    return (((this.totalScoreSum + this.totalScoreZeroSum) / 33 * 70) + (this.WeightedScoreSumXT * 30)).toFixed(2);
-  }
+            return (((this.totalScoreSum + this.totalScoreZeroSum) / 33 * 70) + (this.WeightedScoreSumXT * 30)).toFixed(2);
+        }, 
     }, 
     methods: { 
         setSession (staffid_Main,facid_Main,groupid_Main) {
@@ -917,16 +919,17 @@ export default {
         onTabChange(event) { 
             // console.log(event.index);
             if (event.index==0) {
-                console.log('แบบใบปะหน้า -',event.index); 
+                //console.log('แบบใบปะหน้า -',event.index); 
             }
             if(event.index==1){
-                console.log('รายงาน ป.01 - ป.03 -',event.index);  
+                //console.log('รายงาน ป.01 - ป.03 -',event.index);  
                 this.tab2Data(this.dataStaffid);  
                 this.showdataPoText(this.dataStaffid,this.facid_Main,this.examine_date.d_date,this.examine_date.evalua); 
             } 
             if (event.index==2) {
-                console.log('รายงาน ป.04 -',event.index);
-                this.chkp04dataT4(this.dataStaffid,this.facid_Main,this.examine_date.d_date,this.examine_date.evalua);   
+                //console.log('รายงาน ป.04 -',event.index);
+                this.chkp04dataT4(this.dataStaffid,this.facid_Main,this.examine_date.d_date,this.examine_date.evalua); 
+                this.showdatator();
             }
         },  
         tab2Data(staff_id){  
@@ -1010,6 +1013,22 @@ export default {
             })
             .catch(error => {
                 console.error('Error:', error);
+            });
+        },
+        showdatator() {   
+            axios.post('http://localhost:8000/api/showdatator', {
+                p_year: this.examine_date.d_date,
+                evalua: this.examine_date.evalua,
+                p_staffid: this.staffid_Main
+            })
+            .then(res => {
+                 //console.log('Response',res.data);  
+                this.assessorText = res.data[0].assessor; 
+                this.assessor_positionText = res.data[0].assessor_position;
+                this.showscoresum = res.data[0]  
+            })
+            .catch(error => {
+                console.error('Error fetching data:', error);
             });
         },
 

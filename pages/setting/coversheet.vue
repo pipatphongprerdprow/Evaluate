@@ -36,7 +36,7 @@
                 </div>
             </div>
             <!-- แสดงข้อมูลบันทึก -->
-            <!-- {{ user }} --> 
+            <!-- {{ user.user }}  -->
 
             <!-- //พี่บอยแก้ -->
             <TabView :activeIndex="activeIndex" @tabChange="onTabChange">
@@ -81,8 +81,7 @@
                             <p>5. การจัดทำข้อตกลงภาระงานดังกล่าวนี้ เพื่อใช้เป็นกรอบในการประเมินผลการปฏิบัติราชการ เพื่อประกอบการเลื่อนเงินเดือนและค่าจ้างในแต่ละรอบการประเมิน</p>
                         </div>
                     </div>
-                </TabPanel>
-                
+                </TabPanel> 
                 <TabPanel header="แบบ ป01" value="1">
                     <Por01 :dataPor="product_date"></Por01>
                     <!-- รอข้อมูล -->
@@ -168,6 +167,7 @@ export default {
             },
             assessor: null,
             assessor_position: null,
+            currenttap: 0,
             
             // product_date: {
             //     about: 1 ,
@@ -309,54 +309,10 @@ export default {
             .catch(error => {
                 console.error('Error fetching data:', error);
             });
-        },  
-        // async showDataEvalu(){
-        //     await axios.get('http://localhost:8000/api/showDataEvalu',{
-        //         params: {
-        //             staffid: this.staffid_Main,
-        //             fac_id: this.facid_Main, 
-        //             group_id: this.groupid_Main,
-        //             namefully:this.staffid_name
-        //         },
-        //     }).then(res => {     
-        //          //console.log(res.data);  
-        //         this.products=res.data;   
-        //     })
-        //     .catch(error => {
-        //         console.error('Error:', error);
-        //     });
-        //     },  
-        // async Searchuser(event){   
-        //         // console.log(event.target.value.length);
-        //         if(event.target.value.length==0){
-        //             this.show_evaluator = false; 
-        //         }else{
-        //             this.show_evaluator = true; 
-        //             await axios.post('http://localhost:8000/api/searchUser',{
-        //                 evaluator: this.evaluator
-        //             }).then(res => { 
-        //                 this.userevaluator=res.data 
-        //             })
-        //             .catch(error => {
-        //                 console.error('Error:', error);
-        //             });
-        //         } 
-        //     }, 
-        // async nameUserclick(data){ 
-        //         console.log(data);
-        //         this.show_evaluator = false;   
-        //         this.evaluator = data.fullname      
-        //         this.evaluator_val = data.staffid 
-        //     },
-
-        // พี่บอย
-        // xyz () {
-        //     //console.log("xyz",this.por03key);
-        //     this.por03key++
-        // },
+        },   
         // Anurak
         onTabChange(event) { 
-            // console.log(event.index);
+             //console.log(event.index);
             if(this.product_date.d_date == null || this.product_date.d_date == undefined){
                 Swal.fire("error","กรุณาเลือก รอบการประเมิน ก่อน !","error"); 
             }else{
@@ -364,7 +320,9 @@ export default {
                     this.por03key++; 
                 }else if(event.index==4) {   
                     this.por04key++; 
-                }
+                } 
+                this.currenttap=event.index
+                //console.log(this.currenttap);  
             }
         },  
     },  

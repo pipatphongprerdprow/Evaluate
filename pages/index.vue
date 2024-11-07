@@ -5,10 +5,10 @@
                 <span class="text-blue-500 font-bold text-3xl">ระบบประเมินบุคลากรสายสนับสนุน</span> 
                 <!-- {{ user }} -->
                 <div class="mb-3 mt-3">
-                  <img id="IMG_PICTURE" :src="`${profileImageUrl}${user.user.name.STAFFID}.jpg`" alt="Profile Picture" style="border-radius: 70px;width: 200px;height: auto;" />   
+                  <img id="IMG_PICTURE" :src="`${profileImageUrl}${user.user?.name.STAFFID}.jpg`" alt="Profile Picture" style="border-radius: 70px;width: 200px;height: auto;" />   
                 </div>   
                 <h3 class="text-900 font-bold text-3xl lg:text-2xl mb-2"> 
-                    {{ user.user.name.PREFIXFULLNAME }} {{ user.user.name.STAFFNAME }} {{ user.user.name.STAFFSURNAME }}  
+                    {{ user.user?.name.PREFIXFULLNAME }} {{ user.user?.name.STAFFNAME }} {{ user.user?.name.STAFFSURNAME }}  
                 </h3>   
                 <router-link to="/" class="w-full flex align-items-center py-5 border-300 border-bottom-1"> 
                     <span class="flex justify-content-center align-items-center border-round" 
@@ -17,7 +17,7 @@
                     </span> 
                     <span class="ml-4 flex flex-column" style="flex: 1;">
                         <span class="text-900 lg:text-xl font-medium mb-0 block">สังกัด</span>
-                        <span class="text-600 lg:text-xl">{{ user.user.name.SCOPES?.staffdepartmentname }} </span>
+                        <span class="text-600 lg:text-xl">{{ user.user?.name.SCOPES?.staffdepartmentname }} </span>
                     </span>  
 
                     <span class="flex justify-content-center align-items-center border-round" 
@@ -26,7 +26,7 @@
                     </span> 
                     <span class="ml-4 flex flex-column" style="flex: 1;">
                         <span class="text-900 lg:text-xl font-medium mb-0 block">ตำแหน่ง</span>
-                        <span class="text-600 lg:text-xl">{{ user.user.name.POSITIONNAME ?? '' }}</span>
+                        <span class="text-600 lg:text-xl">{{ user.user?.name.POSITIONNAME ?? '' }}</span>
                     </span>
                 </router-link>
                 <router-link to="/" class="w-full flex align-items-center py-5 border-300 border-bottom-1"> 
@@ -36,7 +36,7 @@
                     </span> 
                     <span class="ml-4 flex flex-column" style="flex: 1;">
                         <span class="text-900 lg:text-xl font-medium mb-0 block">ระดับตำแหน่ง</span>
-                        <span class="text-600 lg:text-xl">{{ user.user.name.POSTYPENAME }}</span>
+                        <span class="text-600 lg:text-xl">{{ user.user?.name.POSTYPENAME }}</span>
                     </span>  
 
                     <span class="flex justify-content-center align-items-center border-round" 
@@ -45,7 +45,7 @@
                     </span> 
                     <span class="ml-4 flex flex-column" style="flex: 1;">
                         <span class="text-900 lg:text-xl font-medium mb-0 block">ประเภทบุคลากร</span>
-                        <span class="text-600 lg:text-xl">{{ user.user.name.GROUPTYPENAME }} </span>
+                        <span class="text-600 lg:text-xl">{{ user.user?.name.GROUPTYPENAME }} </span>
                     </span>
                 </router-link>
                 <!-- <router-link to="/" class="w-full flex align-items-center py-5 border-300 border-bottom-1"> 

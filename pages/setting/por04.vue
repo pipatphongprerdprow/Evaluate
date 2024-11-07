@@ -39,25 +39,25 @@
                             <tr> 
                                 <td>องค์ประกอบที่ 1 ผลสัมฤทธิ์ของงาน</td>
                                 <td class="text-center" style="color: blue;"> 
-                                    <b>{{ ((totalScoreSum + totalScoreZeroSum) / 33).toFixed(2) }}</b>  
+                                    <b>  {{ showscoresum.achievement_score  }} </b>  
+                                </td>  
+                                <td class="text-center" style="color: blue;">  
+                                    <b v-if="showscoresum.persen">{{showscoresum.persen.split(':')[0]}}</b> 
                                 </td> 
-                                <td class="text-center" style="color: blue;"> 
-                                    <b>{{ 70 }}</b>  
-                                </td> 
-                                <td class="text-center" style="color: blue;"> 
-                                    <b>{{ ((totalScoreSum + totalScoreZeroSum) / 33*70).toFixed(2) }}</b>  
+                                <td class="text-center" style="color: blue;">  
+                                   <b v-if="showscoresum.persen">{{ ((showscoresum.achievement_score )*showscoresum.persen.split(':')[0]).toFixed(2) }} </b> 
                                 </td> 
                             </tr>
                             <tr>
                                 <td>องค์ประกอบที่ 2 พฤติกรรมการปฏิบัติราชการ</td>
                                 <td class="text-center" style="color: blue;"> 
-                                    <b>{{ WeightedScoreSumXT }}</b>  
+                                    <b>{{ showscoresum.behavior  }}</b>  
                                 </td> 
                                 <td class="text-center" style="color: blue;"> 
-                                    <b>{{ 30 }}</b>  
+                                    <b v-if="showscoresum.persen">{{showscoresum.persen.split(':')[1]}}</b> 
                                 </td> 
                                 <td class="text-center" style="color: blue;"> 
-                                    <b>{{ (WeightedScoreSumXT *30).toFixed(2) }}</b>  
+                                    <b v-if="showscoresum.persen">{{ ((showscoresum.behavior )*showscoresum.persen.split(':')[1]).toFixed(2) }} </b> 
                                 </td> 
                             </tr>
                             <tr>
@@ -72,7 +72,7 @@
                                     <b>{{ 100 }}%</b>  
                                 </td> 
                                 <td class="text-center" style="color: blue;"> 
-                                    <b>{{ (((totalScoreSum + totalScoreZeroSum) / 33 * 70) + (WeightedScoreSumXT * 30)).toFixed(2) }}</b> 
+                                   {{ showscoresum.sum_score }} 
                                 </td>
                             </tr>
                         </tbody>
@@ -80,11 +80,11 @@
                     <br>
                     <div class="employee-info">
                     <h4>ระดับผลการประเมินที่ได้</h4>
-                        <p><strong>[&nbsp;&nbsp; <b v-if="(((totalScoreSum + totalScoreZeroSum) / 33 * 70) + (WeightedScoreSumXT * 30)) >= 90">&#10003;</b> &nbsp;&nbsp;] ดีเด่น (90-100)</strong></p>
-                        <p><strong>[&nbsp;&nbsp; <b v-if="(((totalScoreSum + totalScoreZeroSum) / 33 * 70) + (WeightedScoreSumXT * 30)) >= 80 && (((totalScoreSum + totalScoreZeroSum) / 33 * 70) + (WeightedScoreSumXT * 30)) < 90">&#10003;</b> &nbsp;&nbsp;] ดีมาก (80-89)</strong></p>
-                        <p><strong>[&nbsp;&nbsp; <b v-if="(((totalScoreSum + totalScoreZeroSum) / 33 * 70) + (WeightedScoreSumXT * 30)) >= 70 && (((totalScoreSum + totalScoreZeroSum) / 33 * 70) + (WeightedScoreSumXT * 30)) < 80">&#10003;</b> &nbsp;&nbsp;] ดี (70-79)</strong></p>
-                        <p><strong>[&nbsp;&nbsp; <b v-if="(((totalScoreSum + totalScoreZeroSum) / 33 * 70) + (WeightedScoreSumXT * 30)) >= 60 && (((totalScoreSum + totalScoreZeroSum) / 33 * 70) + (WeightedScoreSumXT * 30)) < 70">&#10003;</b> &nbsp;&nbsp;] พอใช้ (60-69)</strong></p> 
-                        <p><strong>[&nbsp;&nbsp; <b v-if="(((totalScoreSum + totalScoreZeroSum) / 33 * 70) + (WeightedScoreSumXT * 30)) < 60">&#10003;</b> &nbsp;&nbsp;] ต้องปรับปรุง (ต่ำกว่า 60)</strong></p>
+                        <p><strong>[&nbsp;&nbsp; <b v-if="(showscoresum.sum_score) >= 90">&#10003;</b> &nbsp;&nbsp;] ดีเด่น (90-100)</strong></p>
+                        <p><strong>[&nbsp;&nbsp; <b v-if="(showscoresum.sum_score) >= 80 && (showscoresum.sum_score) < 90">&#10003;</b> &nbsp;&nbsp;] ดีมาก (80-89)</strong></p>
+                        <p><strong>[&nbsp;&nbsp; <b v-if="(showscoresum.sum_score) >= 70 && (showscoresum.sum_score) < 80">&#10003;</b> &nbsp;&nbsp;] ดี (70-79)</strong></p>
+                        <p><strong>[&nbsp;&nbsp; <b v-if="(showscoresum.sum_score) >= 60 && (showscoresum.sum_score) < 70">&#10003;</b> &nbsp;&nbsp;] พอใช้ (60-69)</strong></p> 
+                        <p><strong>[&nbsp;&nbsp; <b v-if="(showscoresum.sum_score) < 60">&#10003;</b> &nbsp;&nbsp;] ต้องปรับปรุง (ต่ำกว่า 60)</strong></p>
                     </div>
 
                     <h5 class="mb-4"><i class="" style="font-size: x-large;"></i> ส่วนที่ 3 แผนพัฒนาการปฏิบัติราชการรายบุคคล</h5>
@@ -298,20 +298,23 @@ export default {
             totalZeroScores:{},
             totalScoreSum:{},
             totalScoreZeroSum:{},
-            totalScoreFinalSum:{},  
+            totalScoreFinalSum:{}, 
+            showscoresum:{} 
         };
     }, 
     components: {
         TabView,
         TabPanel
     }, 
-    async mounted(){ 
+    async mounted(){  
+       // console.log(this.dataPor);  
         const { signIn, getSession, signOut } = await useAuth()
         const user = await getSession();
        // console.log(user.user.name);
         const {STAFFID, SCOPES} = user.user.name
         const {staffdepartment, groupid, staffdepartmentname, groupname} = SCOPES
-        await this.setSession(STAFFID,staffdepartment,groupid);  
+        await this.setSession(STAFFID,staffdepartment,groupid);
+        //this.showdatator()  
     }, 
     watch: { 
         tab4Reload(v) { 
@@ -387,12 +390,22 @@ export default {
             return zeroScoreCount;
         },
         //รวมคะแนนจำนวนสมรรถนะ*3
-        totalScoreSum() {
-            return this.coreCompetencies.reduce((sum, row, index) => { 
-            const dataTable1Value = parseFloat(row.data_table1) || 0;
-            const dataTable2Value = parseFloat(this.jobSpecificCompetencies[index]?.data_table2) || 0;  
-            return sum + (dataTable1Value * 3) + (dataTable2Value * 3); 
-            }, 0);
+        totalScoreSum(staffid) {
+            let sum = 0;
+
+            // คำนวณคะแนนจาก coreCompetencies
+            this.coreCompetencies.forEach(row => {
+                const dataTable1Value = parseFloat(row.data_table1) || 0;
+                sum += dataTable1Value * 3;
+            });
+
+            // คำนวณคะแนนจาก jobSpecificCompetencies
+            this.jobSpecificCompetencies.forEach(row => {
+                const dataTable2Value = parseFloat(row.data_table2) || 0;
+                sum += dataTable2Value * 3;
+            });
+
+            return sum;
         }, 
         totalScoreSumX() {     
             return this.coreCompetencies.reduce((sum, row, index) => { 
@@ -417,14 +430,55 @@ export default {
         },  
     }, 
     methods: { 
+         insertscore1(scoreA04) { 
+        // //console.log(scoreA04); 
+        // //console.log(this.dataPor.d_date,this.dataPor.evalua,scoreA04); 
+        //     axios.post('http://localhost:8000/api/savepersentor',{
+        //             p_staffid: this.staffid_Main, 
+        //             p_year: this.dataPor.d_date, 
+        //             evalua: this.dataPor.evalua, 
+        //             score: scoreA04, 
+        //             insert:"achievement_score"
+        //         }).then(res => {     
+        //             //console.log(res.data); 
+        //     });
+         },
+        // insertscore2(scoreB) { 
+        // //console.log(scoreB); 
+        // //console.log(this.dataStaffid); 
+        //     axios.post('http://localhost:8000/api/savepersentor',{
+        //             p_staffid: this.staffid_Main, 
+        //             p_year: this.tracking_date.d_date, 
+        //             evalua: this.tracking_date.evalua, 
+        //             score: scoreB,
+        //             insert:"behavior" 
+
+        //         }).then(res => {     
+        //             console.log(res.data); 
+        //     });
+        // },
+        // insertscore3(scoreS) { 
+        // //console.log(scoreB); 
+        // //console.log(this.dataStaffid); 
+        //     axios.post('http://localhost:8000/api/savepersentor',{
+        //             p_staffid: this.staffid_Main, 
+        //             p_year: this.tracking_date.d_date, 
+        //             evalua: this.tracking_date.evalua, 
+        //             score: scoreS,
+        //             insert:"sum_score" 
+
+        //         }).then(res => {     
+        //             console.log(res.data); 
+        //     });
+        // },
         setSession (staffid_Main,facid_Main,groupid_Main) {
            // console.log('setSession');  
             this.staffid_Main = staffid_Main
             this.facid_Main = facid_Main
             this.groupid_Main = groupid_Main  
-        }, 
-        /*============= ผู้ประเมิน ==============*/
-        showdatator() {   
+        },  
+        showdatator() {  
+            //console.log(this.dataPor.d_date,scoreA04); 
             axios.post('http://localhost:8000/api/showdatator', {
                 p_year: this.dataPor.d_date,
                 evalua: this.dataPor.evalua,
@@ -433,7 +487,8 @@ export default {
             .then(res => {
                  //console.log('Response',res.data);  
                 this.assessorText = res.data[0].assessor; 
-                this.assessor_positionText = res.data[0].assessor_position; 
+                this.assessor_positionText = res.data[0].assessor_position;
+                this.showscoresum = res.data[0] 
             })
             .catch(error => {
                 console.error('Error fetching data:', error);
@@ -456,445 +511,7 @@ export default {
             .catch(error => {
                 console.error('Error:', error);
             });
-        },  
-
-
-
-// /*-----------------------------------*/
-//         showDataSet() {
-//             axios
-//                 .post('http://localhost:8000/api/showDateSet', {
-//                     staff_id: this.staffid_Main,
-//                     fac_id: this.facid_Main,
-//                     group_id: this.groupid_Main
-//                 })
-//                 .then((res) => {
-//                     // console.log(res.data); 
-//                     this.tracking_dates = res.data;
-//                 })
-//                 .catch((error) => {
-//                     console.error('Error:', error);
-//                 });
-//         },
-//         // ตารางรายชื่อ
-//         xxr(){ 
-//             if(this.tracking_date.evalua === undefined){
-//                 Swal.fire({
-//                     title: "แจ้งเตือนจากระบบ!",
-//                     text: "กรุณาเลือก รอบประเมิน ก่อน!",
-//                     icon: "error"
-//                 });
-//             }else{
-//                 this.showDataEvalu();
-//             } 
-//         }, 
-//         async showDataEvalu() {
-//             try {
-//                 const res = await axios.get('http://localhost:8000/api/showDataEvalu', {
-//                 params: {
-//                     staff_id: this.staffid_Main,
-//                     fac_id: this.facid_Main,
-//                     group_id: this.groupid_Main,
-//                     evalua: this.tracking_date.evalua,
-//                     p_year: this.tracking_date.d_date,
-//                 }
-//                 });
-//                 this.products = res.data; 
-//                 //console.log(res.data);
-                
-//                 // ใช้ Promise.all เพื่อทำการเรียก cvb พร้อมกันหลายๆ รายการ
-//                 //await Promise.all(res.data.map(item => this.cvb(item)));
-//             } catch (error) {
-//                 console.error('Error fetching evaluation data:', error);
-//             }
-//         },
-
-//         async cvb(item) {
-//             // console.log(this.tracking_date.evalua); 
-//             try {
-//                 const response = await axios.post('http://localhost:8000/api/showdatator', {
-//                     p_year: this.tracking_date.d_date,
-//                     evalua: this.tracking_date.evalua,
-//                     p_staffid: item.staffid
-//                 });  
-//                 //console.log(response.data); 
-//                 // อัปเดตค่า persen ใน item แทนการใช้ this.persen
-//                 item.persenGetData = response.data[0]?.persen ?? 0;
-//             } catch (error) {
-//                 console.error('Error fetching data for staff:', error);
-//             }
-//         },
-//         // เพิ่มคะแนนประเมิน
-//         openDataEvalu(staff_id){     
-//             if(this.tracking_date.d_date === undefined){
-//                 Swal.fire("แจ้งเตือนจากระบบ","กรุณาเลือกรอบประเมิน","error");
-//             }else{  
-//                 this.dataStaffid = staff_id
-//                 this.products_Tab1 = [];  
-//                 this.p01_scores = [
-//                     { name: '- ไม่ระบุ -', code: 0 },
-//                     { name: '1 คะแนน', code: 1 },
-//                     { name: '2 คะแนน', code: 2 },
-//                     { name: '3 คะแนน', code: 3 },
-//                     { name: '4 คะแนน', code: 4 },
-//                     { name: '5 คะแนน', code: 5 },
-//                 ];
-
-//                 // ตั้งค่า coreCompetencies กลับไปเป็นค่าเริ่มต้น
-//                 this.coreCompetencies = [
-//                     { id: 1, activity: 'ก. 1 การมุ่งผลสัมฤทธิ์', indicator: '1', data_table1: '' },
-//                     { id: 2, activity: 'ก. 2 การบริการที่ดี', indicator: '1', data_table1: '' },
-//                     { id: 3, activity: 'ก. 3 การสั่งสมความเชี่ยวชาญในงานอาชีพ', indicator: '1', data_table1: '' },
-//                     { id: 4, activity: 'ก. 4 การยึดมั่นในความถูกต้องชอบธรรมและจริยธรรม', indicator: '1', data_table1: '' },
-//                     { id: 5, activity: 'ก. 5 การทำงานเป็นทีม', indicator: '1', data_table1: '' }
-//                 ];  
-                
-//                 // ตั้งค่า jobSpecificCompetencies กลับไปเป็นค่าเริ่มต้น
-//                 this.jobSpecificCompetencies = [
-//                     { id: 6, activity: 'ข. 1 การคิดวิเคราะห์', indicator: '1', data_table2: '' },
-//                     { id: 7, activity: 'ข. 2 การดำเนินการเชิงรุก', indicator: '1', data_table2: '' },
-//                     { id: 8, activity: 'ข. 3 ความผูกพันที่มีต่อส่วนราชการ', indicator: '1', data_table2: '' },
-//                     { id: 9, activity: 'ข. 4 การมองภาพองค์รวม', indicator: '1', data_table2: '' },
-//                     { id: 10, activity: 'ข. 5 การสืบเสาะหาข้อมูล', indicator: '1', data_table2: '' },
-//                     { id: 11, activity: 'ข. 6 การตรวจสอบความถูกต้องตามกระบวนงาน', indicator: '1', data_table2: '' }
-//                 ];
-
-//                 this.improvements = null;
-//                 this.suggestions = null;
-
-//                 this.showdataPo(staff_id,this.facid_Main,this.tracking_date.d_date,this.tracking_date.evalua );
-//                     axios.post('http://localhost:8000/api/showDataP03New',{
-//                         staff_id: staff_id,
-//                         fac_id: this.tracking_date.fac_id,
-//                         year_id: this.tracking_date.d_date, 
-//                         evalua: this.tracking_date.evalua  
-//                     }).then(res => {     
-//                     // console.log('openDataEvalu: ',res.data);    
-//                     if (res.data && Array.isArray(res.data)) {
-//                         this.products_Tab1 = res.data; 
-//                         this.products_Tab1.forEach(h => {
-//                             h.subP01sX.forEach(subP01 => {
-//                                 // ตรวจสอบว่าค่า p01_score นั้นถูกต้องหรือไม่
-//                                 const foundScore = this.p01_scores.find(score => score.code === subP01.p01_score);
-//                                 if (foundScore) {
-//                                     subP01.p01_score = foundScore.code; // ใช้ค่าที่ถูกต้อง
-//                                 } else {
-//                                     subP01.p01_score = this.p01_scores[0].code; // ใช้ค่าเริ่มต้น "- ไม่ระบุ -"
-//                                 }
-//                             });
-//                         });
-//                     } 
-//                     this.DialogAdd = true; 
-//                 })
-//                 .catch(error => {
-//                     console.error('Error:', error);
-//                 });
-//             }
-//         }, 
-//         showdataPo(staff_id,fac_id,year_id,record){  
-//             axios.post('http://localhost:8000/api/showDataPo',{
-//                 staff_id: staff_id,
-//                 fac_id: fac_id,
-//                 year_id: year_id,
-//                 record: record,
-//             }).then(res => {     
-//                 // console.log(res.data);    
-//                 if(res.data.length > 0){
-//                     const data = res.data[0];
-//                     this.coreCompetencies.forEach(item => {
-//                         if (item.id === 1) {
-//                             item.data_table1 = data.p1;  // Update based on the API response
-//                         } else if (item.id === 2) {
-//                             item.data_table1 = data.p2;  // Update based on the API response
-//                         } else if (item.id === 3) {
-//                             item.data_table1 = data.p3;  // Add more conditions if necessary
-//                         } else if (item.id === 4) {
-//                             item.data_table1 = data.p4;  // Add more conditions if necessary
-//                         } else if (item.id === 5) {
-//                             item.data_table1 = data.p5;  // Add more conditions if necessary
-//                         }
-//                     });
-
-//                     this.jobSpecificCompetencies.forEach(item => {
-//                         if (item.id === 6) {
-//                             item.data_table2 = data.p6;  // Update based on the API response
-//                         } else if (item.id === 7) {
-//                             item.data_table2 = data.p7;  // Update based on the API response
-//                         } else if (item.id === 8) {
-//                             item.data_table2 = data.p8;  // Add more conditions if necessary
-//                         } else if (item.id === 9) {
-//                             item.data_table2 = data.p9;  // Add more conditions if necessary
-//                         } else if (item.id === 10) {
-//                             item.data_table2 = data.p10;  // Add more conditions if necessary
-//                         } else if (item.id === 11) {
-//                             item.data_table2 = data.p11;  // Add more conditions if necessary
-//                         }
-//                     });
-
-//                     // Update other fields
-//                     this.improvements = data.improvements;
-//                     this.suggestions = data.suggestions;
-//                 }
-                
-//             })
-//             .catch(error => {
-//                 console.error('Error:', error);
-//             });
-//         }, 
-//         saveEvaTab1(subP01) {  
-//             if(subP01.p01_score === 0){
-//                 Swal.fire("แจ้งเตือน","กรุณาเลือกคะแนน !","error");
-//             }else{
-//                 axios.post('http://localhost:8000/api/saveP03Po',{
-//                     staffid_po: this.staffid_po,
-//                     p01_id: subP01.p01_id,
-//                     p01_score: subP01.p01_score,
-//                     p01_detail: subP01.p01_detail,
-//                 }).then(res => {     
-//                      //console.log(res.data);   
-//                     Swal.fire({
-//                         position: "top-end",
-//                         icon: "success",
-//                         title: "ข้ลมูลผลการประเมินถูกบันทึกเสร็จสิ้น",
-//                         showConfirmButton: false,
-//                         timer: 1000
-//                     });
-//                 })
-//                 .catch(error => {
-//                     console.error('Error:', error);
-//                 });
-//             }
- 
-//         }, 
-//         async saveEvaTab1_1() { 
-//             const payload = {
-//                 staffid_po: this.staffid_po, 
-//                 staff_id: this.staffid_Main, 
-//                 fac_id: this.facid_Main, 
-//                 year: this.tracking_date.d_date,
-//                 record: this.tracking_date.evalua, 
-//                 coreCompetencies: this.coreCompetencies,
-//                 jobSpecificCompetencies: this.jobSpecificCompetencies,
-//                 otherCompetencies: this.otherCompetencies,
-//                 improvements: this.improvements,
-//                 suggestions: this.suggestions
-//             }; 
-//             const res = await axios.post('http://localhost:8000/api/saveP03PoTab1', payload);
-//                  //console.log(res.data);  
-//                 Swal.fire({
-//                     position: "top-end",
-//                     icon: "success",
-//                     title: "บันทึกข้อมูลสมรรถนะ / ความเห็นเพิ่มเติม เสร็จสิ้น",
-//                     showConfirmButton: false,
-//                     timer: 1500
-//                 }); 
-//         }, 
-//         onTabChange(event) { 
-//             console.log(event.index);
-//             if (event.index==0) {
-//                 //console.log('ผลสัมฤทธิ์ของงาน -',event.index); 
-//             }
-//             if(event.index==1){
-//                 //console.log('รายงาน ป.01 - ป.03 -',event.index);  
-//                 this.tab2Data(this.dataStaffid);  
-//                 this.showdataPoText(this.dataStaffid,this.facid_Main,this.tracking_date.d_date,this.tracking_date.evalua); 
-//             }
-//             if (event.index==2) {
-//                 //console.log('แผนพัฒนาการปฏิบัติราชการรายบุคคล -',event.index); 
-//                 this.products_Tab3 =[];
-//                 this.chkp04(this.dataStaffid,this.facid_Main,this.tracking_date.d_date,this.tracking_date.evalua); 
-//                 this.chkp04data(this.dataStaffid,this.facid_Main,this.tracking_date.d_date,this.tracking_date.evalua);  
-//             }
-//             if (event.index==3) {
-//                 //console.log('รายงาน ป.04 -',event.index);
-//                 this.chkp04dataT4(this.dataStaffid,this.facid_Main,this.tracking_date.d_date,this.tracking_date.evalua);   
-//             }
-//         },  
-//         tab2Data(staff_id){  
-//             axios.post('http://localhost:8000/api/showDataP03New',{
-//                 staff_id: staff_id, 
-//                 fac_id: this.tracking_date.fac_id,
-//                 year_id: this.tracking_date.d_date, 
-//                 evalua: this.tracking_date.evalua   
-//             }).then(res => {     
-//                 // console.log(res.data);   
-//                 if (res.data && Array.isArray(res.data)) {
-//                     this.products_Tab2 = res.data;  
-//                 }   
-//             })
-//             .catch(error => {
-//                 console.error('Error:', error);
-//             });
-//         }, 
-//         showdataPoText(staff_id,fac_id,year_id,record){ 
-//             axios.post('http://localhost:8000/api/showDataPo',{
-//                 staff_id: staff_id,
-//                 fac_id: fac_id,
-//                 year_id: year_id,
-//                 record: record,
-//             }).then(res => {     
-//                  //console.log(res.data);    
-//                 if(res.data.length > 0){
-//                     const data = res.data[0];
-//                     this.coreCompetencies.forEach(item => {
-//                         if (item.id === 1) {
-//                             item.data_table1 = data.p1??0;  // Update based on the API response
-//                         } else if (item.id === 2) {
-//                             item.data_table1 = data.p2??0;  // Update based on the API response
-//                         } else if (item.id === 3) {
-//                             item.data_table1 = data.p3??0;  // Add more conditions if necessary
-//                         } else if (item.id === 4) {
-//                             item.data_table1 = data.p4??0;  // Add more conditions if necessary
-//                         } else if (item.id === 5) {
-//                             item.data_table1 = data.p5??0;  // Add more conditions if necessary
-//                         }
-//                     });
-
-//                     this.jobSpecificCompetencies.forEach(item => {
-//                         if (item.id === 6) {
-//                             item.data_table2 = data.p6??0;  // Update based on the API response
-//                         } else if (item.id === 7) {
-//                             item.data_table2 = data.p7??0;  // Update based on the API response
-//                         } else if (item.id === 8) {
-//                             item.data_table2 = data.p8??0;  // Add more conditions if necessary
-//                         } else if (item.id === 9) {
-//                             item.data_table2 = data.p9??0;  // Add more conditions if necessary
-//                         } else if (item.id === 10) {
-//                             item.data_table2 = data.p10??0;  // Add more conditions if necessary
-//                         } else if (item.id === 11) {
-//                             item.data_table2 = data.p11??0;  // Add more conditions if necessary
-//                         }
-//                     });
-
-//                     // Update other fields
-//                     this.improvements = data.improvements??'- ไม่มีข้อมูล -';
-//                     this.suggestions = data.suggestions??'- ไม่มีข้อมูล -';
-//                 }
-                
-//             })
-//             .catch(error => {
-//                 console.error('Error:', error);
-//             });
-//         }, 
-//         chkp04(staff_id,fac_id,year_id,record){
-//             axios.post('http://localhost:8000/api/showDataPo',{
-//                 staff_id: staff_id,
-//                 fac_id: fac_id,
-//                 year_id: year_id,
-//                 record: record,
-//             }).then(res => {     
-//                 // console.log(res.data);    
-//                 if (res.data.length > 0) {
-//                     this.chkP04 = 0; 
-//                 }else{
-//                     this.chkP04 = 1; 
-//                 }
-//             })
-//             .catch(error => {
-//                 console.error('Error:', error);
-//             });
-//         }, 
-//         AddDatap04(){ 
-//             const newData = {
-//                 p04_re1: this.p04_re1,
-//                 p04_re2: this.p04_re2,
-//                 p04_re3: this.p04_re3,
-//             };
-//             this.products_Tab3.push(newData); 
-//             this.p04_re1 = '';
-//             this.p04_re2 = '';
-//             this.p04_re3 = '';
-//         }, 
-//         DeleteRegislick(item) {
-//             // Add logic to remove the selected item
-//             this.products_Tab3 = this.products_Tab3.filter((product) => product !== item);
-//         }, 
-//         saveEvaTab3(){  
-//             axios.post('http://localhost:8000/api/saveEvaTab3',{
-//                 staff_id: this.dataStaffid,
-//                 fac_id: this.facid_Main,
-//                 year_id: this.tracking_date.d_date,
-//                 record: this.tracking_date.evalua,
-//                 products_Tab3: this.products_Tab3
-//             }).then(res => {     
-//                  //console.log(res.data);    
-//                 Swal.fire({
-//                     position: "top-end",
-//                     icon: "success",
-//                     title: "บันทึก แผนพัฒนาการปฏิบัติราชการรายบุคคล เสร็จสิ้น",
-//                     showConfirmButton: false,
-//                     timer: 1000
-//                 });
-//             })
-//             .catch(error => {
-//                 console.error('Error:', error);
-//             });
-//         },
-//         chkp04data(staff_id,fac_id,year_id,record){
-//             axios.post('http://localhost:8000/api/showData04Tab3',{
-//                 staff_id: staff_id,
-//                 fac_id: fac_id,
-//                 year_id: year_id,
-//                 record: record,
-//             }).then(res => {     
-//                 // console.log(res.data);     
-//                 if(res.data.length > 0){
-//                     res.data.forEach(p04 => {
-//                         const newData = {
-//                             p04_re1: p04.p04_re1,
-//                             p04_re2: p04.p04_re2,
-//                             p04_re3: p04.p04_re3
-//                         };
-//                         this.products_Tab3.push(newData); 
-//                     });  
-//                 }
-//                 this.p04_re1 = '';
-//                 this.p04_re2 = '';
-//                 this.p04_re3 = '';
-//             })
-//             .catch(error => {
-//                 console.error('Error:', error);
-//             });
-//         }, 
-//         chkp04dataT4(staff_id,fac_id,year_id,record){
-//             axios.post('http://localhost:8000/api/showData04Tab3',{
-//                 staff_id: staff_id,
-//                 fac_id: fac_id,
-//                 year_id: year_id,
-//                 record: record,
-//             }).then(res => {     
-//                 // console.log(res.data);     
-//                 if(res.data.length > 0){
-//                     this.products_Tab3T4 = res.data;
-//                 } 
-//             })
-//             .catch(error => {
-//                 console.error('Error:', error);
-//             });
-//         },
-//         async mounted() {
-//             const  { signIn, getSession, signOut } = await useAuth()
-//             const user = await getSession();
-//         },  
-//         //โชว์รอบประเมิน/ชื่อผู้ประเมิน
-//         showdatapor04() { 
-//             axios.post('http://localhost:8000/api/showdatator', {
-//                 p_year: this.tracking_date.d_date,
-//                 evalua: this.tracking_date.evalua,
-//                 p_staffid: this.staffid_Main
-//             })
-//             .then(response => {
-//                 const dataSet = response.data[0];
-//                 this.tracking_date.assessor = dataSet.assessor;
-//                 this.tracking_date.assessor_position = dataSet.assessor_position; 
-
-//                 const persen = this.dropdownProportions.filter(f => f.value == dataSet.persen);
-//                 this.dropdownProportion = persen.length > 0 ? persen[0] : null;  
-//             })
-//             .catch(error => {
-//                 console.error('Error fetching data:', error);
-//             });
-//         }  
+        },        
     }
 } 
 
