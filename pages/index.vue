@@ -95,7 +95,7 @@
 <script setup> 
     const { signIn, getSession, signOut } = await useAuth()
     const user = await getSession();
-    console.log(user); 
+    //console.log(user); 
 </script> 
  <script>
      //import profileImage from '@/public/layout/images/pipatphong.jpg';                   
@@ -123,10 +123,19 @@
             };
         },
         async mounted() {
-            const  { signIn, getSession, signOut } = await useAuth()
-            this.user = await getSession();
-            await imgUser();
-        }, 
+                try {
+                    const auth = useAuth(); // เรียกใช้ useAuth() ที่นี่
+                    this.user = await auth.getSession();
+                    await this.imgUser(); // ตรวจสอบว่า imgUser ถูกต้องด้วย
+                } catch (error) {
+                    console.error("Error fetching user data:", error);
+                }
+            },
+        // async mounted() {
+        //     const  { signIn, getSession, signOut } = await useAuth()
+        //     this.user = await getSession();
+        //     await imgUser();
+        // }, 
         methods:{
             imgUser(){
                 console.log('user:',this.user);

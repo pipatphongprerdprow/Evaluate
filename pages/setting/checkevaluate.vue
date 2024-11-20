@@ -6,6 +6,7 @@
                     <div class="col md:col-6"> 
                         <h3 class="mb-4 card-header"><i class="pi pi-star" style="font-size: x-large;"></i> ตรวจสอบ แบบประเมิน</h3>    
                     </div> 
+                    <!-- {{ productstaff[0].prefixfullname  }} -->
                     <div class="col md:col-6" >  
                         <label for="examine_date"></label>
                         <Dropdown id="examine_date" v-model="examine_date" :options="examine_dates" optionLabel="d_evaluationround" placeholder="กรุณาเลือกรอบการประเมิน" style=" max-width: 500px; width: 100%" ></Dropdown> 
@@ -68,10 +69,11 @@
                                 </h4><br>
                                 <!-- ตาราง ก. สมรรถนะหลัก -->
                                 <div class="employee-info">
-                                    <p><strong>ผู้ปฏิบัติงาน:</strong> {{ user.user.name.PREFIXFULLNAME }} {{ user.user.name.STAFFNAME }} {{ user.user.name.STAFFSURNAME }}</p>
-                                    <p><strong>สังกัด:</strong> {{ user.user.name.SCOPES?.staffdepartmentname }} </p>
-                                    <p><strong>ตำแหน่ง:</strong> {{ user.user.name.POSITIONNAME }}  </p>
-                                    <p><strong>ระดับตำแหน่ง:</strong>{{ user.user.name.POSTYPENAME }} </p>
+                                    <p><strong>ผู้ปฏิบัติงาน:</strong> {{ currentstaff[0].prefixfullname }} {{ currentstaff[0].staffname }} {{   currentstaff[0].staffsurname }}</p>
+                                    <p v-if="currentstaff[0].facultyid==201092700000"><strong>สังกัด:</strong> {{ currentstaff[0].departmentname }} </p>
+                                    <p v-else><strong>สังกัด:</strong> {{ currentstaff[0].facultyname }} </p>
+                                    <p><strong>ตำแหน่ง:</strong> {{ currentstaff[0].posnameth }} </p>
+                                    <p><strong>ระดับตำแหน่ง:</strong>{{ currentstaff[0].postypenameth }}</p>
                                     <!-- <p><strong>ประเภทบุคลากร:</strong></p> -->
                                     <p><strong>ชื่อผู้ประเมิน:</strong> {{ assessorText }}</p> 
                                     <p><strong>ตำแหน่งผู้ประเมิน :</strong>{{ assessor_positionText }}</p> 
@@ -236,8 +238,9 @@
                                                 <table id="ratingTable">
                                                     <thead>
                                                         <tr>
-                                                            <th style="width: 60%;">ก. สมรรถนะหลัก (สำหรับข้าราชการและพนักงานทุกคน)</th>
+                                                            <th style="width: 50%;">ก. สมรรถนะหลัก (สำหรับข้าราชการและพนักงานทุกคน)</th>
                                                             <th style="width: 20%;">(1)ระดับ<br>สมรรถนะ<br>ที่คาดหวัง</th>
+                                                            <th style="width: 20%;">ระดับ<br>สมรรถนะ<br>ประเมินตนเอง</th> 
                                                             <th style="width: 20%;">(2)ระดับ<br>สมรรถนะ<br>ที่แสดงออก</th>
                                                         </tr>
                                                     </thead>
@@ -245,6 +248,11 @@
                                                         <tr v-for="(row1, index) in coreCompetencies" :key="index">
                                                             <td style="text-align: left;">{{ row1.activity }}</td> 
                                                             <td>{{ row1.indicator }}</td>
+                                                            <!-- <td style="color: blue"><b>{{ row1.selfAssessment }}</b></td> -->
+                                                            <td>  
+                                                                <b v-if="row1.selfAssessment == '' ||  row1.selfAssessment == null" style="color: red;">0</b> 
+                                                                <b v-if="row1.selfAssessment != 0 " style="color: blue" >{{ row1.selfAssessment }}</b> 
+                                                            </td>
                                                             <td>  
                                                                 <b v-if="row1.data_table1 == '' " style="color: red;">0</b> 
                                                                 <b v-if="row1.data_table1 != 0 " >{{ row1.data_table1 }}</b> 
@@ -258,18 +266,24 @@
                                                 <table id="ratingTable">
                                                     <thead>
                                                         <tr>
-                                                            <th style="width: 60%;">ข. สมรรถนะเฉพาะตามลักษณะงานที่ปฏิบัติ (สำหรับข้าราชการและพนักงานเฉพาะตามตำแหน่งที่รับผิดชอบตามที่ ก.บ.ม. กำหนด)</th>
+                                                            <th style="width: 50%;">ข. สมรรถนะเฉพาะตามลักษณะงานที่ปฏิบัติ (สำหรับข้าราชการและพนักงานเฉพาะตามตำแหน่งที่รับผิดชอบตามที่ ก.บ.ม. กำหนด)</th>
                                                             <th style="width: 20%;">(3)ระดับ<br>สมรรถนะ<br>ที่คาดหวัง</th>
+                                                            <th style="width: 20%;">ระดับ<br>สมรรถนะ<br>ประเมินตนเอง</th>
                                                             <th style="width: 20%;">(4)ระดับ<br>สมรรถนะ<br>ที่แสดงออก</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
-                                                        <tr v-for="(row2, index) in jobSpecificCompetencies" :key="index">
-                                                            <td style="text-align: left;">{{ row2.activity }}</td> 
-                                                            <td>{{ row2.indicator }}</td>
+                                                        <tr v-for="(row2, index) in jobSpecificCompetencies" :key="index"> 
+                                                            <td style="text-align: left;">ข. {{ index+6 }} {{ row2.WORK_NAME }}</td> 
+                                                            <td>{{ row2.COMPLEVEL }}</td>
+                                                            <!-- <td style="color: blue"><b>{{ row2.SCORESUM }}</b></td> -->
+                                                            <td>  
+                                                                <b v-if="row2.SCORESUM == '' ||  row2.SCORESUM == null" style="color: red;">0</b> 
+                                                                <b v-if="row2.SCORESUM != 0 " style="color: blue" >{{ row2.SCORESUM }}</b> 
+                                                            </td>
                                                             <td>
-                                                                <b v-if="row2.data_table2 == '' " style="color: red;">0</b> 
-                                                                <b v-if="row2.data_table2 != 0 " >{{ row2.data_table2 }}</b> 
+                                                                <b v-if="row2.SCORE == null ||row2.SCORE == '' "  style="color: red;">0</b> 
+                                                                <b v-if="row2.SCORE != 0 " >{{ row2.SCORE }}</b> 
                                                             </td>
                                                         </tr>
                                                     </tbody>
@@ -280,14 +294,16 @@
                                                 <table id="ratingTable">
                                                     <thead>
                                                         <tr>
-                                                            <th style="width: 60%;">ค. สมรรถนะทางการบริหาร (สำหรับตำแหน่งประเภทบริหารตามที่ ก.บ.ม. กำหนด)</th>
+                                                            <th style="width: 50%;">ค. สมรรถนะทางการบริหาร (สำหรับตำแหน่งประเภทบริหารตามที่ ก.บ.ม. กำหนด)</th>
                                                             <th style="width: 20%;">(5)ระดับ<br>สมรรถนะ<br>ที่คาดหวัง</th>
+                                                            <th style="width: 20%;">ระดับ<br>สมรรถนะ<br>ประเมินตนเอง</th> 
                                                             <th style="width: 20%;">(6)ระดับ<br>สมรรถนะ<br>ที่แสดงออก</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
                                                         <tr v-for="(row3, index) in otherCompetencies" :key="index">
                                                             <td style="text-align: left;">{{ row3.activity }}</td> 
+                                                            <td></td>
                                                             <td></td>
                                                             <td></td>
                                                         </tr>
@@ -392,10 +408,11 @@
                                             <!-- ตาราง ก. สมรรถนะหลัก -->
                                             <div class="employee-info"> 
                                                 <p><strong>รอบการประเมิน:</strong> {{ examine_date.d_evaluationround }}</p>
-                                                <p><strong>ชื่อผู้รับการประเมิน:</strong> {{ user.user.name.PREFIXFULLNAME }} {{ user.user.name.STAFFNAME }} {{ user.user.name.STAFFSURNAME }} </p>
-                                                <p><strong>ตำแหน่ง:</strong> {{ user.user.name.POSITIONNAME }} </p>
-                                                <p><strong>ระดับตำแหน่ง:</strong>{{ user.user.name.POSTYPENAME }} </p>
-                                                <p><strong>สังกัด:</strong> {{ user.user.name.SCOPES?.staffdepartmentname }} </p>
+                                                <p><strong>ชื่อผู้รับการประเมิน:</strong>  {{ currentstaff[0].prefixfullname }} {{ currentstaff[0].staffname }} {{   currentstaff[0].staffsurname }} </p>
+                                                <p><strong>ตำแหน่ง:</strong> {{ currentstaff[0].posnameth }} </p>
+                                                <p><strong>ระดับตำแหน่ง:</strong>{{ currentstaff[0].postypenameth }}</p>
+                                                <p v-if="currentstaff[0].facultyid==201092700000"><strong>สังกัด:</strong> {{ currentstaff[0].departmentname }} </p>
+                                                <p v-else><strong>สังกัด:</strong> {{ currentstaff[0].facultyname }} </p>
                                                 <p><strong>ชื่อผู้ประเมิน:</strong> {{ assessorText??'-' }}</p>
                                             </div><br>
                                             <div class="employee-info" style="border: groove;padding: 15px;">
@@ -497,8 +514,8 @@
                                                     </td>
                                                         <td class="center-align"><br><br>
                                                             ลงชื่อ .................................................................<br>
-                                                            ชื่อ {{ user.user.name.PREFIXFULLNAME }} {{ user.user.name.STAFFNAME }} {{ user.user.name.STAFFSURNAME }}<br>
-                                                            ตำแหน่ง {{ user.user.name.POSITIONNAME }}<br>
+                                                            ชื่อ {{ currentstaff[0].prefixfullname }} {{ currentstaff[0].staffname }} {{   currentstaff[0].staffsurname }}<br>
+                                                            ตำแหน่ง {{ currentstaff[0].posnameth }}<br>
                                                             วันที่ .......... เดือน .......................... พ.ศ.
                                                         </td>
                                                     </tr>
@@ -534,8 +551,8 @@
                                                     </td>
                                                     <td class="center-align"><br><br>
                                                         ลงชื่อ : .................................................................<br>
-                                                        ชื่อ : {{ user.user.name.PREFIXFULLNAME }} {{ user.user.name.STAFFNAME }} {{ user.user.name.STAFFSURNAME }}<br>
-                                                        ตำแหน่ง : {{ user.user.name.POSITIONNAME }}<br>
+                                                        ชื่อ : {{ currentstaff[0].prefixfullname }} {{ currentstaff[0].staffname }} {{   currentstaff[0].staffsurname }}<br>
+                                                        ตำแหน่ง : {{ currentstaff[0].posnameth }}<br>
                                                         วันที่ : .......... เดือน .......................... พ.ศ.............
                                                     </td>
                                                     </tr>
@@ -605,23 +622,14 @@ export default {
             ],
             DialogAdd: false,
             coreCompetencies: [
-                { activity: 'ก. 1 การมุ่งผลสัมฤทธิ์', indicator: '1',report: '1' },
-                { activity: 'ก. 2 การบริการที่ดี', indicator: '1',report: '1'  },
-                { activity: 'ก. 3 การสั่งสมความเชี่ยวชาญในงานอาชีพ', indicator: '1',report: '1'},
-                { activity: 'ก. 4 การยึดมั่นในความถูกต้องชอบธรรมและจริยธรรม', indicator: '1',report: '1'},
-                { activity: 'ก. 5 การทำงานเป็นทีม', indicator: '1',report: '1'}
+                { id: 1, activity: 'ก. 1 การมุ่งผลสัมฤทธิ์', indicator: '', data_table1: '',selfAssessment:''},
+                { id: 2, activity: 'ก. 2 การบริการที่ดี', indicator: '', data_table1: '',selfAssessment:''},
+                { id: 3, activity: 'ก. 3 การสั่งสมความเชี่ยวชาญในงานอาชีพ', indicator: '', data_table1: '',selfAssessment:''},
+                { id: 4, activity: 'ก. 4 การยึดมั่นในความถูกต้องชอบธรรมและจริยธรรม', indicator: '', data_table1: '',selfAssessment:''},
+                { id: 5, activity: 'ก. 5 การทำงานเป็นทีม', indicator: '', data_table1: '',selfAssessment:''}
             ],
-            jobSpecificCompetencies: [
-                { activity: 'ข. 1 การคิดวิเคราะห์', indicator: '1',report: '1'},
-                { activity: 'ข. 2 การดำเนินการเชิงรุก', indicator: '1',report: '1'},
-                { activity: 'ข. 3 ความผูกพันที่มีต่อส่วนราชการ', indicator: '1',report: '1'},
-                { activity: 'ข. 4 การมองภาพองค์รวม', indicator: '1',report: '1'},
-                { activity: 'ข. 5 การสืบเสาะหาข้อมูล', indicator: '1',report: '1'},
-                { activity: 'ข. 6 การตรวจสอบความถูกต้องตามกระบวนงาน', indicator: '1',report: '1'}
-                
-            ],
+            jobSpecificCompetencies: [],
             otherCompetencies: [
-                { activity: 'ค. 1 สภาวะผู้นำ', indicator: '0',report: '1'},
                 { activity: 'ค. 2 วิสัยทัศน์', indicator: '0',report: '1'},
                 { activity: 'ค. 3 การวางกลยุทธ์ภาครัฐ', indicator: '0',report: '1'},
                 { activity: 'ค. 4 ศักยภาพเพื่อนำการปรับเปลี่ยน', indicator: '0',report: '1'},
@@ -667,7 +675,8 @@ export default {
             //ชื่อผู้ประเมิน ตำแหน่งผู้ประเมิน
             assessorText: null,
             assessor_positionText: null,
-            showscoresum:{}
+            showscoresum:{}, 
+            currentstaff: {},
           
         };
     },
@@ -678,9 +687,9 @@ export default {
        // console.log(user.user.name);
         const {STAFFID, SCOPES} = user.user.name
         const {staffdepartment, groupid, staffdepartmentname, groupname} = SCOPES
-        await this.setSession(STAFFID,staffdepartment,groupid); 
+        await this.setSession(STAFFID, staffdepartment, groupid, user.user.name.POSTYPENAME, user.user.name.POSITIONNAMEID);  
         this.showDataEvalu();  
-        this.showDataSet();
+        this.showDataSet(); 
     }, 
     computed: {
         totalscoretrack() {
@@ -782,11 +791,13 @@ export default {
         }, 
     }, 
     methods: { 
-        setSession (staffid_Main,facid_Main,groupid_Main) {
-           // console.log('setSession');  
+        setSession (staffid_Main,facid_Main,groupid_Main,postypename,postypenameid) {
+            // console.log('postypename:',postypename);  
             this.staffid_Main = staffid_Main
             this.facid_Main = facid_Main
-            this.groupid_Main = groupid_Main  
+            this.groupid_Main = groupid_Main   
+            this.postypename = postypename    
+            this.postypenameid = postypenameid    
         },
         showDataSet() {
             axios
@@ -891,31 +902,42 @@ export default {
             }else{  
                 this.DialogAdd = true; 
                 this.dataStaffid = staff_id
-                this.products_Tab2 = [];
+                this.currentstaff = this.products.filter((product) => product.staffid === this.dataStaffid);
+                this.products_Tab2 = []; 
                 // ตั้งค่า coreCompetencies กลับไปเป็นค่าเริ่มต้น
+                let postypetext = `ระดับ${this.currentstaff[0].postypenameth}`;
+            const levelMapping = {
+                'ระดับปฏิบัติการ': 1,
+                'ระดับชำนาญการ': 2,
+                'ระดับชำนาญการพิเศษ': 3,
+                'อาจารย์': 3,
+                'ระดับเชี่ยวชาญ': 4,
+                'ระดับเชี่ยวชาญพิเศษ': 5
+            };
+            let xr = levelMapping[postypetext] || 0;
                 this.coreCompetencies = [
-                    { id: 1, activity: 'ก. 1 การมุ่งผลสัมฤทธิ์', indicator: '1', data_table1: '' },
-                    { id: 2, activity: 'ก. 2 การบริการที่ดี', indicator: '1', data_table1: '' },
-                    { id: 3, activity: 'ก. 3 การสั่งสมความเชี่ยวชาญในงานอาชีพ', indicator: '1', data_table1: '' },
-                    { id: 4, activity: 'ก. 4 การยึดมั่นในความถูกต้องชอบธรรมและจริยธรรม', indicator: '1', data_table1: '' },
-                    { id: 5, activity: 'ก. 5 การทำงานเป็นทีม', indicator: '1', data_table1: '' }
-                ];  
+                { id: 1, activity: 'ก. 1 การมุ่งผลสัมฤทธิ์', indicator: xr, data_table1: '',selfAssessment:''},
+                { id: 2, activity: 'ก. 2 การบริการที่ดี', indicator: xr, data_table1: '',selfAssessment:''},
+                { id: 3, activity: 'ก. 3 การสั่งสมความเชี่ยวชาญในงานอาชีพ', indicator: xr, data_table1: '',selfAssessment:''},
+                { id: 4, activity: 'ก. 4 การยึดมั่นในความถูกต้องชอบธรรมและจริยธรรม', indicator: xr, data_table1: '',selfAssessment:''},
+                { id: 5, activity: 'ก. 5 การทำงานเป็นทีม', indicator: xr, data_table1: '',selfAssessment:''}
+            ];  
                 
                 // ตั้งค่า jobSpecificCompetencies กลับไปเป็นค่าเริ่มต้น
-                this.jobSpecificCompetencies = [
-                    { id: 6, activity: 'ข. 1 การคิดวิเคราะห์', indicator: '1', data_table2: '' },
-                    { id: 7, activity: 'ข. 2 การดำเนินการเชิงรุก', indicator: '1', data_table2: '' },
-                    { id: 8, activity: 'ข. 3 ความผูกพันที่มีต่อส่วนราชการ', indicator: '1', data_table2: '' },
-                    { id: 9, activity: 'ข. 4 การมองภาพองค์รวม', indicator: '1', data_table2: '' },
-                    { id: 10, activity: 'ข. 5 การสืบเสาะหาข้อมูล', indicator: '1', data_table2: '' },
-                    { id: 11, activity: 'ข. 6 การตรวจสอบความถูกต้องตามกระบวนงาน', indicator: '1', data_table2: '' }
-                ];
-
+                this.showPostype(this.currentstaff[0].postypenameth,this.postypenameid); 
+                // this.jobSpecificCompetencies = [
+                //     { id: 6, activity: 'ข. 1 การคิดวิเคราะห์', indicator: '1', data_table2: '' },
+                //     { id: 7, activity: 'ข. 2 การดำเนินการเชิงรุก', indicator: '1', data_table2: '' },
+                //     { id: 8, activity: 'ข. 3 ความผูกพันที่มีต่อส่วนราชการ', indicator: '1', data_table2: '' },
+                //     { id: 9, activity: 'ข. 4 การมองภาพองค์รวม', indicator: '1', data_table2: '' },
+                //     { id: 10, activity: 'ข. 5 การสืบเสาะหาข้อมูล', indicator: '1', data_table2: '' },
+                //     { id: 11, activity: 'ข. 6 การตรวจสอบความถูกต้องตามกระบวนงาน', indicator: '1', data_table2: '' }
+                // ]; 
                 this.improvements = null;
                 this.suggestions = null;
-            }
-        }, 
 
+            }
+        },  
         onTabChange(event) { 
             // console.log(event.index);
             if (event.index==0) {
@@ -947,8 +969,7 @@ export default {
             .catch(error => {
                 console.error('Error:', error);
             });
-        },
-
+        }, 
         showdataPoText(staff_id,fac_id,year_id,record){ 
             axios.post('http://localhost:8000/api/showDataPo',{
                 staff_id: staff_id,
@@ -970,9 +991,8 @@ export default {
                             item.data_table1 = data.p4??0;  // Add more conditions if necessary
                         } else if (item.id === 5) {
                             item.data_table1 = data.p5??0;  // Add more conditions if necessary
-                        }
-                    });
-
+                        } 
+                    }); 
                     this.jobSpecificCompetencies.forEach(item => {
                         if (item.id === 6) {
                             item.data_table2 = data.p6??0;  // Update based on the API response
@@ -1031,7 +1051,61 @@ export default {
                 console.error('Error fetching data:', error);
             });
         },
+        getjobSpecificCompetencies(dataStaffid) {
+            axios.post('http://localhost:8000/api/showdataposp02', {
+                p_year: this.examine_date.d_date,
+                evalua: this.examine_date.evalua,
+                p_staffid: this.dataStaffid
+            }).then(res => {
+                if (res.data && res.data[0]) {
+                    for (let i = 0; i < this.jobSpecificCompetencies.length; i++) {
+                        const jobData = res.data[0];
+                        // ตรวจสอบและกำหนดค่าให้ jobSpecificCompetencies
+                        this.jobSpecificCompetencies[i]['SCORE'] = jobData[`p${i + 6}`] ?? 0; // ค่าเริ่มต้น 0 หากไม่มีข้อมูล
+                        this.jobSpecificCompetencies[i]['SCORESUM'] = jobData[`pa_${i + 6}`] ?? 0;
 
+                        // ตรวจสอบและกำหนดค่าให้ coreCompetencies
+                        if (this.coreCompetencies[i]) {
+                            this.coreCompetencies[i]['selfAssessment'] = jobData[`pa_${i + 1}`] ?? 0;
+                        } else {
+                            console.warn(`Missing coreCompetencies index ${i}`);
+                        }
+                    }
+                } else {
+                    console.warn('Invalid response data from API:', res.data);
+                }
+            }).catch(error => {
+                console.error('Error fetching data:', error);
+            });
+        }, 
+        async showPostype(postypename,postypenameid){
+            // console.log(postypename); 
+            var postypetext = `ระดับ`+postypename;
+           await axios.post('http://localhost:8000/api/showdatapostypename', {
+                postypename: postypetext,
+                postypenameid: postypenameid
+            })
+            .then(res => {
+                //console.log('Response',res.data);  
+                if (res.data.length > 0) { 
+                    this.jobSpecificCompetencies = res.data; 
+                // } else {
+                //     // Fallback to default data if response doesn't contain expected data
+                //     this.jobSpecificCompetencies = [
+                //         { id: 6, activity: 'ข. 1 การคิดวิเคราะห์', indicator: '1', data_table2: '' },
+                //         { id: 7, activity: 'ข. 2 การดำเนินการเชิงรุก', indicator: '1', data_table2: '' },
+                //         { id: 8, activity: 'ข. 3 ความผูกพันที่มีต่อส่วนราชการ', indicator: '1', data_table2: '' },
+                //         { id: 9, activity: 'ข. 4 การมองภาพองค์รวม', indicator: '1', data_table2: '' },
+                //         { id: 10, activity: 'ข. 5 การสืบเสาะหาข้อมูล', indicator: '1', data_table2: '' },
+                //         { id: 11, activity: 'ข. 6 การตรวจสอบความถูกต้องตามกระบวนงาน', indicator: '1', data_table2: '' }
+                //     ];
+                 }  
+            })
+            .catch(error => {
+                console.error('Error fetching data:', error);
+            });
+           await this.getjobSpecificCompetencies(); 
+        },
     }
 }
 

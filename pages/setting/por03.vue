@@ -3,8 +3,7 @@
         <div class="col-12 lg:col-12 xl:col-12">
             <!-- <div class="col md:col-12 text-right">
                 <Button label="Export" icon="pi pi-file-word" class="mr-2 mb-2 "></Button>
-            </div>   -->
-            <!-- {{ dataPor }} -->
+            </div>   --> 
               <!-- {{ user }} -->​  
             <div class="card mb-0">
                 <div class="formgroup-inline mb-1">
@@ -103,14 +102,16 @@
             <div class="card mb-0">
                 <!-- พฤติกรรมการปฏิบัติราชการ -->
                 <B><h4>2.พฤติกรรมการปฏิบัติราชการ</h4></B>
+                <!-- {{jobSpecificCompetencies}} -->
                 <div class="p-fluid formgrid grid">
                     <!-- ตาราง ก. สมรรถนะหลัก -->
                     <div class="field col-12 md:col-4"> 
                         <table id="ratingTable">
                             <thead>
                                 <tr>
-                                    <th style="width: 60%;">ก. สมรรถนะหลัก (สำหรับข้าราชการและพนักงานทุกคน)</th>
+                                    <th style="width: 40%;">ก. สมรรถนะหลัก (สำหรับข้าราชการและพนักงานทุกคน)</th>
                                     <th style="width: 20%;">(1)ระดับ<br>สมรรถนะ<br>ที่คาดหวัง</th>
+                                    <th style="width: 20%;">ระดับ<br>สมรรถนะ<br>ประเมินตนเอง</th>
                                     <th style="width: 20%;">(2)ระดับ<br>สมรรถนะ<br>ที่แสดงออก</th>
                                 </tr>
                             </thead>
@@ -118,10 +119,20 @@
                                 <tr v-for="(row1, index) in coreCompetencies" :key="index">
                                     <td style="text-align: left;">{{ row1.activity }}</td> 
                                     <td>{{ row1.indicator }}</td>
+                                    <td> 
+                                        <InputText 
+                                            v-model="row1.selfAssessment"
+                                            type="text" 
+                                            placeholder="0" 
+                                            autocomplete="off"  
+                                            @input="validateNumericInput(index)"
+                                            showButtons
+                                        />    
+                                    </td> 
                                     <td>  
                                         <b v-if="row1.data_table1 == '' " style="color: red;">0</b> 
                                         <b v-if="row1.data_table1 != 0 " >{{ row1.data_table1 }}</b> 
-                                    </td>
+                                    </td> 
                                 </tr>
                             </tbody>
                         </table>
@@ -131,18 +142,29 @@
                         <table id="ratingTable">
                             <thead>
                                 <tr>
-                                    <th style="width: 60%;">ข. สมรรถนะเฉพาะตามลักษณะงานที่ปฏิบัติ (สำหรับข้าราชการและพนักงานเฉพาะตามตำแหน่งที่รับผิดชอบตามที่ ก.บ.ม. กำหนด)</th>
+                                    <th style="width: 50%;">ข. สมรรถนะเฉพาะตามลักษณะงานที่ปฏิบัติ (สำหรับข้าราชการและพนักงานเฉพาะตามตำแหน่งที่รับผิดชอบตามที่ ก.บ.ม. กำหนด)</th>
                                     <th style="width: 20%;">(3)ระดับ<br>สมรรถนะ<br>ที่คาดหวัง</th>
+                                    <th style="width: 20%;">ระดับ<br>สมรรถนะ<br>ประเมินตนเอง</th>
                                     <th style="width: 20%;">(4)ระดับ<br>สมรรถนะ<br>ที่แสดงออก</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr v-for="(row2, index) in jobSpecificCompetencies" :key="index">
-                                    <td style="text-align: left;">{{ row2.activity }}</td> 
-                                    <td>{{ row2.indicator }}</td>
+                                <tr v-for="(row2, index) in jobSpecificCompetencies" :key="index"> 
+                                    <td style="text-align: left;">ข. {{ index+6 }} {{ row2.WORK_NAME }}</td> 
+                                    <td>{{ row2.COMPLEVEL }}</td>
                                     <td>
-                                        <b v-if="row2.data_table2 == '' " style="color: red;">0</b> 
-                                        <b v-if="row2.data_table2 != 0 " >{{ row2.data_table2 }}</b> 
+                                        <InputText 
+                                            v-model="row2.selfAssessment"
+                                            type="text" 
+                                            placeholder="0" 
+                                            autocomplete="off"  
+                                            @input="validateNumericInputR2(index)"
+                                            showButtons
+                                        />    
+                                    </td>
+                                    <td>
+                                        <b v-if="row2.SCORE == null ||row2.SCORE == '' " style="color: red;">0</b> 
+                                        <b v-if="row2.SCORE != 0 " >{{ row2.SCORE }}</b> 
                                     </td>
                                 </tr>
                             </tbody>
@@ -153,8 +175,9 @@
                         <table id="ratingTable">
                             <thead>
                                 <tr>
-                                    <th style="width: 60%;">ค. สมรรถนะทางการบริหาร (สำหรับตำแหน่งประเภทบริหารตามที่ ก.บ.ม. กำหนด)</th>
+                                    <th style="width: 40%;">ค. สมรรถนะทางการบริหาร (สำหรับตำแหน่งประเภทบริหารตามที่ ก.บ.ม. กำหนด)</th>
                                     <th style="width: 20%;">(5)ระดับ<br>สมรรถนะ<br>ที่คาดหวัง</th>
+                                    <th style="width: 20%;">ระดับ<br>สมรรถนะ<br>ประเมินตนเอง</th>
                                     <th style="width: 20%;">(6)ระดับ<br>สมรรถนะ<br>ที่แสดงออก</th>
                                 </tr>
                             </thead>
@@ -163,12 +186,16 @@
                                     <td style="text-align: left;">{{ row3.activity }}</td> 
                                     <td></td>
                                     <td></td>
+                                    <td></td>
                                 </tr>
                             </tbody>
-                        </table>
-                    </div>
+                        </table> 
+                    </div> 
                 </div>
             </div> 
+            <div class="ml-4 mr-4" style="text-align: center;">
+            <Button icon="pi pi-save" severity="primary" class="mb-2 mr-2" label="บันทึกระดับสมรรถนะประเมินตนเอง" @click="saveAssess" />  
+        </div>  
             <br>
             <!-- เพิ่มทักษะที่ต้องการพัฒนา -->
             <div class="card mb-0"> 
@@ -352,6 +379,7 @@ import { ref, onMounted } from 'vue';
 import axios from 'axios';
 import Swal from 'sweetalert2'
 import { saveAs } from 'file-saver'; 
+import InputText from 'primevue/inputtext';
     export default { 
         props: {
             dataPor: {
@@ -405,21 +433,21 @@ import { saveAs } from 'file-saver';
 /*=========== 2.พฤติกรรมการปฏิบัติราชการ =============*/ 
                 //ตาราง ก. สมรรถนะหลัก
            coreCompetencies: [
-                { id: 1, activity: 'ก. 1 การมุ่งผลสัมฤทธิ์', indicator: '1', data_table1: '' },
-                { id: 2, activity: 'ก. 2 การบริการที่ดี', indicator: '1', data_table1: '' },
-                { id: 3, activity: 'ก. 3 การสั่งสมความเชี่ยวชาญในงานอาชีพ', indicator: '1', data_table1: '' },
-                { id: 4, activity: 'ก. 4 การยึดมั่นในความถูกต้องชอบธรรมและจริยธรรม', indicator: '1', data_table1: '' },
-                { id: 5, activity: 'ก. 5 การทำงานเป็นทีม', indicator: '1', data_table1: '' }
+                { id: 1, activity: 'ก. 1 การมุ่งผลสัมฤทธิ์', indicator: '', data_table1: '', selfAssessment: '' },
+                { id: 2, activity: 'ก. 2 การบริการที่ดี', indicator: '', data_table1: '', selfAssessment: '' },
+                { id: 3, activity: 'ก. 3 การสั่งสมความเชี่ยวชาญในงานอาชีพ', indicator: '', selfAssessment: '', data_table1: '', selfAssessment: '' },
+                { id: 4, activity: 'ก. 4 การยึดมั่นในความถูกต้องชอบธรรมและจริยธรรม', indicator: '', data_table1: '', selfAssessment: '' },
+                { id: 5, activity: 'ก. 5 การทำงานเป็นทีม', indicator: '', data_table1: '', selfAssessment: '' }
             ],
             //ตาราง ข. สมรรถนะเฉพาะตามลักษณะงานที่ปฏิบัติ
-            jobSpecificCompetencies: [
-                { id: 6, activity: 'ข. 1 การคิดวิเคราะห์', indicator: '1', data_table2: '' },
-                { id: 7, activity: 'ข. 2 การดำเนินการเชิงรุก', indicator: '1', data_table2: '' },
-                { id: 8, activity: 'ข. 3 ความผูกพันที่มีต่อส่วนราชการ', indicator: '1', data_table2: '' },
-                { id: 9, activity: 'ข. 4 การมองภาพองค์รวม', indicator: '1', data_table2: '' },
-                { id: 10, activity: 'ข. 5 การสืบเสาะหาข้อมูล', indicator: '1', data_table2: '' },
-                { id: 11, activity: 'ข. 6 การตรวจสอบความถูกต้องตามกระบวนงาน', indicator: '1', data_table2: '' }
-            ],
+            jobSpecificCompetencies: [],
+                //{ id: 6, activity: 'ข. 1 การคิดวิเคราะห์', indicator: '1', data_table2: '' },
+            //     { id: 7, activity: 'ข. 2 การดำเนินการเชิงรุก', indicator: '1', data_table2: '' },
+            //     { id: 8, activity: 'ข. 3 ความผูกพันที่มีต่อส่วนราชการ', indicator: '1', data_table2: '' },
+            //     { id: 9, activity: 'ข. 4 การมองภาพองค์รวม', indicator: '1', data_table2: '' },
+            //     { id: 10, activity: 'ข. 5 การสืบเสาะหาข้อมูล', indicator: '1', data_table2: '' },
+            //     { id: 11, activity: 'ข. 6 การตรวจสอบความถูกต้องตามกระบวนงาน', indicator: '1', data_table2: '' }
+            // ],
             //ตาราง ค. สมรรถนะอื่นๆ
             otherCompetencies: [
                 { id: 12, activity: 'ค. 1 สภาวะผู้นำ', indicator: '0', data_table3: '' },
@@ -466,7 +494,7 @@ import { saveAs } from 'file-saver';
                 p04_re1: null,
                 p04_re2: null,
                 p04_re3: null,
-                products_Tab3: [],
+                products_Tab3: [], 
             }
         }, 
         async mounted(){  
@@ -475,12 +503,13 @@ import { saveAs } from 'file-saver';
             //console.log(user.user.name); 
             const {STAFFID, SCOPES} = user.user.name
             const {staffdepartment, groupid, staffdepartmentname, groupname} = SCOPES
-            await this.setSession(STAFFID,staffdepartment,groupid);   
+            await this.setSession(STAFFID,staffdepartment,groupid,user.user.name.POSTYPENAME,user.user.name.POSITIONNAMEID);   
         }, 
         watch: { 
             tab3Reload(v) { 
                 // console.log("por03 tab3Reload",v);
-                this.showDataP03(); 
+                this.showDataP03();  
+
             }, 
             // เฝ้าดูการเปลี่ยนแปลงของ dataPor
             dataPor: {
@@ -489,17 +518,30 @@ import { saveAs } from 'file-saver';
                     this.showDataP03();
                     this.showdataPo();
                     this.chkp03data();
+                    this.getjobSpecificCompetencies(); 
+                    this.showAssess();
                     // ทำสิ่งที่ต้องการเมื่อ dataPor เปลี่ยนแปลง
                 },
                 deep: true // ใช้ deep: true เพื่อดูการเปลี่ยนแปลงภายใน object
             }
         },
         methods: { 
-            setSession (staffid_Main,facid_Main,groupid_Main) { 
+            setSession (staffid_Main,facid_Main,groupid_Main,postypename,postypenameid) { 
                 this.staffid_Main = staffid_Main
                 this.facid_Main = facid_Main
                 this.groupid_Main = groupid_Main  
+                this.postypename = postypename    
+                this.postypenameid = postypenameid 
                 // console.log('setSession: ',staffid_Main,facid_Main,groupid_Main);  
+            },
+            // กรองเฉพาะตัวเลข
+            validateNumericInput(index) { 
+                const input = this.coreCompetencies[index].selfAssessment;
+                this.coreCompetencies[index].selfAssessment = input.replace(/[^0-9]/g, ''); // Only allow numeric input
+            },
+            validateNumericInputR2(index) { 
+                const input = this.jobSpecificCompetencies[index].selfAssessment;
+                this.jobSpecificCompetencies[index].selfAssessment = input.replace(/[^0-9]/g, ''); // Only allow numeric input
             },
             // ดึงข้อมูลเข้าตาราง
             async showDataP03(){
@@ -808,70 +850,153 @@ import { saveAs } from 'file-saver';
                     });
                 }
             }, 
+            getjobSpecificCompetencies(){
+            //console.log(this.staffid_Main,this.dataPor);
+            
+            axios.post('http://localhost:8000/api/showdataposp02', { 
+                p_year: this.dataPor.d_date,
+                evalua: this.dataPor.evalua,
+                p_staffid: this.staffid_Main
+            })
+            .then(res => {
+                for (let i = 0; i < this.jobSpecificCompetencies.length; i++) { // แก้ไขเงื่อนไขที่นี่
+                    // ตรวจสอบว่า `res.data[0][`p${i+6}`]` มีค่าก่อนตั้งค่า
+                    if (res.data[0] && res.data[0][`p${i+6}`] !== undefined) {
+                        this.jobSpecificCompetencies[i]['SCORE'] = res.data[0][`p${i+6}`]; 
+                    } else {
+                        console.warn(`Missing data for p${i+6}`);
+                    }
+                }
+                // console.log('Response', res.data);
+            })
+            },
             showdataPo(){  
-                    // ตั้งค่า coreCompetencies กลับไปเป็นค่าเริ่มต้น
-                    this.coreCompetencies = [
-                        { id: 1, activity: 'ก. 1 การมุ่งผลสัมฤทธิ์', indicator: '1', data_table1: '' },
-                        { id: 2, activity: 'ก. 2 การบริการที่ดี', indicator: '1', data_table1: '' },
-                        { id: 3, activity: 'ก. 3 การสั่งสมความเชี่ยวชาญในงานอาชีพ', indicator: '1', data_table1: '' },
-                        { id: 4, activity: 'ก. 4 การยึดมั่นในความถูกต้องชอบธรรมและจริยธรรม', indicator: '1', data_table1: '' },
-                        { id: 5, activity: 'ก. 5 การทำงานเป็นทีม', indicator: '1', data_table1: '' }
-                    ];  
-                    
-                    // ตั้งค่า jobSpecificCompetencies กลับไปเป็นค่าเริ่มต้น
-                    this.jobSpecificCompetencies = [
-                        { id: 6, activity: 'ข. 1 การคิดวิเคราะห์', indicator: '1', data_table2: '' },
-                        { id: 7, activity: 'ข. 2 การดำเนินการเชิงรุก', indicator: '1', data_table2: '' },
-                        { id: 8, activity: 'ข. 3 ความผูกพันที่มีต่อส่วนราชการ', indicator: '1', data_table2: '' },
-                        { id: 9, activity: 'ข. 4 การมองภาพองค์รวม', indicator: '1', data_table2: '' },
-                        { id: 10, activity: 'ข. 5 การสืบเสาะหาข้อมูล', indicator: '1', data_table2: '' },
-                        { id: 11, activity: 'ข. 6 การตรวจสอบความถูกต้องตามกระบวนงาน', indicator: '1', data_table2: '' }
-                    ]; 
-                    
-                    axios.post('http://localhost:8000/api/showDataPo',{
-                        staff_id: this.staffid_Main,
-                        fac_id: this.facid_Main,
-                        year_id: this.dataPor.d_date,
-                        record: this.dataPor.evalua,
-                    }).then(res => {     
-                         //console.log(res.data);    
-                        if(res.data.length > 0){
-                            const data = res.data[0];
-                            this.coreCompetencies.forEach(item => {
-                                if (item.id === 1) {
-                                    item.data_table1 = data.p1;  // Update based on the API response
-                                } else if (item.id === 2) {
-                                    item.data_table1 = data.p2;  // Update based on the API response
-                                } else if (item.id === 3) {
-                                    item.data_table1 = data.p3;  // Add more conditions if necessary
-                                } else if (item.id === 4) {
-                                    item.data_table1 = data.p4;  // Add more conditions if necessary
-                                } else if (item.id === 5) {
-                                    item.data_table1 = data.p5;  // Add more conditions if necessary
-                                }
-                            });
+                let postypetext = `ระดับ${this.postypename}`;
+                const levelMapping = {
+                    'ระดับปฏิบัติการ': 1,
+                    'ระดับชำนาญการ': 2,
+                    'ระดับชำนาญการพิเศษ': 3,
+                    'อาจารย์': 3,
+                    'ระดับเชี่ยวชาญ': 4,
+                    'ระดับเชี่ยวชาญพิเศษ': 5
+                };
+                let xr = levelMapping[postypetext] || 0;
 
-                            this.jobSpecificCompetencies.forEach(item => {
-                                if (item.id === 6) {
-                                    item.data_table2 = data.p6;  // Update based on the API response
-                                } else if (item.id === 7) {
-                                    item.data_table2 = data.p7;  // Update based on the API response
-                                } else if (item.id === 8) {
-                                    item.data_table2 = data.p8;  // Add more conditions if necessary
-                                } else if (item.id === 9) {
-                                    item.data_table2 = data.p9;  // Add more conditions if necessary
-                                } else if (item.id === 10) {
-                                    item.data_table2 = data.p10;  // Add more conditions if necessary
-                                } else if (item.id === 11) {
-                                    item.data_table2 = data.p11;  // Add more conditions if necessary
-                                }
-                            });
-                        } 
-                    })
-            .catch(error => {
-                console.error('Error:', error);
-            });
-            }, 
+                // ตั้งค่า coreCompetencies กลับไปเป็นค่าเริ่มต้น
+                this.coreCompetencies = [
+                    { id: 1, activity: 'ก. 1 การมุ่งผลสัมฤทธิ์', indicator: xr, data_table1: '', selfAssessment: '' },
+                    { id: 2, activity: 'ก. 2 การบริการที่ดี', indicator: xr, data_table1: '', selfAssessment: '' },
+                    { id: 3, activity: 'ก. 3 การสั่งสมความเชี่ยวชาญในงานอาชีพ', indicator: xr, data_table1: '', selfAssessment: '' },
+                    { id: 4, activity: 'ก. 4 การยึดมั่นในความถูกต้องชอบธรรมและจริยธรรม', indicator: xr, data_table1: '', selfAssessment: '' },
+                    { id: 5, activity: 'ก. 5 การทำงานเป็นทีม', indicator: xr, data_table1: '', selfAssessment: '' }
+                ];  
+                
+                
+                // ตั้งค่า jobSpecificCompetencies กลับไปเป็นค่าเริ่มต้น 
+                this.showPostype(this.postypename,this.postypenameid); 
+                
+                axios.post('http://localhost:8000/api/showDataPo',{
+                    staff_id: this.staffid_Main,
+                    fac_id: this.facid_Main,
+                    year_id: this.dataPor.d_date,
+                    record: this.dataPor.evalua,
+                    postypename: postypetext
+                }).then(res => {     
+                    // console.log('showDataPo > ',res.data);    
+                    if(res.data.length > 0){
+                        const data = res.data[0]; 
+                        this.coreCompetencies = this.coreCompetencies.map(item => {
+                            if (data[`p${item.id}`] !== undefined) {
+                                return {
+                                    ...item,
+                                    data_table1: data[`p${item.id}`]
+                                };
+                            }
+                            return item;
+                        }); 
+
+                        // this.jobSpecificCompetencies.forEach(item => {
+                        //     if (item.id === 6) {
+                        //         item.data_table2 = data.p6;  // Update based on the API response
+                        //     } else if (item.id === 7) {
+                        //         item.data_table2 = data.p7;  // Update based on the API response
+                        //     } else if (item.id === 8) {
+                        //         item.data_table2 = data.p8;  // Add more conditions if necessary
+                        //     } else if (item.id === 9) {
+                        //         item.data_table2 = data.p9;  // Add more conditions if necessary
+                        //     } else if (item.id === 10) {
+                        //         item.data_table2 = data.p10;  // Add more conditions if necessary
+                        //     } else if (item.id === 11) {
+                        //         item.data_table2 = data.p11;  // Add more conditions if necessary
+                        //     }
+                        // });
+                    } 
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+            },
+            showPostype(postypename,postypenameid){
+                // console.log(postypename); 
+                var postypetext = `ระดับ`+postypename;
+                axios.post('http://localhost:8000/api/showdatapostypename', {
+                    postypename: postypetext,
+                    postypenameid: postypenameid
+                })
+                .then(res => {
+                    // console.log('Response',res.data);  
+                    if (res.data.length > 0) { 
+                        this.jobSpecificCompetencies = res.data;
+                    }
+                    // } else {
+                    //     // Fallback to default data if response doesn't contain expected data
+                    //     this.jobSpecificCompetencies = [
+                    //         { id: 6, activity: 'ข. 1 การคิดวิเคราะห์', indicator: '1', data_table2: '' },
+                    //         { id: 7, activity: 'ข. 2 การดำเนินการเชิงรุก', indicator: '1', data_table2: '' },
+                    //         { id: 8, activity: 'ข. 3 ความผูกพันที่มีต่อส่วนราชการ', indicator: '1', data_table2: '' },
+                    //         { id: 9, activity: 'ข. 4 การมองภาพองค์รวม', indicator: '1', data_table2: '' },
+                    //         { id: 10, activity: 'ข. 5 การสืบเสาะหาข้อมูล', indicator: '1', data_table2: '' },
+                    //         { id: 11, activity: 'ข. 6 การตรวจสอบความถูกต้องตามกระบวนงาน', indicator: '1', data_table2: '' }
+                    //     ];
+                    // }  
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                }); 
+            },
+            showdatator() {  
+                //console.log(this.dataPor.d_date,scoreA04); 
+                axios.post('http://localhost:8000/api/showdatator', {
+                    p_year: this.dataPor.d_date,
+                    evalua: this.dataPor.evalua,
+                    p_staffid: this.staffid_Main
+                })
+                .then(res => {
+                    //console.log('Response',res.data);  
+                    this.assessorText = res.data[0].assessor; 
+                    this.assessor_positionText = res.data[0].assessor_position;
+                    this.showscoresum = res.data[0] 
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                });
+            },
+            showjobSpecificCompetencies (){
+                axios.post('http://localhost:8000/api/showdataposp02', { 
+                p_year: this.dataPor.d_date,
+                evalua: this.dataPor.evalua,
+                p_staffid: this.staffid_Mainห
+                })
+                .then(res => {
+                    //console.log('Response',res.data);  
+                    this.assessorText = res.data[0].assessor; 
+                    this.assessor_positionText = res.data[0].assessor_position;
+                    this.showscoresum = res.data[0] 
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                });
+            } ,
 /*============= ความรู้/ทักษะ/สมรรถนะ ที่ต้องการพัฒนา =============*/ 
             chkp03data(){ 
                 this.products_Tab3 = [];
@@ -947,9 +1072,101 @@ import { saveAs } from 'file-saver';
                     console.error('Error:', error);
                 });   
 
+            },  
+            async saveAssess() {
+                try {
+                    const response = await axios.post('http://localhost:8000/api/savedataAssess', {
+                        p_staffid: this.staffid_Main,
+                        fac_id: this.facid_Main,
+                        p_year: this.dataPor.d_date,
+                        evalua: this.dataPor.evalua, 
+                        corecompetencies: this.coreCompetencies,
+                        jobspecificcompetencies: this.jobSpecificCompetencies,
+                    });
+
+                    // Assuming the response is successful
+                    Swal.fire({
+                        position: 'top-end',
+                        icon: 'success',
+                        title: 'ข้ลมูลผลการประเมินถูกบันทึกเสร็จสิ้น',
+                        showConfirmButton: false,
+                        timer: 1000
+                    });
+
+                } catch (error) {
+                    console.error('Error saving data:', error);
+                    Swal.fire({
+                        position: 'top-end',
+                        icon: 'error',
+                        title: 'เกิดข้อผิดพลาดในการบันทึกข้อมูล',
+                        showConfirmButton: false,
+                        timer: 1000
+                    });
+                }
+            },  
+            showAssess( ) {
+                axios .post('http://localhost:8000/api/showdataAssess', { 
+                    staff_id:this.staffid_Main,
+                    fac_id: this.facid_Main,
+                    year: this.dataPor.d_date,
+                    record: this.dataPor.evalua, 
+                    coreCompetencies: this.coreCompetencies,
+                    jobSpecificCompetencies: this.jobSpecificCompetencies,   
+                })
+                .then((res) => {
+                    //console.log(res.data);
+                    if (res.data.length > 0) {
+                        const data = res.data[0];
+                        this.coreCompetencies.forEach((item) => {
+                            if (item.id === 1) {
+                                item.selfAssessment = data.pa_1 ?? 0;  
+                            } else if (item.id === 2) {
+                                item.selfAssessment = data.pa_2 ?? 0;  
+                            } else if (item.id === 3) {
+                                item.selfAssessment = data.pa_3 ?? 0;  
+                            } else if (item.id === 4) {
+                                item.selfAssessment = data.pa_4 ?? 0;  
+                            } else if (item.id === 5) {
+                                item.selfAssessment = data.pa_5 ?? 0;  
+                            }
+                        });
+
+                        this.jobSpecificCompetencies.forEach((item) => {
+                            if (item.id === 6) {
+                                item.selfAssessment = data.pa_6 ?? 0;  
+                            } else if (item.id === 7) {
+                                item.selfAssessment = data.pa_7 ?? 0;  
+                            } else if (item.id === 8) {
+                                item.selfAssessment = data.pa_8 ?? 0;  
+                            } else if (item.id === 9) {
+                                item.selfAssessment = data.pa_9 ?? 0;  
+                            } else if (item.id === 10) {
+                                item.selfAssessment = data.pa_10 ?? 0;  
+                            } else if (item.id === 11) {
+                                item.selfAssessment = data.pa_11 ?? 0;  
+                            }
+                        });
+
+                        // Update other fields
+                        this.improvements = data.improvements ?? '- ไม่มีข้อมูล -';
+                        this.suggestions = data.suggestions ?? '- ไม่มีข้อมูล -';
+                    }
+                        for (let i = 0; i < this.jobSpecificCompetencies.length; i++) { // แก้ไขเงื่อนไขที่นี่
+                        // ตรวจสอบว่า `res.data[0][`p${i+6}`]` มีค่าก่อนตั้งค่า
+                        if (res.data[0] && res.data[0][`pa_${i+6}`] !== undefined) {
+                            this.jobSpecificCompetencies[i]['selfAssessment'] = res.data[0][`pa_${i+6}`]; 
+                        } else {
+                            console.warn(`Missing data for pa_${i+6}`);
+                        }
+                    }
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                }); 
             }, 
-        } 
-    }
+        },
+    } 
+    
 
     </script>
 

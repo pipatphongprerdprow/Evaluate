@@ -4,22 +4,31 @@
     </div> --> 
     <div class="card">
         <h3 class="mb-4" style="text-align: left;"><i class="pi pi-folder-open" style="font-size: x-large;"></i> แบบ ป02</h3>
-        <h4>ข้อตกลงและแบบการประเมินผลสัมฤทธิ์ของงานของข้าราชการและพนักงาน สังกัดมหาวิทยาลัยมหาสารคาม (องค์ประกอบที่ 2)</h4><br> 
+        <h4>ข้อตกลงและแบบการประเมินผลสัมฤทธิ์ของงานของข้าราชการและพนักงาน สังกัดมหาวิทยาลัยมหาสารคาม (องค์ประกอบที่ 2)</h4><br>   
+          <!-- {{ jobSpecificCompetencies }} -->
         <div class="p-fluid formgrid grid">  
             <!-- ตาราง ก. สมรรถนะหลัก -->
             <div class="field col-12 md:col-4"> 
                 <table id="ratingTable">
                     <thead>
                         <tr>
-                            <th style="width: 60%;">ก. สมรรถนะหลัก (สำหรับข้าราชการและพนักงานทุกคน)</th>
+                            <th style="width: 40%;">ก. สมรรถนะหลัก (สำหรับข้าราชการและพนักงานทุกคน)</th>
                             <th style="width: 20%;">(1)ระดับ<br>สมรรถนะ<br>ที่คาดหวัง</th>
+                            <th style="width: 20%;">ระดับ<br>สมรรถนะ<br>ประเมินตนเอง</th>
                             <th style="width: 20%;">(2)ระดับ<br>สมรรถนะ<br>ที่แสดงออก</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr v-for="(row1, index) in coreCompetencies" :key="index">
-                            <td style="text-align: left;">{{ row1.activity }}</td> 
-                            <td>{{ row1.indicator }}</td>
+                            <td style="text-align: left;">{{ row1.activity }}</td>  
+                            <td>
+                                <p>{{ row1.indicator }}</p>
+                            </td>   
+                            <!-- <td style="color: blue"><b>{{row1.selfAssessment}}</b></td> -->
+                            <td>  
+                                <b v-if="row1.selfAssessment == '' ||  row1.selfAssessment == null" style="color: red;">0</b> 
+                                <b v-if="row1.selfAssessment != 0 " style="color: blue" >{{ row1.selfAssessment }}</b> 
+                            </td>
                             <td>  
                                 <b v-if="row1.data_table1 == '' " style="color: red;">0</b> 
                                 <b v-if="row1.data_table1 != 0 " >{{ row1.data_table1 }}</b> 
@@ -27,14 +36,15 @@
                         </tr>
                     </tbody>
                 </table>
-            </div>
+            </div> 
             <!-- ตาราง ข. สมรรถนะเฉพาะตามลักษณะงานที่ปฏิบัติ -->
             <div class="field col-12 md:col-4"> 
                 <table id="ratingTable">
                     <thead>
                         <tr>
-                            <th style="width: 60%;">ข. สมรรถนะเฉพาะตามลักษณะงานที่ปฏิบัติ (สำหรับข้าราชการและพนักงานเฉพาะตามตำแหน่งที่รับผิดชอบตามที่ ก.บ.ม. กำหนด)</th>
+                            <th style="width: 50%;">ข. สมรรถนะเฉพาะตามลักษณะงานที่ปฏิบัติ (สำหรับข้าราชการและพนักงานเฉพาะตามตำแหน่งที่รับผิดชอบตามที่ ก.บ.ม. กำหนด)</th>
                             <th style="width: 20%;">(3)ระดับ<br>สมรรถนะ<br>ที่คาดหวัง</th>
+                            <th style="width: 20%;">ระดับ<br>สมรรถนะ<br>ประเมินตนเอง</th>
                             <th style="width: 20%;">(4)ระดับ<br>สมรรถนะ<br>ที่แสดงออก</th>
                         </tr>
                     </thead>
@@ -42,8 +52,13 @@
                         <tr v-for="(row2, index) in jobSpecificCompetencies" :key="index"> 
                             <td style="text-align: left;">ข. {{ index+6 }} {{ row2.WORK_NAME }}</td> 
                             <td>{{ row2.COMPLEVEL }}</td>
+                            <!-- <td style="color: blue;"><b>{{ row2.SCOREPERSON}}</b></td> -->
+                            <td>  
+                                <b v-if="row2.SCOREPERSON == '' || row2.SCOREPERSON == null" style="color: red;">0</b> 
+                                <b v-if="row2.SCOREPERSON != 0 " style="color: blue;" >{{ row2.SCOREPERSON }}</b> 
+                            </td>
                             <td>
-                                <b v-if="row2.SCORE == '' " style="color: red;">0</b> 
+                                <b v-if="row2.SCORE == null ||row2.SCORE == '' " style="color: red;">0</b> 
                                 <b v-if="row2.SCORE != 0 " >{{ row2.SCORE }}</b> 
                             </td>
                         </tr>
@@ -57,12 +72,14 @@
                         <tr>
                             <th style="width: 60%;">ค. สมรรถนะทางการบริหาร (สำหรับตำแหน่งประเภทบริหารตามที่ ก.บ.ม. กำหนด)</th>
                             <th style="width: 20%;">(5)ระดับ<br>สมรรถนะ<br>ที่คาดหวัง</th>
-                            <th style="width: 20%;">(6)ระดับ<br>สมรรถนะ<br>ที่แสดงออก</th>
+                            <th style="width: 20%;">ระดับ<br>สมรรถนะ<br>ประเมิน<br>ตนเอง</th>
+                            <th style="width: 20%;">(6)ระดับ<br>สมรรถนะ<br>ที่แสดง<br>ออก</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr v-for="(row3, index) in otherCompetencies" :key="index">
                             <td style="text-align: left;">{{ row3.activity }}</td> 
+                            <td></td>
                             <td></td>
                             <td></td>
                         </tr>
@@ -94,11 +111,11 @@ export default {
         return {
            //ตาราง ก. สมรรถนะหลัก
            coreCompetencies: [
-                { id: 1, activity: 'ก. 1 การมุ่งผลสัมฤทธิ์', indicator: '1', data_table1: '' },
-                { id: 2, activity: 'ก. 2 การบริการที่ดี', indicator: '1', data_table1: '' },
-                { id: 3, activity: 'ก. 3 การสั่งสมความเชี่ยวชาญในงานอาชีพ', indicator: '1', data_table1: '' },
-                { id: 4, activity: 'ก. 4 การยึดมั่นในความถูกต้องชอบธรรมและจริยธรรม', indicator: '1', data_table1: '' },
-                { id: 5, activity: 'ก. 5 การทำงานเป็นทีม', indicator: '1', data_table1: '' }
+                { id: 1, activity: 'ก. 1 การมุ่งผลสัมฤทธิ์', indicator: '', data_table1: '',selfAssessment:'' },
+                { id: 2, activity: 'ก. 2 การบริการที่ดี', indicator: '', data_table1: '',selfAssessment:'' },
+                { id: 3, activity: 'ก. 3 การสั่งสมความเชี่ยวชาญในงานอาชีพ', indicator: '', data_table1: '',selfAssessment:'' },
+                { id: 4, activity: 'ก. 4 การยึดมั่นในความถูกต้องชอบธรรมและจริยธรรม', indicator: '', data_table1: '',selfAssessment:'' },
+                { id: 5, activity: 'ก. 5 การทำงานเป็นทีม', indicator: '', data_table1: '',selfAssessment:'' }
             ],
             //ตาราง ข. สมรรถนะเฉพาะตามลักษณะงานที่ปฏิบัติ
             jobSpecificCompetencies: [],
@@ -117,7 +134,8 @@ export default {
                 { id: 14, activity: 'ค. 3 การวางกลยุทธ์ภาครัฐ', indicator: '0', data_table3: '' },
                 { id: 15, activity: 'ค. 4 ศักยภาพเพื่อนำการปรับเปลี่ยน', indicator: '0', data_table3: '' },
                 { id: 16, activity: 'ค. 5 การสอนงานและการมอบหมายงาน', indicator: '0', data_table3: '' }
-            ], 
+            ],  
+            postypetext: null,
              
         };   
     }, 
@@ -165,57 +183,64 @@ export default {
                 p_staffid: this.staffid_Main
             })
             .then(res => {
-                for(let i=0;i<=this.jobSpecificCompetencies.length;i++){
-                    //console.log(this.jobSpecificCompetencies[i]);
-                     
-                    this.jobSpecificCompetencies[i]['SCORE'] = res.data[0][`p${i+6}`];
-                    
+                for (let i = 0; i < this.jobSpecificCompetencies.length; i++) { // แก้ไขเงื่อนไขที่นี่
+                    // ตรวจสอบว่า `res.data[0][`p${i+6}`]` มีค่าก่อนตั้งค่า
+                    if (res.data[0] && res.data[0][`p${i+6}`] !== undefined) {
+                        this.jobSpecificCompetencies[i]['SCORE'] = res.data[0][`p${i+6}`];
+                        this.jobSpecificCompetencies[i]['SCOREPERSON'] = res.data[0][`pa_${i+6}`];
+                    } else {
+                        console.warn(`Missing data for p${i+6}`);
+                    }
                 }
-                 //console.log('Response',res.data);  
-                // this.assessorText = res.data[0].assessor; 
-                // this.assessor_positionText = res.data[0].assessor_position;
-                // this.showscoresum = res.data[0] 
+                // console.log('Response', res.data);
             })
-            .catch(error => {
-                console.error('Error fetching data:', error);
-            });
         },
         showdataPo(){  
+            let postypetext = `ระดับ${this.postypename}`;
+            const levelMapping = {
+                'ระดับปฏิบัติการ': 1,
+                'ระดับชำนาญการ': 2,
+                'ระดับชำนาญการพิเศษ': 3,
+                'อาจารย์': 3,
+                'ระดับเชี่ยวชาญ': 4,
+                'ระดับเชี่ยวชาญพิเศษ': 5
+            };
+            let xr = levelMapping[postypetext] || 0;
+
             // ตั้งค่า coreCompetencies กลับไปเป็นค่าเริ่มต้น
             this.coreCompetencies = [
-                { id: 1, activity: 'ก. 1 การมุ่งผลสัมฤทธิ์', indicator: '1', data_table1: '' },
-                { id: 2, activity: 'ก. 2 การบริการที่ดี', indicator: '1', data_table1: '' },
-                { id: 3, activity: 'ก. 3 การสั่งสมความเชี่ยวชาญในงานอาชีพ', indicator: '1', data_table1: '' },
-                { id: 4, activity: 'ก. 4 การยึดมั่นในความถูกต้องชอบธรรมและจริยธรรม', indicator: '1', data_table1: '' },
-                { id: 5, activity: 'ก. 5 การทำงานเป็นทีม', indicator: '1', data_table1: '' }
+                { id: 1, activity: 'ก. 1 การมุ่งผลสัมฤทธิ์', indicator: xr, data_table1: '',selfAssessment:'' },
+                { id: 2, activity: 'ก. 2 การบริการที่ดี', indicator: xr, data_table1: '',selfAssessment:''  },
+                { id: 3, activity: 'ก. 3 การสั่งสมความเชี่ยวชาญในงานอาชีพ', indicator: xr, data_table1: '',selfAssessment:''  },
+                { id: 4, activity: 'ก. 4 การยึดมั่นในความถูกต้องชอบธรรมและจริยธรรม', indicator: xr, data_table1: '',selfAssessment:''  },
+                { id: 5, activity: 'ก. 5 การทำงานเป็นทีม', indicator: xr, data_table1: '',selfAssessment:''  }
             ];  
             
             
             // ตั้งค่า jobSpecificCompetencies กลับไปเป็นค่าเริ่มต้น 
             this.showPostype(this.postypename,this.postypenameid);
-
+  
+            
             axios.post('http://localhost:8000/api/showDataPo',{
                 staff_id: this.staffid_Main,
                 fac_id: this.facid_Main,
                 year_id: this.dataPor.d_date,
                 record: this.dataPor.evalua,
+                postypename: postypetext
             }).then(res => {     
-                // console.log(res.data);    
+                // console.log('showDataPo > ',res.data);    
                 if(res.data.length > 0){
-                    const data = res.data[0];
-                    this.coreCompetencies.forEach(item => {
-                        if (item.id === 1) {
-                            item.data_table1 = data.p1;  // Update based on the API response
-                        } else if (item.id === 2) {
-                            item.data_table1 = data.p2;  // Update based on the API response
-                        } else if (item.id === 3) {
-                            item.data_table1 = data.p3;  // Add more conditions if necessary
-                        } else if (item.id === 4) {
-                            item.data_table1 = data.p4;  // Add more conditions if necessary
-                        } else if (item.id === 5) {
-                            item.data_table1 = data.p5;  // Add more conditions if necessary
+                    const data = res.data[0]; 
+                    this.coreCompetencies = this.coreCompetencies.map(item => {
+                        if (data[`p${item.id}`] !== undefined) {
+                            return {
+                                ...item,
+                                data_table1: data[`p${item.id}`],
+                                selfAssessment: data[`pa_${item.id}`]
+                            };
                         }
-                    });
+                        return item;
+                    }); 
 
                     // this.jobSpecificCompetencies.forEach(item => {
                     //     if (item.id === 6) {
@@ -246,7 +271,7 @@ export default {
                 postypenameid: postypenameid
             })
             .then(res => {
-                console.log('Response',res.data);  
+                // console.log('Response',res.data);  
                 if (res.data.length > 0) { 
                     this.jobSpecificCompetencies = res.data;
                 }

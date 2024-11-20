@@ -5,7 +5,7 @@
                 <div class="formgroup-inline mb-1">
                     <div class="col md:col-6"> 
                         <h3 class="mb-4 card-header"><i class="pi pi-credit-card" style="font-size: x-large;"></i> ตรวจติดตามแบบประเมิน</h3>    
-                    </div>  
+                    </div>   
                     <div class="col md:col-5" >  
                         <label for="tracking_date"></label>
                         <Dropdown v-model="tracking_date" :options="tracking_dates" optionLabel="d_evaluationround" placeholder="กรุณาเลือกรอบการประเมิน" style=" max-width: 500px; width: 100%"></Dropdown> 
@@ -69,7 +69,7 @@
                                                         <th rowspan="2" style="width: 20%;">ตัวชี้วัด / เกณฑ์การประเมิน</th>
                                                         <th rowspan="2" style="width: 20%;">รางานการปฏิบัติราชการ<br> ตามตัวชี้วัด/เกณฑ์การประเมิน</th>
                                                         <th rowspan="2" style="width: 20%;">หลักฐานที่แสดงถึงผลการปฏิบัติราชการตามเกณฑ์การประเมิน(หลักฐานเชิงประจักษ์)</th> 
-                                                         <th rowspan="2" style="width: 10%;">ค่าคะแนนประเมินตนเอง</th>  
+                                                        <th rowspan="2" style="width: 10%;">ค่าคะแนนประเมินตนเอง</th>  
                                                         <th colspan="5" style="width: 15%;">ค่าคะแนนที่ได้</th>  
                                                     </tr> 
                                                     <tr>
@@ -147,28 +147,34 @@
                                             <div class="p-fluid formgrid grid">
                                                 <!-- ตาราง ก. สมรรถนะหลัก -->
                                                 <div class="field col-12 md:col-4"> 
+                                                   
                                                     <table id="ratingTable">
                                                         <thead>
                                                             <tr>
-                                                                <th style="width: 60%;">ก. สมรรถนะหลัก (สำหรับข้าราชการและพนักงานทุกคน)</th>
+                                                                <th style="width: 50%;">ก. สมรรถนะหลัก (สำหรับข้าราชการและพนักงานทุกคน)</th>
                                                                 <th style="width: 20%;">(1)ระดับ<br>สมรรถนะ<br>ที่คาดหวัง</th>
+                                                                <th style="width: 20%;">(1)ระดับ<br>สมรรถนะ<br>ประเมินตนเอง</th> 
                                                                 <th style="width: 20%;">(2)ระดับ<br>สมรรถนะ<br>ที่แสดงออก</th>
                                                             </tr>
                                                         </thead>
-                                                        <tbody>
+                                                        <tbody> 
                                                             <tr v-for="(row1, index) in coreCompetencies" :key="index">
                                                                 <td style="text-align: left;">{{ row1.activity }}</td> 
                                                                 <td>{{ row1.indicator }}</td>
+                                                                <!-- <td style="color: blue;"><b>{{ row1.selfAssessment}}</b></td>  -->
+                                                                <td>  
+                                                                    <b v-if="row1.selfAssessment == '' ||  row1.selfAssessment == null" style="color: red;">0</b> 
+                                                                    <b v-if="row1.selfAssessment != 0 " style="color: blue" >{{ row1.selfAssessment }}</b> 
+                                                                </td>
                                                                 <td>
                                                                     <InputNumber 
                                                                         v-model.number="row1.data_table1" 
                                                                         type="text" 
                                                                         placeholder="0" 
-                                                                        autocomplete="off"
-                                                                         :min="0" :max="row1.indicator" 
+                                                                        autocomplete="off" 
                                                                          showButtons
                                                                     />   
-<!--                                                                     
+                                                                    <!--                                                                     
                                                                     <InputNumber 
                                                                         v-model.number="row1.data_table1" 
                                                                         type="text" 
@@ -187,8 +193,9 @@
                                                     <table id="ratingTable">
                                                         <thead>
                                                             <tr>
-                                                                <th style="width: 60%;">ข. สมรรถนะเฉพาะตามลักษณะงานที่ปฏิบัติ (สำหรับข้าราชการและพนักงานเฉพาะตามตำแหน่งที่รับผิดชอบตามที่ ก.บ.ม. กำหนด)</th>
+                                                                <th style="width: 50%;">ข. สมรรถนะเฉพาะตามลักษณะงานที่ปฏิบัติ (สำหรับข้าราชการและพนักงานเฉพาะตามตำแหน่งที่รับผิดชอบตามที่ ก.บ.ม. กำหนด)</th>
                                                                 <th style="width: 20%;">(3)ระดับ<br>สมรรถนะ<br>ที่คาดหวัง</th>
+                                                                <th style="width: 20%;">(1)ระดับ<br>สมรรถนะ<br>ประเมินตนเอง</th> 
                                                                 <th style="width: 20%;">(4)ระดับ<br>สมรรถนะ<br>ที่แสดงออก</th>
                                                             </tr>
                                                         </thead>
@@ -197,7 +204,11 @@
                                                             <tr v-for="(row2, index) in jobSpecificCompetencies" :key="index">
                                                                 <td style="text-align: left;"> ข. {{ index+6 }} {{ row2.WORK_NAME }}</td> 
                                                                 <td> {{ row2.COMPLEVEL }}</td>
-                                                               
+                                                                <!-- <td style="color: blue"> <b>{{ row2.SCOREPERSON }}</b></td>  -->
+                                                                <td>  
+                                                                    <b v-if="row2.SCOREPERSON == '' || row2.SCOREPERSON == null" style="color: red;">0</b> 
+                                                                    <b v-if="row2.SCOREPERSON != 0 " style="color: blue;" >{{ row2.SCOREPERSON }}</b> 
+                                                                </td>
                                                                 <td>
                                                                     <!-- <InputText 
                                                                         v-model.number="row2.data_table2" 
@@ -207,11 +218,10 @@
                                                                         @input="(event) => event.target.value = event.target.value.replace(/[^0-9]/g, '') " 
                                                                     /> -->
                                                                     <InputNumber 
-                                                                        v-model.number="row2.SCORE" 
+                                                                        v-model.number="row2.SCORE"
                                                                         type="text" 
                                                                         placeholder="0" 
-                                                                        autocomplete="off"
-                                                                         :min="0" :max="row2.COMPLEVEL" 
+                                                                        autocomplete="off" 
                                                                          showButtons
                                                                     />    
                                                                 </td>
@@ -224,14 +234,16 @@
                                                     <table id="ratingTable">
                                                         <thead>
                                                             <tr>
-                                                                <th style="width: 60%;">ค. สมรรถนะทางการบริหาร (สำหรับตำแหน่งประเภทบริหารตามที่ ก.บ.ม. กำหนด)</th>
+                                                                <th style="width: 50%;">ค. สมรรถนะทางการบริหาร (สำหรับตำแหน่งประเภทบริหารตามที่ ก.บ.ม. กำหนด)</th>
                                                                 <th style="width: 20%;">(5)ระดับ<br>สมรรถนะ<br>ที่คาดหวัง</th>
+                                                                <th style="width: 20%;">(5)ระดับ<br>สมรรถนะ<br>ประเมินตนเอง</th>
                                                                 <th style="width: 20%;">(6)ระดับ<br>สมรรถนะ<br>ที่แสดงออก</th>
                                                             </tr>
                                                         </thead>
                                                         <tbody>
                                                             <tr v-for="(row3, index) in otherCompetencies" :key="index">
                                                                 <td style="text-align: left;">{{ row3.activity }}</td> 
+                                                                <td></td>
                                                                 <td></td>
                                                                 <td></td>
                                                             </tr>
@@ -384,34 +396,41 @@
                                             <hr>
                                             <div class="p-fluid formgrid grid">
                                                 <!-- ตาราง ก. สมรรถนะหลัก -->
-                                                <div class="field col-12 md:col-4"> 
+                                                <div class="field col-12 md:col-4">  
                                                     <table id="ratingTable">
                                                         <thead>
                                                             <tr>
-                                                                <th style="width: 60%;">ก. สมรรถนะหลัก (สำหรับข้าราชการและพนักงานทุกคน)</th>
+                                                                <th style="width: 50%;">ก. สมรรถนะหลัก (สำหรับข้าราชการและพนักงานทุกคน)</th>
                                                                 <th style="width: 20%;">(1)ระดับ<br>สมรรถนะ<br>ที่คาดหวัง</th>
+                                                                <th style="width: 20%;">ระดับ<br>สมรรถนะ<br>ประเมินตนเอง</th>
                                                                 <th style="width: 20%;">(2)ระดับ<br>สมรรถนะ<br>ที่แสดงออก</th>
                                                             </tr>
                                                         </thead>
-                                                        <tbody>
+                                                        <tbody> 
                                                             <tr v-for="(row1, index) in coreCompetencies" :key="index">
                                                                 <td style="text-align: left;">{{ row1.activity }}</td> 
                                                                 <td>{{ row1.indicator }}</td>
+                                                                <!-- <td style="color: blue;"><b>{{ row1.selfAssessment}}</b></td>  -->
+                                                                <td>  
+                                                                    <b v-if="row1.selfAssessment == '' ||  row1.selfAssessment == null" style="color: red;">0</b> 
+                                                                    <b v-if="row1.selfAssessment != 0 " style="color: blue" >{{ row1.selfAssessment }}</b> 
+                                                                </td> 
                                                                 <td>  
                                                                     <b v-if="row1.data_table1 == '' " style="color: red;">0</b> 
-                                                                    <b v-if="row1.data_table1 != 0 " >{{ row1.data_table1 }}</b> 
+                                                                    <b v-if="row1.data_table1 != 0 "  >{{ row1.data_table1 }}</b> 
                                                                 </td>
                                                             </tr>
                                                         </tbody>
                                                     </table>
                                                 </div>
                                                 <!-- ตาราง ข. สมรรถนะเฉพาะตามลักษณะงานที่ปฏิบัติ -->
-                                                <div class="field col-12 md:col-4"> 
+                                                <div class="field col-12 md:col-4">  
                                                     <table id="ratingTable">
                                                         <thead>
                                                             <tr>
-                                                                <th style="width: 60%;">ข. สมรรถนะเฉพาะตามลักษณะงานที่ปฏิบัติ (สำหรับข้าราชการและพนักงานเฉพาะตามตำแหน่งที่รับผิดชอบตามที่ ก.บ.ม. กำหนด)</th>
+                                                                <th style="width: 50%;">ข. สมรรถนะเฉพาะตามลักษณะงานที่ปฏิบัติ (สำหรับข้าราชการและพนักงานเฉพาะตามตำแหน่งที่รับผิดชอบตามที่ ก.บ.ม. กำหนด)</th>
                                                                 <th style="width: 20%;">(3)ระดับ<br>สมรรถนะ<br>ที่คาดหวัง</th>
+                                                                <th style="width: 20%;">ระดับ<br>สมรรถนะ<br>ประเมินตนเอง</th>
                                                                 <th style="width: 20%;">(4)ระดับ<br>สมรรถนะ<br>ที่แสดงออก</th>
                                                             </tr>
                                                         </thead>
@@ -419,9 +438,14 @@
                                                             <tr v-for="(row2, index) in jobSpecificCompetencies" :key="index">
                                                                 <td style="text-align: left;"> ข. {{ index+6 }} {{ row2.WORK_NAME }}</td> 
                                                                 <td> {{ row2.COMPLEVEL }}</td> 
+                                                                <!-- <td style="color: blue"> <b>{{ row2 }}</b></td> -->
+                                                                <td>  
+                                                                    <b v-if="row2.SCOREPERSON == '' ||  row2.SCOREPERSON == null " style="color: red;">0</b> 
+                                                                    <b v-if="row2.SCOREPERSON != 0 " style="color: blue;">{{ row2.SCOREPERSON }}</b> 
+                                                                </td> 
                                                                 <td>
-                                                                    <b v-if="row2.SCORE == '' " style="color: red;">0</b> 
-                                                                    <b v-if="row2.SCORE != 0 " >{{ row2.SCORE }}</b> 
+                                                                    <b v-if="row2.SCORE == '' ||  row2.SCORE == null " style="color: red;">0</b> 
+                                                                    <b v-if="row2.SCORE != 0  ||  row2.SCORE == null" >{{ row2.SCORE }}</b> 
                                                                 </td>
                                                             </tr> 
                                                         </tbody>
@@ -432,14 +456,16 @@
                                                     <table id="ratingTable">
                                                         <thead>
                                                             <tr>
-                                                                <th style="width: 60%;">ค. สมรรถนะทางการบริหาร (สำหรับตำแหน่งประเภทบริหารตามที่ ก.บ.ม. กำหนด)</th>
+                                                                <th style="width: 50%;">ค. สมรรถนะทางการบริหาร (สำหรับตำแหน่งประเภทบริหารตามที่ ก.บ.ม. กำหนด)</th>
                                                                 <th style="width: 20%;">(5)ระดับ<br>สมรรถนะ<br>ที่คาดหวัง</th>
+                                                                <th style="width: 20%;">ระดับ<br>สมรรถนะ<br>ประเมินตนเอง</th> 
                                                                 <th style="width: 20%;">(6)ระดับ<br>สมรรถนะ<br>ที่แสดงออก</th>
                                                             </tr>
                                                         </thead>
                                                         <tbody>
                                                             <tr v-for="(row3, index) in otherCompetencies" :key="index">
                                                                 <td style="text-align: left;">{{ row3.activity }}</td> 
+                                                                <td></td>
                                                                 <td></td>
                                                                 <td></td>
                                                             </tr>
@@ -465,7 +491,7 @@
                                                     <tr>
                                                         <td style=" vertical-align: middle;" class="text-left">จำนวนสมรรถนะหลัก /สมรรถนะเฉพาะตามลักษณะงานที่ปฏิบัติ /สมรรถนะทางการบริหาร ที่มีระดับสมรรถนะที่แสดงออก สูงกว่าหรือเท่ากับ ระดับสมรรถนะที่คาดหวัง X 3 คะแนน</td>
                                                             <td class="text-center" style="color: blue;">
-                                                                <b>{{ totalCoreCompetencies }}</b>  
+                                                                <b>{{ totalCoreCompetenciesX3 }}</b>  
                                                             </td>
                                                             <td class="text-center" style="color: blue;"><b>3</b></td>   
                                                             <td class="text-center" style="color: blue;">
@@ -503,16 +529,18 @@
                                                             </td> 
                                                     </tr>
                                                     <tr>
-                                                    <td style="text-align: right; vertical-align: middle;" colspan="3">
+                                                    <td style="text-align: center; vertical-align: middle;" colspan="3">
                                                         <b style="color: blue;">(9) สรุปคะแนนส่วนพฤติกรรมการปฏิบัติราชการ   (สมรรถนะ) =	 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </b>
                                                         <b style="color: blue;">  ผลรวมคะแนน ใน (8)</b>
-                                                        <div style="display: flex; justify-content: flex-end;">
-                                                            <hr style="border: 1px solid black; width: 20%;">
-                                                        </div>
-                                                        <b style="color: blue;">จำนวนสมรรถนะที่ใช้ในการประเมิน X 3 คะแนน</b>
-                                                    </td>
+                                                        <b style="display: block; text-align: right; color: blue;">{{ totalScoreSum + totalScoreZeroSum }}</b>   
+                                                        <div style="display: flex; justify-content: flex-end;"> 
+                                                            <hr style="border: 1px solid black; width: 70%;">
+                                                        </div> 
+                                                        <b style="display: block; text-align: right; color: blue;">{{ 33}}</b>
+                                                        <b style="color: blue;">จำนวนสมรรถนะที่ใช้ในการประเมิน X 3 คะแนน</b>  
+                                                    </td> 
                                                     <td class="text-center" style="color: blue;"> 
-                                                         <b>{{ ((totalScoreSum + totalScoreZeroSum) / 33).toFixed(2) }}</b>  
+                                                         <b> = {{ ((totalScoreSum + totalScoreZeroSum) / 33).toFixed(2) }}</b>  
                                                     </td> 
                                                 </tr>  
                                                 </tbody>
@@ -587,7 +615,7 @@
                                                 <!-- ตาราง ก. สมรรถนะหลัก --> 
                                                 <div class="employee-info">  
                                                     <p><strong>รอบการประเมิน:</strong> {{ tracking_date.d_evaluationround }} </p>
-                                                    <p><strong>ชื่อผู้รับการประเมิน:</strong>  {{ currentstaff[0].prefixfullname }} {{ currentstaff[0].staffname }} {{   currentstaff[0].staffsurname }}</p>
+                                                    <p><strong>ชื่อผู้รับการประเมิน:</strong>  {{ currentstaff[0].prefixfullname }} {{ currentstaff[0].staffname }} {{   currentstaff[0].staffsurname }} </p>
                                                     <p><strong>ตำแหน่ง:</strong> {{ currentstaff[0].posnameth }} </p>
                                                     <p><strong>ระดับตำแหน่ง:</strong>{{ currentstaff[0].postypenameth }} </p>
                                                     <p v-if="currentstaff[0].facultyid==201092700000"><strong>สังกัด:</strong> {{ currentstaff[0].departmentname }} </p>
@@ -622,7 +650,7 @@
                                                             <td>องค์ประกอบที่ 1 ผลสัมฤทธิ์ของงาน</td>
                                                             <td class="text-center" style="color: blue;"> 
                                                                 <b id="sumX">{{ ((totalScoreSum + totalScoreZeroSum) / 33).toFixed(2) }}</b> 
-                                                                {{ insert1(((totalScoreSum + totalScoreZeroSum) / 33).toFixed(2)) }} 
+                                                                <!-- {{ insert1(((totalScoreSum + totalScoreZeroSum) / 33).toFixed(2)) }}  -->
                                                             </td> 
                                                             <td class="text-center" style="color: blue;">  
                                                                 <b>{{ Item.tb_tor?Item.tb_tor.persen.split(':')[0]: '' }}</b>
@@ -634,7 +662,7 @@
                                                         <tr v-if="dataStaffid==Item.staffid"> 
                                                             <td>องค์ประกอบที่ 2 พฤติกรรมการปฏิบัติราชการ</td>
                                                             <td class="text-center" style="color: blue;">
-                                                                {{ insert2(WeightedScoreSumXT) }} 
+                                                                <!-- {{ insert2(WeightedScoreSumXT) }}  -->
                                                                 <b>{{ WeightedScoreSumXT }}</b>
 
                                                             </td>  
@@ -642,26 +670,25 @@
                                                                 <b>{{ Item.tb_tor?Item.tb_tor.persen.split(':')[1]: '' }}</b>
                                                             </td> 
                                                             <td class="text-center" style="color: blue;"> 
-                                                                <b>{{ (WeightedScoreSumXT *(Item.tb_tor?Item.tb_tor.persen.split(':')[1]:0)).toFixed(2) }}</b>  
+                                                                <b>{{ ((WeightedScoreSumXT *(Item.tb_tor?Item.tb_tor.persen.split(':')[1]:0)).toFixed(2)) }}</b>  
                                                             </td>  
                                                         </tr>
-                                                        </template>  
-                                                        <tr>
+                                                        <tr v-if="dataStaffid==Item.staffid">
                                                             <td>องค์ประกอบอื่นๆ (ถ้ามี)</td>
                                                             <td></td>
                                                             <td></td>
                                                             <td></td>
                                                         </tr>
-                                                        <tr style="font-weight: bold;">
+                                                        <tr v-if="dataStaffid==Item.staffid" style="font-weight: bold;">
                                                             <td colspan="2" style="text-align: right;">รวม</td>
                                                             <td class="text-center" style="color: blue;"> 
                                                                 <b>{{ 100 }}%</b>  
                                                             </td> 
-                                                            <td class="text-center" style="color: blue;"> 
-                                                                {{ insert3 ((((totalScoreSum + totalScoreZeroSum) / 33 * 70) + (WeightedScoreSumXT * 30)).toFixed(2)) }} 
-                                                                      {{ (((totalScoreSum + totalScoreZeroSum) / 33 * 70) + (WeightedScoreSumXT * 30)).toFixed(2) }}
+                                                            <td class="text-center" style="color: blue;">  
+                                                             <b>{{ Item.tb_tor?Item.tb_tor.sum_score:'' }} </b> 
                                                             </td>
                                                         </tr>
+                                                        </template>   
                                                     </tbody>
                                                 </table>
                                                 <div class="employee-info">
@@ -700,8 +727,8 @@
                                                         </td>
                                                             <td class="center-align"><br><br>
                                                                 ลงชื่อ .................................................................<br>
-                                                                ชื่อ {{ user.user.name.PREFIXFULLNAME }} {{ user.user.name.STAFFNAME }} {{ user.user.name.STAFFSURNAME }}<br>
-                                                                ตำแหน่ง {{ user.user.name.POSITIONNAME }} <br>
+                                                                ชื่อ {{ currentstaff[0].prefixfullname }} {{ currentstaff[0].staffname }} {{   currentstaff[0].staffsurname }}<br>
+                                                                ตำแหน่ง {{ currentstaff[0].posnameth }} <br>
                                                                 วันที่ .......... เดือน .......................... พ.ศ.
                                                             </td>
                                                         </tr>
@@ -738,8 +765,8 @@
                                                         </td>
                                                         <td class="center-align"><br><br>
                                                             ลงชื่อ : .................................................................<br>
-                                                            ชื่อ : {{ user.user.name.PREFIXFULLNAME }} {{ user.user.name.STAFFNAME }} {{ user.user.name.STAFFSURNAME }}<br>
-                                                            ตำแหน่ง : {{ user.user.name.POSITIONNAME }}<br>
+                                                            ชื่อ : {{ currentstaff[0].prefixfullname }} {{ currentstaff[0].staffname }} {{   currentstaff[0].staffsurname }}<br>
+                                                            ตำแหน่ง : {{ currentstaff[0].posnameth }}<br>
                                                             วันที่ : .......... เดือน .......................... พ.ศ.............
                                                         </td>
                                                         </tr>
@@ -777,15 +804,15 @@
     </div>     
 </template>
 
-<script setup> 
-    const { signIn, getSession, signOut } = await useAuth()
-    const user = await getSession();
-    // console.log(user);
+<script setup>
+const { signIn, getSession, signOut } = await useAuth();
+const user = await getSession();
+// console.log(user);
 </script>
-<script> 
+<script>
 import { ref } from 'vue';
-import axios from 'axios';  
-import Swal from 'sweetalert2' 
+import axios from 'axios';
+import Swal from 'sweetalert2';
 import TabView from 'primevue/tabview';
 import TabPanel from 'primevue/tabpanel';
 import { LogarithmicScale } from 'chart.js';
@@ -795,18 +822,18 @@ export default {
     //     dataPor: {
     //         type: Object,
     //         required: true
-    //     }, 
+    //     },
     //     tab4Tracking: {
     //         type: String,
     //         default: '0'
-    //     } 
+    //     }
     // },
-    data() { 
-        return {  
+    data() {
+        return {
             staffid_po: 130102,
             staffid_Main: '',
             facid_Main: '',
-            groupid_Main: '', 
+            groupid_Main: '',
             // ปีงบประมาณ
             dropdownItemYear: { name: 'ปีงบประมาณ 2568', code: 2568 },
             dropdownItemsYear: [
@@ -814,26 +841,26 @@ export default {
                 { name: 'ปีงบประมาณ 2568', code: 2568 },
                 { name: 'ปีงบประมาณ 2567', code: 2567 },
                 { name: 'ปีงบประมาณ 2566', code: 2566 },
-                { name: 'ปีงบประมาณ 2565', code: 2565 },
+                { name: 'ปีงบประมาณ 2565', code: 2565 }
             ],
             // รอบประเมิน
             dropdownItemRecord: { name: 'รอบที่ 2 วันที่ 1 มีนาคม ถึง วันที่ 31 สิงหาคม', code: '2' },
             dropdownItemRecords: [
                 { name: 'รอบที่ 1 วันที่ 1 กันยายน  ถึง วันที่ 28 กุมภาพันธ์', code: '1' },
-                { name: 'รอบที่ 2 วันที่ 1 มีนาคม ถึง วันที่ 31 สิงหาคม', code: '2' },
-            ], 
+                { name: 'รอบที่ 2 วันที่ 1 มีนาคม ถึง วันที่ 31 สิงหาคม', code: '2' }
+            ],
             tracking_date: '',
-            tracking_dates: null, 
-             
-            // ตารางรายชื่อ
-            products: [], 
+            tracking_dates: null,
 
-            // เพิ่มคะแนนประเมิน 
-            DialogAdd: false, 
+            // ตารางรายชื่อ
+            products: [],
+
+            // เพิ่มคะแนนประเมิน
+            DialogAdd: false,
             activeIndex: 0,
             dataStaffid: null,
-            //Tab 1 
-            products_Tab1: [], 
+            //Tab 1
+            products_Tab1: [],
             p01_score: null,
             p01_scores: [
                 { name: '- ไม่ระบุ -', code: 0 },
@@ -841,16 +868,16 @@ export default {
                 { name: '2 คะแนน', code: 2 },
                 { name: '3 คะแนน', code: 3 },
                 { name: '4 คะแนน', code: 4 },
-                { name: '5 คะแนน', code: 5 },
+                { name: '5 คะแนน', code: 5 }
             ],
             p01_detail: null,
             //ตาราง ก. สมรรถนะหลัก
             coreCompetencies: [
-                { id: 1, activity: 'ก. 1 การมุ่งผลสัมฤทธิ์', indicator: '1', data_table1: '' },
-                { id: 2, activity: 'ก. 2 การบริการที่ดี', indicator: '1', data_table1: '' },
-                { id: 3, activity: 'ก. 3 การสั่งสมความเชี่ยวชาญในงานอาชีพ', indicator: '1', data_table1: '' },
-                { id: 4, activity: 'ก. 4 การยึดมั่นในความถูกต้องชอบธรรมและจริยธรรม', indicator: '1', data_table1: '' },
-                { id: 5, activity: 'ก. 5 การทำงานเป็นทีม', indicator: '1', data_table1: '' }
+                { id: 1, activity: 'ก. 1 การมุ่งผลสัมฤทธิ์', indicator: '', data_table1: '',selfAssessment:''},
+                { id: 2, activity: 'ก. 2 การบริการที่ดี', indicator: '', data_table1: '',selfAssessment:''},
+                { id: 3, activity: 'ก. 3 การสั่งสมความเชี่ยวชาญในงานอาชีพ', indicator: '', data_table1: '',selfAssessment:''},
+                { id: 4, activity: 'ก. 4 การยึดมั่นในความถูกต้องชอบธรรมและจริยธรรม', indicator: '', data_table1: '',selfAssessment:''},
+                { id: 5, activity: 'ก. 5 การทำงานเป็นทีม', indicator: '', data_table1: '',selfAssessment:''}
             ],
             //ตาราง ข. สมรรถนะเฉพาะตามลักษณะงานที่ปฏิบัติ
             jobSpecificCompetencies: [],
@@ -871,8 +898,8 @@ export default {
                 { id: 16, activity: 'ค. 5 การสอนงานและการมอบหมายงาน', indicator: '0', data_table3: '' }
             ],
             improvements: null,
-            suggestions: null,  
-            //Tab 2 
+            suggestions: null,
+            //Tab 2
             products_Tab2: [],
             //Tab 3
             p04_re1: null,
@@ -883,204 +910,254 @@ export default {
             //Tab 4
             products_Tab3T4: [],
             //total weight
-            totalscoretrack:{},
-            totalWeighttrack: {}, 
-            WeightedScoreSumtrack:{},
-            WeightedScoreSumX :{},
+            totalscoretrack: {},
+            totalWeighttrack: {},
+            WeightedScoreSumtrack: {},
+            WeightedScoreSumX: {},
             WeightedScoreSumXT: {},
             //รวมคะแนน เกณฑ์การประเมิน
-            totalCoreCompetencies:{},
-            totalZeroScores:{},
-            totalScoreSum:{},
-            totalScoreZeroSum:{},
-            totalScoreFinalSum:{}, 
-            
+            totalCoreCompetenciesX3: 0,
+            totalZeroScores: {},
+            totalScoreSum: {},
+            totalScoreZeroSum: {},
+            totalScoreFinalSum: {},
+
             assessorText: null,
             assessor_positionText: null,
-            currentstaff:{},
-        }
-    }, 
+            currentstaff: {},
+           
+             
+        };
+    },
     components: {
         TabView,
         TabPanel
-    }, 
-    
-    async mounted(){ 
-        const { signIn, getSession, signOut } = await useAuth()
+    },
+
+    async mounted() {
+        const { signIn, getSession, signOut } = await useAuth();
         const user = await getSession();
-       // console.log(user.user.name);
-        const {STAFFID, SCOPES} = user.user.name
-        const {staffdepartment, groupid, staffdepartmentname, groupname} = SCOPES
-        await this.setSession(STAFFID,staffdepartment,groupid,user.user.name.POSTYPENAME,user.user.name.POSITIONNAMEID); 
-        // this.showDataEvalu();  
+        // console.log(user.user.name);
+        const { STAFFID, SCOPES } = user.user.name;
+        const { staffdepartment, groupid, staffdepartmentname, groupname } = SCOPES;
+        await this.setSession(STAFFID, staffdepartment, groupid, user.user.name.POSTYPENAME, user.user.name.POSITIONNAMEID);
+        // this.showDataEvalu();
         this.showDataSet(); 
-        this.getjobSpecificCompetencies();
-        
+        // this.showAssesstack(); 
     },  
     computed: {
         totalscoretrack() {
             // ใช้ reduce เพื่อคำนวณค่ารวมของ p_weight(รวมค่าคะแนนที่ได้)
             return this.products_Tab2.reduce((total, h) => {
-                return total + h.subP01sX.reduce((subTotal, subP01) => {
-                    return subTotal + subP01.p01_score ; // เพิ่ม p01_weight ของแต่ละ subP01
-                }, 0);
+                return (
+                    total +
+                    h.subP01sX.reduce((subTotal, subP01) => {
+                        return subTotal + subP01.p01_score; // เพิ่ม p01_weight ของแต่ละ subP01
+                    }, 0)
+                );
             }, 0);
         },
         totalWeighttrack() {
             // ใช้ reduce เพื่อคำนวณค่ารวมของ p_weight*(รวมน้ำหนักความยากง่ายของงาน)
             return this.products_Tab2.reduce((total, h) => {
-                return total + h.subP01sX.reduce((subTotal, subP01) => {
-                    return subTotal + subP01.p01_weight; // เพิ่ม p01_weight ของแต่ละ subP01
-                }, 0);
+                return (
+                    total +
+                    h.subP01sX.reduce((subTotal, subP01) => {
+                        return subTotal + subP01.p01_weight; // เพิ่ม p01_weight ของแต่ละ subP01
+                    }, 0)
+                );
             }, 0);
         },
         WeightedScoreSumtrack() {
             // คำนวณค่ารวมของคะแนนที่คำนวณ และหารด้วย 5(รวมค่าคะแนนถ่วงน้ำหนัก)
-            return this.products_Tab2.reduce((total, h) => {
-                return total + h.subP01sX.reduce((subTotal, subP01) => {
-                    // คำนวณคะแนนรวม (subP01.p01_score * subP01.p01_weight / 100) แล้วหารด้วย 5
-                    return subTotal + ((subP01.p01_score * subP01.p01_weight / 100));
-                }, 0);
-            }, 0).toFixed(3); // ใช้ toFixed(3) เพื่อแสดงทศนิยม 3 ตำแหน่ง
+            return this.products_Tab2
+                .reduce((total, h) => {
+                    return (
+                        total +
+                        h.subP01sX.reduce((subTotal, subP01) => {
+                            // คำนวณคะแนนรวม (subP01.p01_score * subP01.p01_weight / 100) แล้วหารด้วย 5
+                            return subTotal + (subP01.p01_score * subP01.p01_weight) / 100;
+                        }, 0)
+                    );
+                }, 0)
+                .toFixed(3); // ใช้ toFixed(3) เพื่อแสดงทศนิยม 3 ตำแหน่ง
         },
         WeightedScoreSumX() {
             // คำนวณค่ารวมของคะแนนที่คำนวณ(รวมน้ำหนักความยากง่ายของงาน/5)
-            return this.products_Tab2.reduce((total, h) => {
-                return total + h.subP01sX.reduce((subTotal, subP01) => {
-                    return subTotal + (subP01.p01_weight/5 );
-                }, 0);
-            }, 0).toFixed(2); // ใช้ toFixed(2) เพื่อให้มีทศนิยม 2 ตำแหน่ง
+            return this.products_Tab2
+                .reduce((total, h) => {
+                    return (
+                        total +
+                        h.subP01sX.reduce((subTotal, subP01) => {
+                            return subTotal + subP01.p01_weight / 5;
+                        }, 0)
+                    );
+                }, 0)
+                .toFixed(2); // ใช้ toFixed(2) เพื่อให้มีทศนิยม 2 ตำแหน่ง
         },
         WeightedScoreSumXT() {
-           // console.log( this.products_Tab2);
-            
+            // console.log( this.products_Tab2);
+
             // คำนวณค่ารวมของคะแนนที่คำนวณ (รวมค่าคะแนนถ่วงน้ำหนัก/5)
-            return this.products_Tab2.reduce((total, h) => {
-                return total + h.subP01sX.reduce((subTotal, subP01) => {
-                    return subTotal + ((subP01.p01_score * subP01.p01_weight / 100) / 5);
-                }, 0);
-            }, 0).toFixed(2); // ใช้ toFixed(2) เพื่อให้มีทศนิยม 2 ตำแหน่ง
+            return this.products_Tab2
+                .reduce((total, h) => {
+                    return (
+                        total +
+                        h.subP01sX.reduce((subTotal, subP01) => {
+                            return subTotal + (subP01.p01_score * subP01.p01_weight) / 100 / 5;
+                        }, 0)
+                    );
+                }, 0)
+                .toFixed(2); // ใช้ toFixed(2) เพื่อให้มีทศนิยม 2 ตำแหน่ง
         },
         //รวมคะแนน เกณฑ์การประเมิน
         //รวมช่องสมรรถนะ
-        totalCoreCompetencies() {   
+        totalCoreCompetenciesX3() {
             const maxLength = Math.max(this.coreCompetencies.length, this.jobSpecificCompetencies.length);
-            
-            let total = 0; 
-            for (let i = 0; i < maxLength; i++) {
-                const dataTable1Value = parseFloat(this.coreCompetencies[i]?.data_table1) ?1: 0;
-                const dataTable2Value = parseFloat(this.jobSpecificCompetencies[i]?.SCORE) ?1: 0;
-                
-               // console.log(`Row ${i + 1}: data_table1 = ${dataTable1Value}, data_table2 = ${dataTable2Value}`);
-                
-                total += dataTable1Value + dataTable2Value;
+            let total = 0;
+
+            //กกกกก
+            for (let i = 0; i < this.coreCompetencies.length; i++) {
+                const dataTable1Value = parseFloat(this.coreCompetencies[i]?.indicator) || 0;
+                const dataTable2Value = parseFloat(this.coreCompetencies[i]?.data_table1) || 0;
+                // // ตรวจสอบเงื่อนไขและเพิ่มค่า T1 ถ้าเงื่อนไขเป็นจริง
+                if ((dataTable1Value - dataTable2Value) <= 0) {
+                    total++;
+                }
             } 
+            //ขขข
+            for (let i = 0; i < this.jobSpecificCompetencies.length; i++) {
+                const dataTable1Value = parseFloat(this.jobSpecificCompetencies[i]?.COMPLEVEL) || 0;
+                const dataTable2Value = parseFloat(this.jobSpecificCompetencies[i]?.SCORE) || 0;
+
+                // // ตรวจสอบเงื่อนไขและเพิ่มค่า T1 ถ้าเงื่อนไขเป็นจริง
+                if ((dataTable1Value - dataTable2Value) <= 0) {
+                    total++;
+                }
+            } 
+            
+            //คคค
+            for (let i = 0; i < maxLength; i++) {
+                // const dataTable1Value = parseFloat(this.coreCompetencies[i]?.data_table1) || 0;
+                // const dataTable2Value = parseFloat(this.jobSpecificCompetencies[i]?.SCORE) || 0;
+
+                // // // ตรวจสอบเงื่อนไขและเพิ่มค่า T1 ถ้าเงื่อนไขเป็นจริง
+                // if ((dataTable1Value - dataTable2Value) <= 0) {
+                //     total++;
+                // }
+            } 
+
             return total;
-        },
-            //รวมช่องค่า0
-        totalZeroScores() { 
-            let zeroScoreCount = 0; 
-            this.coreCompetencies.forEach(row => {
-            if (parseFloat(row.data_table1) === 0) {
-                zeroScoreCount++;
-            }
-            });  
-            this.jobSpecificCompetencies.forEach(row => {
-            if (parseFloat(row.SCORE) === 0) {
-                zeroScoreCount++;
-            }
-            }); 
-            return zeroScoreCount;
-        },
-        //รวมคะแนนจำนวนสมรรถนะ*3
-        totalScoreSum(staffid) {
-            let sum = 0;
-
-            // คำนวณคะแนนจาก coreCompetencies
-            this.coreCompetencies.forEach(row => {
-                const dataTable1Value = parseFloat(row.data_table1) || 0;
-                sum += dataTable1Value * 3;
-            });
-
-            // คำนวณคะแนนจาก jobSpecificCompetencies
-            this.jobSpecificCompetencies.forEach(row => {
-                const dataTable2Value = parseFloat(row.SCORE) ?1: 0;
-                sum += dataTable2Value * 3;
-            });
-
-            return sum;
-        },
-        totalScoreSumX() {     
-            return this.coreCompetencies.reduce((sum, row, index) => { 
-                const dataTable1Value = parseFloat(row.data_table1) || 0;
-                const dataTable2Value = parseFloat(this.jobSpecificCompetencies[index]?.SCORE) || 0;  
-                return sum + (dataTable1Value * 3) + (dataTable2Value * 3);
-            }, 0);
-        },  
-        totalScoreZeroSum() { 
-            let zeroScoreCount = 0;  
-            this.coreCompetencies.forEach(row => { 
+        }, 
+        //รวมช่องค่า0
+        totalZeroScores() {
+            let zeroScoreCount = 0;
+            this.coreCompetencies.forEach((row) => {
                 if (parseFloat(row.data_table1) === 0) {
                     zeroScoreCount++;
                 }
-            });  
-            this.jobSpecificCompetencies.forEach(row => { 
+            });
+            this.jobSpecificCompetencies.forEach((row) => {
                 if (parseFloat(row.SCORE) === 0) {
                     zeroScoreCount++;
                 }
-            });  
+            });
+            return zeroScoreCount;
+        },
+        //รวมคะแนนจำนวนสมรรถนะ*3
+        totalScoreSum() {
+            let sum = 0;
+
+            // คำนวณคะแนนจาก coreCompetencies
+            this.coreCompetencies.forEach((row) => {
+                const dataTable1Value = parseFloat(row.data_table1) || 0;
+                sum += dataTable1Value * 3;
+            }); 
+
+
+            // // คำนวณคะแนนจาก jobSpecificCompetencies
+            // this.jobSpecificCompetencies.forEach((row) => {
+            //     const dataTable2Value = parseFloat(row.SCORE) ? 1 : 0;
+            //     sum += dataTable2Value * 3;
+            // });
+
+            return sum;
+        },
+        totalScoreSumX() {
+            return this.coreCompetencies.reduce((sum, row, index) => {
+                const dataTable1Value = parseFloat(row.data_table1) || 0;
+                const dataTable2Value = parseFloat(this.jobSpecificCompetencies[index]?.SCORE) || 0;
+                return sum + dataTable1Value * 3 + dataTable2Value * 3;
+            }, 0);
+        },
+        totalScoreZeroSum() {
+            let zeroScoreCount = 0;
+            this.coreCompetencies.forEach((row) => {
+                if (parseFloat(row.data_table1) === 0) {
+                    zeroScoreCount++;
+                }
+            });
+            this.jobSpecificCompetencies.forEach((row) => {
+                if (parseFloat(row.SCORE) === 0) {
+                    zeroScoreCount++;
+                }
+            });
             return zeroScoreCount * 2;
-        },  
-    },  
-    methods: { 
-        insert1(scoreA) { 
-        //console.log(scoreA); 
-        //console.log(this.dataStaffid,scoreA); 
-            axios.post('http://localhost:8000/api/savepersentor',{
-                    p_staffid: this.dataStaffid, 
-                    p_year: this.tracking_date.d_date, 
-                    evalua: this.tracking_date.evalua, 
-                    score: scoreA, 
-                    insert:"achievement_score"
-                }).then(res => {     
-                    //console.log(res.data); 
-            });
+        }
+    },
+    methods: {
+        insert1(scoreA) {
+            //console.log(scoreA);
+            //console.log(this.dataStaffid,scoreA);
+            axios
+                .post('http://localhost:8000/api/savepersentor', {
+                    p_staffid: this.dataStaffid,
+                    p_year: this.tracking_date.d_date,
+                    evalua: this.tracking_date.evalua,
+                    score: scoreA,
+                    insert: 'achievement_score'
+                })
+                .then((res) => {
+                    //console.log(res.data);
+                });
         },
-        insert2(scoreB) { 
-        //console.log(scoreB); 
-        //console.log(this.dataStaffid); 
-            axios.post('http://localhost:8000/api/savepersentor',{
-                    p_staffid: this.dataStaffid, 
-                    p_year: this.tracking_date.d_date, 
-                    evalua: this.tracking_date.evalua, 
+        insert2(scoreB) {
+            //console.log(scoreB);
+            //console.log(this.dataStaffid);
+            axios
+                .post('http://localhost:8000/api/savepersentor', {
+                    p_staffid: this.dataStaffid,
+                    p_year: this.tracking_date.d_date,
+                    evalua: this.tracking_date.evalua,
                     score: scoreB,
-                    insert:"behavior" 
-
-                }).then(res => {     
-                    console.log(res.data); 
-            });
+                    insert: 'behavior'
+                })
+                .then((res) => {
+                    console.log(res.data);
+                });
         },
-        insert3(scoreS) { 
-        //console.log(scoreB); 
-        //console.log(this.dataStaffid); 
-            axios.post('http://localhost:8000/api/savepersentor',{
-                    p_staffid: this.dataStaffid, 
-                    p_year: this.tracking_date.d_date, 
-                    evalua: this.tracking_date.evalua, 
+        insert3(scoreS) {
+            //console.log(scoreB);
+            //console.log(this.dataStaffid);
+            axios
+                .post('http://localhost:8000/api/savepersentor', {
+                    p_staffid: this.dataStaffid,
+                    p_year: this.tracking_date.d_date,
+                    evalua: this.tracking_date.evalua,
                     score: scoreS,
-                    insert:"sum_score" 
-
-                }).then(res => {     
-                    console.log(res.data); 
-            });
+                    insert: 'sum_score'
+                })
+                .then((res) => {
+                    console.log(res.data);
+                });
         },
-        setSession (staffid_Main,facid_Main,groupid_Main,postypename,postypenameid) {
-            // console.log('postypename:',postypename);  
-            this.staffid_Main = staffid_Main
-            this.facid_Main = facid_Main
-            this.groupid_Main = groupid_Main   
-            this.postypename = postypename    
-            this.postypenameid = postypenameid    
+        setSession(staffid_Main, facid_Main, groupid_Main, postypename, postypenameid) {
+            // console.log('postypename:',postypename);
+            this.staffid_Main = staffid_Main;
+            this.facid_Main = facid_Main;
+            this.groupid_Main = groupid_Main;
+            this.postypename = postypename;
+            this.postypenameid = postypenameid;
         },
         showDataSet() {
             axios
@@ -1090,7 +1167,7 @@ export default {
                     group_id: this.groupid_Main
                 })
                 .then((res) => {
-                    // console.log(res.data); 
+                    // console.log(res.data);
                     this.tracking_dates = res.data;
                 })
                 .catch((error) => {
@@ -1098,46 +1175,46 @@ export default {
                 });
         },
         // ตารางรายชื่อ
-        xxr(){ 
-            if(this.tracking_date.evalua === undefined){
+        xxr() {
+            if (this.tracking_date.evalua === undefined) {
                 Swal.fire({
-                    title: "แจ้งเตือนจากระบบ!",
-                    text: "กรุณาเลือก รอบประเมิน ก่อน!",
-                    icon: "error"
+                    title: 'แจ้งเตือนจากระบบ!',
+                    text: 'กรุณาเลือก รอบประเมิน ก่อน!',
+                    icon: 'error'
                 });
-            }else{
+            } else {
                 this.showDataEvalu();
-            } 
-        }, 
+            }
+        },
         async showDataEvalu() {
             try {
                 const res = await axios.get('http://localhost:8000/api/showDataEvalu', {
-                params: {
-                    staff_id: this.staffid_Main,
-                    fac_id: this.facid_Main,
-                    group_id: this.groupid_Main,
-                    evalua: this.tracking_date.evalua,
-                    p_year: this.tracking_date.d_date,
-                }
+                    params: {
+                        staff_id: this.staffid_Main,
+                        fac_id: this.facid_Main,
+                        group_id: this.groupid_Main,
+                        evalua: this.tracking_date.evalua,
+                        p_year: this.tracking_date.d_date
+                    }
                 });
-                this.products = res.data; 
+                this.products = res.data;
                 //console.log(res.data);
-                
+
                 // ใช้ Promise.all เพื่อทำการเรียก cvb พร้อมกันหลายๆ รายการ
                 //await Promise.all(res.data.map(item => this.cvb(item)));
             } catch (error) {
                 console.error('Error fetching evaluation data:', error);
             }
-        }, 
+        },
         async cvb(item) {
-            // console.log(this.tracking_date.evalua); 
+            // console.log(this.tracking_date.evalua);
             try {
                 const response = await axios.post('http://localhost:8000/api/showdatator', {
                     p_year: this.tracking_date.d_date,
                     evalua: this.tracking_date.evalua,
                     p_staffid: item.staffid
-                });  
-                //console.log(response.data); 
+                });
+                //console.log(response.data);
                 // อัปเดตค่า persen ใน item แทนการใช้ this.persen
                 item.persenGetData = response.data[0]?.persen ?? 0;
             } catch (error) {
@@ -1145,32 +1222,34 @@ export default {
             }
         },
         // เพิ่มคะแนนประเมิน
-       async  openDataEvalu(staff_id){     
-            if(this.tracking_date.d_date === undefined){
-                Swal.fire("แจ้งเตือนจากระบบ","กรุณาเลือกรอบประเมิน","error");
-            }else{  
-                this.dataStaffid = staff_id
-               await this.showDataEvalu();
-                this.currentstaff = this.products.filter(product => product.staffid === this.dataStaffid);
-                this.products_Tab1 = [];  
+        async openDataEvalu(staff_id) {
+            // console.log(staff_id);
+            
+            if (this.tracking_date.d_date === undefined) {
+                Swal.fire('แจ้งเตือนจากระบบ', 'กรุณาเลือกรอบประเมิน', 'error');
+            } else {
+                this.dataStaffid = staff_id;
+                await this.showDataEvalu();
+                this.currentstaff = this.products.filter((product) => product.staffid === this.dataStaffid);
+                this.products_Tab1 = [];
                 this.p01_scores = [
                     { name: '- ไม่ระบุ -', code: 0 },
                     { name: '1 คะแนน', code: 1 },
                     { name: '2 คะแนน', code: 2 },
                     { name: '3 คะแนน', code: 3 },
                     { name: '4 คะแนน', code: 4 },
-                    { name: '5 คะแนน', code: 5 },
+                    { name: '5 คะแนน', code: 5 }
                 ];
 
                 // ตั้งค่า coreCompetencies กลับไปเป็นค่าเริ่มต้น
                 this.coreCompetencies = [
-                    { id: 1, activity: 'ก. 1 การมุ่งผลสัมฤทธิ์', indicator: '1', data_table1: '' },
-                    { id: 2, activity: 'ก. 2 การบริการที่ดี', indicator: '1', data_table1: '' },
-                    { id: 3, activity: 'ก. 3 การสั่งสมความเชี่ยวชาญในงานอาชีพ', indicator: '1', data_table1: '' },
-                    { id: 4, activity: 'ก. 4 การยึดมั่นในความถูกต้องชอบธรรมและจริยธรรม', indicator: '1', data_table1: '' },
-                    { id: 5, activity: 'ก. 5 การทำงานเป็นทีม', indicator: '1', data_table1: '' }
-                ];  
-                
+                    { id: 1, activity: 'ก. 1 การมุ่งผลสัมฤทธิ์', indicator: '1', data_table1: '',selfAssessment:'' },
+                    { id: 2, activity: 'ก. 2 การบริการที่ดี', indicator: '1', data_table1: '',selfAssessment:'' },
+                    { id: 3, activity: 'ก. 3 การสั่งสมความเชี่ยวชาญในงานอาชีพ', indicator: '1', data_table1: '',selfAssessment:'' },
+                    { id: 4, activity: 'ก. 4 การยึดมั่นในความถูกต้องชอบธรรมและจริยธรรม', indicator: '1', data_table1: '',selfAssessment:'' },
+                    { id: 5, activity: 'ก. 5 การทำงานเป็นทีม', indicator: '1', data_table1: '',selfAssessment:'' }
+                ];
+
                 // ตั้งค่า jobSpecificCompetencies กลับไปเป็นค่าเริ่มต้น
                 this.jobSpecificCompetencies = [
                     // { id: 6, activity: 'ข. 1 การคิดวิเคราะห์', indicator: '1', data_table2: '' },
@@ -1184,489 +1263,557 @@ export default {
                 this.improvements = null;
                 this.suggestions = null;
 
-                this.showdataPo(staff_id,this.facid_Main,this.tracking_date.d_date,this.tracking_date.evalua );
-                    axios.post('http://localhost:8000/api/showDataP03New',{
+                this.showdataPo(staff_id, this.facid_Main, this.tracking_date.d_date, this.tracking_date.evalua);
+                axios
+                    .post('http://localhost:8000/api/showDataP03New', {
                         staff_id: staff_id,
                         fac_id: this.tracking_date.fac_id,
-                        year_id: this.tracking_date.d_date, 
-                        evalua: this.tracking_date.evalua  
-                    }).then(res => {     
-                    // console.log('openDataEvalu: ',res.data);    
-                    if (res.data && Array.isArray(res.data)) {
-                        this.products_Tab1 = res.data; 
-                        this.products_Tab1.forEach(h => {
-                            h.subP01sX.forEach(subP01 => {
-                                // ตรวจสอบว่าค่า p01_score นั้นถูกต้องหรือไม่
-                                const foundScore = this.p01_scores.find(score => score.code === subP01.p01_score);
-                                if (foundScore) {
-                                    subP01.p01_score = foundScore.code; // ใช้ค่าที่ถูกต้อง
-                                } else {
-                                    subP01.p01_score = this.p01_scores[0].code; // ใช้ค่าเริ่มต้น "- ไม่ระบุ -"
-                                }
+                        year_id: this.tracking_date.d_date,
+                        evalua: this.tracking_date.evalua
+                    })
+                    .then((res) => {
+                        // console.log('openDataEvalu: ',res.data);
+                        if (res.data && Array.isArray(res.data)) {
+                            this.products_Tab1 = res.data;
+                            this.products_Tab1.forEach((h) => {
+                                h.subP01sX.forEach((subP01) => {
+                                    // ตรวจสอบว่าค่า p01_score นั้นถูกต้องหรือไม่
+                                    const foundScore = this.p01_scores.find((score) => score.code === subP01.p01_score);
+                                    if (foundScore) {
+                                        subP01.p01_score = foundScore.code; // ใช้ค่าที่ถูกต้อง
+                                    } else {
+                                        subP01.p01_score = this.p01_scores[0].code; // ใช้ค่าเริ่มต้น "- ไม่ระบุ -"
+                                    }
+                                });
                             });
-                        });
-                    } 
-                    this.DialogAdd = true; 
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                });
-            }
-        }, 
-        showdataPo(staff_id,fac_id,year_id,record){  
-
-            this.showPostype(this.postypename,this.postypenameid);
-
-            axios.post('http://localhost:8000/api/showDataPo',{
-                staff_id: staff_id,
-                fac_id: fac_id,
-                year_id: year_id,
-                record: record,
-            }).then(res => {     
-                // console.log(res.data);    
-                if(res.data.length > 0){
-                    const data = res.data[0];
-                    this.coreCompetencies.forEach(item => {
-                        if (item.id === 1) {
-                            item.data_table1 = data.p1;  // Update based on the API response
-                        } else if (item.id === 2) {
-                            item.data_table1 = data.p2;  // Update based on the API response
-                        } else if (item.id === 3) {
-                            item.data_table1 = data.p3;  // Add more conditions if necessary
-                        } else if (item.id === 4) {
-                            item.data_table1 = data.p4;  // Add more conditions if necessary
-                        } else if (item.id === 5) {
-                            item.data_table1 = data.p5;  // Add more conditions if necessary
                         }
+                        this.DialogAdd = true;
+                    })
+                    .catch((error) => {
+                        console.error('Error:', error);
                     });
+            }
+        },
+/* Start Anurak 14/11/67 */
+        // showdataPo(staff_id, fac_id, year_id, record) { 
+            
+        //     this.showPostype(this.postypename, this.postypenameid);
 
-                    // this.jobSpecificCompetencies.forEach(item => {
-                    //     if (item.id === 6) {
-                    //         item.data_table2 = data.p6;  // Update based on the API response
-                    //     } else if (item.id === 7) {
-                    //         item.data_table2 = data.p7;  // Update based on the API response
-                    //     } else if (item.id === 8) {
-                    //         item.data_table2 = data.p8;  // Add more conditions if necessary
-                    //     } else if (item.id === 9) {
-                    //         item.data_table2 = data.p9;  // Add more conditions if necessary
-                    //     } else if (item.id === 10) {
-                    //         item.data_table2 = data.p10;  // Add more conditions if necessary
-                    //     } else if (item.id === 11) {
-                    //         item.data_table2 = data.p11;  // Add more conditions if necessary
-                    //     }
-                    // });
+        //     axios.post('http://localhost:8000/api/showDataPo',{
+        //         staff_id: this.staffid_Main,
+        //         fac_id: this.facid_Main,
+        //         year_id: this.tracking_date.d_date,
+        //         record: this.tracking_date.evalua,
+        //         postypename: postypetext
+        //     }).then(res => {     
+        //         // console.log('showDataPo > ',res.data);
+        //         if(res.data.length > 0){
+        //             const data = res.data[0]; 
+        //             this.coreCompetencies = this.coreCompetencies.map(item => {
+        //                 if (data[`p${item.id}`] !== undefined) {
+        //                     return {
+        //                         ...item,
+        //                         data_table1: data[`p${item.id}`]
+        //                     };
+        //                 }
+        //                 return item;
+        //             });
 
-                    // Update other fields
-                    this.improvements = data.improvements;
-                    this.suggestions = data.suggestions;
-                    
-                }
-                
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
-        }, 
-       async saveEvaTab1(subP01) {  
-            if(subP01.p01_score === 0){
-                Swal.fire("แจ้งเตือน","กรุณาเลือกคะแนน !","error");
-            }else{
-               await axios.post('http://localhost:8000/api/saveP03Po',{
-                    staffid_po: this.staffid_po,
-                    p01_id: subP01.p01_id,
-                    p01_score: subP01.p01_score,
-                    p01_detail: subP01.p01_detail,
-                    p01_evalua:this.tracking_date.evalua,
-                    p01_staffid:this.staffid_Main,
-                    p01_year:this.tracking_date.d_date 
+        //                 // this.jobSpecificCompetencies.forEach(item => {
+        //                 //     if (item.id === 6) {
+        //                 //         item.data_table2 = data.p6;  // Update based on the API response
+        //                 //     } else if (item.id === 7) {
+        //                 //         item.data_table2 = data.p7;  // Update based on the API response
+        //                 //     } else if (item.id === 8) {
+        //                 //         item.data_table2 = data.p8;  // Add more conditions if necessary
+        //                 //     } else if (item.id === 9) {
+        //                 //         item.data_table2 = data.p9;  // Add more conditions if necessary
+        //                 //     } else if (item.id === 10) {
+        //                 //         item.data_table2 = data.p10;  // Add more conditions if necessary
+        //                 //     } else if (item.id === 11) {
+        //                 //         item.data_table2 = data.p11;  // Add more conditions if necessary
+        //                 //     }
+        //                 // });
 
-                }).then(res => {     
-                     //console.log(res.data);   
-                    Swal.fire({
-                        position: "top-end",
-                        icon: "success",
-                        title: "ข้ลมูลผลการประเมินถูกบันทึกเสร็จสิ้น",
-                        showConfirmButton: false,
-                        timer: 1000
+        //                 // Update other fields
+        //                 this.improvements = data.improvements;
+        //                 this.suggestions = data.suggestions;
+        //             }
+        //         })
+        //         .catch((error) => {
+        //             console.error('Error:', error);
+        //         });
+        // },
+/* End Anurak 14/11/67 */        
+        async saveEvaTab1(subP01) {
+            if (subP01.p01_score === 0) {
+                Swal.fire('แจ้งเตือน', 'กรุณาเลือกคะแนน !', 'error');
+            } else {
+                await axios
+                    .post('http://localhost:8000/api/saveP03Po', {
+                        staffid_po: this.staffid_po,
+                        p01_id: subP01.p01_id,
+                        p01_score: subP01.p01_score,
+                        p01_detail: subP01.p01_detail,
+                        p01_evalua: this.tracking_date.evalua,
+                        p01_staffid: this.staffid_Main,
+                        p01_year: this.tracking_date.d_date
+                    })
+                    .then((res) => {
+                        //console.log(res.data);
+                        Swal.fire({
+                            position: 'top-end',
+                            icon: 'success',
+                            title: 'ข้ลมูลผลการประเมินถูกบันทึกเสร็จสิ้น',
+                            showConfirmButton: false,
+                            timer: 1000
+                        });
+                    })
+                    .catch((error) => {
+                        console.error('Error:', error);
                     });
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                });
                 await this.showDataEvalu();
             }
-            
-        }, 
-        async saveEvaTab1_1() { 
-            this.coreCompetencies.forEach((item,index) => {
-                        if (index === 0) {
-                            item.data_table1 = item.data_table1??0;  // Update based on the API response
-                        } else if (index === 1) {
-                            item.data_table1 = item.data_table1??0;  // Update based on the API response
-                        } else if (index === 2) {
-                            item.data_table1 = item.data_table1??0;  // Add more conditions if necessary
-                        } else if (index === 3) {
-                            item.data_table1 = item.data_table1??0;  // Add more conditions if necessary
-                        } else if (index === 4) {
-                            item.data_table1 = item.data_table1??0;  // Add more conditions if necessary
-                        } else if (index === 5) {
-                            item.data_table1 = item.data_table1??0;  // Add more conditions if necessary
-                        }
-                    }); 
-            this.jobSpecificCompetencies.forEach((item,index) => {
-                        if (index === 0) {
-                            item.SCORE = item.SCORE??0;  // Update based on the API response
-                        } else if (index === 1) {
-                            item.SCORE = item.SCORE??0;  // Update based on the API response
-                        } else if (index === 2) {
-                            item.SCORE = item.SCORE??0;  // Add more conditions if necessary
-                        } else if (index === 3) {
-                            item.SCORE = item.SCORE??0;  // Add more conditions if necessary
-                        } else if (index === 4) {
-                            item.SCORE = item.SCORE??0;  // Add more conditions if necessary
-                        } else if (index === 5) {
-                            item.SCORE = item.SCORE??0;  // Add more conditions if necessary
-                        }
-                    });
+        },
+        async saveEvaTab1_1() {
+            this.coreCompetencies.forEach((item, index) => {
+                if (index === 0) {
+                    item.data_table1 = item.data_table1 ?? 0; // Update based on the API response
+                } else if (index === 1) {
+                    item.data_table1 = item.data_table1 ?? 0; // Update based on the API response
+                } else if (index === 2) {
+                    item.data_table1 = item.data_table1 ?? 0; // Add more conditions if necessary
+                } else if (index === 3) {
+                    item.data_table1 = item.data_table1 ?? 0; // Add more conditions if necessary
+                } else if (index === 4) {
+                    item.data_table1 = item.data_table1 ?? 0; // Add more conditions if necessary
+                } else if (index === 5) {
+                    item.data_table1 = item.data_table1 ?? 0; // Add more conditions if necessary
+                }
+            });
+            this.jobSpecificCompetencies.forEach((item, index) => {
+                if (index === 0) {
+                    item.SCORE = item.SCORE ?? 0; // Update based on the API response
+                } else if (index === 1) {
+                    item.SCORE = item.SCORE ?? 0; // Update based on the API response
+                } else if (index === 2) {
+                    item.SCORE = item.SCORE ?? 0; // Add more conditions if necessary
+                } else if (index === 3) {
+                    item.SCORE = item.SCORE ?? 0; // Add more conditions if necessary
+                } else if (index === 4) {
+                    item.SCORE = item.SCORE ?? 0; // Add more conditions if necessary
+                } else if (index === 5) {
+                    item.SCORE = item.SCORE ?? 0; // Add more conditions if necessary
+                }
+            });
             const payload = {
-                staffid_po: this.staffid_po, 
-                staff_id: this.staffid_Main, 
-                fac_id: this.facid_Main, 
+                staffid_po: this.staffid_po,
+                staff_id: this.staffid_Main,
+                fac_id: this.facid_Main,
                 year: this.tracking_date.d_date,
-                record: this.tracking_date.evalua, 
+                record: this.tracking_date.evalua,
                 coreCompetencies: this.coreCompetencies,
                 jobSpecificCompetencies: this.jobSpecificCompetencies,
                 otherCompetencies: this.otherCompetencies,
                 improvements: this.improvements,
                 suggestions: this.suggestions
-            }; 
+            };
             const res = await axios.post('http://localhost:8000/api/saveP03PoTab1', payload);
-                 //console.log(res.data);  
-                Swal.fire({
-                    position: "top-end",
-                    icon: "success",
-                    title: "บันทึกข้อมูลสมรรถนะ / ความเห็นเพิ่มเติม เสร็จสิ้น",
-                    showConfirmButton: false,
-                    timer: 1500
-                });
-                await this.showDataEvalu();
-        }, 
-       async onTabChange(event) { 
+            //console.log(res.data);
+            Swal.fire({
+                position: 'top-end',
+                icon: 'success',
+                title: 'บันทึกข้อมูลสมรรถนะ / ความเห็นเพิ่มเติม เสร็จสิ้น',
+                showConfirmButton: false,
+                timer: 1500
+            });
+            await this.showDataEvalu();
+        },
+        async onTabChange(event) {
             // console.log(event.index);
-            if (event.index==0) {
-                //console.log('ผลสัมฤทธิ์ของงาน -',event.index); 
+            if (event.index == 0) {
+                //console.log('ผลสัมฤทธิ์ของงาน -',event.index);
             }
-            if(event.index==1){
-                //console.log('รายงาน ป.01 - ป.03 -',event.index);  
-                this.tab2Data(this.dataStaffid);  
-                this.showdataPoText(this.dataStaffid,this.facid_Main,this.tracking_date.d_date,this.tracking_date.evalua); 
+            if (event.index == 1) {
+                //console.log('รายงาน ป.01 - ป.03 -',event.index);
+                this.tab2Data(this.dataStaffid);
+                this.showdataPoText(this.dataStaffid, this.facid_Main, this.tracking_date.d_date, this.tracking_date.evalua);
             }
-            if (event.index==2) {
-                //console.log('แผนพัฒนาการปฏิบัติราชการรายบุคคล -',event.index); 
-                this.products_Tab3 =[];
-                this.chkp04(this.dataStaffid,this.facid_Main,this.tracking_date.d_date,this.tracking_date.evalua); 
-                this.chkp04data(this.dataStaffid,this.facid_Main,this.tracking_date.d_date,this.tracking_date.evalua);  
+            if (event.index == 2) {
+                //console.log('แผนพัฒนาการปฏิบัติราชการรายบุคคล -',event.index);
+                this.products_Tab3 = [];
+                this.chkp04(this.dataStaffid, this.facid_Main, this.tracking_date.d_date, this.tracking_date.evalua);
+                this.chkp04data(this.dataStaffid, this.facid_Main, this.tracking_date.d_date, this.tracking_date.evalua);
             }
-            if (event.index==3) {
-                //console.log('รายงาน ป.04 -',event.index); 
-                this.tab2Data(this.dataStaffid);     
-                await  this.chkp04dataT4(this.dataStaffid,this.facid_Main,this.tracking_date.d_date,this.tracking_date.evalua);  
-                await  this.showdatator();
-               
+            if (event.index == 3) {
+                //console.log('รายงาน ป.04 -',event.index);
+                this.tab2Data(this.dataStaffid);
+                await this.chkp04dataT4(this.dataStaffid, this.facid_Main, this.tracking_date.d_date, this.tracking_date.evalua);
+                await this.showdatator();
             }
-        },  
-        tab2Data(staff_id){  
-            axios.post('http://localhost:8000/api/showDataP03New',{
-                staff_id: staff_id, 
-                fac_id: this.tracking_date.fac_id,
-                year_id: this.tracking_date.d_date, 
-                evalua: this.tracking_date.evalua   
-            }).then(res => {     
-                // console.log(res.data);   
-                if (res.data && Array.isArray(res.data)) {
-                    this.products_Tab2 = res.data;  
-                }   
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
-        }, 
-        showdataPoText(staff_id,fac_id,year_id,record){ 
-            axios.post('http://localhost:8000/api/showDataPo',{
-                staff_id: staff_id,
-                fac_id: fac_id,
-                year_id: year_id,
-                record: record,
-            }).then(res => {     
-                 //console.log(res.data);    
-                if(res.data.length > 0){
-                    const data = res.data[0];
-                    this.coreCompetencies.forEach(item => {
-                        if (item.id === 1) {
-                            item.data_table1 = data.p1??0;  // Update based on the API response
-                        } else if (item.id === 2) {
-                            item.data_table1 = data.p2??0;  // Update based on the API response
-                        } else if (item.id === 3) {
-                            item.data_table1 = data.p3??0;  // Add more conditions if necessary
-                        } else if (item.id === 4) {
-                            item.data_table1 = data.p4??0;  // Add more conditions if necessary
-                        } else if (item.id === 5) {
-                            item.data_table1 = data.p5??0;  // Add more conditions if necessary
-                        }
-                    });
+        },
+        tab2Data(staff_id) {
+            axios
+                .post('http://localhost:8000/api/showDataP03New', {
+                    staff_id: staff_id,
+                    fac_id: this.tracking_date.fac_id,
+                    year_id: this.tracking_date.d_date,
+                    evalua: this.tracking_date.evalua
+                })
+                .then((res) => {
+                    // console.log(res.data);
+                    if (res.data && Array.isArray(res.data)) {
+                        this.products_Tab2 = res.data;
+                    }
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                });
+        },
+        showdataPoText(staff_id, fac_id, year_id, record) {
+            // console.log(staff_id);
+            
+            axios .post('http://localhost:8000/api/showDataPo', {
+                    staff_id: staff_id,
+                    fac_id: fac_id,
+                    year_id: year_id,
+                    record: record
+                })
+                .then((res) => {
+                    //console.log(res.data);
+                    if (res.data.length > 0) {
+                        const data = res.data[0];
+                        this.coreCompetencies.forEach((item) => {
+                            if (item.id === 1) {
+                                item.data_table1 = data.p1 ?? 0; // Update based on the API response
+                            } else if (item.id === 2) {
+                                item.data_table1 = data.p2 ?? 0; // Update based on the API response
+                            } else if (item.id === 3) {
+                                item.data_table1 = data.p3 ?? 0; // Add more conditions if necessary
+                            } else if (item.id === 4) {
+                                item.data_table1 = data.p4 ?? 0; // Add more conditions if necessary
+                            } else if (item.id === 5) {
+                                item.data_table1 = data.p5 ?? 0; // Add more conditions if necessary
+                            }
+                        });
 
-                    this.jobSpecificCompetencies.forEach(item => {
-                        if (item.id === 6) {
-                            item.data_table2 = data.p6??0;  // Update based on the API response
-                        } else if (item.id === 7) {
-                            item.data_table2 = data.p7??0;  // Update based on the API response
-                        } else if (item.id === 8) {
-                            item.data_table2 = data.p8??0;  // Add more conditions if necessary
-                        } else if (item.id === 9) {
-                            item.data_table2 = data.p9??0;  // Add more conditions if necessary
-                        } else if (item.id === 10) {
-                            item.data_table2 = data.p10??0;  // Add more conditions if necessary
-                        } else if (item.id === 11) {
-                            item.data_table2 = data.p11??0;  // Add more conditions if necessary
-                        }
-                    });
+                        this.jobSpecificCompetencies.forEach((item) => {
+                            if (item.id === 6) {
+                                item.data_table2 = data.p6 ?? 0; // Update based on the API response
+                            } else if (item.id === 7) {
+                                item.data_table2 = data.p7 ?? 0; // Update based on the API response
+                            } else if (item.id === 8) {
+                                item.data_table2 = data.p8 ?? 0; // Add more conditions if necessary
+                            } else if (item.id === 9) {
+                                item.data_table2 = data.p9 ?? 0; // Add more conditions if necessary
+                            } else if (item.id === 10) {
+                                item.data_table2 = data.p10 ?? 0; // Add more conditions if necessary
+                            } else if (item.id === 11) {
+                                item.data_table2 = data.p11 ?? 0; // Add more conditions if necessary
+                            }
+                        });
 
-                    // Update other fields
-                    this.improvements = data.improvements??'- ไม่มีข้อมูล -';
-                    this.suggestions = data.suggestions??'- ไม่มีข้อมูล -';
-                }
-                
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
-        }, 
-        chkp04(staff_id,fac_id,year_id,record){
-            axios.post('http://localhost:8000/api/showDataPo',{
-                staff_id: staff_id,
-                fac_id: fac_id,
-                year_id: year_id,
-                record: record,
-            }).then(res => {     
-                // console.log(res.data);    
-                if (res.data.length > 0) {
-                    this.chkP04 = 0; 
-                }else{
-                    this.chkP04 = 1; 
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
-        }, 
-        AddDatap04(){ 
+                        // Update other fields
+                        this.improvements = data.improvements ?? '- ไม่มีข้อมูล -';
+                        this.suggestions = data.suggestions ?? '- ไม่มีข้อมูล -';
+                    }
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                });
+        },
+        chkp04(staff_id, fac_id, year_id, record) {
+            axios
+                .post('http://localhost:8000/api/showDataPo', {
+                    staff_id: staff_id,
+                    fac_id: fac_id,
+                    year_id: year_id,
+                    record: record
+                })
+                .then((res) => {
+                    // console.log(res.data);
+                    if (res.data.length > 0) {
+                        this.chkP04 = 0;
+                    } else {
+                        this.chkP04 = 1;
+                    }
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                });
+        },
+        AddDatap04() {
             const newData = {
                 p04_re1: this.p04_re1,
                 p04_re2: this.p04_re2,
-                p04_re3: this.p04_re3,
+                p04_re3: this.p04_re3
             };
-            this.products_Tab3.push(newData); 
+            this.products_Tab3.push(newData);
             this.p04_re1 = '';
             this.p04_re2 = '';
             this.p04_re3 = '';
-        }, 
+        },
         DeleteRegislick(item) {
             // Add logic to remove the selected item
             this.products_Tab3 = this.products_Tab3.filter((product) => product !== item);
-        }, 
-        saveEvaTab3(){  
-            axios.post('http://localhost:8000/api/saveEvaTab3',{
-                staff_id: this.dataStaffid,
-                fac_id: this.facid_Main,
-                year_id: this.tracking_date.d_date,
-                record: this.tracking_date.evalua,
-                products_Tab3: this.products_Tab3
-            }).then(res => {     
-                 //console.log(res.data);    
-                Swal.fire({
-                    position: "top-end",
-                    icon: "success",
-                    title: "บันทึก แผนพัฒนาการปฏิบัติราชการรายบุคคล เสร็จสิ้น",
-                    showConfirmButton: false,
-                    timer: 1000
-                });
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
         },
-        chkp04data(staff_id,fac_id,year_id,record){
-            axios.post('http://localhost:8000/api/showData04Tab3',{
+        saveEvaTab3() {
+            axios
+                .post('http://localhost:8000/api/saveEvaTab3', {
+                    staff_id: this.dataStaffid,
+                    fac_id: this.facid_Main,
+                    year_id: this.tracking_date.d_date,
+                    record: this.tracking_date.evalua,
+                    products_Tab3: this.products_Tab3
+                })
+                .then((res) => {
+                    //console.log(res.data);
+                    Swal.fire({
+                        position: 'top-end',
+                        icon: 'success',
+                        title: 'บันทึก แผนพัฒนาการปฏิบัติราชการรายบุคคล เสร็จสิ้น',
+                        showConfirmButton: false,
+                        timer: 1000
+                    });
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                });
+        },
+        chkp04data(staff_id, fac_id, year_id, record) {
+            axios
+                .post('http://localhost:8000/api/showData04Tab3', {
+                    staff_id: staff_id,
+                    fac_id: fac_id,
+                    year_id: year_id,
+                    record: record
+                })
+                .then((res) => {
+                    // console.log(res.data);
+                    if (res.data.length > 0) {
+                        res.data.forEach((p04) => {
+                            const newData = {
+                                p04_re1: p04.p04_re1,
+                                p04_re2: p04.p04_re2,
+                                p04_re3: p04.p04_re3
+                            };
+                            this.products_Tab3.push(newData);
+                        });
+                    }
+                    this.p04_re1 = '';
+                    this.p04_re2 = '';
+                    this.p04_re3 = '';
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                });
+        },
+        chkp04dataT4(staff_id, fac_id, year_id, record) {
+            axios
+                .post('http://localhost:8000/api/showData04Tab3', {
+                    staff_id: staff_id,
+                    fac_id: fac_id,
+                    year_id: year_id,
+                    record: record
+                })
+                .then((res) => {
+                    // console.log(res.data);
+                    if (res.data.length > 0) {
+                        this.products_Tab3T4 = res.data;
+                    }
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                });
+        },
+        /*============= ผู้ประเมิน ==============*/
+        showdatator() {
+            (this.assessorText = null),
+                (this.assessor_positionText = null),
+                axios
+                    .post('http://localhost:8000/api/showdatator', {
+                        p_year: this.tracking_date.d_date,
+                        evalua: this.tracking_date.evalua,
+                        p_staffid: this.dataStaffid
+                    })
+                    .then((res) => {
+                        //console.log('Response',res.data);
+                        this.assessorText = res.data[0].assessor;
+                        this.assessor_positionText = res.data[0].assessor_position;
+                    })
+                    .catch((error) => {
+                        console.error('Error fetching data:', error);
+                    });
+        },
+        async showPostype(postypename, postypenameid) {
+            // console.log(postypename, postypenameid);
+            var postypetext = `ระดับ` + postypename;
+            await axios
+                .post('http://localhost:8000/api/showdatapostypename', {
+                    postypename: postypetext,
+                    postypenameid: postypenameid
+                })
+                .then((res) => {
+                    // console.log('Response',res.data);
+                    if (res.data.length > 0) {
+                        this.jobSpecificCompetencies = res.data;
+                    }
+                    // } else {
+                    //     // Fallback to default data if response doesn't contain expected data
+                    //     this.jobSpecificCompetencies = [
+                    //         { id: 6, activity: 'ข. 1 การคิดวิเคราะห์', indicator: '1', data_table2: '' },
+                    //         { id: 7, activity: 'ข. 2 การดำเนินการเชิงรุก', indicator: '1', data_table2: '' },
+                    //         { id: 8, activity: 'ข. 3 ความผูกพันที่มีต่อส่วนราชการ', indicator: '1', data_table2: '' },
+                    //         { id: 9, activity: 'ข. 4 การมองภาพองค์รวม', indicator: '1', data_table2: '' },
+                    //         { id: 10, activity: 'ข. 5 การสืบเสาะหาข้อมูล', indicator: '1', data_table2: '' },
+                    //         { id: 11, activity: 'ข. 6 การตรวจสอบความถูกต้องตามกระบวนงาน', indicator: '1', data_table2: '' }
+                    //     ];
+                    // }
+                })
+                .catch((error) => {
+                    console.error('Error fetching data:', error);
+                });
+            await this.getjobSpecificCompetencies();
+        },
+        getjobSpecificCompetencies(dataStaffid) {
+            //console.log(this.staffid_Main,this.dataPor);
+
+            axios .post('http://localhost:8000/api/showdataposp02', { 
+                    p_year: this.tracking_date.d_date,
+                    evalua: this.tracking_date.evalua,
+                    p_staffid: this.dataStaffid
+                })
+                .then(res => {
+                   // console.log('getjobSpecificCompetencies',res.data);
+                    
+                    for (let i = 0; i < this.jobSpecificCompetencies.length; i++) { // แก้ไขเงื่อนไขที่นี่
+                        // ตรวจสอบว่า `res.data[0][`p${i+6}`]` มีค่าก่อนตั้งค่า
+                        if (res.data[0] && res.data[0][`p${i+6}`] !== undefined) {
+                            this.jobSpecificCompetencies[i]['SCORE'] = res.data[0][`p${i+6}`];
+                            this.jobSpecificCompetencies[i]['SCOREPERSON'] = res.data[0][`pa_${i+6}`];
+                        } else {
+                            console.warn(`Missing data for p${i+6}`);
+                        }
+                    }
+                    // console.log('Response', res.data);
+                })
+                .catch((error) => {
+                    console.error('Error fetching data:', error);
+                });
+        },
+        showdataPo(staff_id,facid_Main,d_date,evalua){  
+            // console.log(staff_id,facid_Main,d_date,evalua);
+            
+            // let postypetext = `ระดับ${this.postypename}`;
+            let postypetext = `ระดับ${this.currentstaff[0].postypenameth}`;
+            // console.log(`postypetext > `,this.currentstaff[0].postypenameth);
+            
+            const levelMapping = {
+                'ระดับปฏิบัติการ': 1,
+                'ระดับชำนาญการ': 2,
+                'ระดับชำนาญการพิเศษ': 3,
+                'อาจารย์': 3,
+                'ระดับเชี่ยวชาญ': 4,
+                'ระดับเชี่ยวชาญพิเศษ': 5
+            };
+            let xr = levelMapping[postypetext] || 0;
+
+            // ตั้งค่า coreCompetencies กลับไปเป็นค่าเริ่มต้น
+            this.coreCompetencies = [
+                { id: 1, activity: 'ก. 1 การมุ่งผลสัมฤทธิ์', indicator: xr, data_table1: '',selfAssessment:'' },
+                { id: 2, activity: 'ก. 2 การบริการที่ดี', indicator: xr, data_table1: '',selfAssessment:'' },
+                { id: 3, activity: 'ก. 3 การสั่งสมความเชี่ยวชาญในงานอาชีพ', indicator: xr, data_table1: '',selfAssessment:'' },
+                { id: 4, activity: 'ก. 4 การยึดมั่นในความถูกต้องชอบธรรมและจริยธรรม', indicator: xr, data_table1: '',selfAssessment:'' },
+                { id: 5, activity: 'ก. 5 การทำงานเป็นทีม', indicator: xr, data_table1: '',selfAssessment:'' }
+            ];  
+            
+            
+            // ตั้งค่า jobSpecificCompetencies กลับไปเป็นค่าเริ่มต้น 
+            this.showPostype(this.currentstaff[0].postypenameth,this.postypenameid);
+  
+            
+            axios.post('http://localhost:8000/api/showDataPo',{
                 staff_id: staff_id,
-                fac_id: fac_id,
-                year_id: year_id,
-                record: record,
+                fac_id: facid_Main,
+                year_id: d_date,
+                record: evalua,
+                postypename: postypetext
             }).then(res => {     
-                // console.log(res.data);     
+                // console.log('showDataPo > ',res.data);    
                 if(res.data.length > 0){
-                    res.data.forEach(p04 => {
-                        const newData = {
-                            p04_re1: p04.p04_re1,
-                            p04_re2: p04.p04_re2,
-                            p04_re3: p04.p04_re3
-                        };
-                        this.products_Tab3.push(newData); 
+                    const data = res.data[0]; 
+                    this.coreCompetencies = this.coreCompetencies.map(item => {
+                        if (data[`p${item.id}`] !== undefined) {
+                            return {
+                                ...item,
+                                data_table1: data[`p${item.id}`],
+                                selfAssessment: data[`pa_${item.id}`]
+                            };
+                        } 
+                        return item;
                     });  
-                }
-                this.p04_re1 = '';
-                this.p04_re2 = '';
-                this.p04_re3 = '';
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
-        }, 
-        chkp04dataT4(staff_id,fac_id,year_id,record){
-            axios.post('http://localhost:8000/api/showData04Tab3',{
-                staff_id: staff_id,
-                fac_id: fac_id,
-                year_id: year_id,
-                record: record,
-            }).then(res => {     
-                // console.log(res.data);     
-                if(res.data.length > 0){
-                    this.products_Tab3T4 = res.data;
                 } 
             })
             .catch(error => {
                 console.error('Error:', error);
             });
-        }, 
-        /*============= ผู้ประเมิน ==============*/
-        showdatator() { 
-            this.assessorText = null,
-            this.assessor_positionText = null,
-            axios.post('http://localhost:8000/api/showdatator', {
-                p_year: this.tracking_date.d_date,
-                evalua: this.tracking_date.evalua,
-                p_staffid: this.dataStaffid,
-            })
-            .then(res => {
-                 //console.log('Response',res.data);   
-                this.assessorText = res.data[0].assessor; 
-                this.assessor_positionText = res.data[0].assessor_position; 
-            })
-            .catch(error => {
-                console.error('Error fetching data:', error);
-            });
-        }, 
-       async showPostype(postypename,postypenameid){
-            // console.log(postypename); 
-            var postypetext = `ระดับ`+postypename;
-            await axios.post('http://localhost:8000/api/showdatapostypename', {
-                postypename: postypetext,
-                postypenameid: postypenameid
-            })
-            .then(res => {
-                //console.log('Response',res.data);  
-                if (res.data.length > 0) { 
-                    this.jobSpecificCompetencies = res.data;
-                }
-                // } else {
-                //     // Fallback to default data if response doesn't contain expected data
-                //     this.jobSpecificCompetencies = [
-                //         { id: 6, activity: 'ข. 1 การคิดวิเคราะห์', indicator: '1', data_table2: '' },
-                //         { id: 7, activity: 'ข. 2 การดำเนินการเชิงรุก', indicator: '1', data_table2: '' },
-                //         { id: 8, activity: 'ข. 3 ความผูกพันที่มีต่อส่วนราชการ', indicator: '1', data_table2: '' },
-                //         { id: 9, activity: 'ข. 4 การมองภาพองค์รวม', indicator: '1', data_table2: '' },
-                //         { id: 10, activity: 'ข. 5 การสืบเสาะหาข้อมูล', indicator: '1', data_table2: '' },
-                //         { id: 11, activity: 'ข. 6 การตรวจสอบความถูกต้องตามกระบวนงาน', indicator: '1', data_table2: '' }
-                //     ];
-                // }  
-                
-            })
-            .catch(error => {
-                console.error('Error fetching data:', error);
-            }); 
-            await this.getjobSpecificCompetencies();
         },
-        getjobSpecificCompetencies(){
-            //console.log(this.staffid_Main,this.dataPor);
-            
-            axios.post('http://localhost:8000/api/showdataposp02', { 
-               p_year: this.tracking_date.d_date,
-                evalua: this.tracking_date.evalua,
-                p_staffid: this.staffid_Main
-            })
-            .then(res => {
-                for(let i=0;i<=this.jobSpecificCompetencies.length;i++){
-                    //console.log(this.jobSpecificCompetencies[i]);
-                     
-                    this.jobSpecificCompetencies[i]['SCORE'] = res.data[0][`p${i+6}`];
-                    
-                }
-                 //console.log('Response',res.data);  
-                // this.assessorText = res.data[0].assessor; 
-                // this.assessor_positionText = res.data[0].assessor_position;
-                // this.showscoresum = res.data[0] 
-            })
-            .catch(error => {
-                console.error('Error fetching data:', error);
-            });
-        },
-
 
         //29/10/67
         saveScore() {
-             axios.post('http://localhost:8000/api/saveDatator', {
-            score: this.totalScore
-            })
-            .then(response => {
-            console.log('บันทึกคะแนนสำเร็จ:', response.data); 
-            })
-            .catch(error => {
-            console.error('เกิดข้อผิดพลาดในการบันทึกคะแนน:', error); 
-            });
-        },  
+            axios
+                .post('http://localhost:8000/api/saveDatator', {
+                    score: this.totalScore
+                })
+                .then((response) => {
+                    console.log('บันทึกคะแนนสำเร็จ:', response.data);
+                })
+                .catch((error) => {
+                    console.error('เกิดข้อผิดพลาดในการบันทึกคะแนน:', error);
+                });
+        },
         saveDatatorScore() {
-            //console.log(res.data); 
-                if (!this.assessor || !this.assessor_position) {
-                    Swal.fire({
+            //console.log(res.data);
+            if (!this.assessor || !this.assessor_position) {
+                Swal.fire({
                     icon: 'warning',
                     title: 'กรุณากรอกข้อมูล',
-                    text: 'กรุณากรอกชื่อและตำแหน่งผู้ประเมินให้ครบถ้วน',
-                    });
-                } else { 
-                    Swal.fire({
-                        title: "บันทึกสำเร็จ!",
-                        text: "ข้อมูล ระดับการประเมินตนเอง ถูกบันทึกเรียบร้อย!",
-                        icon: "success"
-                    });
-                    this.DialogScore = false; 
-                } 
-            if(this.product_date.d_date == null || this.product_date.d_date == undefined){
+                    text: 'กรุณากรอกชื่อและตำแหน่งผู้ประเมินให้ครบถ้วน'
+                });
+            } else {
                 Swal.fire({
-                    icon: 'error',  
-                    title: 'เกิดข้อผิดพลาด',  
-                    text: 'กรุณาเลือก รอบการประเมิน'  
-                }); 
-            }else if(this.dropdownProportion == null || this.dropdownProportion == undefined){
+                    title: 'บันทึกสำเร็จ!',
+                    text: 'ข้อมูล ระดับการประเมินตนเอง ถูกบันทึกเรียบร้อย!',
+                    icon: 'success'
+                });
+                this.DialogScore = false;
+            }
+            if (this.product_date.d_date == null || this.product_date.d_date == undefined) {
                 Swal.fire({
-                    icon: 'error',  
-                    title: 'เกิดข้อผิดพลาด',  
-                    text: 'กรุณาเลือก สัดส่วน'  
-                }); 
-                
-            }else{
-                 
-            // console.log({
-            //     p_year: this.product_date.d_date,
-            //     evalua: this.product_date.evalua,
-            //     p_staffid: this.staffid_Main,
-            //     staffid_name: this.staffid_name,
-            //     pos_id: this.pos_id,
-            //     postype_id: this.postype_id,
-            //     fac_id: this.facid_Main,  
-            //     dropdownProportion: this.dropdownProportion.value,
-            //     assessor: this.assessor,
-            //     assessor_position: this. assessor_position
-            // });
-        
+                    icon: 'error',
+                    title: 'เกิดข้อผิดพลาด',
+                    text: 'กรุณาเลือก รอบการประเมิน'
+                });
+            } else if (this.dropdownProportion == null || this.dropdownProportion == undefined) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'เกิดข้อผิดพลาด',
+                    text: 'กรุณาเลือก สัดส่วน'
+                });
+            } else {
+                // console.log({
+                //     p_year: this.product_date.d_date,
+                //     evalua: this.product_date.evalua,
+                //     p_staffid: this.staffid_Main,
+                //     staffid_name: this.staffid_name,
+                //     pos_id: this.pos_id,
+                //     postype_id: this.postype_id,
+                //     fac_id: this.facid_Main,
+                //     dropdownProportion: this.dropdownProportion.value,
+                //     assessor: this.assessor,
+                //     assessor_position: this. assessor_position
+                // });
+
                 const formData = {
                     p_year: this.product_date.d_date,
                     evalua: this.product_date.evalua,
@@ -1677,32 +1824,33 @@ export default {
                     fac_id: this.facid_Main,
                     dropdownProportion: this.dropdownProportion.value,
                     assessor: this.assessor,
-                    assessor_position: this. assessor_position
+                    assessor_position: this.assessor_position
                 };
 
-                axios.post('http://localhost:8000/api/saveDatator', 
-                    formData
-                ).then(response => { 
-                        this.DialogScore = false; 
-                   // console.log('showDataP03',res.data);
-                })
-                .catch(error => {
-                    console.error('Error saving data:', error);
-                });
+                axios
+                    .post('http://localhost:8000/api/saveDatator', formData)
+                    .then((response) => {
+                        this.DialogScore = false;
+                        // console.log('showDataP03',res.data);
+                    })
+                    .catch((error) => {
+                        console.error('Error saving data:', error);
+                    });
             }
-        },  
+        },
+          
     },
-    filters:{
-        removeC:function (value){
-            if (!value) return ''
-           return value.split(':')[0]
-        }
-    } 
-}
+    filters: {
+        removeC: function (value) {
+            if (!value) return '';
+            return value.split(':')[0];
+        } 
+    }
+};
 </script>
 
-<style scoped> 
-label{
+<style scoped>
+label {
     font-size: medium;
     font-weight: 500;
 }
@@ -1737,7 +1885,8 @@ table {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     margin-bottom: 20px;
 }
-th, td {
+th,
+td {
     border: 1px solid #ddd;
     padding: 8px; /* Reduced padding */
     text-align: center;
@@ -1746,17 +1895,21 @@ th, td {
 th {
     background-color: #ffffff;
 }
-th, td:first-child {
+th,
+td:first-child {
     width: 35%; /* Adjusted width for first column */
 }
-td:nth-child(2), td:nth-child(3) {
+td:nth-child(2),
+td:nth-child(3) {
     width: 32.5%; /* Adjusted width for other columns */
 }
 .add-row-form {
     margin: 5px 0; /* Reduced margin */
     font-size: 14px; /* Smaller font size for form */
 }
-.add-button, .save-button, .cancel-button {
+.add-button,
+.save-button,
+.cancel-button {
     margin: 3px; /* Smaller margin */
     padding: 6px 12px; /* Smaller padding */
     font-size: 12px; /* Smaller font size for buttons */
@@ -1768,7 +1921,8 @@ td:nth-child(2), td:nth-child(3) {
     border-radius: 4px;
     font-size: 14px; /* Smaller font size */
 }
-.edit-icon, .delete-icon {
+.edit-icon,
+.delete-icon {
     margin: 0 8px; /* Smaller margin */
     cursor: pointer;
     font-size: 16px; /* Slightly larger font size */
@@ -1784,135 +1938,143 @@ th {
     color: rgb(9, 8, 8);
 }
 .bordered-box {
-      border: 1px solid rgb(179, 177, 177);
-      padding: 20px;
-      margin-top: 20px;
-    }
-    /* P01 */
-    label{
-      font-size: medium;
-      font-weight: 500;
-  }
-  .card-header {
-      text-align: left; /* Aligns text to the left */
-      margin: 0; /* Removes default margins */
-      padding: 0; /* Removes default padding */
-  }
-  .table {
-      width: 100%;
-      border-collapse: collapse;
-  }
-  .table th, .table td {
-      border: 1px solid #ddd;
-      padding: 8px;
-      text-align: center;
-  }
-  .table th {
-      background-color: #edf2bb;
-      font-weight: bold;
-  }
-  .table td {
-      vertical-align: top;
-  }
-  .button-container {
-  text-align: center; /* จัดกึ่งกลางในแนวนอน */
+    border: 1px solid rgb(179, 177, 177);
+    padding: 20px;
+    margin-top: 20px;
+}
+/* P01 */
+label {
+    font-size: medium;
+    font-weight: 500;
+}
+.card-header {
+    text-align: left; /* Aligns text to the left */
+    margin: 0; /* Removes default margins */
+    padding: 0; /* Removes default padding */
+}
+.table {
+    width: 100%;
+    border-collapse: collapse;
+}
+.table th,
+.table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: center;
+}
+.table th {
+    background-color: #edf2bb;
+    font-weight: bold;
+}
+.table td {
+    vertical-align: top;
+}
+.button-container {
+    text-align: center; /* จัดกึ่งกลางในแนวนอน */
 }
 .custom-textarea {
-  width: 100%; /* ให้เต็มความกว้างของ container */
-  height: 100px; /* ปรับความสูงของ textarea */
-  padding: 10px; /* เพิ่มช่องว่างด้านใน */
-  border-radius: 5px; /* ปรับมุมให้โค้งมน */
-  border: 1px solid #ccc; /* กำหนดขอบ */
-  font-size: 1rem; /* ขนาดตัวอักษร */
-  resize: none; /* ปิดการย่อขยาย */
+    width: 100%; /* ให้เต็มความกว้างของ container */
+    height: 100px; /* ปรับความสูงของ textarea */
+    padding: 10px; /* เพิ่มช่องว่างด้านใน */
+    border-radius: 5px; /* ปรับมุมให้โค้งมน */
+    border: 1px solid #ccc; /* กำหนดขอบ */
+    font-size: 1rem; /* ขนาดตัวอักษร */
+    resize: none; /* ปิดการย่อขยาย */
 }
 body {
-  font-family: 'Prompt', Arial, sans-serif;
-  background-color: #f5f5f5;
-  margin: 0;
-  padding: 0;
+    font-family: 'Prompt', Arial, sans-serif;
+    background-color: #f5f5f5;
+    margin: 0;
+    padding: 0;
 }
 .container {
-  width: 95%;
-  margin: 0 auto;
-  padding: 20px;
-  background-color: #fff;
-  border-radius: 8px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    width: 95%;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 h3 {
-  text-align: center;
-  margin-bottom: 20px;
+    text-align: center;
+    margin-bottom: 20px;
 }
 table {
-  width: 100%;
-  table-layout: fixed;
-  border-collapse: collapse;
-  background-color: #fff;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  margin-bottom: 20px;
+    width: 100%;
+    table-layout: fixed;
+    border-collapse: collapse;
+    background-color: #fff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
 }
-th, td {
-  border: 1px solid #ddd;
-  padding: 8px; /* Reduced padding */
-  text-align: center;
-  font-size: 14px; /* Smaller font size */
+th,
+td {
+    border: 1px solid #ddd;
+    padding: 8px; /* Reduced padding */
+    text-align: center;
+    font-size: 14px; /* Smaller font size */
 }
 th {
-  background-color: #ffffff;
+    background-color: #ffffff;
 }
-th, td:first-child {
-  width: 35%; /* Adjusted width for first column */
+th,
+td:first-child {
+    width: 35%; /* Adjusted width for first column */
 }
-td:nth-child(2), td:nth-child(3) {
-  width: 32.5%; /* Adjusted width for other columns */
+td:nth-child(2),
+td:nth-child(3) {
+    width: 32.5%; /* Adjusted width for other columns */
 }
 .add-row-form {
-  margin: 5px 0; /* Reduced margin */
-  font-size: 14px; /* Smaller font size for form */
+    margin: 5px 0; /* Reduced margin */
+    font-size: 14px; /* Smaller font size for form */
 }
-.add-button, .save-button, .cancel-button {
-  margin: 3px; /* Smaller margin */
-  padding: 6px 12px; /* Smaller padding */
-  font-size: 12px; /* Smaller font size for buttons */
+.add-button,
+.save-button,
+.cancel-button {
+    margin: 3px; /* Smaller margin */
+    padding: 6px 12px; /* Smaller padding */
+    font-size: 12px; /* Smaller font size for buttons */
 }
 .form-container {
-  padding: 8px; /* Reduced padding */
-  border: 1px solid #ddd;
-  background-color: #f0f0f0;
-  border-radius: 4px;
-  font-size: 14px; /* Smaller font size */
+    padding: 8px; /* Reduced padding */
+    border: 1px solid #ddd;
+    background-color: #f0f0f0;
+    border-radius: 4px;
+    font-size: 14px; /* Smaller font size */
 }
-.edit-icon, .delete-icon {
-  margin: 0 8px; /* Smaller margin */
-  cursor: pointer;
-  font-size: 16px; /* Slightly larger font size */
+.edit-icon,
+.delete-icon {
+    margin: 0 8px; /* Smaller margin */
+    cursor: pointer;
+    font-size: 16px; /* Slightly larger font size */
 }
 .edit-icon {
-  color: #ffc107;
+    color: #ffc107;
 }
 .delete-icon {
-  color: #dc3545;
+    color: #dc3545;
 }
 .styled-table {
     width: 100%;
     border-collapse: collapse;
-  }
-  
-  .styled-table thead tr {
+}
+
+.styled-table thead tr {
     background-color: #f2f2f2;
-  }
-  
-  .styled-table th, .styled-table td {
+}
+
+.styled-table th,
+.styled-table td {
     padding: 8px;
     text-align: center;
     border: 1px solid #ddd;
-  }
+}
 
-  .styled-table td b {
+.styled-table td b {
     word-break: break-word;
-  }
-  .left-align {
+}
+.left-align {
     text-align: left;
-  }
+}
 </style>

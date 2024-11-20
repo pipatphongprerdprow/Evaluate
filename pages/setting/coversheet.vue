@@ -63,7 +63,7 @@
                                 <label for="dropdownProportion"><b>สัดส่วน :</b></label>
                                 <Dropdown id="dropdownProportions" v-model="dropdownProportion" :options="dropdownProportions" optionLabel="name" placeholder="เลือกสัดส่วน"></Dropdown>
                             </div><br>
-                            <div class="ml-4 mr-4" style="text-align: center;">
+                                <div class="ml-4 mr-4" style="text-align: center;">
                                     <Button icon="pi pi-save" severity="primary" class="mb-2 mr-2" label="บันทึกแบบข้อตกลงภาระงาน" @click="saveDatator" />  
                                 </div>   
                         <div class="explanation">
@@ -138,7 +138,7 @@ export default {
             // Anurak
             activeIndex: 0,
 //----------------------------
-            
+            dataStaffid: null,
             staffid_Main: '',
             staffid_name: '',
             year_Main: '',
@@ -249,7 +249,7 @@ export default {
                 console.error('Error:', error);
             });
         }, 
-        saveDatator() {
+        saveDatator(dataStaffid) {
             //console.log(res.data); 
             if(this.product_date.d_date == null || this.product_date.d_date == undefined){
                 Swal.fire("error","กรุณาเลือก รอบการประเมิน ก่อน","error"); 
@@ -264,7 +264,8 @@ export default {
                     const formData = {
                         p_year: this.product_date.d_date,
                         evalua: this.product_date.evalua,
-                        p_staffid: this.staffid_Main,
+                        p_staffid: this.dataStaffid,
+                        // p_staffid: this.staffid_Main,
                         staffid_name: this.staffid_name,
                         pos_id: this.pos_id,
                         postype_id: this.postype_id,
@@ -283,11 +284,18 @@ export default {
                         // const data = res.data[0].persen.splin(":"); // 70:30
                         // const persen0 = data[0]; // ค่าข้างหน้า = 70
                         // const persen1 = data[1]; // ค่าข้างหลัง = 30 
-
+                        Swal.fire({
+                            position: "top-end",
+                            icon: "success",
+                            title: "บันทึกข้อตกลงภาระงานเรียบร้อย",
+                            showConfirmButton: false,
+                            timer: 1500
+                        });
                     })
                     .catch(error => {
                         console.error('Error saving data:', error);
-                    }); 
+                        Swal.fire("error", "การบันทึกข้อมูลล้มเหลว", "error");
+                    });  
                 }   
             } 
         },
