@@ -378,7 +378,7 @@
                                                         <tr>
                                                             <td style="text-align: right; vertical-align: middle;" colspan="10">
                                                                 <b style="color: blue;">(8) สรุปคะแนนส่วนผลสัมฤทธิ์ของงาน =&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </b>
-                                                                <b style="color: blue;">ผลรวมของค่าคะแนนถ่วงน้ำหนัก</b>
+                                                                <b style="color: blue;">ผลรวมของค่าคะแนนถ่วงน้ำหนัก</b> 
                                                                 <div style="display: flex; justify-content: flex-end;">
                                                                     <hr style="border: 1px solid black; width: 16%;">
                                                                 </div>
@@ -387,8 +387,13 @@
                                                             <td class="text-center" style="color: blue;  vertical-align: middle;">
                                                                 <b>{{ WeightedScoreSumX }}</b> <!-- แสดงผลรวม/จำนวนระดับเป้าหมาย -->
                                                             </td>
-                                                            <td class="text-center" style="color: blue;  vertical-align: middle;">
-                                                                <b>{{ WeightedScoreSumXT }}</b> <!-- แสดงผลรวม/จำนวนระดับเป้าหมาย -->
+                                                            <td class="text-center" style="color: blue;  vertical-align: middle;" >
+                                                                <b style="display: block; text-align: right; color: blue; text-align: left;">{{ WeightedScoreSumtrack }}</b>
+                                                                <hr style="border: 1px solid black; width: 60%; text-align: left;">
+                                                                <b style="display: block; text-align: right; color: blue; text-align: left;">{{5}}</b>
+                                                                <div style="text-align: right;">
+                                                                    <b>= {{ WeightedScoreSumXT }}</b>
+                                                                </div> <!-- แสดงผลรวม/จำนวนระดับเป้าหมาย -->
                                                             </td>
                                                         </tr>  
                                                     </tbody>
@@ -501,11 +506,11 @@
                                                     <tr>
                                                         <td style=" vertical-align: middle;" class="text-left">จำนวนสมรรถนะหลัก /สมรรถนะเฉพาะตามลักษณะงานที่ปฏิบัติ /สมรรถนะทางการบริหาร ที่มีระดับสมรรถนะที่แสดงออก ต่ำกว่า ระดับสมรรถนะที่คาดหวัง 1 ระดับ X 2 คะแนน</td>
                                                             <td class="text-center" style="color: blue;">
-                                                                <b>{{ totalZeroScores }}</b> 
+                                                                <b>{{ totallowerthanscore }}</b> 
                                                             </td>
                                                             <td class="text-center" style="color: blue;"><b>2</b></td> 
                                                             <td class="text-center" style="color: blue;">
-                                                                <b>{{ totalScoreZeroSum }}</b>  
+                                                                <b>{{ totalScorelowSum }}</b>  
                                                             </td>
                                                     </tr>
                                                     <tr>
@@ -525,14 +530,14 @@
                                                             <b style="color: blue;"> (8) ผลรวม</b>
                                                         </td>
                                                             <td class="text-center" style="color: blue;"> 
-                                                                <b>{{ totalScoreSum+totalScoreZeroSum }}</b>  
+                                                                <b>{{ totalScoreSum+totalScorelowSum }}</b>  
                                                             </td> 
                                                     </tr>
                                                     <tr>
                                                     <td style="text-align: center; vertical-align: middle;" colspan="3">
                                                         <b style="color: blue;">(9) สรุปคะแนนส่วนพฤติกรรมการปฏิบัติราชการ   (สมรรถนะ) =	 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </b>
                                                         <b style="color: blue;">  ผลรวมคะแนน ใน (8)</b>
-                                                        <b style="display: block; text-align: right; color: blue;">{{ totalScoreSum + totalScoreZeroSum }}</b>   
+                                                        <b style="display: block; text-align: right; color: blue;">{{ totalScoreSum + totalScorelowSum }}</b>   
                                                         <div style="display: flex; justify-content: flex-end;"> 
                                                             <hr style="border: 1px solid black; width: 70%;">
                                                         </div> 
@@ -540,7 +545,7 @@
                                                         <b style="color: blue;">จำนวนสมรรถนะที่ใช้ในการประเมิน X 3 คะแนน</b>  
                                                     </td> 
                                                     <td class="text-center" style="color: blue;"> 
-                                                         <b> = {{ ((totalScoreSum + totalScoreZeroSum) / 33).toFixed(2) }}</b>  
+                                                         <b> = {{ ((totalScoreSum + totalScorelowSum) / 33).toFixed(2) }}</b>  
                                                     </td> 
                                                 </tr>  
                                                 </tbody>
@@ -644,33 +649,34 @@
                                                             <th rowspan="2">สรุปคะแนน (ก) X (ข)</th>
                                                         </tr>
                                                     </thead>
-                                                    <tbody> 
+                                                    <tbody>  
                                                         <template v-for="(Item, index) in products" :key="index"> 
                                                         <tr v-if="dataStaffid==Item.staffid">  
                                                             <td>องค์ประกอบที่ 1 ผลสัมฤทธิ์ของงาน</td>
                                                             <td class="text-center" style="color: blue;"> 
-                                                                <b id="sumX">{{ ((totalScoreSum + totalScoreZeroSum) / 33).toFixed(2) }}</b> 
-                                                                <!-- {{ insert1(((totalScoreSum + totalScoreZeroSum) / 33).toFixed(2)) }}  -->
+                                                                <!-- <b id="sumX">{{ ((totalScoreSum + totalScorelowSum) / 33).toFixed(2) }}</b>  --> 
+                                                                  <b>{{ Item.tb_tor.achievement_score }}</b> 
                                                             </td> 
                                                             <td class="text-center" style="color: blue;">  
                                                                 <b>{{ Item.tb_tor?Item.tb_tor.persen.split(':')[0]: '' }}</b>
                                                             </td> 
                                                             <td class="text-center" style="color: blue;">  
-                                                                <b>{{ (((totalScoreSum + totalScoreZeroSum) / 33).toFixed(2) *(Item.tb_tor?Item.tb_tor.persen.split(':')[0]:0)).toFixed(2) }}</b>  
+                                                                <!-- <b>{{ (((totalScoreSum + totalScorelowSum) / 33).toFixed(2) *(Item.tb_tor?Item.tb_tor.persen.split(':')[0]:0)).toFixed(2)}}</b>   --> 
+                                                                <b>{{ ( Item.tb_tor  ? Item.tb_tor.achievement_score * (parseFloat(Item.tb_tor.persen.split(':')[0]) || 0) : 0 ).toFixed(2) }}</b>  
                                                             </td> 
                                                         </tr> 
                                                         <tr v-if="dataStaffid==Item.staffid"> 
                                                             <td>องค์ประกอบที่ 2 พฤติกรรมการปฏิบัติราชการ</td>
                                                             <td class="text-center" style="color: blue;">
-                                                                <!-- {{ insert2(WeightedScoreSumXT) }}  -->
-                                                                <b>{{ WeightedScoreSumXT }}</b>
+                                                                <!-- {{ insert2(WeightedScoreSumXT) }} -->
+                                                                <b>{{Item.tb_tor.behavior }}</b>
 
                                                             </td>  
                                                             <td class="text-center" style="color: blue;">  
-                                                                <b>{{ Item.tb_tor?Item.tb_tor.persen.split(':')[1]: '' }}</b>
+                                                                <b>{{ Item.tb_tor?Item.tb_tor.persen.split(':')[1]: ''}}</b>
                                                             </td> 
                                                             <td class="text-center" style="color: blue;"> 
-                                                                <b>{{ ((WeightedScoreSumXT *(Item.tb_tor?Item.tb_tor.persen.split(':')[1]:0)).toFixed(2)) }}</b>  
+                                                                <b>{{ ((Item.tb_tor.behavior *(Item.tb_tor?Item.tb_tor.persen.split(':')[1]:0)).toFixed(2)) }}</b>  
                                                             </td>  
                                                         </tr>
                                                         <tr v-if="dataStaffid==Item.staffid">
@@ -693,13 +699,12 @@
                                                 </table>
                                                 <div class="employee-info">
                                                 <h4>ระดับผลการประเมินที่ได้</h4>
-                                                    <p><strong>[&nbsp;&nbsp; <b v-if="(((totalScoreSum + totalScoreZeroSum) / 33 * 70) + (WeightedScoreSumXT * 30)) >= 90">&#10003;</b> &nbsp;&nbsp;] ดีเด่น (90-100)</strong></p>
-                                                    <p><strong>[&nbsp;&nbsp; <b v-if="(((totalScoreSum + totalScoreZeroSum) / 33 * 70) + (WeightedScoreSumXT * 30)) >= 80 && (((totalScoreSum + totalScoreZeroSum) / 33 * 70) + (WeightedScoreSumXT * 30)) < 90">&#10003;</b> &nbsp;&nbsp;] ดีมาก (80-89)</strong></p>
-                                                    <p><strong>[&nbsp;&nbsp; <b v-if="(((totalScoreSum + totalScoreZeroSum) / 33 * 70) + (WeightedScoreSumXT * 30)) >= 70 && (((totalScoreSum + totalScoreZeroSum) / 33 * 70) + (WeightedScoreSumXT * 30)) < 80">&#10003;</b> &nbsp;&nbsp;] ดี (70-79)</strong></p>
-                                                    <p><strong>[&nbsp;&nbsp; <b v-if="(((totalScoreSum + totalScoreZeroSum) / 33 * 70) + (WeightedScoreSumXT * 30)) >= 60 && (((totalScoreSum + totalScoreZeroSum) / 33 * 70) + (WeightedScoreSumXT * 30)) < 70">&#10003;</b> &nbsp;&nbsp;] พอใช้ (60-69)</strong></p> 
-                                                    <p><strong>[&nbsp;&nbsp; <b v-if="(((totalScoreSum + totalScoreZeroSum) / 33 * 70) + (WeightedScoreSumXT * 30)) < 60">&#10003;</b> &nbsp;&nbsp;] ต้องปรับปรุง (ต่ำกว่า 60)</strong></p>
+                                                    <p><strong>[&nbsp;&nbsp; <b v-if="(((totalScoreSum + totalScorelowSum) / 33 * 70) + (WeightedScoreSumXT * 30)) >= 90">&#10003;</b> &nbsp;&nbsp;] ดีเด่น (90-100)</strong></p>
+                                                    <p><strong>[&nbsp;&nbsp; <b v-if="(((totalScoreSum + totalScorelowSum) / 33 * 70) + (WeightedScoreSumXT * 30)) >= 80 && (((totalScoreSum + totalScorelowSum) / 33 * 70) + (WeightedScoreSumXT * 30)) < 90">&#10003;</b> &nbsp;&nbsp;] ดีมาก (80-89)</strong></p>
+                                                    <p><strong>[&nbsp;&nbsp; <b v-if="(((totalScoreSum + totalScorelowSum) / 33 * 70) + (WeightedScoreSumXT * 30)) >= 70 && (((totalScoreSum + totalScorelowSum) / 33 * 70) + (WeightedScoreSumXT * 30)) < 80">&#10003;</b> &nbsp;&nbsp;] ดี (70-79)</strong></p>
+                                                    <p><strong>[&nbsp;&nbsp; <b v-if="(((totalScoreSum + totalScorelowSum) / 33 * 70) + (WeightedScoreSumXT * 30)) >= 60 && (((totalScoreSum + totalScorelowSum) / 33 * 70) + (WeightedScoreSumXT * 30)) < 70">&#10003;</b> &nbsp;&nbsp;] พอใช้ (60-69)</strong></p> 
+                                                    <p><strong>[&nbsp;&nbsp; <b v-if="(((totalScoreSum + totalScorelowSum) / 33 * 70) + (WeightedScoreSumXT * 30)) < 60">&#10003;</b> &nbsp;&nbsp;] ต้องปรับปรุง (ต่ำกว่า 60)</strong></p>
                                                 </div>
-
                                                 <h5 class="mb-4"><i class="" style="font-size: x-large;"></i> ส่วนที่ 3 แผนพัฒนาการปฏิบัติราชการรายบุคคล</h5>
                                                 <table border="1" cellspacing="0" cellpadding="5">
                                                     <thead>
@@ -917,16 +922,14 @@ export default {
             WeightedScoreSumXT: {},
             //รวมคะแนน เกณฑ์การประเมิน
             totalCoreCompetenciesX3: 0,
-            totalZeroScores: {},
+            totallowerthanscore: {},
             totalScoreSum: {},
-            totalScoreZeroSum: {},
+            totalScorelowSum: {},
             totalScoreFinalSum: {},
 
             assessorText: null,
             assessor_positionText: null,
-            currentstaff: {},
-           
-             
+            currentstaff: {},  
         };
     },
     components: {
@@ -1049,39 +1052,55 @@ export default {
 
             return total;
         }, 
-        //รวมช่องค่า0
-        totalZeroScores() {
-            let zeroScoreCount = 0;
-            this.coreCompetencies.forEach((row) => {
-                if (parseFloat(row.data_table1) === 0) {
-                    zeroScoreCount++;
+        //รวมช่องสมรรถนะตำกว่าที่คาดหวัง
+        totallowerthanscore() {
+            let total1 = 0; // Initialize total1
+            let total2 = 0; // Initialize total2
+
+            // ตรวจสอบเงื่อนไขแรก: data_table1 น้อยกว่า indicator
+            for (let i = 0; i < this.coreCompetencies.length; i++) {
+                const dataTable1Value = parseFloat(this.coreCompetencies[i]?.indicator) || 0;
+                const dataTable2Value = parseFloat(this.coreCompetencies[i]?.data_table1) || 0;
+                if (dataTable2Value < dataTable1Value) {
+                    total1++; // Increment total1 when condition is met
                 }
-            });
-            this.jobSpecificCompetencies.forEach((row) => {
-                if (parseFloat(row.SCORE) === 0) {
-                    zeroScoreCount++;
+            }
+
+            // ตรวจสอบเงื่อนไขที่สอง: COMPLEVEL น้อยกว่า SCORE
+            for (let j = 0; j < this.jobSpecificCompetencies.length; j++) {
+                const dataTable1Value = parseFloat(this.jobSpecificCompetencies[j]?.COMPLEVEL) || 0;
+                const dataTable2Value = parseFloat(this.jobSpecificCompetencies[j]?.SCORE) || 0;
+                if (dataTable2Value < dataTable1Value) {
+                    total2++; // Increment total2 when condition is met
                 }
-            });
-            return zeroScoreCount;
-        },
+            } 
+            // รวมผลลัพธ์ทั้งต่ำกว่าสมรรถนะที่คาดหวัง
+            return total1 + total2 ;  
+        }, 
         //รวมคะแนนจำนวนสมรรถนะ*3
         totalScoreSum() {
-            let sum = 0;
+            let total = 0;  
+                // ตรวจสอบและนับค่าจาก coreCompetencies
+                for (let i = 0; i < this.coreCompetencies.length; i++) {
+                    const dataTable1Value = parseFloat(this.coreCompetencies[i]?.indicator) || 0;
+                    const dataTable2Value = parseFloat(this.coreCompetencies[i]?.data_table1) || 0;
 
-            // คำนวณคะแนนจาก coreCompetencies
-            this.coreCompetencies.forEach((row) => {
-                const dataTable1Value = parseFloat(row.data_table1) || 0;
-                sum += dataTable1Value * 3;
-            }); 
+                    if ((dataTable1Value - dataTable2Value) <= 0) {
+                        total++;
+                    }
+                } 
+ 
+                // ตรวจสอบและนับค่าจาก jobSpecificCompetencies
+                for (let i = 0; i < this.jobSpecificCompetencies.length; i++) {
+                    const dataTable1Value = parseFloat(this.jobSpecificCompetencies[i]?.COMPLEVEL) || 0;
+                    const dataTable2Value = parseFloat(this.jobSpecificCompetencies[i]?.SCORE) || 0;
 
-
-            // // คำนวณคะแนนจาก jobSpecificCompetencies
-            // this.jobSpecificCompetencies.forEach((row) => {
-            //     const dataTable2Value = parseFloat(row.SCORE) ? 1 : 0;
-            //     sum += dataTable2Value * 3;
-            // });
-
-            return sum;
+                    if ((dataTable1Value - dataTable2Value) <= 0) {
+                        total++;
+                    }
+                } 
+                // คูณค่ารวมทั้งหมดด้วย 3
+            return total * 3;
         },
         totalScoreSumX() {
             return this.coreCompetencies.reduce((sum, row, index) => {
@@ -1090,20 +1109,26 @@ export default {
                 return sum + dataTable1Value * 3 + dataTable2Value * 3;
             }, 0);
         },
-        totalScoreZeroSum() {
-            let zeroScoreCount = 0;
-            this.coreCompetencies.forEach((row) => {
-                if (parseFloat(row.data_table1) === 0) {
-                    zeroScoreCount++;
+        totalScorelowSum() {
+            let total1 = 0;  
+            let total2 = 0;  
+            for (let i = 0; i < this.coreCompetencies.length; i++) {
+                const dataTable1Value = parseFloat(this.coreCompetencies[i]?.indicator) || 0;
+                const dataTable2Value = parseFloat(this.coreCompetencies[i]?.data_table1) || 0;
+                if (dataTable2Value < dataTable1Value) {
+                    total1++;  
                 }
-            });
-            this.jobSpecificCompetencies.forEach((row) => {
-                if (parseFloat(row.SCORE) === 0) {
-                    zeroScoreCount++;
+            } 
+            for (let j = 0; j < this.jobSpecificCompetencies.length; j++) {
+                const dataTable1Value = parseFloat(this.jobSpecificCompetencies[j]?.COMPLEVEL) || 0;
+                const dataTable2Value = parseFloat(this.jobSpecificCompetencies[j]?.SCORE) || 0;
+                if (dataTable2Value < dataTable1Value) {
+                    total2++; 
                 }
-            });
-            return zeroScoreCount * 2;
-        }
+            } 
+            // รวมผลลัพธ์ทั้งต่ำกว่าสมรรถนะที่คาดหวัง *2
+            return ((total1 + total2) * 2);  
+        } 
     },
     methods: {
         insert1(scoreA) {

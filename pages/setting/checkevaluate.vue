@@ -339,11 +339,11 @@
                                                 <tr>
                                                     <td style=" vertical-align: middle;" class="text-left">จำนวนสมรรถนะหลัก /สมรรถนะเฉพาะตามลักษณะงานที่ปฏิบัติ /สมรรถนะทางการบริหาร ที่มีระดับสมรรถนะที่แสดงออก ต่ำกว่า ระดับสมรรถนะที่คาดหวัง 1 ระดับ X 2 คะแนน</td>
                                                         <td class="text-center" style="color: blue;">
-                                                            <b>{{ totalZeroScores }}</b> 
+                                                            <b>{{ totallowScores }}</b> 
                                                         </td>
                                                         <td class="text-center" style="color: blue;"><b>2</b></td> 
                                                         <td class="text-center" style="color: blue;">
-                                                            <b>{{ totalScoreZeroSum }}</b>  
+                                                            <b>{{ totalScorelowSum }}</b>  
                                                         </td>
                                                 </tr>
                                                 <tr>
@@ -363,23 +363,25 @@
                                                         <b style="color: blue;"> (8) ผลรวม</b>
                                                     </td>
                                                         <td class="text-center" style="color: blue;"> 
-                                                            <b>{{ totalScoreSum+totalScoreZeroSum }}</b>  
+                                                            <b>{{ totalScoreSum+totalScorelowSum }}</b>  
                                                         </td>
                                                     
                                                 </tr>
                                                 <tr>
-                                                <td style="text-align: right; vertical-align: middle;" colspan="3">
-                                                    <b style="color: blue;">(9) สรุปคะแนนส่วนพฤติกรรมการปฏิบัติราชการ   (สมรรถนะ) =	 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </b>
-                                                    <b style="color: blue;">  ผลรวมคะแนน ใน (8)</b>
-                                                    <div style="display: flex; justify-content: flex-end;">
-                                                        <hr style="border: 1px solid black; width: 20%;">
-                                                    </div>
-                                                    <b style="color: blue;">จำนวนสมรรถนะที่ใช้ในการประเมิน X 3 คะแนน</b>
-                                                </td>
-                                                <td class="text-center" style="color: blue;"> 
-                                                    <b>{{ ((totalScoreSum + totalScoreZeroSum) / 33).toFixed(2) }}</b>  
-                                                </td> 
-                                            </tr>  
+                                                    <td style="text-align: center; vertical-align: middle;" colspan="3">
+                                                        <b style="color: blue;">(9) สรุปคะแนนส่วนพฤติกรรมการปฏิบัติราชการ   (สมรรถนะ) =	 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </b>
+                                                        <b style="color: blue;">  ผลรวมคะแนน ใน (8)</b>
+                                                        <b style="display: block; text-align: right; color: blue;">{{ totalScoreSum + totalScorelowSum }}</b>   
+                                                        <div style="display: flex; justify-content: flex-end;"> 
+                                                            <hr style="border: 1px solid black; width: 70%;">
+                                                        </div> 
+                                                        <b style="display: block; text-align: right; color: blue;">{{ 33}}</b>
+                                                        <b style="color: blue;">จำนวนสมรรถนะที่ใช้ในการประเมิน X 3 คะแนน</b>  
+                                                    </td> 
+                                                    <td class="text-center" style="color: blue;"> 
+                                                         <b> = {{ ((totalScoreSum + totalScorelowSum) / 33).toFixed(2) }}</b>  
+                                                    </td> 
+                                                </tr>  
                                             </tbody>
                                                 <br>
                                                 <div class="p-fluid formgrid grid"> 
@@ -667,10 +669,10 @@ export default {
             WeightedScoreSumX :{},
             WeightedScoreSumXT: {},
             //รวมคะแนน เกณฑ์การประเมิน
-            totalCoreCompetencies:{},
-            totalZeroScores:{},
+            totalCoreCompetencies:0,
+            totallowScores:{},
             totalScoreSum:{},
-            totalScoreZeroSum:{},
+            totalScorelowSum:{},
             totalScoreFinalSum:{},
             //ชื่อผู้ประเมิน ตำแหน่งผู้ประเมิน
             assessorText: null,
@@ -736,34 +738,91 @@ export default {
             //รวมคะแนน เกณฑ์การประเมิน
             //รวมช่องสมรรถนะ
         totalCoreCompetencies() { 
-            return this.coreCompetencies.reduce((sum, row, index) => { 
-                const dataTable1Value = parseFloat(row.data_table1) || 0;
-                const dataTable2Value = parseFloat(this.jobSpecificCompetencies[index]?.data_table2) || 0; 
-                return sum + dataTable1Value + dataTable2Value;
-            }, 0);
+            const maxLength = Math.max(this.coreCompetencies.length, this.jobSpecificCompetencies.length);
+            let total = 0;
+
+            //กกกกก
+            for (let i = 0; i < this.coreCompetencies.length; i++) {
+                const dataTable1Value = parseFloat(this.coreCompetencies[i]?.indicator) || 0;
+                const dataTable2Value = parseFloat(this.coreCompetencies[i]?.data_table1) || 0;
+                // // ตรวจสอบเงื่อนไขและเพิ่มค่า T1 ถ้าเงื่อนไขเป็นจริง
+                if ((dataTable1Value - dataTable2Value) <= 0) {
+                    total++;
+                }
+            } 
+            //ขขข
+            for (let i = 0; i < this.jobSpecificCompetencies.length; i++) {
+                const dataTable1Value = parseFloat(this.jobSpecificCompetencies[i]?.COMPLEVEL) || 0;
+                const dataTable2Value = parseFloat(this.jobSpecificCompetencies[i]?.SCORE) || 0;
+
+                // // ตรวจสอบเงื่อนไขและเพิ่มค่า T1 ถ้าเงื่อนไขเป็นจริง
+                if ((dataTable1Value - dataTable2Value) <= 0) {
+                    total++;
+                }
+            } 
+            
+            //คคค
+            for (let i = 0; i < maxLength; i++) {
+                // const dataTable1Value = parseFloat(this.coreCompetencies[i]?.data_table1) || 0;
+                // const dataTable2Value = parseFloat(this.jobSpecificCompetencies[i]?.SCORE) || 0;
+
+                // // // ตรวจสอบเงื่อนไขและเพิ่มค่า T1 ถ้าเงื่อนไขเป็นจริง
+                // if ((dataTable1Value - dataTable2Value) <= 0) {
+                //     total++;
+                // }
+            } 
+
+            return total;
         },
-            //รวมช่องค่า0
-        totalZeroScores() { 
-            let zeroScoreCount = 0; 
-            this.coreCompetencies.forEach(row => {
-            if (parseFloat(row.data_table1) === 0) {
-                zeroScoreCount++;
+            //รวมช่องค่าที่ต่ำกว่าสมรรถนะ
+        totallowScores() { 
+            let total1 = 0; // Initialize total1
+            let total2 = 0; // Initialize total2
+
+            // ตรวจสอบเงื่อนไขแรก: data_table1 น้อยกว่า indicator
+            for (let i = 0; i < this.coreCompetencies.length; i++) {
+                const dataTable1Value = parseFloat(this.coreCompetencies[i]?.indicator) || 0;
+                const dataTable2Value = parseFloat(this.coreCompetencies[i]?.data_table1) || 0;
+                if (dataTable2Value < dataTable1Value) {
+                    total1++; // Increment total1 when condition is met
+                }
             }
-            });  
-            this.jobSpecificCompetencies.forEach(row => {
-            if (parseFloat(row.data_table2) === 0) {
-                zeroScoreCount++;
-            }
-            }); 
-            return zeroScoreCount;
+
+            // ตรวจสอบเงื่อนไขที่สอง: COMPLEVEL น้อยกว่า SCORE
+            for (let j = 0; j < this.jobSpecificCompetencies.length; j++) {
+                const dataTable1Value = parseFloat(this.jobSpecificCompetencies[j]?.COMPLEVEL) || 0;
+                const dataTable2Value = parseFloat(this.jobSpecificCompetencies[j]?.SCORE) || 0;
+                if (dataTable2Value < dataTable1Value) {
+                    total2++; // Increment total2 when condition is met
+                }
+            } 
+            // รวมผลลัพธ์ทั้งต่ำกว่าสมรรถนะที่คาดหวัง
+            return total1 + total2 ;  
         },
         //รวมคะแนนจำนวนสมรรถนะ*3
         totalScoreSum() {
-            return this.coreCompetencies.reduce((sum, row, index) => { 
-            const dataTable1Value = parseFloat(row.data_table1) || 0;
-            const dataTable2Value = parseFloat(this.jobSpecificCompetencies[index]?.data_table2) || 0;  
-            return sum + (dataTable1Value * 3) + (dataTable2Value * 3); 
-            }, 0);
+            let total = 0;  
+                // ตรวจสอบและนับค่าจาก coreCompetencies
+                for (let i = 0; i < this.coreCompetencies.length; i++) {
+                    const dataTable1Value = parseFloat(this.coreCompetencies[i]?.indicator) || 0;
+                    const dataTable2Value = parseFloat(this.coreCompetencies[i]?.data_table1) || 0;
+
+                    if ((dataTable1Value - dataTable2Value) <= 0) {
+                        total++;
+                    }
+                } 
+ 
+                // ตรวจสอบและนับค่าจาก jobSpecificCompetencies
+                for (let i = 0; i < this.jobSpecificCompetencies.length; i++) {
+                    const dataTable1Value = parseFloat(this.jobSpecificCompetencies[i]?.COMPLEVEL) || 0;
+                    const dataTable2Value = parseFloat(this.jobSpecificCompetencies[i]?.SCORE) || 0;
+
+                    if ((dataTable1Value - dataTable2Value) <= 0) {
+                        total++;
+                    }
+                } 
+                // คูณค่ารวมทั้งหมดด้วย 3
+            return total * 3;
         }, 
         totalScoreSumX() {     
             return this.coreCompetencies.reduce((sum, row, index) => { 
@@ -772,23 +831,26 @@ export default {
                 return sum + (dataTable1Value * 3) + (dataTable2Value * 3);
             }, 0);
         },  
-        totalScoreZeroSum() { 
-            let zeroScoreCount = 0;  
-            this.coreCompetencies.forEach(row => { 
-                if (parseFloat(row.data_table1) === 0) {
-                    zeroScoreCount++;
+        totalScorelowSum() { 
+            let total1 = 0;  
+            let total2 = 0;  
+            for (let i = 0; i < this.coreCompetencies.length; i++) {
+                const dataTable1Value = parseFloat(this.coreCompetencies[i]?.indicator) || 0;
+                const dataTable2Value = parseFloat(this.coreCompetencies[i]?.data_table1) || 0;
+                if (dataTable2Value < dataTable1Value) {
+                    total1++;  
                 }
-            });  
-            this.jobSpecificCompetencies.forEach(row => { 
-                if (parseFloat(row.data_table2) === 0) {
-                    zeroScoreCount++;
+            } 
+            for (let j = 0; j < this.jobSpecificCompetencies.length; j++) {
+                const dataTable1Value = parseFloat(this.jobSpecificCompetencies[j]?.COMPLEVEL) || 0;
+                const dataTable2Value = parseFloat(this.jobSpecificCompetencies[j]?.SCORE) || 0;
+                if (dataTable2Value < dataTable1Value) {
+                    total2++; 
                 }
-            });  
-            return zeroScoreCount * 2;
-        },
-        totalScoreT() {
-            return (((this.totalScoreSum + this.totalScoreZeroSum) / 33 * 70) + (this.WeightedScoreSumXT * 30)).toFixed(2);
-        }, 
+            } 
+            // รวมผลลัพธ์ทั้งต่ำกว่าสมรรถนะที่คาดหวัง *2
+            return ((total1 + total2) * 2);  
+        } 
     }, 
     methods: { 
         setSession (staffid_Main,facid_Main,groupid_Main,postypename,postypenameid) {
@@ -1035,11 +1097,11 @@ export default {
                 console.error('Error:', error);
             });
         },
-        showdatator() {   
+        showdatator(dataStaffid) {   
             axios.post('http://localhost:8000/api/showdatator', {
                 p_year: this.examine_date.d_date,
                 evalua: this.examine_date.evalua,
-                p_staffid: this.staffid_Main
+                p_staffid: this.dataStaffid
             })
             .then(res => {
                  //console.log('Response',res.data);  

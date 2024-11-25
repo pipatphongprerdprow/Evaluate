@@ -128,7 +128,7 @@
                     this.user = await auth.getSession();
                     await this.imgUser(); // ตรวจสอบว่า imgUser ถูกต้องด้วย
                 } catch (error) {
-                    console.error("Error fetching user data:", error);
+                    //console.error("Error fetching user data:", error);
                 }
             },
         // async mounted() {

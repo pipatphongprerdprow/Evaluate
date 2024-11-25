@@ -97,16 +97,19 @@
                             <td></td> 
                         </tr>
                         <tr>
-                            <td style="text-align: right; vertical-align: middle;" colspan="9">
+                            <td style="text-align: center; vertical-align: middle;" colspan="9">
                                 <b style="color: blue;">(8) สรุปคะแนนส่วนผลสัมฤทธิ์ของงาน =&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </b>
                                 <b style="color: blue;">ผลรวมของค่าคะแนนถ่วงน้ำหนัก</b>
+                                <b style="display: block; text-align: right; color: blue;">{{ totalCalculatedScore}}</b>
                                 <div style="display: flex; justify-content: flex-end;">
-                                    <hr style="border: 1px solid black; width: 25%;">
+                                    <hr style="border: 1px solid black; width: 80%;">
                                 </div>
+                                <b style="display: block; text-align: right; color: blue;">{{ 5 }}</b>
                                 <b style="color: blue;">จำนวนระดับค่าเป้าหมาย = 5 </b>
                             </td>
                             <td class="text-center" style="color: blue;  vertical-align: middle;">
-                                <b>{{ WeightedScoreSum }}</b> <!-- แสดงผลรวม/จำนวนระดับเป้าหมาย -->
+                                <!-- <b>{{ totalCalculatedScore }}</b> = --> 
+                                <b> = {{ WeightedScoreSum }}</b> 
                             </td>
                             <td></td>
                         </tr>  
