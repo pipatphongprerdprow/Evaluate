@@ -2,7 +2,7 @@
     <div class="grid">
         <div class="col-12 lg:col-12 xl:col-12"> 
             <div class="card mb-0">
-                <!-- {{ dataPor }} -->
+                <!-- {{ dataPor }} --> 
                 <div class="formgroup-inline mb-1"> 
                     <div class="col md:col-6">
                         <h3 class="mb-4 card-header">
@@ -270,7 +270,7 @@
                             </Column>  
                             <Column field="options" header="ตัวเลือก" style="text-align: center; width: 10%">
                                 <template #body="Item">   
-                                    <Button severity="danger" icon="pi pi-trash" class="p-button-text" outlined rounded @click="DeleteRegislick(Item.data.ind_no)"></Button>
+                                    <Button style="text-align: center;" severity="danger" icon="pi pi-trash" class="p-button-text" outlined rounded @click="DeleteRegislick(Item.data.ind_no)"></Button>
                                 </template>
                             </Column> 
                         </DataTable>

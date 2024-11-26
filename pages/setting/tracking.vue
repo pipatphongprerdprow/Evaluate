@@ -17,7 +17,7 @@
                 <table class="table">
                     <thead> 
                         <tr style="height: 40px;background-color: blanchedalmond;">
-                            <th>ผู้รับการประเมิน</th>  
+                            <th style="width: 40%;">ผู้รับการประเมิน</th>  
                             <th>สัดส่วน</th>  
                             <th>ผลสัมฤทธิ์ของงาน</th>  
                             <th>พฤติกรรมการปฏิบัติราชการ</th>  
@@ -27,7 +27,7 @@
                     </thead>
                     <tbody>
                         <tr v-for="(Item, index) in products" :key="index">
-                            <td style="padding-left: 5px;width: 20%;text-align: left;">  
+                            <td style="padding-left: 5px;width: 30%;text-align: left;">  
                                 <!-- {{ Item }} -->
                                 <b style="color: blue;">{{ Item.prefixfullname }} {{ Item.namefully }} </b> 
                             </td> 
@@ -35,8 +35,18 @@
                             <td class="text-center" style="color: blue;"><b>{{ Item.tb_tor?Item.tb_tor.achievement_score:'' }}</b></td>    
                             <td class="text-center" style="color: blue;"><b>{{ Item.tb_tor?Item.tb_tor.behavior:'' }}</b></td>
                             <td class="text-center" style="color: blue;"><b>{{ Item.tb_tor?Item.tb_tor.sum_score:'' }} </b></td>  
-                            <td style="text-align: center;width: 10%;">
-                                <Button label="ประเมิน" class="mb-2 mr-2" icon="pi pi-list" @click="openDataEvalu(Item.staffid)" />  
+                            <td style="text-align: center;width: 10%;">  
+                                <div v-if="Item.tb_tor">
+                                    <Button 
+                                        label="ประเมิน" 
+                                        class="mb-2 mr-2" 
+                                        icon="pi pi-list" 
+                                        @click="openDataEvalu(Item.staffid)" 
+                                    />  
+                                </div>
+                                <div v-else>
+                                    <p style="color: brown;">-รอข้อมูลการประเมิน-</p>
+                                </div> 
                             </td> 
                         </tr>  
                     </tbody> 
@@ -106,7 +116,7 @@
                                                                     <b style="color: red;">- ไม่มีข้อมูล -</b>
                                                                 </p> 
                                                             </td>
-                                                            
+                                                            <!-- {{ subP01 }} -->
                                                             <td style="text-align: left;"> 
                                                                 <p v-for="(subIitemDoc, inDoc) in subP01.subITemP03doc" :key="inDoc" style="padding-left: 8px;margin-bottom: 5px;"> 
                                                                     <a v-if="subIitemDoc.doc_file!=null" :href="'http://localhost:8000/storage/uploadsP03/'+subIitemDoc.doc_file" target="_blank"><b>ระดับ</b> <b>{{subIitemDoc.doc_no }}</b> {{ subIitemDoc.doc_name }}</a> 
@@ -116,10 +126,11 @@
                                                                     <b style="color: red;">- ไม่มีข้อมูล -</b>
                                                                 </p>
                                                             </td>  
-                                                            <td style=" vertical-align: middle;" class="text-center">{{ subP01.p01_target }}</td>
+                                                            <td style=" vertical-align: middle;" class="text-center">{{ subP01.score }}</td>
                                                             
-
+                                                            
                                                             <td class="text-center" colspan="5">  
+                                                           
                                                                 <Dropdown 
                                                                     class="mb-1" 
                                                                     v-model="subP01.p01_score" 
@@ -128,8 +139,7 @@
                                                                     optionValue="code" 
                                                                     placeholder="เลือกคะแนน" 
                                                                     :value="subP01.p01_score || p01_scores[0]" 
-                                                                /> 
-
+                                                                />  
                                                                 <!-- <div class="mb-1">
                                                                     <InputText v-model="subP01.p01_score" :options="p01_scores"  optionLabel="name" optionValue="code"  :value="subP01.p01_score || p01_scores[0]"></InputText>
                                                                 </div> -->

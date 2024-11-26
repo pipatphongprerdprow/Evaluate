@@ -8,7 +8,7 @@
                             <i class="" style="font-size: x-large"></i> สังกัด: {{ user.user.name.SCOPES?.staffdepartmentname }}
                         </h5>  
                         <small style="color: red;font-size: larger;">* กรุณาเลือกรอบประเมิน เพื่อทำแบบประเมิน</small>
-                    </div>  
+                    </div>   
                     <div class="col md:col-6">  
                         <label for="product_date"></label>
                         <Dropdown 
@@ -88,7 +88,7 @@
                 </TabPanel>
 
                 <TabPanel header="แบบ ป02" value="2">
-                    <Por02 :dataPor="product_date"></Por02>
+                    <Por02 :dataPor="product_date" :tab2Reload="por02key"></Por02>
                     <!-- รอข้อมูล -->
                 </TabPanel>
 
@@ -133,6 +133,7 @@ export default {
             //พี่บอยแก้
             p01x: '',
             xxx: '2',
+            por02key: 0,
             por03key: 0,
             por04key: 0,
             // Anurak
@@ -249,7 +250,7 @@ export default {
                 console.error('Error:', error);
             });
         }, 
-        saveDatator(dataStaffid) {
+        saveDatator() {
             //console.log(res.data); 
             if(this.product_date.d_date == null || this.product_date.d_date == undefined){
                 Swal.fire("error","กรุณาเลือก รอบการประเมิน ก่อน","error"); 
@@ -264,7 +265,7 @@ export default {
                     const formData = {
                         p_year: this.product_date.d_date,
                         evalua: this.product_date.evalua,
-                        p_staffid: this.dataStaffid,
+                        p_staffid: this.staffid_Main,
                         // p_staffid: this.staffid_Main,
                         staffid_name: this.staffid_name,
                         pos_id: this.pos_id,
@@ -315,7 +316,7 @@ export default {
                 this.dropdownProportion = persen.length > 0 ? persen[0] : null;  
             })
             .catch(error => {
-                console.error('Error fetching data:', error);
+               // console.error('Error fetching data:', error);
             });
         },   
         // Anurak
@@ -324,7 +325,9 @@ export default {
             if(this.product_date.d_date == null || this.product_date.d_date == undefined){
                 Swal.fire("error","กรุณาเลือก รอบการประเมิน ก่อน !","error"); 
             }else{
-                if(event.index==3) {   
+                if(event.index==2) {   
+                    this.por02key++; 
+                }else if(event.index==3) {   
                     this.por03key++; 
                 }else if(event.index==4) {   
                     this.por04key++; 

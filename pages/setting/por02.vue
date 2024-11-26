@@ -99,13 +99,18 @@ import { ref } from 'vue';
 import axios from 'axios';  
 import Swal from 'sweetalert2'
 import { saveAs } from 'file-saver';
+import InputText from 'primevue/inputtext';
 export default {
     props: {
         // กำหนด props ที่จะรับข้อมูลจาก parent
         dataPor: {
             type: Object,
             required: true
-        }
+        },
+        tab2Reload: {
+            type: String,
+            default: '0'
+        } 
     },
     data() {
         return {
@@ -148,13 +153,18 @@ export default {
         const {staffdepartment, groupid, staffdepartmentname, groupname} = SCOPES
         await this.setSession(STAFFID,staffdepartment,groupid,user.user.name.POSTYPENAME,user.user.name.POSITIONNAMEID); 
        
- 
+        
         // this.showdataPo(STAFFID,staffdepartment,this.dataPor.d_date,this.dataPor.evalua);
         // console.log(this.dataPor.d_date); 
         // this.showdataPo(staff_id,this.facid_Main,this.tracking_date.d_date,this.tracking_date.evalua );
     },  
     watch: {
-        // เฝ้าดูการเปลี่ยนแปลงของ dataPor
+        tab2Reload(v) { 
+            // console.log("por02 tab2Reload",v);
+            this.showdataPo();
+            this.getjobSpecificCompetencies();
+
+        },  
         dataPor: {
             handler(newVal, oldVal) {
                 // console.log('dataPor changed:', newVal);
@@ -163,7 +173,8 @@ export default {
                     // ทำสิ่งที่ต้องการเมื่อ dataPor เปลี่ยนแปลง
             },
             deep: true // ใช้ deep: true เพื่อดูการเปลี่ยนแปลงภายใน object
-        }
+        },
+        
     },
     methods: {  
         setSession (staffid_Main,facid_Main,groupid_Main,postypename,postypenameid) {

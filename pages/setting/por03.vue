@@ -241,7 +241,7 @@
         <Dialog header="จัดการ รางานการปฏิบัติราชการตามตัวชี้วัด/เกณฑ์การประเมิน" maximizable v-model:visible="DialogAdd" :breakpoints="{ '960px': '75vw' }" :style="{ width: '100vw' }" :modal="true" position="top">
             <form> 
                 <InputText v-model="text_edtP03" type="hidden" style="display: none;" /> 
-                <div class="p-fluid formgrid grid">
+                <!-- <div class="p-fluid formgrid grid">
                     <div class="field col-12 md:col-12">
                         <label for="list_no_p03">รายงานผลการปฏิบัติราชการตามตัวชี้วัด/ เกณฑ์การประเมิน <em style="color: red;font-size: small">*ถ้ามี 1 ระดับ ให้ใส่ ระดับ 0</em></label>
                         <InputGroup style="text-align: center;">
@@ -250,7 +250,23 @@
                             <Button icon="pi pi-save" label="บันทึก" severity="warning" @click="AddDatalist" />
                         </InputGroup>
                     </div>
-                </div>
+                </div> -->
+                <div class="p-fluid formgrid mb-2">  
+                    <label for="list_no_p03">รายงานผลการปฏิบัติราชการตามตัวชี้วัด/ เกณฑ์การประเมิน <em style="color: red;font-size: small">*ถ้ามี 1 ระดับ ให้ใส่ ระดับ 0</em></label> 
+                    <div class="p-fluid formgrid grid"> 
+                        <div class="col-12 md:col-2">
+                            <label for="list_no_p03">ระดับ</label>
+                            <Dropdown v-model="list_no_p03" :options="list_no_p03s" optionLabel="name" placeholder="เลือกระดับ"></Dropdown>  
+                        </div> 
+                        <div class="col-12 md:col-8">
+                            <label for="list_text_p03">ชื่อตัวชี้วัด / เกณฑ์การประเมิน</label>
+                            <InputText v-model="list_text_p03" type="text" placeholder="ชื่อตัวชี้วัด / เกณฑ์การประเมิน" autocomplete="off"/>  
+                        </div>  
+                        <div class="col-12 md:col-2" style="align-self: end;">
+                            <Button icon="pi pi-save" label="บันทึก" severity="warning" @click="AddDatalist" /> 
+                        </div> 
+                    </div>   
+                </div>   
                 <DataTable :value="products_list_p03" :rows="10" :paginator="true" responsiveLayout="scroll" dataKey="id">
                     <Column field="p03ind_no" header="ลำดับ" style="width: 10%">
                         <template #body="Item">
@@ -263,8 +279,8 @@
                         </template>
                     </Column> 
                     <Column field="options" header="ตัวเลือก" style="text-align: center; width: 10%">
-                        <template #body="Item">
-                            <Button severity="danger" icon="pi pi-trash" class="p-button-text" outlined rounded @click="DeleteRegislick(Item.data)"></Button>
+                        <template #body="Item"> 
+                            <Button severity="danger" icon="pi pi-trash" class="p-button-text" outlined rounded @click="DeleteRegislicklist(Item.data)"></Button>
                         </template>
                     </Column>
                 </DataTable> 
@@ -357,7 +373,7 @@
                 </template>
         </Dialog>
 
-        <!-- /*============= ระดับการประเมินตนเอง (ค่าคะแนนที่ได้) =============*/ --> 
+        <!-- /*============= ระดับการประเมินตนเอง (ค่าคะแนนที่ได้) =============*/ -->  
         <Dialog header="ระดับคะแนนประเมินตนเอง (ค่าคะแนนที่ได้) " maximizable v-model:visible="DialogScore" :breakpoints="{ '960px': '75vw' }" :style="{ width: '30vw' }" :modal="true" position="top">
             <form> 
                 <div class="p-fluid formgrid">
@@ -401,14 +417,14 @@ import InputText from 'primevue/inputtext';
             products_personP03: [], 
             itemsBtu: (item) => [
                 {
-                    label: 'รางานการปฏิบัติราชการ',
+                    label: 'รายงานการปฏิบัติราชการ',
                     icon: 'pi pi-sort-amount-down',
                     command: () => {
                         this.OpenDialogAdd(item);
                     }
                 },
                 {
-                    label: '(หลักฐาน)รางานการปฏิบัติราชการ',
+                    label: '(หลักฐาน)รายงานการปฏิบัติราชการ',
                     icon: 'pi pi-file',
                     command: () => {
                         this.OpenDialogDoc(item);
@@ -458,6 +474,14 @@ import InputText from 'primevue/inputtext';
             ],
 /*============= รายงานผลการปฏิบัติราชการตามตัวชี้วัด/ เกณฑ์การประเมิน =============*/
                 DialogAdd: false,
+                list_no_p03: { name: '- เลือกระดับ -', value: 0 },
+                list_no_p03s: [
+                    { name: 'ระดับที่ 1', value: 1 },
+                    { name: 'ระดับที่ 2', value: 2 },
+                    { name: 'ระดับที่ 3', value: 3 },
+                    { name: 'ระดับที่ 4', value: 4 },
+                    { name: 'ระดับที่ 5', value: 5 },
+                ],
                 text_edtP03: null,
                 list_no_p03: null,
                 list_text_p03: null,
@@ -587,22 +611,25 @@ import InputText from 'primevue/inputtext';
                 });
             },
             // เพิ่มรายงานผลการปฏิบัติราชการตามตัวชี้วัด/ เกณฑ์การประเมิน
-            AddDatalist(){ 
-                if(this.list_no_p03 == null || this.list_text_p03 == null){ 
-                    Swal.fire("ไม่มีข้อมูล","กรุณาตรวจสอบข้อมูล ลำดับ - ชื่อตัวชี้วัด / เกณฑ์การประเมิน!","error");
+            AddDatalist(){      
+                if(this.list_no_p03.length === 0){ 
+                    Swal.fire("ไม่มีข้อมูล","กรุณาตรวจสอบข้อมูล ลำดับ!","error"); 
+                } else if(this.list_text_p03 == null){ 
+                    Swal.fire("ไม่มีข้อมูล","กรุณาตรวจสอบข้อมูลชื่อตัวชี้วัด / เกณฑ์การประเมิน!","error");
                 } else { 
                     this.products_list_p03.push({
-                        p03ind_no: this.list_no_p03,
+                        p03ind_no: this.list_no_p03.value,
                         p03ind_Items: this.list_text_p03
                     }); 
                     this.products_list_p03.sort((a, b) => a.p03ind_no - b.p03ind_no); 
-                    this.list_no_p03 = null;
+                    this.list_no_p03.value = null;
                     this.list_text_p03 = null;  
                 }
             }, 
             // ลบรายงานผลการปฏิบัติราชการตามตัวชี้วัด/ เกณฑ์การประเมิน
-            DeleteRegislick(data){ 
-                this.products_list_p03 = this.products_list_p03.filter(product => product.p03ind_no !== data.p03ind_no);
+            DeleteRegislicklist(data){ 
+                // console.log(data); 
+                 this.products_list_p03 = this.products_list_p03.filter(product => product.p03ind_no !== data.p03ind_no); 
             },
             // บันทึกรายงานผลการปฏิบัติราชการตามตัวชี้วัด/ เกณฑ์การประเมิน
             saveDataListP03() {   
