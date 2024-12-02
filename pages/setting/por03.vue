@@ -1,9 +1,9 @@
 <template>
     <div class="grid">
         <div class="col-12 lg:col-12 xl:col-12">
-            <!-- <div class="col md:col-12 text-right">
+            <div class="col md:col-12 text-right">
                 <Button label="Export" icon="pi pi-file-word" class="mr-2 mb-2 "></Button>
-            </div>   --> 
+            </div>   
               <!-- {{ user }} -->​  
             <div class="card mb-0">
                 <div class="formgroup-inline mb-1">
@@ -119,7 +119,7 @@
                                 <tr v-for="(row1, index) in coreCompetencies" :key="index">
                                     <td style="text-align: left;">{{ row1.activity }}</td> 
                                     <td>{{ row1.indicator }}</td>
-                                    <td> 
+                                    <!-- <td> 
                                         <InputText 
                                             v-model="row1.selfAssessment"
                                             type="text" 
@@ -128,7 +128,16 @@
                                             @input="validateNumericInput(index)"
                                             showButtons
                                         />    
-                                    </td> 
+                                    </td>  -->
+                                    <td>
+                                        <InputNumber 
+                                            v-model.number="row1.selfAssessment" 
+                                            type="text" 
+                                            placeholder="0" 
+                                            autocomplete="off" 
+                                            showButtons
+                                        />
+                                    </td>
                                     <td>  
                                         <b v-if="row1.data_table1 == '' " style="color: red;">0</b> 
                                         <b v-if="row1.data_table1 != 0 " >{{ row1.data_table1 }}</b> 
@@ -152,7 +161,7 @@
                                 <tr v-for="(row2, index) in jobSpecificCompetencies" :key="index"> 
                                     <td style="text-align: left;">ข. {{ index+6 }} {{ row2.WORK_NAME }}</td> 
                                     <td>{{ row2.COMPLEVEL }}</td>
-                                    <td>
+                                    <!-- <td>
                                         <InputText 
                                             v-model="row2.selfAssessment"
                                             type="text" 
@@ -161,6 +170,15 @@
                                             @input="validateNumericInputR2(index)"
                                             showButtons
                                         />    
+                                    </td> -->
+                                    <td>
+                                        <InputNumber 
+                                            v-model.number="row2.selfAssessment" 
+                                            type="text" 
+                                            placeholder="0" 
+                                            autocomplete="off" 
+                                            showButtons
+                                        />
                                     </td>
                                     <td>
                                         <b v-if="row2.SCORE == null ||row2.SCORE == '' " style="color: red;">0</b> 
@@ -430,13 +448,13 @@ import InputText from 'primevue/inputtext';
                         this.OpenDialogDoc(item);
                     }
                 },
-                {
-                    label: 'ระดับคะแนนประเมินตนเอง',
-                    icon: 'pi pi-thumbs-up',
-                    command: () => {
-                        this.OpenDialogScore(item);
-                    }
-                },
+                //  {
+                //     label: 'ระดับคะแนนประเมินตนเอง',
+                //         icon: 'pi pi-thumbs-up',
+                //         command: () => {
+                //             this.OpenDialogScore(item);
+                //         }
+                // },
                 {
                     label: 'ลบข้อมูล',
                     icon: 'pi pi-times',
@@ -611,7 +629,8 @@ import InputText from 'primevue/inputtext';
                 });
             },
             // เพิ่มรายงานผลการปฏิบัติราชการตามตัวชี้วัด/ เกณฑ์การประเมิน
-            AddDatalist(){      
+            AddDatalist(){  
+
                 if(this.list_no_p03.length === 0){ 
                     Swal.fire("ไม่มีข้อมูล","กรุณาตรวจสอบข้อมูล ลำดับ!","error"); 
                 } else if(this.list_text_p03 == null){ 
@@ -621,10 +640,11 @@ import InputText from 'primevue/inputtext';
                         p03ind_no: this.list_no_p03.value,
                         p03ind_Items: this.list_text_p03
                     }); 
+                    
                     this.products_list_p03.sort((a, b) => a.p03ind_no - b.p03ind_no); 
-                    this.list_no_p03.value = null;
-                    this.list_text_p03 = null;  
-                }
+                    this.list_text_p03 = null;
+                } 
+                
             }, 
             // ลบรายงานผลการปฏิบัติราชการตามตัวชี้วัด/ เกณฑ์การประเมิน
             DeleteRegislicklist(data){ 
@@ -641,7 +661,7 @@ import InputText from 'primevue/inputtext';
                         products_list: this.products_list_p03
                     })
                     .then((res) => {
-                        // console.log(res.data);  
+                         console.log(res.data);  
                         Swal.fire({
                             title: "บันทึกสำเร็จ!",
                             text: "ข้อมูล ตัวชี้วัด/ เกณฑ์การประเมิน ถูกบันทึกเรียบร้อย!",
@@ -1102,15 +1122,17 @@ import InputText from 'primevue/inputtext';
             },  
             async saveAssess() {
                 try {
-                    const response = await axios.post('http://localhost:8000/api/savedataAssess', {
+                    const response = await axios.post('http://localhost:8000/api/savedataAssess', { 
                         p_staffid: this.staffid_Main,
                         fac_id: this.facid_Main,
                         p_year: this.dataPor.d_date,
                         evalua: this.dataPor.evalua, 
                         corecompetencies: this.coreCompetencies,
                         jobspecificcompetencies: this.jobSpecificCompetencies,
-                    });
-
+                        
+                    }); 
+                   // console.log( this.staffid_Main,this.facid_Main,this.dataPor.evalua, this.coreCompetencies,this.jobSpecificCompetencies, );
+                    
                     // Assuming the response is successful
                     Swal.fire({
                         position: 'top-end',

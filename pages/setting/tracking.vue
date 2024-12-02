@@ -627,9 +627,9 @@
                                         <div class="p-fluid formgrid grid">
                                             <div class="card">                      
                                                 <h5 class="mb-4"><i class="" style="font-size: x-large;"></i> ส่วนที่ 1 ข้อมูลของผู้รับการประเมิน</h5>
-                                                <!-- ตาราง ก. สมรรถนะหลัก --> 
+                                                <!-- ตาราง ก. สมรรถนะหลัก -->  
                                                 <div class="employee-info">  
-                                                    <p><strong>รอบการประเมิน:</strong> {{ tracking_date.d_evaluationround }} </p>
+                                                    <p><strong>รอบการประเมิน:</strong> {{ tracking_date.d_evaluationround }} {{ tracking_date.d_date }} </p>
                                                     <p><strong>ชื่อผู้รับการประเมิน:</strong>  {{ currentstaff[0].prefixfullname }} {{ currentstaff[0].staffname }} {{   currentstaff[0].staffsurname }} </p>
                                                     <p><strong>ตำแหน่ง:</strong> {{ currentstaff[0].posnameth }} </p>
                                                     <p><strong>ระดับตำแหน่ง:</strong>{{ currentstaff[0].postypenameth }} </p>
@@ -701,20 +701,30 @@
                                                                 <b>{{ 100 }}%</b>  
                                                             </td> 
                                                             <td class="text-center" style="color: blue;">  
-                                                             <b>{{ Item.tb_tor?Item.tb_tor.sum_score:'' }} </b> 
-                                                            </td>
+                                                                <b>{{ Item.tb_tor?Item.tb_tor.sum_score:'' }}</b>  
+                                                            </td> 
                                                         </tr>
                                                         </template>   
                                                     </tbody>
                                                 </table>
-                                                <div class="employee-info">
+                                                <!-- <div class="employee-info">
                                                 <h4>ระดับผลการประเมินที่ได้</h4>
-                                                    <p><strong>[&nbsp;&nbsp; <b v-if="(((totalScoreSum + totalScorelowSum) / 33 * 70) + (WeightedScoreSumXT * 30)) >= 90">&#10003;</b> &nbsp;&nbsp;] ดีเด่น (90-100)</strong></p>
-                                                    <p><strong>[&nbsp;&nbsp; <b v-if="(((totalScoreSum + totalScorelowSum) / 33 * 70) + (WeightedScoreSumXT * 30)) >= 80 && (((totalScoreSum + totalScorelowSum) / 33 * 70) + (WeightedScoreSumXT * 30)) < 90">&#10003;</b> &nbsp;&nbsp;] ดีมาก (80-89)</strong></p>
-                                                    <p><strong>[&nbsp;&nbsp; <b v-if="(((totalScoreSum + totalScorelowSum) / 33 * 70) + (WeightedScoreSumXT * 30)) >= 70 && (((totalScoreSum + totalScorelowSum) / 33 * 70) + (WeightedScoreSumXT * 30)) < 80">&#10003;</b> &nbsp;&nbsp;] ดี (70-79)</strong></p>
-                                                    <p><strong>[&nbsp;&nbsp; <b v-if="(((totalScoreSum + totalScorelowSum) / 33 * 70) + (WeightedScoreSumXT * 30)) >= 60 && (((totalScoreSum + totalScorelowSum) / 33 * 70) + (WeightedScoreSumXT * 30)) < 70">&#10003;</b> &nbsp;&nbsp;] พอใช้ (60-69)</strong></p> 
-                                                    <p><strong>[&nbsp;&nbsp; <b v-if="(((totalScoreSum + totalScorelowSum) / 33 * 70) + (WeightedScoreSumXT * 30)) < 60">&#10003;</b> &nbsp;&nbsp;] ต้องปรับปรุง (ต่ำกว่า 60)</strong></p>
-                                                </div>
+                                                        <p><strong>[&nbsp;&nbsp; <b v-if="(((totalScoreSum + totalScorelowSum) / 33 * 70) + (WeightedScoreSumXT * 30)) >= 90">&#10003;</b> &nbsp;&nbsp;] ดีเด่น (90-100)</strong></p>
+                                                        <p><strong>[&nbsp;&nbsp; <b v-if="(((totalScoreSum + totalScorelowSum) / 33 * 70) + (WeightedScoreSumXT * 30)) >= 80 && (((totalScoreSum + totalScorelowSum) / 33 * 70) + (WeightedScoreSumXT * 30)) < 90">&#10003;</b> &nbsp;&nbsp;] ดีมาก (80-89)</strong></p>
+                                                        <p><strong>[&nbsp;&nbsp; <b v-if="(((totalScoreSum + totalScorelowSum) / 33 * 70) + (WeightedScoreSumXT * 30)) >= 70 && (((totalScoreSum + totalScorelowSum) / 33 * 70) + (WeightedScoreSumXT * 30)) < 80">&#10003;</b> &nbsp;&nbsp;] ดี (70-79)</strong></p>
+                                                        <p><strong>[&nbsp;&nbsp; <b v-if="(((totalScoreSum + totalScorelowSum) / 33 * 70) + (WeightedScoreSumXT * 30)) >= 60 && (((totalScoreSum + totalScorelowSum) / 33 * 70) + (WeightedScoreSumXT * 30)) < 70">&#10003;</b> &nbsp;&nbsp;] พอใช้ (60-69)</strong></p> 
+                                                        <p><strong>[&nbsp;&nbsp; <b v-if="(((totalScoreSum + totalScorelowSum) / 33 * 70) + (WeightedScoreSumXT * 30)) < 60">&#10003;</b> &nbsp;&nbsp;] ต้องปรับปรุง (ต่ำกว่า 60)</strong></p>
+                                                </div>  -->
+                                                <template v-for="(Item, index) in products" :key="index">
+                                                    <div v-if="dataStaffid == Item.staffid" class="employee-info">
+                                                        <h4>ระดับผลการประเมินที่ได้</h4>
+                                                            <p> <strong> [&nbsp;&nbsp;<b v-if="Item?.tb_tor?.sum_score >= 90">&#10003;</b>&nbsp;&nbsp;] ดีเด่น (90-100)</strong> </p>
+                                                            <p> <strong> [&nbsp;&nbsp; <b v-if="Item?.tb_tor?.sum_score >= 80 && Item?.tb_tor?.sum_score < 90">&#10003;</b>&nbsp;&nbsp;] ดีมาก (80-89)</strong></p>
+                                                            <p> <strong> [&nbsp;&nbsp; <b v-if="Item?.tb_tor?.sum_score >= 70 && Item?.tb_tor?.sum_score < 80">&#10003;</b> &nbsp;&nbsp;] ดี (70-79) </strong></p>
+                                                            <p> <strong> [&nbsp;&nbsp; <b v-if="Item?.tb_tor?.sum_score >= 60 && Item?.tb_tor?.sum_score < 70">&#10003;</b> &nbsp;&nbsp;] พอใช้ (60-69)</strong></p>
+                                                            <p> <strong> [&nbsp;&nbsp;  <b v-if="Item?.tb_tor?.sum_score < 60">&#10003;</b> &nbsp;&nbsp;] ต้องปรับปรุง (ต่ำกว่า 60) </strong> </p>
+                                                    </div>
+                                                </template> 
                                                 <h5 class="mb-4"><i class="" style="font-size: x-large;"></i> ส่วนที่ 3 แผนพัฒนาการปฏิบัติราชการรายบุคคล</h5>
                                                 <table border="1" cellspacing="0" cellpadding="5">
                                                     <thead>

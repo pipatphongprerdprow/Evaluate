@@ -1,4 +1,7 @@
 <template>
+    <div class="col md:col-12 text-right">
+        <Button label="Export" icon="pi pi-file-word" class="mr-2 mb-2 "></Button>
+    </div> 
     <div class="card">
         <h4 style="text-align: left">แบบสรุปการประเมินผล</h4>
             <div class="p-fluid formgrid grid">
@@ -6,7 +9,7 @@
                     <h5 class="mb-4"><i class="" style="font-size: x-large;"></i> ส่วนที่ 1 ข้อมูลของผู้รับการประเมิน</h5>  
                     <!-- ตาราง ก. สมรรถนะหลัก -->
                     <div class="employee-info">   
-                        <p><strong>รอบการประเมิน:</strong> {{dataPor.d_evaluationround}}</p>
+                        <p><strong>รอบการประเมิน:</strong> {{dataPor.d_evaluationround}} {{ dataPor.d_date }} </p>
                         <p><strong>ชื่อผู้รับการประเมิน:</strong> {{ user.user.name.PREFIXFULLNAME }} {{ user.user.name.STAFFNAME }} {{ user.user.name.STAFFSURNAME }} </p>
                         <p><strong>ตำแหน่ง:</strong> {{ user.user.name.POSITIONNAME }} </p>
                         <p><strong>ระดับตำแหน่ง:</strong>{{ user.user.name.POSTYPENAME }} </p>

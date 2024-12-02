@@ -1,4 +1,7 @@
 <template>
+    <div class="col md:col-12 text-right">
+        <Button label="Export" icon="pi pi-file-word" class="mr-2 mb-2 " @click="printDataP01"></Button>
+    </div> 
     <div class="grid">
         <div class="col-12 lg:col-12 xl:col-12"> 
             <div class="card mb-0">
@@ -484,6 +487,22 @@ export default {
                     }); 
                 }
             }); 
+        },
+        // printDataP01
+        async printDataP01() {     
+            const form = {
+                staff_id: this.staffid_Main,
+                group_id: this.groupid_Main,
+                fac_id: this.dataPor.fac_id,
+                year_id: this.dataPor.d_date,
+                evalua: this.dataPor.evalua   
+            }
+
+            const queryParams = new URLSearchParams(form).toString();
+            // console.log(queryParams); 
+            const url = `http://localhost:8000/report_p01?${queryParams}`;
+            window.open(url, '_blank');
+ 
         },
 
 //*================== Start เลือกข้อมูลแบบประเมิน ป.01 ==================*//

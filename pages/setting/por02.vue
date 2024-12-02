@@ -1,7 +1,7 @@
 <template>
-     <!-- <div class="col md:col-12 text-right">
-        <Button label="Export" icon="pi pi-file-word" class="mr-2 mb-2 "></Button>
-    </div> --> 
+     <div class="col md:col-12 text-right">
+        <Button label="Export" icon="pi pi-file-word" class="mr-2 mb-2 " @click="printDataP02"></Button>
+    </div> 
     <div class="card">
         <h3 class="mb-4" style="text-align: left;"><i class="pi pi-folder-open" style="font-size: x-large;"></i> แบบ ป02</h3>
         <h4>ข้อตกลงและแบบการประเมินผลสัมฤทธิ์ของงานของข้าราชการและพนักงาน สังกัดมหาวิทยาลัยมหาสารคาม (องค์ประกอบที่ 2)</h4><br>   
@@ -334,7 +334,22 @@ export default {
             .catch(error => {
                 console.error('Error fetching data:', error);
             });
-        }   
+        },   
+        async printDataP02() {     
+            const form = {
+                staff_id: this.staffid_Main,
+                group_id: this.groupid_Main,
+                fac_id: this.dataPor.fac_id,
+                year_id: this.dataPor.d_date,
+                evalua: this.dataPor.evalua   
+            }
+
+            const queryParams = new URLSearchParams(form).toString();
+            // console.log(queryParams); 
+            const url = `http://localhost:8000/printReportP01_1?${queryParams}`;
+            window.open(url, '_blank');
+ 
+        },
           
 
     }  

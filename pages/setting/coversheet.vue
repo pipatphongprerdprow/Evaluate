@@ -1,6 +1,6 @@
-<template>  
+<template>   
     <div class="grid">
-        <div  class="col-12 lg:col-12 xl:col-12">
+        <div  class="col-12 lg:col-12 xl:col-12"> 
             <div class="card mb-0"> 
                 <div class="formgroup-inline mb-1">
                     <div class="col md:col-6">   
@@ -8,14 +8,15 @@
                             <i class="" style="font-size: x-large"></i> สังกัด: {{ user.user.name.SCOPES?.staffdepartmentname }}
                         </h5>  
                         <small style="color: red;font-size: larger;">* กรุณาเลือกรอบประเมิน เพื่อทำแบบประเมิน</small>
-                    </div>   
+                    </div>  
+                    <!-- {{  this.product_date.d_date }}    -->
                     <div class="col md:col-6">  
                         <label for="product_date"></label>
                         <Dropdown 
                             id="product_date" 
                             v-model="product_date" 
                             :options="products_date" 
-                            optionLabel="d_evaluationround" 
+                            optionLabel="d_evaluationround"
                             placeholder="กรุณาเลือกรอบการประเมิน" 
                             style="max-width: 500px;width: 100%;border: outset;" 
                             @change="showdatator" 
@@ -36,18 +37,20 @@
                 </div>
             </div>
             <!-- แสดงข้อมูลบันทึก -->
-            <!-- {{ user.user }}  -->
-
+            <!-- {{ user.user }}  --> 
             <!-- //พี่บอยแก้ -->
             <TabView :activeIndex="activeIndex" @tabChange="onTabChange">
                 <!-- <TabView @click="xyz"> -->
                 <TabPanel header="แบบ ใบปะหน้า" value="0">
+                    <div class="col md:col-12 text-right">
+                        <Button label="Export" icon="pi pi-file-word" class="mr-2 mb-2 " @click="printDataP01"></Button>
+                    </div> 
                     <div class="card"> 
                         <div style="display: flex; justify-content: center">
                             <img src="~/assets/layout/images/kongkang.jpg" alt="Description of image" class="contract-image" />
                         </div>
                         <h4 style="text-align: center">แบบข้อตกลงภาระงานและพฤติกรรมการปฏิบัติราชการ (Term of Reference : TOR) <br>ข้าราชการและพนักงาน สังกัดมหาวิทยาลัยมหาสารคาม</h4>
-                        <br />
+                        <br /> 
                         <!-- ตาราง ก. สมรรถนะหลัก -->
                         <div class="employee-info">
                             <p><strong>ผู้ปฏิบัติงาน:</strong> {{ user.user.name.PREFIXFULLNAME }} {{ user.user.name.STAFFNAME }} {{ user.user.name.STAFFSURNAME }}</p>
@@ -57,7 +60,7 @@
                             <!-- <p><strong>ประเภทบุคลากร:</strong></p> --> 
                             <p><strong>ชื่อผู้ประเมิน:</strong> <InputText type="text" placeholder="ชื่อผู้ประเมิน"  v-model="assessor" style="width: 300px;"/></p> 
                             <p><strong>ตำแหน่งผู้ประเมิน :</strong> <InputText type="text" placeholder="ตำแหน่งผู้ประเมิน" v-model="assessor_position" style="width: 265px;" /></p> 
-                            <p><strong>รายละเอียดข้อตกลง ระหว่าง วันที่ : </strong>{{ product_date.d_evaluationround }}</p>
+                            <p><strong>รายละเอียดข้อตกลง ระหว่าง วันที่ : </strong>{{ product_date.d_evaluationround }}  {{ product_date.d_date }}</p>
                         </div><br> 
                             <div class="ml-4 mr-4" style="text-align: center;">
                                 <label for="dropdownProportion"><b>สัดส่วน :</b></label>
@@ -164,7 +167,7 @@ export default {
                     }
             },
             product_date: {
-                d_evaluationround: ''
+                d_evaluationround: '',  
             },
             assessor: null,
             assessor_position: null,
@@ -216,7 +219,7 @@ export default {
         await this.showDataSet(STAFFID, staffdepartment, groupid);
         //this.showDataEvalu();   
     }, 
-    methods: {
+    methods: { 
         setSession(staffid_Main, facid_Main, groupid_Main ,user) {
             // console.log('user: ',user.user.name);
             this.staffid_Main = staffid_Main;
@@ -335,7 +338,22 @@ export default {
                 this.currenttap=event.index
                 //console.log(this.currenttap);  
             }
-        },  
+        }, 
+        async printDataP01() {     
+            const form = {
+                staff_id: this.staffid_Main,
+                group_id: this.groupid_Main,
+                fac_id: this.facid_Main,
+                year_id: this.product_date.d_date,
+                evalua: this.product_date.evalua   
+            }
+
+            const queryParams = new URLSearchParams(form).toString();
+            // console.log(queryParams); 
+            const url = `http://localhost:8000/printReportCoverpage?${queryParams}`;
+            window.open(url, '_blank');
+ 
+        }, 
     },  
 }
 </script>

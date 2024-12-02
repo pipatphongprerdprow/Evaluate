@@ -7,10 +7,12 @@
                         <h3 class="mb-4 card-header"><i class="pi pi-star" style="font-size: x-large;"></i> ตรวจสอบ แบบประเมิน</h3>    
                     </div> 
                     <!-- {{ productstaff[0].prefixfullname  }} -->
-                    <div class="col md:col-6" >  
-                        <label for="examine_date"></label>
+                    <div class="col md:col-5" >   
                         <Dropdown id="examine_date" v-model="examine_date" :options="examine_dates" optionLabel="d_evaluationround" placeholder="กรุณาเลือกรอบการประเมิน" style=" max-width: 500px; width: 100%" ></Dropdown> 
-                    </div>     
+                    </div>   
+                    <div class="col md:col-1" >  
+                        <Button class="mb-2 mr-2" icon="pi pi-search" @click="xxr" /> 
+                    </div>  
                 </div>  
                 <table class="table">
                     <thead> 
@@ -23,25 +25,41 @@
                     </thead>
                     <tbody>
                         <tr v-for="(Item, index) in products" :key="index">
-                            <td style="padding-left: 5px;width: 40%;">
-                                <b style="color: blue;">{{ Item.prefixfullname }} {{ Item.namefully }} </b>
-                                <Tag v-if="Item.countchk==2 " severity="success" style="font-size: larger;">อนุมัติ</Tag>
-                                <Tag v-if="Item.countchk==3 " severity="danger" style="font-size: larger;">ไม่ผ่าน</Tag> 
+                            <td style="padding-left: 5px;width: 40%;text-align: left;">
+                                <b style="color: blue;">{{ Item.prefixfullname }} {{ Item.namefully }} </b> &nbsp;&nbsp;
+                                <Tag v-if="Item.countchk==2 " severity="success" style="font-size: small;">อนุมัติ</Tag>
+                                <Tag v-if="Item.countchk==3 " severity="danger" style="font-size: small;">ไม่ผ่าน</Tag> 
                             </td>
                             <td style="padding-left: 5px;width: 25%;"><b>{{ Item.posnameth }}</b></td>
                             <td style="text-align: center;width: 20%;">   
-                                <div v-if="Item.countchk!=''">
-                                    <Button icon="pi pi-check" label="อนุมัติ" rounded class="mb-2 mr-2" @click="Btnstatus(Item.staffid,2)" />
-                                    <Button icon="pi pi-times" severity="danger" label="ไม่ผ่าน" rounded class="mb-2 mr-2" @click="Btnstatus(Item.staffid,3)"  /> 
+                                <div v-if="Item.tb_tor">
+                                    <Button icon="pi pi-check" label="อนุมัติ" rounded class="mb-2 mr-2" size="small" @click="Btnstatus(Item.staffid,2)" />
+                                    <Button icon="pi pi-times" severity="danger" label="ไม่ผ่าน" rounded class="mb-2 mr-2" size="small" @click="Btnstatus(Item.staffid,3)"  /> 
                                 </div>
-                                <div v-if="Item.countchk==''">
-                                    <Button icon="pi pi-bookmark" severity="secondary" label="ไม่มีข้อมูล" rounded class="mb-2 mr-2"/>
+                                <div v-else>-</div>  
+                            </td>
+                            <td style="text-align: center;width: 15%;">  
+                            <!-- 28 / 11 / 67
+                                <div v-if="Item">
+                                    <Button severity="info" label="รายละเอียด" class="mb-2 mr-2" icon="pi pi-plus" @click="openDataEvalu(Item.staffid)" />  
+                                </div>
+                                <div v-else>
+                                    <p style="color: brown;">-รอข้อมูลการประเมิน-</p>
+                                </div>  
+                            -->
+                                <div v-if="Item.tb_tor">
+                                    <Button 
+                                        label="รายละเอียด" 
+                                        severity="info"
+                                        class="mb-2 mr-2" 
+                                        icon="pi pi-list" 
+                                        @click="openDataEvalu(Item.staffid)" 
+                                    />  
+                                </div>
+                                <div v-else>
+                                    <p style="color: brown;">-รอข้อมูลการประเมิน-</p>
                                 </div> 
-                                <!-- {{ Item.countchk }} -->
-                            </td>
-                            <td style="text-align: center;width: 15%;">
-                                <Button severity="info" label="รายละเอียด" class="mb-2 mr-2" icon="pi pi-plus" @click="openDataEvalu(Item.staffid)" />  
-                            </td>
+                            </td> 
                         </tr> 
                     </tbody>
                 </table>
@@ -77,7 +95,7 @@
                                     <!-- <p><strong>ประเภทบุคลากร:</strong></p> -->
                                     <p><strong>ชื่อผู้ประเมิน:</strong> {{ assessorText }}</p> 
                                     <p><strong>ตำแหน่งผู้ประเมิน :</strong>{{ assessor_positionText }}</p> 
-                                    <p><strong>รายละเอียดข้อตกลง ระหว่าง วันที่ :</strong> {{ examine_date.d_evaluationround }} </p>
+                                    <p><strong>รายละเอียดข้อตกลง ระหว่าง วันที่ :</strong> {{ examine_date.d_evaluationround }} {{ examine_date.d_date }}</p>
                                 </div><br>
 
                                 <div class="explanation">
@@ -409,7 +427,7 @@
                                             <h5 class="mb-4"><i class="" style="font-size: x-large;"></i> ส่วนที่ 1 ข้อมูลของผู้รับการประเมิน</h5>
                                             <!-- ตาราง ก. สมรรถนะหลัก -->
                                             <div class="employee-info"> 
-                                                <p><strong>รอบการประเมิน:</strong> {{ examine_date.d_evaluationround }}</p>
+                                                <p><strong>รอบการประเมิน:</strong> {{ examine_date.d_evaluationround }} {{ examine_date.d_date }}</p>
                                                 <p><strong>ชื่อผู้รับการประเมิน:</strong>  {{ currentstaff[0].prefixfullname }} {{ currentstaff[0].staffname }} {{   currentstaff[0].staffsurname }} </p>
                                                 <p><strong>ตำแหน่ง:</strong> {{ currentstaff[0].posnameth }} </p>
                                                 <p><strong>ระดับตำแหน่ง:</strong>{{ currentstaff[0].postypenameth }}</p>
@@ -690,7 +708,7 @@ export default {
         const {STAFFID, SCOPES} = user.user.name
         const {staffdepartment, groupid, staffdepartmentname, groupname} = SCOPES
         await this.setSession(STAFFID, staffdepartment, groupid, user.user.name.POSTYPENAME, user.user.name.POSITIONNAMEID);  
-        this.showDataEvalu();  
+        // this.showDataEvalu();  
         this.showDataSet(); 
     }, 
     computed: {
@@ -860,7 +878,7 @@ export default {
             this.groupid_Main = groupid_Main   
             this.postypename = postypename    
             this.postypenameid = postypenameid    
-        },
+        }, 
         showDataSet() {
             axios
                 .post('http://localhost:8000/api/showDateSet', {
@@ -876,13 +894,32 @@ export default {
                     console.error('Error:', error);
                 });
         },
+        xxr() {
+            if (this.examine_date.evalua === undefined) {
+                Swal.fire({
+                    title: 'แจ้งเตือนจากระบบ!',
+                    text: 'กรุณาเลือก รอบประเมิน ก่อน!',
+                    icon: 'error'
+                });
+            } else { 
+                this.showDataEvalu();
+            }
+        },
         async showDataEvalu(){
             await axios.get('http://localhost:8000/api/showDataEvalu',{
+                // 28 / 11 / 67
+                // params: {
+                //     staff_id: this.staffid_Main,
+                //     fac_id: this.facid_Main, 
+                //     group_id: this.groupid_Main
+                // },
                 params: {
                     staff_id: this.staffid_Main,
-                    fac_id: this.facid_Main, 
-                    group_id: this.groupid_Main
-                },
+                    fac_id: this.facid_Main,
+                    group_id: this.groupid_Main,
+                    evalua: this.examine_date.evalua,
+                    p_year: this.examine_date.d_date
+                }
             }).then(res => {     
                 // console.log(res.data);  
                 this.products=res.data;   
@@ -1110,7 +1147,7 @@ export default {
                 this.showscoresum = res.data[0]  
             })
             .catch(error => {
-                console.error('Error fetching data:', error);
+                //console.error('Error fetching data:', error);
             });
         },
         getjobSpecificCompetencies(dataStaffid) {
@@ -1137,7 +1174,7 @@ export default {
                     console.warn('Invalid response data from API:', res.data);
                 }
             }).catch(error => {
-                console.error('Error fetching data:', error);
+               // console.error('Error fetching data:', error);
             });
         }, 
         async showPostype(postypename,postypenameid){
