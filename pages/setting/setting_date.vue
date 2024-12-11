@@ -7,8 +7,7 @@
                         <h3 class="mb-4 card-header"><i class="pi pi-calendar" style="font-size: x-large;"></i> จัดการ รอบประเมิน</h3>
                     </div> 
                     <!-- {{ user }} -->
-                    <br>
-                     <!-- {{ por01Data }}  -->
+                    <br> 
                     <div class="col md:col-16 text-right"> 
                         <Button icon="pi pi-plus" severity="info" class="mb-2 mr-2" label="เพิ่มข้อมูลรอบประเมิน" @click="OpenDialogAdd" /> 
                         <!-- เพิ่มข้อมูลรอบประเมิน -->

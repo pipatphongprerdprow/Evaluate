@@ -2,7 +2,7 @@
     <div class="grid">
         <div class="col-12 lg:col-12 xl:col-12">
             <div class="col md:col-12 text-right">
-                <Button label="Export" icon="pi pi-file-word" class="mr-2 mb-2 "></Button>
+                <Button label="Export" icon="pi pi-file-word" class="mr-2 mb-2 " @click="printDataP03"></Button>
             </div>   
               <!-- {{ user }} -->​  
             <div class="card mb-0">
@@ -1213,6 +1213,19 @@ import InputText from 'primevue/inputtext';
                     console.error('Error:', error);
                 }); 
             }, 
+            async printDataP03() {     
+                const form = {
+                    staff_id: this.staffid_Main,
+                    group_id: this.groupid_Main,
+                    fac_id: this.dataPor.fac_id,
+                    year_id: this.dataPor.d_date,
+                    evalua: this.dataPor.evalua   
+                } 
+                const queryParams = new URLSearchParams(form).toString();
+                // console.log(queryParams); 
+                const url = `http://localhost:8000/report_p03?${queryParams}`;
+                window.open(url, '_blank'); 
+            },     
         },
     } 
     

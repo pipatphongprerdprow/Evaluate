@@ -9,7 +9,7 @@
                         </h5>  
                         <small style="color: red;font-size: larger;">* กรุณาเลือกรอบประเมิน เพื่อทำแบบประเมิน</small>
                     </div>  
-                    <!-- {{  this.product_date.d_date }}    -->
+                    <!-- {{ product_date.d_date }}    -->
                     <div class="col md:col-6">  
                         <label for="product_date"></label>
                         <Dropdown 

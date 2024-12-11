@@ -1,7 +1,7 @@
 <template>
     <div class="col md:col-12 text-right">
-        <Button label="Export" icon="pi pi-file-word" class="mr-2 mb-2 "></Button>
-    </div> 
+            <Button label="Export" icon="pi pi-file-word" class="mr-2 mb-2 " @click="printDataP04"></Button>
+        </div> 
     <div class="card">
         <h4 style="text-align: left">แบบสรุปการประเมินผล</h4>
             <div class="p-fluid formgrid grid">
@@ -514,7 +514,20 @@ export default {
             .catch(error => {
                 console.error('Error:', error);
             });
-        },        
+        }, 
+        async printDataP04() {     
+            const form = {
+                staff_id: this.staffid_Main,
+                group_id: this.groupid_Main,
+                fac_id: this.dataPor.fac_id,
+                year_id: this.dataPor.d_date,
+                evalua: this.dataPor.evalua   
+            } 
+            const queryParams = new URLSearchParams(form).toString();
+            // console.log(queryParams); 
+            const url = `http://localhost:8000/report_p04?${queryParams}`;
+            window.open(url, '_blank'); 
+        },            
     }
 } 
 

@@ -33,12 +33,12 @@
                             <td style="padding-left: 5px;width: 25%;"><b>{{ Item.posnameth }}</b></td>
                             <td style="text-align: center;width: 20%;">   
                                 <div v-if="Item.tb_tor">
-                                    <Button icon="pi pi-check" label="อนุมัติ" rounded class="mb-2 mr-2" size="small" @click="Btnstatus(Item.staffid,2)" />
+                                    <Button icon="pi pi-check" label="อนุมัติ" rounded class="mb-2 mr-2" size="small" @click="Btnstatus(Item.staffid,2,)" />
                                     <Button icon="pi pi-times" severity="danger" label="ไม่ผ่าน" rounded class="mb-2 mr-2" size="small" @click="Btnstatus(Item.staffid,3)"  /> 
                                 </div>
                                 <div v-else>-</div>  
                             </td>
-                            <td style="text-align: center;width: 15%;">  
+                            <td style="text-align: center;width: 15%;">   
                             <!-- 28 / 11 / 67
                                 <div v-if="Item">
                                     <Button severity="info" label="รายละเอียด" class="mb-2 mr-2" icon="pi pi-plus" @click="openDataEvalu(Item.staffid)" />  
@@ -57,24 +57,22 @@
                                     />  
                                 </div>
                                 <div v-else>
-                                    <p style="color: brown;">-รอข้อมูลการประเมิน-</p>
+                                    <p style="color: brown;">-รอข้อมูลการประเมิน-</p> 
                                 </div> 
                             </td> 
                         </tr> 
                     </tbody>
-                </table>
-               
+                </table> 
                 <Dialog header="จัดการแบบ ป01" maximizable v-model:visible="DialogAdd" :breakpoints="{ '960px': '75vw' }" :style="{ width: '100vw' }" :modal="true" position="top">
                     <template v-slot:header>
                         <h3>รายงานแบบแบบประเมิน ป01-ป04</h3>
                         <InputText v-model="dataStaffid" type="hidden" autocomplete="off" style="display: none;"/>   
                     </template>
-                    <TabView :activeIndex="activeIndex" @tabChange="onTabChange"> 
-
+                    <TabView :activeIndex="activeIndex" @tabChange="onTabChange">  
                         <TabPanel header="แบบใบปะหน้า">
                             <!-- <div class="col md:col-12 text-right">
-                                <Button label="Export" icon="pi pi-file-word" class="mr-2 mb-2 "></Button>
-                            </div> -->
+                                    <Button label="Export" icon="pi pi-file-word" class="mr-2 mb-2 " @click="printDataP01"></Button>
+                                </div> -->
                                 <div class="card">
                                     <h3 class="mb-4" style="text-align: right;">
                                         <i class="pi pi-folder-open" style="font-size: x-large;"></i> แบบ ป01-02
@@ -96,8 +94,7 @@
                                     <p><strong>ชื่อผู้ประเมิน:</strong> {{ assessorText }}</p> 
                                     <p><strong>ตำแหน่งผู้ประเมิน :</strong>{{ assessor_positionText }}</p> 
                                     <p><strong>รายละเอียดข้อตกลง ระหว่าง วันที่ :</strong> {{ examine_date.d_evaluationround }} {{ examine_date.d_date }}</p>
-                                </div><br>
-
+                                </div><br> 
                                 <div class="explanation">
                                     <h4>คำชี้แจง</h4>
                                     <p>
@@ -1205,6 +1202,21 @@ export default {
             });
            await this.getjobSpecificCompetencies(); 
         },
+        // async printDataP01() {     
+        //     const form = {
+        //         staff_id: this.staffid_Main,
+        //         group_id: this.groupid_Main,
+        //         fac_id: this.facid_Main,
+        //         year_id: this.examine_date.d_date,
+        //         evalua: this.examine_date.evalua   
+        //     }
+
+        //     const queryParams = new URLSearchParams(form).toString();
+        //     // console.log(queryParams); 
+        //     const url = `http://localhost:8000/printReportCoverpage?${queryParams}`;
+        //     window.open(url, '_blank');
+ 
+        // }, 
     }
 }
 
