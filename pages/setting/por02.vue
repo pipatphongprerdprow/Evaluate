@@ -97,8 +97,9 @@
 <script>
 import { ref } from 'vue';
 import axios from 'axios';  
-import Swal from 'sweetalert2'
-import { saveAs } from 'file-saver';
+import Swal from 'sweetalert2' 
+ 
+
 import InputText from 'primevue/inputtext';
 export default {
     props: {

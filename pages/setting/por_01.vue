@@ -291,7 +291,9 @@
 import { ref } from 'vue';
 import axios from 'axios';  
 import Swal from 'sweetalert2'
-import { saveAs } from 'file-saver';
+ 
+ 
+
 
 export default {
     props: {
@@ -638,45 +640,7 @@ export default {
 //*================== End เพิ่มข้อมูลแบบประเมิน ==================*//
 
         // Export File
-        exportToWord() {
-            // สร้างเนื้อหาในไฟล์ Word เป็น HTML
-            const content = `
-                <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
-                <head><meta charset="utf-8"><title>Exported Word</title></head>
-                <body>
-                    <h1>รายงานการปฏิบัติงาน</h1>
-                    <p>นี่คือเนื้อหาที่จะส่งออกไปเป็นไฟล์ Word</p>
-                    <p>ข้อมูลเพิ่มเติมสามารถแทรกได้ที่นี่</p>
-                </body>
-                </html>
-            `;
-
-            // สร้าง Blob สำหรับไฟล์ Word
-            const blob = new Blob(['\ufeff', content], {
-                type: 'application/msword',
-            });
-
-            // ดาวน์โหลดไฟล์โดยใช้ file-saver
-            saveAs(blob, 'report.doc');
-            },
-
-            // async mounted() {
-            //     const  { signIn, getSession, signOut } = await useAuth()
-            //     const user = await getSession();
-            // }, 
-             
-            toggleSelectAll() {
-                if (this.selectAll) {
-                    // เลือก checkbox ทั้งหมด
-                    this.checkboxValue = this.products_person.flatMap(item => 
-                        item.subP01s.map(subP01 => subP01.p_id)
-                    );
-                } else {
-                    // ยกเลิก checkbox ทั้งหมด
-                    this.checkboxValue = [];
-                }
-            }                
-        } 
+        }
     } 
 
  </script>

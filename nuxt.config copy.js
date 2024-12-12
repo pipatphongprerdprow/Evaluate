@@ -14,7 +14,16 @@ export default defineNuxtConfig({
                 }
             ]
         }
-    }, 
+    },
+    build: {
+        transpile: ['primevue'],
+      },
+      plugins: [
+        { src: '~/plugins/primevue.js', ssr: false },
+      ],
+    // build: {
+    //     transpile: ['file-saver'],
+    //   },
     modules: ['nuxt-primevue','@sidebase/nuxt-auth'],
     primevue: {
         options: { ripple: true },

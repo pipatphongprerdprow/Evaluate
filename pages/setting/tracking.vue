@@ -8,7 +8,7 @@
                     </div>   
                     <div class="col md:col-5" >  
                         <label for="tracking_date"></label>
-                        <Dropdown v-model="tracking_date" :options="tracking_dates" optionLabel="d_evaluationround" placeholder="กรุณาเลือกรอบการประเมิน" style=" max-width: 500px; width: 100%"></Dropdown> 
+                        <Dropdown v-model="tracking_date" :options="tracking_dates"    optionLabel="d_evaluationround" placeholder="กรุณาเลือกรอบการประเมิน" style=" max-width: 500px; width: 100%"></Dropdown> 
                     </div> 
                     <div class="col md:col-1" >  
                         <Button class="mb-2 mr-2" icon="pi pi-search" @click="xxr" /> 
@@ -629,7 +629,7 @@
                                                 <h5 class="mb-4"><i class="" style="font-size: x-large;"></i> ส่วนที่ 1 ข้อมูลของผู้รับการประเมิน</h5>
                                                 <!-- ตาราง ก. สมรรถนะหลัก -->  
                                                 <div class="employee-info">  
-                                                    <p><strong>รอบการประเมิน:</strong> {{ tracking_date.d_evaluationround }} {{ tracking_date.d_date }} </p>
+                                                    <p v-if="tracking_date.d_evaluationround"> <strong>รอบการประเมิน:</strong> {{ tracking_date.d_evaluationround }} {{ tracking_date.d_date }} </p>
                                                     <p><strong>ชื่อผู้รับการประเมิน:</strong>  {{ currentstaff[0].prefixfullname }} {{ currentstaff[0].staffname }} {{   currentstaff[0].staffsurname }} </p>
                                                     <p><strong>ตำแหน่ง:</strong> {{ currentstaff[0].posnameth }} </p>
                                                     <p><strong>ระดับตำแหน่ง:</strong>{{ currentstaff[0].postypenameth }} </p>
@@ -876,6 +876,7 @@ export default {
             ],
             tracking_date: '',
             tracking_dates: null,
+            
 
             // ตารางรายชื่อ
             products: [],

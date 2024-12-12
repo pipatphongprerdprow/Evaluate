@@ -70,7 +70,7 @@
                     </Column>
                     <Column field="Tb_ind" header="รอบประเมิน" style="width: 20%; text-align: center;">
                         <template #body="Item">   
-                            <div style="display: flex; justify-content: center; align-items: center;">
+                            <div v-if="Item.data.d_evaluationround" style="display: flex; justify-content: center; align-items: center;">
                                 {{ Item.data.d_evaluationround }}
                             </div>
                         </template>

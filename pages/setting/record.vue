@@ -28,7 +28,7 @@
                             <td style="width: 20%;text-align: center"> 
                                 <b style="color: brown;">{{ Item.p01_year }}</b>
                             </td>
-                            <td style="padding-left: 5px;width: 40%;"><b>{{ Item.d_evaluationround }}</b></td>
+                            <td v-if="Item.d_evaluationround" style="padding-left: 5px;width: 40%;"><b>{{ Item.d_evaluationround }}</b></td>
                             <td style="padding-left: 5px;width: 20%;"><b>0</b></td>
                             <td style="text-align: center;width: 20%;">
                                 <Button severity="danger" label="รายละเอียด" class="mb-2 mr-2" icon="pi pi-plus" @click="openDataEvalu(Item.staffid)" />  

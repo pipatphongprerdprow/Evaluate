@@ -1,5 +1,5 @@
 <template>   
-    <div class="grid">
+    <div v-if="user.user" class="grid">
         <div  class="col-12 lg:col-12 xl:col-12"> 
             <div class="card mb-0"> 
                 <div class="formgroup-inline mb-1">
@@ -45,7 +45,7 @@
                     <div class="col md:col-12 text-right">
                         <Button label="Export" icon="pi pi-file-word" class="mr-2 mb-2 " @click="printDataP01"></Button>
                     </div> 
-                    <div class="card"> 
+                    <div v-if="user.user" class="card"> 
                         <div style="display: flex; justify-content: center">
                             <img src="~/assets/layout/images/kongkang.jpg" alt="Description of image" class="contract-image" />
                         </div>

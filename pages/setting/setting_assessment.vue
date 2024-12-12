@@ -5,7 +5,7 @@
                 <div class="formgroup-inline mb-1">
                    
                     <div class="col md:col-9"> 
-                        <h3 class="mb-4 card-header"><i class="pi pi-fw pi-sliders-h" style="font-size: x-large;"></i>  
+                        <h3 v-if="dataP01" class="mb-4 card-header"><i class="pi pi-fw pi-sliders-h" style="font-size: x-large;"></i>  
                             จัดการ แบบประเมิน {{ dataP01.d_evaluationround }} ปีงบประมาณ : {{ dataP01.year }}  
                             <!-- {{ dataP01 }} -->
                         </h3> 
