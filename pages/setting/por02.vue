@@ -1,7 +1,7 @@
 <template>
-     <div class="col md:col-12 text-right">
+     <!-- <div class="col md:col-12 text-right">
         <Button label="Export" icon="pi pi-file-word" class="mr-2 mb-2 " @click="printDataP01"></Button>
-    </div> 
+    </div>  -->
     <div class="card">
         <h3 class="mb-4" style="text-align: left;"><i class="pi pi-folder-open" style="font-size: x-large;"></i> แบบ ป02</h3>
         <h4>ข้อตกลงและแบบการประเมินผลสัมฤทธิ์ของงานของข้าราชการและพนักงาน สังกัดมหาวิทยาลัยมหาสารคาม (องค์ประกอบที่ 2)</h4><br>   

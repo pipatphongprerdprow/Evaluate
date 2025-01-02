@@ -13,7 +13,8 @@
                     <div class="col md:col-1" >  
                         <Button class="mb-2 mr-2" icon="pi pi-search" @click="xxr" /> 
                     </div>  
-                </div>  
+                </div> 
+                <!-- {{ products }}  -->
                 <table class="table">
                     <thead> 
                         <tr style="height: 40px;background-color: blanchedalmond;">
@@ -22,8 +23,8 @@
                             <th>สถานะ</th>  
                             <th>ตัวเลือก</th>  
                         </tr>
-                    </thead>
-                    <tbody>
+                    </thead> 
+                    <tbody>   
                         <tr v-for="(Item, index) in products" :key="index">
                             <td style="padding-left: 5px;width: 40%;text-align: left;">
                                 <b style="color: blue;">{{ Item.prefixfullname }} {{ Item.namefully }} </b> &nbsp;&nbsp;
@@ -33,7 +34,7 @@
                             <td style="padding-left: 5px;width: 25%;"><b>{{ Item.posnameth }}</b></td>
                             <td style="text-align: center;width: 20%;">   
                                 <div v-if="Item.tb_tor">
-                                    <Button icon="pi pi-check" label="อนุมัติ" rounded class="mb-2 mr-2" size="small" @click="Btnstatus(Item.staffid,2,)" />
+                                    <Button icon="pi pi-check" label="อนุมัติ" rounded class="mb-2 mr-2" size="small" @click="Btnstatus(Item.staffid,2)" />
                                     <Button icon="pi pi-times" severity="danger" label="ไม่ผ่าน" rounded class="mb-2 mr-2" size="small" @click="Btnstatus(Item.staffid,3)"  /> 
                                 </div>
                                 <div v-else>-</div>  
@@ -46,7 +47,7 @@
                                 <div v-else>
                                     <p style="color: brown;">-รอข้อมูลการประเมิน-</p>
                                 </div>  
-                            -->
+                            --> 
                                 <div v-if="Item.tb_tor">
                                     <Button 
                                         label="รายละเอียด" 
@@ -915,7 +916,8 @@ export default {
                     fac_id: this.facid_Main,
                     group_id: this.groupid_Main,
                     evalua: this.examine_date.evalua,
-                    p_year: this.examine_date.d_date
+                    p_year: this.examine_date.d_date 
+
                 }
             }).then(res => {     
                 // console.log(res.data);  
@@ -976,7 +978,7 @@ export default {
                 staff_id: staff_id ,
                 status: status
             }).then(res => {     
-                // console.log(res.data);  
+                //console.log(res.data);  
                 Swal.fire({
                     position: "top-center",
                     icon: "success",
