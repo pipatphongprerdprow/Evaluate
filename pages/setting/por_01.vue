@@ -46,7 +46,8 @@
                                 <td style="text-align: left;" colspan="9">
                                     <b style="color: blue;">{{ h.id }}. {{ h.nameH }}</b>
                                 </td>
-                                <td class="text-center" style="color: blue;"><b>{{ h.h_weight }}%</b></td> 
+                                <td class="text-center" style="color: blue;"><b></b></td> 
+                                <!-- <td class="text-center" style="color: blue;"><b>{{ h.h_weight }}%</b></td>  -->
                                 <td></td>
                             </tr> 
                             <tr v-for="(subP01, idx) in h.subP01sX" :key="idx" style="vertical-align: baseline;"> 
@@ -291,6 +292,7 @@
 import { ref } from 'vue';
 import axios from 'axios';  
 import Swal from 'sweetalert2'
+
  
  
 
@@ -377,7 +379,12 @@ export default {
                     // ทำสิ่งที่ต้องการเมื่อ dataPor เปลี่ยนแปลง
             },
             deep: true // ใช้ deep: true เพื่อดูการเปลี่ยนแปลงภายใน object
-        }
+        },
+            checkboxValue(newVal) {
+            // ตรวจสอบว่าช่องเลือกทั้งหมดถูกเลือกหรือไม่
+            const totalItems = this.products_person.flatMap(item => item.subP01s).length;
+            this.selectAll = newVal.length === totalItems;
+        },
     },
     computed: {
         totalWeight() {
@@ -491,14 +498,25 @@ export default {
             }); 
         },
         // printDataP01
-        async printDataP01() {     
+        async printDataP01() {  
+            const { signIn, getSession, signOut } = await useAuth()
+            const user = await getSession(); 
+            // console.log(user.user.name);   
             const form = {
                 staff_id: this.staffid_Main,
                 group_id: this.groupid_Main,
                 fac_id: this.dataPor.fac_id,
                 year_id: this.dataPor.d_date,
-                evalua: this.dataPor.evalua   
+                evalua: this.dataPor.evalua,
+                PREFIXFULLNAME:user.user.name.PREFIXFULLNAME,
+                STAFFNAME :user.user.name.STAFFNAME,
+                STAFFSURNAME:user.user.name.STAFFSURNAME,
+                POSITIONNAME:user.user.name.POSITIONNAME,
+                GROUPTYPENAME:user.user.name.GROUPTYPENAME,
+                POSTYPENAME:user.user.name.POSTYPENAME,  
             }
+           
+            
 
             const queryParams = new URLSearchParams(form).toString();
             // console.log(queryParams); 
@@ -636,6 +654,17 @@ export default {
         // ปิดบันทึกแบบจัดการ ป.1 
         cancelDialog(){
             this.DialogAdd = false;
+        },   
+        toggleSelectAll() {
+            if (this.selectAll) {
+                // เลือกทั้งหมด
+                this.checkboxValue = this.products_person.flatMap(item =>
+                    item.subP01s.map(subP01 => subP01.p_id)
+                );
+            } else {
+                // ยกเลิกการเลือกทั้งหมด
+                this.checkboxValue = [];
+            }
         },
 //*================== End เพิ่มข้อมูลแบบประเมิน ==================*//
 

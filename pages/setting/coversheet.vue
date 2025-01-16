@@ -5,18 +5,17 @@
                 <div class="formgroup-inline mb-1">
                     <div class="col md:col-6">   
                         <h5 class="mb-4" style="text-align: left;margin-right: 16px;margin-bottom: 0px;">
-                            <i class="" style="font-size: x-large"></i> สังกัด: {{ user.user.name.SCOPES?.staffdepartmentname }}
+                            <i class="" style="font-size: x-large"></i> สังกัด: {{ user.user.name.SCOPES?.staffdepartmentname }} 
                         </h5>  
                         <small style="color: red;font-size: larger;">* กรุณาเลือกรอบประเมิน เพื่อทำแบบประเมิน</small>
-                    </div>  
-                    <!-- {{ product_date.d_date }}    -->
+                    </div>   
+                    <!-- {{ product_date.d_evaluationround}} {{ product_date.d_date}} -->
                     <div class="col md:col-6">  
                         <label for="product_date"></label>
-                        <Dropdown 
-                            id="product_date" 
+                        <Dropdown  id="product_date" 
                             v-model="product_date" 
-                            :options="products_date" 
-                            optionLabel="d_evaluationround"
+                            :options="products_date"  autoFilterFocus
+                            :optionLabel="(item) => `${item.d_evaluationround} ${item.d_date}`"
                             placeholder="กรุณาเลือกรอบการประเมิน" 
                             style="max-width: 500px;width: 100%;border: outset;" 
                             @change="showdatator" 
@@ -26,7 +25,7 @@
                 </div> 
             </div>
         </div>  
-    </div>  
+    </div>   
     <div class="grid">
         <div class="col-12 lg:col-12 xl:col-12">
             <div class="formgroup-inline mb-1">
@@ -37,8 +36,7 @@
                 </div>
             </div>
             <!-- แสดงข้อมูลบันทึก -->
-            <!-- {{ user.user }}  --> 
-            <!-- //พี่บอยแก้ -->
+            <!-- {{ user.user }}  -->  
             <TabView :activeIndex="activeIndex" @tabChange="onTabChange">
                 <!-- <TabView @click="xyz"> -->
                 <TabPanel header="แบบ ใบปะหน้า" value="0">
@@ -60,7 +58,7 @@
                             <!-- <p><strong>ประเภทบุคลากร:</strong></p> --> 
                             <p><strong>ชื่อผู้ประเมิน:</strong> <InputText type="text" placeholder="ชื่อผู้ประเมิน"  v-model="assessor" style="width: 300px;"/></p> 
                             <p><strong>ตำแหน่งผู้ประเมิน :</strong> <InputText type="text" placeholder="ตำแหน่งผู้ประเมิน" v-model="assessor_position" style="width: 265px;" /></p> 
-                            <p><strong>รายละเอียดข้อตกลง ระหว่าง วันที่ : </strong>{{ product_date.d_evaluationround }}  {{ product_date.d_date }}</p>
+                            <p><strong>รายละเอียดข้อตกลง ระหว่าง วันที่ : </strong> {{ product_date.d_evaluationround }}  {{ product_date.d_date }}</p>
                         </div><br> 
                             <div class="ml-4 mr-4" style="text-align: center;">
                                 <label for="dropdownProportion"><b>สัดส่วน :</b></label>
@@ -167,12 +165,11 @@ export default {
                     }
             },
             product_date: {
-                d_evaluationround: '',  
-            },
+                d_evaluationround: '', 
+            },  
             assessor: null,
             assessor_position: null,
-            currenttap: 0,
-            
+            currenttap: 0, 
             // product_date: {
             //     about: 1 ,
             //     d_date : 2569,
@@ -353,7 +350,7 @@ export default {
             const url = `http://localhost:8000/printReportCoverpage?${queryParams}`;
             window.open(url, '_blank');
  
-        }, 
+        },  
     },  
 }
 </script>

@@ -1034,7 +1034,7 @@ import InputText from 'primevue/inputtext';
                 axios.post('http://localhost:8000/api/showdataposp02', { 
                 p_year: this.dataPor.d_date,
                 evalua: this.dataPor.evalua,
-                p_staffid: this.staffid_Mainห
+                p_staffid: this.staffid_Main
                 })
                 .then(res => {
                     //console.log('Response',res.data);  

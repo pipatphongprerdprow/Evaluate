@@ -7,8 +7,9 @@
                         <h3 class="mb-4 card-header"><i class="pi pi-credit-card" style="font-size: x-large;"></i> ตรวจติดตามแบบประเมิน</h3>    
                     </div>   
                     <div class="col md:col-5" >  
+                        <!-- <h3 class="mb- card-header"><i class="" style="font-size: x-large;"></i> ปีงบประมาณ: {{ tracking_date.d_date }}</h3>   -->
                         <label for="tracking_date"></label>
-                        <Dropdown v-model="tracking_date" :options="tracking_dates"    optionLabel="d_evaluationround" placeholder="กรุณาเลือกรอบการประเมิน" style=" max-width: 500px; width: 100%"></Dropdown> 
+                        <Dropdown v-model="tracking_date" :options="tracking_dates" :optionLabel="(item) => `${item.d_evaluationround} ${item.d_date}`" placeholder="กรุณาเลือกรอบการประเมิน" style=" max-width: 500px; width: 100%"></Dropdown> 
                     </div> 
                     <div class="col md:col-1" >  
                         <Button class="mb-2 mr-2" icon="pi pi-search" @click="xxr" /> 

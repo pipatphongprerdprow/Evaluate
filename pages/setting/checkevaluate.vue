@@ -8,7 +8,7 @@
                     </div> 
                     <!-- {{ productstaff[0].prefixfullname  }} -->
                     <div class="col md:col-5" >   
-                        <Dropdown id="examine_date" v-model="examine_date" :options="examine_dates"  optionLabel="d_evaluationround" placeholder="กรุณาเลือกรอบการประเมิน" style=" max-width: 500px; width: 100%" ></Dropdown> 
+                        <Dropdown id="examine_date" v-model="examine_date" :options="examine_dates"  :optionLabel="(item) => `${item.d_evaluationround} ${item.d_date}`" placeholder="กรุณาเลือกรอบการประเมิน" style=" max-width: 500px; width: 100%" ></Dropdown> 
                     </div>   
                     <div class="col md:col-1" >  
                         <Button class="mb-2 mr-2" icon="pi pi-search" @click="xxr" /> 
