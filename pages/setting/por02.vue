@@ -350,7 +350,9 @@ export default {
                 STAFFSURNAME:user.user.name.STAFFSURNAME,
                 POSITIONNAME:user.user.name.POSITIONNAME,
                 GROUPTYPENAME:user.user.name.GROUPTYPENAME,
-                POSTYPENAME:user.user.name.POSTYPENAME,   
+                POSTYPENAME:user.user.name.POSTYPENAME, 
+                SCOPES:user.user.name.SCOPES.staffdepartmentname,
+                postypename: `ระดับ${this.postypename}`
             } 
             const queryParams = new URLSearchParams(form).toString();
             // console.log(queryParams); 

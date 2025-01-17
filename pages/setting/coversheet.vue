@@ -336,13 +336,22 @@ export default {
                 //console.log(this.currenttap);  
             }
         }, 
-        async printDataP01() {     
+        async printDataP01() { 
+            const { signIn, getSession, signOut } = await useAuth()
+            const user = await getSession();     
             const form = {
                 staff_id: this.staffid_Main,
                 group_id: this.groupid_Main,
                 fac_id: this.facid_Main,
                 year_id: this.product_date.d_date,
-                evalua: this.product_date.evalua   
+                evalua: this.product_date.evalua , 
+                PREFIXFULLNAME:user.user.name.PREFIXFULLNAME,
+                STAFFNAME :user.user.name.STAFFNAME,
+                STAFFSURNAME:user.user.name.STAFFSURNAME,
+                POSITIONNAME:user.user.name.POSITIONNAME,
+                GROUPTYPENAME:user.user.name.GROUPTYPENAME,
+                POSTYPENAME:user.user.name.POSTYPENAME, 
+                SCOPES:user.user.name.SCOPES.staffdepartmentname 
             }
 
             const queryParams = new URLSearchParams(form).toString();

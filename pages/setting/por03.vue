@@ -1215,13 +1215,23 @@ import InputText from 'primevue/inputtext';
                     console.error('Error:', error);
                 }); 
             }, 
-            async printDataP03() {     
+            async printDataP03() { 
+                const { signIn, getSession, signOut } = await useAuth()
+                const user = await getSession();     
                 const form = {
                     staff_id: this.staffid_Main,
                     group_id: this.groupid_Main,
                     fac_id: this.dataPor.fac_id,
                     year_id: this.dataPor.d_date,
-                    evalua: this.dataPor.evalua   
+                    evalua: this.dataPor.evalua,
+                    PREFIXFULLNAME:user.user.name.PREFIXFULLNAME,
+                    STAFFNAME :user.user.name.STAFFNAME,
+                    STAFFSURNAME:user.user.name.STAFFSURNAME,
+                    POSITIONNAME:user.user.name.POSITIONNAME,
+                    GROUPTYPENAME:user.user.name.GROUPTYPENAME,
+                    POSTYPENAME:user.user.name.POSTYPENAME, 
+                    SCOPES:user.user.name.SCOPES.staffdepartmentname,
+                    postypename: `ระดับ${this.postypename}`   
                 } 
                 const queryParams = new URLSearchParams(form).toString();
                 // console.log(queryParams); 
