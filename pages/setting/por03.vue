@@ -316,7 +316,7 @@
                 <div class="p-fluid formgrid"> 
                     <div class="field col-12 md:col-6">
                         <label for="radioValueDoc">เลือกประเภทการแนปเอกสาร</label> 
-                        <!-- <b style="color: red;"> (รองรับขนาดไฟล์ไม่เกิน 2 Mb) </b> -->
+                        <b style="color: red;"> (รองรับขนาดไฟล์ไม่เกิน 10 Mb) </b>
 
                         <!-- <Dropdown v-model="radioValueDoc" :options="radioValueDocs" optionLabel="name" placeholder="เลือกระดับการประเมินตนเอง"></Dropdown>  -->
                         <div class="grid">
@@ -690,9 +690,29 @@ import InputText from 'primevue/inputtext';
                 this.Data_Doc();
             }, 
             handleFileChange(event) {
-                const files = event.target.files;
-                this.selectedFiles = Array.from(files);
-            },
+                const files = event.target.files; // ไฟล์ที่ถูกเลือก
+                const maxFileSize = 10 * 1024 * 1024; // ขนาดไฟล์สูงสุด 10 MB
+                const validFiles = []; // สำหรับเก็บไฟล์ที่ผ่านการตรวจสอบ
+
+                // วนลูปตรวจสอบไฟล์แต่ละไฟล์
+                Array.from(files).forEach(file => {
+                    if (file.size > maxFileSize) {
+                        alert(`ไฟล์ ${file.name} ไฟล์มีขนาดเกิน 10 MB `); // แจ้งเตือนเมื่อไฟล์เกินขนาด
+                    } else {
+                        validFiles.push(file); // เก็บไฟล์ที่ผ่านเงื่อนไข
+                    }
+                });
+
+                // เก็บเฉพาะไฟล์ที่ผ่านการตรวจสอบใน selectedFiles
+                this.selectedFiles = validFiles;
+
+                // แสดงไฟล์ที่ผ่านการอัปโหลดใน console
+                console.log("ไฟล์ที่อัปโหลด:", this.selectedFiles);
+            }, 
+            // handleFileChange(event) {
+            //     const files = event.target.files;
+            //     this.selectedFiles = Array.from(files);
+            // },
             add_data_file(file){
                 return new Promise((resolve, reject) => {
                     const reader = new FileReader();

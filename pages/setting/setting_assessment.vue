@@ -81,7 +81,7 @@
                                         </template>
                                     </Column>  
                                     <Column field="options" header="ตัวเลือก" style="width: 10%">
-                                        <template #body="Item">   
+                                        <template #body="Item" >   
                                             <Button severity="danger" icon="pi pi-trash" class="p-button-text" outlined rounded @click="DeleteRegislick(Item.data.ind_no)"></Button>
                                         </template>
                                     </Column> 
@@ -123,7 +123,8 @@
                                     <td style="text-align: left;" colspan="8">
                                         <b style="color: blue;">{{ item.id }}. {{ item.nameH }}</b>
                                     </td>  
-                                    <td class="text-center" style="color: blue;"><b>{{ item.h_weight }}%</b></td>
+                                    <!-- <td class="text-center" style="color: blue;"><b>{{ item.h_weight }}%</b></td> -->
+                                    <td></td>
                                     <td></td>
                                     <td></td>
                                 </tr>
