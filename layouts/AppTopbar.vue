@@ -82,7 +82,7 @@ const x = await getSession()
 
         <div class="layout-topbar-menu" :class="topbarMenuClasses">
             <template v-if="Object.keys(x).length === 0">
-                <button @click="signIn('custom-oauth')" class="p-link layout-topbar-button pr-4">
+                <button @click="signIn('erpauth')" class="p-link layout-topbar-button pr-4">
                     <i class="pi pi-sign-in"></i>
                     <i style="font-size: 1.25em;margin-left: 0.25em;margin-right: 1em;text-wrap: nowrap;">เข้าสู่ระบบ</i>
                 </button>

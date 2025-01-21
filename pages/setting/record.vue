@@ -103,7 +103,7 @@
                                                             
                                                             <td style="text-align: left;"> 
                                                                 <p v-for="(subIitemDoc, inDoc) in subP01.subITemP03doc" :key="inDoc" style="padding-left: 8px;margin-bottom: 5px;"> 
-                                                                    <a v-if="subIitemDoc.doc_file!=null" :href="'http://localhost:8000/storage/uploadsP03/'+subIitemDoc.doc_file" target="_blank"><b>ระดับ</b> <b>{{subIitemDoc.doc_no }}</b> {{ subIitemDoc.doc_name }}</a> 
+                                                                    <a v-if="subIitemDoc.doc_file!=null" :href="'http://survey.msu.ac.th/evaluatebackend/storage/uploadsP03/'+subIitemDoc.doc_file" target="_blank"><b>ระดับ</b> <b>{{subIitemDoc.doc_no }}</b> {{ subIitemDoc.doc_name }}</a> 
                                                                     <a v-if="subIitemDoc.doc_link!=null" :href="subIitemDoc.doc_link" target="_blank"><b>ระดับ</b> <b>{{ subIitemDoc.p03ind_no }}</b> {{ subIitemDoc.doc_name }}</a> 
                                                                 </p>
                                                                 <p v-if="subP01.subITemP03doc.length == 0" style="padding-left: 8px;margin-bottom: 5px;">
@@ -342,7 +342,7 @@
         }, 
         methods: { 
             async showDataRecord(staffidData){ 
-                await axios.post('http://localhost:8000/api/showDataRecord',{ 
+                await axios.post('http://survey.msu.ac.th/evaluatebackend/api/showDataRecord',{ 
                     staff_id: staffidData
                 }).then(res => {     
                     console.log(res.data);  
@@ -356,7 +356,7 @@
                 console.log(this.staffidData);
                 
                 this.DialogAdd = true; 
-                // axios.post('http://localhost:8000/api/showDataValuate',{
+                // axios.post('http://survey.msu.ac.th/evaluatebackend/api/showDataValuate',{
                 //     staff_id: staff_id,
                 //     fac_id: this.facid_Main,
                 //     year_id: this.dropdownItemYear.code,

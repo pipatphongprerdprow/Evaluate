@@ -1,13 +1,13 @@
 import { NuxtAuthHandler } from '#auth'
-// import GoogleProvider from 'next-auth/providers/google'
-// import { randomBytes } from "crypto" 
+import GoogleProvider from 'next-auth/providers/google'
+import { randomBytes } from "crypto" 
 
-// function generateState() {
-//   return randomBytes(16).toString("hex");  // Generates a random 16-byte string
-// }
+function generateState() {
+  return randomBytes(16).toString("hex");  // Generates a random 16-byte string
+}
 
 export default NuxtAuthHandler({
-  secret: 'R31FG8G33cBnW7PrmEGj4SHeDV3cBs0rXTIDQDLdT3s=',
+  secret: process.env.AUTH_SECRET || 'R31FG8G33cBnW7PrmEGj4SHeDV3cBs0rXTIDQDLdT3s=',
   // pages: {
   //   signIn: '/signin'
   // },
@@ -17,22 +17,23 @@ export default NuxtAuthHandler({
     //   clientSecret: process.env.GOOGLE_CLIENT_SECRET
     // }),
     {
-      id: 'erpauth',  
-      name: 'erpauth', 
+      id: 'custom-oauth',  
+      name: 'Custom OAuth', 
       type: 'oauth',
 
       // OAuth 2.0 flow endpoints
       authorization: {
         url: 'https://erp.msu.ac.th/authen/oauth/_authorize',
         params: {
-          grant_type: "authorization_code",
+          state: generateState(),
+          client_id: '9e04ac52-608f-4d13-8674-1374b228d6d0',
           response_type: 'code',
-          redirect_uri: 'https://survey.msu.ac.th/evaluate/api/auth/callback/erpauth',
+          redirect_uri: 'http://survey.msu.ac.th/evaluate/api/auth/callback/custom-oauth',
           scope: '',
         }
       },
       token: 'https://erp.msu.ac.th/authen/oauth/token',  // Token endpoint
-      userinfo: 'https://erp.msu.ac.th/authen/api/authuserinfo?progcode=parcelapp',  // User info endpoint
+      userinfo: 'https://erp.msu.ac.th/authen/api/authuser',  // User info endpoint
 
       // Client ID and secret for the custom provider, from environment variables
       clientId: '9e04ac52-608f-4d13-8674-1374b228d6d0',
@@ -40,16 +41,13 @@ export default NuxtAuthHandler({
 
       // Function to extract the profile information from the userinfo response
       profile(profile) {
-        // console.log(profile);
-
-        const {STAFFID, STAFFNAME, STAFFSURNAME, STAFFEMAIL1} = profile.user
+        console.log(profile);
         
         return {
-          id: STAFFID,           // Unique identifier
-          name: `${STAFFNAME} ${STAFFSURNAME}`,        // User's name
-          email: STAFFEMAIL1,      // User's email
-          image: STAFFID ,
-          ...profile.user
+          id: profile.STAFFID,           // Unique identifier
+          name: profile,//`${profile.PREFIXFULLNAME}${profile.STAFFNAME} ${profile.STAFFSURNAME}`,        // User's name
+          email: (profile.STAFFEMAIL1??profile.STAFFEMAIL2)??'',      // User's email
+          //image: profile ,
         }
       }
     }
@@ -65,8 +63,10 @@ export default NuxtAuthHandler({
           access_token: account?.access_token,
           expire_at: account?.expires_at,
           refresh_token: account?.refresh_token,
-          ...user
+          //...user
         }
+
+        token.name = profile
       }
 
       return Promise.resolve(token);

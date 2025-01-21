@@ -423,7 +423,7 @@ export default {
         // ดึงข้อมูลเข้าตาราง 
         showDataPerson(){  
             //console.log('dataPor: ',this.dataPor); 
-            axios.post('http://localhost:8000/api/showDataPersonX',{
+            axios.post('http://survey.msu.ac.th/evaluatebackend/api/showDataPersonX',{
             staff_id: this.staffid_Main,
             fac_id: this.dataPor.fac_id,
             year_id: this.dataPor.d_date, 
@@ -440,7 +440,7 @@ export default {
       
         // ดึงข้อมูลมาแก้ไข
         async editDatax(data){    
-          await axios.post('http://localhost:8000/api/edtDataPersonx',{
+          await axios.post('http://survey.msu.ac.th/evaluatebackend/api/edtDataPersonx',{
               p01_id: data.p01_id
           }).then(res => { 
                 // console.log(data);   
@@ -460,7 +460,7 @@ export default {
         }, 
         // ดึงข้อมูลภาระงาน
         selectDataHEdt(he){  
-            axios.post('http://localhost:8000/api/selectDataPersonH').then(res => {     
+            axios.post('http://survey.msu.ac.th/evaluatebackend/api/selectDataPersonH').then(res => {     
                 // console.log(res.data); 
                 this.dropdownItemsH=res.data;  
                 const h_f = res.data.filter(f=>f.id==he); 
@@ -482,7 +482,7 @@ export default {
                 confirmButtonText: "Yes, delete it!"
             }).then((result) => {
                 if (result.isConfirmed) {
-                    axios.post('http://localhost:8000/api/delDataPersonx', {
+                    axios.post('http://survey.msu.ac.th/evaluatebackend/api/delDataPersonx', {
                         p01_id: data.p01_id
                     }).then(res => { 
                         this.showDataPerson(); 
@@ -521,7 +521,7 @@ export default {
 
             const queryParams = new URLSearchParams(form).toString();
             // console.log(queryParams); 
-            const url = `http://localhost:8000/report_p01?${queryParams}`;
+            const url = `http://survey.msu.ac.th/evaluatebackend/report_p01?${queryParams}`;
             window.open(url, '_blank');
  
         },
@@ -529,7 +529,7 @@ export default {
 //*================== Start เลือกข้อมูลแบบประเมิน ป.01 ==================*//
         // เปิดหน้าต่างสำหรับบันทึก *ดึงข้อมูล
         OpenDialogP01(){ 
-            axios.post('http://localhost:8000/api/showDataPerson', { 
+            axios.post('http://survey.msu.ac.th/evaluatebackend/api/showDataPerson', { 
                 fac_id: this.dataPor.fac_id,
                 year_id: this.dataPor.d_date,
                 evalua: this.dataPor.evalua 
@@ -554,7 +554,7 @@ export default {
             if(x.length == 0){
                 Swal.fire("ไม่มีข้อมูล","กรุณาเลือกข้อคำถามจาก ตัวจัดการ !","error");
             }else{
-            await axios.post('http://localhost:8000/api/savePushDataP01',{
+            await axios.post('http://survey.msu.ac.th/evaluatebackend/api/savePushDataP01',{
                 data: x,
                 staffid_Main: this.staffid_Main,
             }).then(res => { 
@@ -596,7 +596,7 @@ export default {
         }, 
         // ดึงข้อมูลภาระงาน
         selectDataH(){  
-            axios.post('http://localhost:8000/api/selectDataPersonH').then(res => {     
+            axios.post('http://survey.msu.ac.th/evaluatebackend/api/selectDataPersonH').then(res => {     
                 //console.log(res.data); 
                 this.dropdownItemsH=res.data;  
             })
@@ -624,7 +624,7 @@ export default {
         },
         // บันทึกแบบจัดการ ป.1 
         async saveDatax() {
-            await axios.post('http://localhost:8000/api/saveDataP01User',{
+            await axios.post('http://survey.msu.ac.th/evaluatebackend/api/saveDataP01User',{
                 staff_id: this.staffid_Main,
                 fac_id: this.dataPor.fac_id,
                 year_id: this.dataPor.d_date, 

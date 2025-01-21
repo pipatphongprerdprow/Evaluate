@@ -120,7 +120,7 @@
                                                             <!-- {{ subP01 }} -->
                                                             <td style="text-align: left;"> 
                                                                 <p v-for="(subIitemDoc, inDoc) in subP01.subITemP03doc" :key="inDoc" style="padding-left: 8px;margin-bottom: 5px;"> 
-                                                                    <a v-if="subIitemDoc.doc_file!=null" :href="'http://localhost:8000/storage/uploadsP03/'+subIitemDoc.doc_file" target="_blank"><b>ระดับ</b> <b>{{subIitemDoc.doc_no }}</b> {{ subIitemDoc.doc_name }}</a> 
+                                                                    <a v-if="subIitemDoc.doc_file!=null" :href="'http://survey.msu.ac.th/evaluatebackend/storage/uploadsP03/'+subIitemDoc.doc_file" target="_blank"><b>ระดับ</b> <b>{{subIitemDoc.doc_no }}</b> {{ subIitemDoc.doc_name }}</a> 
                                                                     <a v-if="subIitemDoc.doc_link!=null" :href="subIitemDoc.doc_link" target="_blank"><b>ระดับ</b> <b>{{ subIitemDoc.p03ind_no }}</b> {{ subIitemDoc.doc_name }}</a> 
                                                                 </p>
                                                                 <p v-if="subP01.subITemP03doc.length == 0" style="padding-left: 8px;margin-bottom: 5px;">
@@ -339,7 +339,7 @@
                                                             </td> 
                                                             <td style="text-align: left;"> 
                                                                 <p v-for="(subIitemDoc, inDoc) in subP01.subITemP03doc" :key="inDoc" style="padding-left: 8px;margin-bottom: 5px;"> 
-                                                                    <a v-if="subIitemDoc.doc_file!=null" :href="'http://localhost:8000/storage/uploadsP03/'+subIitemDoc.doc_file" target="_blank"><b>ระดับ</b> <b>{{subIitemDoc.doc_no }}</b> {{ subIitemDoc.doc_name }}</a> 
+                                                                    <a v-if="subIitemDoc.doc_file!=null" :href="'http://survey.msu.ac.th/evaluatebackend/storage/uploadsP03/'+subIitemDoc.doc_file" target="_blank"><b>ระดับ</b> <b>{{subIitemDoc.doc_no }}</b> {{ subIitemDoc.doc_name }}</a> 
                                                                     <a v-if="subIitemDoc.doc_link!=null" :href="subIitemDoc.doc_link" target="_blank"><b>ระดับ</b> <b>{{ subIitemDoc.p03ind_no }}</b> {{ subIitemDoc.doc_name }}</a> 
                                                                 </p>
                                                                 <p v-if="subP01.subITemP03doc.length == 0" style="padding-left: 8px;margin-bottom: 5px;">
@@ -1157,7 +1157,7 @@ export default {
             //console.log(scoreA);
             //console.log(this.dataStaffid,scoreA);
             axios
-                .post('http://localhost:8000/api/savepersentor', {
+                .post('http://survey.msu.ac.th/evaluatebackend/api/savepersentor', {
                     p_staffid: this.dataStaffid,
                     p_year: this.tracking_date.d_date,
                     evalua: this.tracking_date.evalua,
@@ -1172,7 +1172,7 @@ export default {
             //console.log(scoreB);
             //console.log(this.dataStaffid);
             axios
-                .post('http://localhost:8000/api/savepersentor', {
+                .post('http://survey.msu.ac.th/evaluatebackend/api/savepersentor', {
                     p_staffid: this.dataStaffid,
                     p_year: this.tracking_date.d_date,
                     evalua: this.tracking_date.evalua,
@@ -1187,7 +1187,7 @@ export default {
             //console.log(scoreB);
             //console.log(this.dataStaffid);
             axios
-                .post('http://localhost:8000/api/savepersentor', {
+                .post('http://survey.msu.ac.th/evaluatebackend/api/savepersentor', {
                     p_staffid: this.dataStaffid,
                     p_year: this.tracking_date.d_date,
                     evalua: this.tracking_date.evalua,
@@ -1208,7 +1208,7 @@ export default {
         },
         showDataSet() {
             axios
-                .post('http://localhost:8000/api/showDateSet', {
+                .post('http://survey.msu.ac.th/evaluatebackend/api/showDateSet', {
                     staff_id: this.staffid_Main,
                     fac_id: this.facid_Main,
                     group_id: this.groupid_Main
@@ -1235,7 +1235,7 @@ export default {
         },
         async showDataEvalu() {
             try {
-                const res = await axios.get('http://localhost:8000/api/showDataEvalu', {
+                const res = await axios.get('http://survey.msu.ac.th/evaluatebackend/api/showDataEvalu', {
                     params: {
                         staff_id: this.staffid_Main,
                         fac_id: this.facid_Main,
@@ -1256,7 +1256,7 @@ export default {
         async cvb(item) {
             // console.log(this.tracking_date.evalua);
             try {
-                const response = await axios.post('http://localhost:8000/api/showdatator', {
+                const response = await axios.post('http://survey.msu.ac.th/evaluatebackend/api/showdatator', {
                     p_year: this.tracking_date.d_date,
                     evalua: this.tracking_date.evalua,
                     p_staffid: item.staffid
@@ -1312,7 +1312,7 @@ export default {
 
                 this.showdataPo(staff_id, this.facid_Main, this.tracking_date.d_date, this.tracking_date.evalua);
                 axios
-                    .post('http://localhost:8000/api/showDataP03New', {
+                    .post('http://survey.msu.ac.th/evaluatebackend/api/showDataP03New', {
                         staff_id: staff_id,
                         fac_id: this.tracking_date.fac_id,
                         year_id: this.tracking_date.d_date,
@@ -1346,7 +1346,7 @@ export default {
             
         //     this.showPostype(this.postypename, this.postypenameid);
 
-        //     axios.post('http://localhost:8000/api/showDataPo',{
+        //     axios.post('http://survey.msu.ac.th/evaluatebackend/api/showDataPo',{
         //         staff_id: this.staffid_Main,
         //         fac_id: this.facid_Main,
         //         year_id: this.tracking_date.d_date,
@@ -1397,7 +1397,7 @@ export default {
                 Swal.fire('แจ้งเตือน', 'กรุณาเลือกคะแนน !', 'error');
             } else {
                 await axios
-                    .post('http://localhost:8000/api/saveP03Po', {
+                    .post('http://survey.msu.ac.th/evaluatebackend/api/saveP03Po', {
                         staffid_po: this.staffid_po,
                         p01_id: subP01.p01_id,
                         p01_score: subP01.p01_score,
@@ -1465,7 +1465,7 @@ export default {
                 improvements: this.improvements,
                 suggestions: this.suggestions
             };
-            const res = await axios.post('http://localhost:8000/api/saveP03PoTab1', payload);
+            const res = await axios.post('http://survey.msu.ac.th/evaluatebackend/api/saveP03PoTab1', payload);
             //console.log(res.data);
             Swal.fire({
                 position: 'top-end',
@@ -1501,7 +1501,7 @@ export default {
         },
         tab2Data(staff_id) {
             axios
-                .post('http://localhost:8000/api/showDataP03New', {
+                .post('http://survey.msu.ac.th/evaluatebackend/api/showDataP03New', {
                     staff_id: staff_id,
                     fac_id: this.tracking_date.fac_id,
                     year_id: this.tracking_date.d_date,
@@ -1520,7 +1520,7 @@ export default {
         showdataPoText(staff_id, fac_id, year_id, record) {
             // console.log(staff_id);
             
-            axios .post('http://localhost:8000/api/showDataPo', {
+            axios .post('http://survey.msu.ac.th/evaluatebackend/api/showDataPo', {
                     staff_id: staff_id,
                     fac_id: fac_id,
                     year_id: year_id,
@@ -1571,7 +1571,7 @@ export default {
         },
         chkp04(staff_id, fac_id, year_id, record) {
             axios
-                .post('http://localhost:8000/api/showDataPo', {
+                .post('http://survey.msu.ac.th/evaluatebackend/api/showDataPo', {
                     staff_id: staff_id,
                     fac_id: fac_id,
                     year_id: year_id,
@@ -1606,7 +1606,7 @@ export default {
         },
         saveEvaTab3() {
             axios
-                .post('http://localhost:8000/api/saveEvaTab3', {
+                .post('http://survey.msu.ac.th/evaluatebackend/api/saveEvaTab3', {
                     staff_id: this.dataStaffid,
                     fac_id: this.facid_Main,
                     year_id: this.tracking_date.d_date,
@@ -1629,7 +1629,7 @@ export default {
         },
         chkp04data(staff_id, fac_id, year_id, record) {
             axios
-                .post('http://localhost:8000/api/showData04Tab3', {
+                .post('http://survey.msu.ac.th/evaluatebackend/api/showData04Tab3', {
                     staff_id: staff_id,
                     fac_id: fac_id,
                     year_id: year_id,
@@ -1657,7 +1657,7 @@ export default {
         },
         chkp04dataT4(staff_id, fac_id, year_id, record) {
             axios
-                .post('http://localhost:8000/api/showData04Tab3', {
+                .post('http://survey.msu.ac.th/evaluatebackend/api/showData04Tab3', {
                     staff_id: staff_id,
                     fac_id: fac_id,
                     year_id: year_id,
@@ -1678,7 +1678,7 @@ export default {
             (this.assessorText = null),
                 (this.assessor_positionText = null),
                 axios
-                    .post('http://localhost:8000/api/showdatator', {
+                    .post('http://survey.msu.ac.th/evaluatebackend/api/showdatator', {
                         p_year: this.tracking_date.d_date,
                         evalua: this.tracking_date.evalua,
                         p_staffid: this.dataStaffid
@@ -1696,7 +1696,7 @@ export default {
             // console.log(postypename, postypenameid);
             var postypetext = `ระดับ` + postypename;
             await axios
-                .post('http://localhost:8000/api/showdatapostypename', {
+                .post('http://survey.msu.ac.th/evaluatebackend/api/showdatapostypename', {
                     postypename: postypetext,
                     postypenameid: postypenameid
                 })
@@ -1725,7 +1725,7 @@ export default {
         getjobSpecificCompetencies(dataStaffid) {
             //console.log(this.staffid_Main,this.dataPor);
 
-            axios .post('http://localhost:8000/api/showdataposp02', { 
+            axios .post('http://survey.msu.ac.th/evaluatebackend/api/showdataposp02', { 
                     p_year: this.tracking_date.d_date,
                     evalua: this.tracking_date.evalua,
                     p_staffid: this.dataStaffid
@@ -1779,7 +1779,7 @@ export default {
             this.showPostype(this.currentstaff[0].postypenameth,this.postypenameid);
   
             
-            axios.post('http://localhost:8000/api/showDataPo',{
+            axios.post('http://survey.msu.ac.th/evaluatebackend/api/showDataPo',{
                 staff_id: staff_id,
                 fac_id: facid_Main,
                 year_id: d_date,
@@ -1809,7 +1809,7 @@ export default {
         //29/10/67
         saveScore() {
             axios
-                .post('http://localhost:8000/api/saveDatator', {
+                .post('http://survey.msu.ac.th/evaluatebackend/api/saveDatator', {
                     score: this.totalScore
                 })
                 .then((response) => {
@@ -1875,7 +1875,7 @@ export default {
                 };
 
                 axios
-                    .post('http://localhost:8000/api/saveDatator', formData)
+                    .post('http://survey.msu.ac.th/evaluatebackend/api/saveDatator', formData)
                     .then((response) => {
                         this.DialogScore = false;
                         // console.log('showDataP03',res.data);

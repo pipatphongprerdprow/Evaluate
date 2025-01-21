@@ -39,7 +39,7 @@
                 },
                 {
                     label: 'คู่มือการใช้งานระบบ', items: [  
-                        // { label: 'คู่มือใช้งานระบบ (User)', icon: 'pi pi-id-card', href:'http://localhost:8000/storage/uploadsP03/P03_219_c1ba1af8-e110-49ba-aab0-b6f1c80d5848.pdf', target: '_blank' }, 
+                        // { label: 'คู่มือใช้งานระบบ (User)', icon: 'pi pi-id-card', href:'http://survey.msu.ac.th/evaluatebackend/storage/uploadsP03/P03_219_c1ba1af8-e110-49ba-aab0-b6f1c80d5848.pdf', target: '_blank' }, 
                         // {  label: 'คู่มือใช้งานระบบ (เจ้าหน้าที่บุคคล)', icon: 'pi pi-id-card', to: '/storage/uploadsP03/personnel_manual.pdf/', target: '_blank' },
                         // {  label: 'คู่มือใช้งานระบบ (ผู้บริหาร)', icon: 'pi pi-id-card', to:'/storage/uploadsP03/manager_manual.pdf/', target: '_blank' }
                     ]
@@ -76,19 +76,19 @@
                                 {
                                     label: 'คู่มือใช้งานระบบ (User)',
                                     icon: 'pi pi-id-card',
-                                    href: 'http://localhost:8000/storage/manual/manual_user.pdf',
+                                    href: 'http://survey.msu.ac.th/evaluatebackend/storage/manuals/manual_user.pdf',
                                     target: '_blank',
                                 },
                                 {
                                     label: 'คู่มือใช้งานระบบ (เจ้าหน้าที่บุคคล)',
                                     icon: 'pi pi-user',
-                                    href: 'http://localhost:8000/storage/manual/manual_person.pdf',
+                                    href: 'http://survey.msu.ac.th/evaluatebackend/storage/manuals/manual_person.pdf',
                                     target: '_blank',
                                 },
                                 {
                                     label: 'คู่มือใช้งานระบบ (ผู้บริหาร)',
                                     icon: 'pi pi-users',
-                                    href: 'http://localhost:8000/storage/manual/manual_executive.pdf',
+                                    href: 'http://survey.msu.ac.th/evaluatebackend/storage/manuals/manual_executive.pdf',
                                     target: '_blank',
                                 },
                             ],
