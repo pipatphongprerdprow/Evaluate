@@ -342,7 +342,7 @@
         }, 
         methods: { 
             async showDataRecord(staffidData){ 
-                await axios.post('http://survey.msu.ac.th/evaluatebackend/api/showDataRecord',{ 
+                await axios.post('/evaluatebackend/api/showDataRecord',{ 
                     staff_id: staffidData
                 }).then(res => {     
                     console.log(res.data);  
@@ -356,7 +356,7 @@
                 console.log(this.staffidData);
                 
                 this.DialogAdd = true; 
-                // axios.post('http://survey.msu.ac.th/evaluatebackend/api/showDataValuate',{
+                // axios.post('/evaluatebackend/api/showDataValuate',{
                 //     staff_id: staff_id,
                 //     fac_id: this.facid_Main,
                 //     year_id: this.dropdownItemYear.code,

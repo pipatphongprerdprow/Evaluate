@@ -879,7 +879,7 @@ export default {
         }, 
         showDataSet() {
             axios
-                .post('http://survey.msu.ac.th/evaluatebackend/api/showDateSet', {
+                .post('/evaluatebackend/api/showDateSet', {
                     staff_id: this.staffid_Main,
                     fac_id: this.facid_Main,
                     group_id: this.groupid_Main
@@ -904,7 +904,7 @@ export default {
             }
         },
         async showDataEvalu(){
-            await axios.get('http://survey.msu.ac.th/evaluatebackend/api/showDataEvalu',{
+            await axios.get('/evaluatebackend/api/showDataEvalu',{
                 // 28 / 11 / 67
                 // params: {
                 //     staff_id: this.staffid_Main,
@@ -973,7 +973,7 @@ export default {
             // เพิ่มฟังก์ชันการอัพโหลดไฟล์
         },
         async Btnstatus(staff_id,status){   
-            await axios.post('http://survey.msu.ac.th/evaluatebackend/api/postDataChkBtn',{ 
+            await axios.post('/evaluatebackend/api/postDataChkBtn',{ 
                 year: this.dropdownItemYear ,
                 staff_id: staff_id ,
                 status: status
@@ -1053,7 +1053,7 @@ export default {
             }
         },  
         tab2Data(staff_id){  
-            axios.post('http://survey.msu.ac.th/evaluatebackend/api/showDataP03New',{
+            axios.post('/evaluatebackend/api/showDataP03New',{
                 staff_id: staff_id, 
                 fac_id: this.examine_date.fac_id,
                 year_id: this.examine_date.d_date, 
@@ -1069,7 +1069,7 @@ export default {
             });
         }, 
         showdataPoText(staff_id,fac_id,year_id,record){ 
-            axios.post('http://survey.msu.ac.th/evaluatebackend/api/showDataPo',{
+            axios.post('/evaluatebackend/api/showDataPo',{
                 staff_id: staff_id,
                 fac_id: fac_id,
                 year_id: year_id,
@@ -1118,7 +1118,7 @@ export default {
             });
         },
         chkp04dataT4(staff_id,fac_id,year_id,record){
-            axios.post('http://survey.msu.ac.th/evaluatebackend/api/showData04Tab3',{
+            axios.post('/evaluatebackend/api/showData04Tab3',{
                 staff_id: staff_id,
                 fac_id: fac_id,
                 year_id: year_id,
@@ -1134,7 +1134,7 @@ export default {
             });
         },
         showdatator(dataStaffid) {   
-            axios.post('http://survey.msu.ac.th/evaluatebackend/api/showdatator', {
+            axios.post('/evaluatebackend/api/showdatator', {
                 p_year: this.examine_date.d_date,
                 evalua: this.examine_date.evalua,
                 p_staffid: this.dataStaffid
@@ -1150,7 +1150,7 @@ export default {
             });
         },
         getjobSpecificCompetencies(dataStaffid) {
-            axios.post('http://survey.msu.ac.th/evaluatebackend/api/showdataposp02', {
+            axios.post('/evaluatebackend/api/showdataposp02', {
                 p_year: this.examine_date.d_date,
                 evalua: this.examine_date.evalua,
                 p_staffid: this.dataStaffid
@@ -1179,7 +1179,7 @@ export default {
         async showPostype(postypename,postypenameid){
             // console.log(postypename); 
             var postypetext = `ระดับ`+postypename;
-           await axios.post('http://survey.msu.ac.th/evaluatebackend/api/showdatapostypename', {
+           await axios.post('/evaluatebackend/api/showdatapostypename', {
                 postypename: postypetext,
                 postypenameid: postypenameid
             })
