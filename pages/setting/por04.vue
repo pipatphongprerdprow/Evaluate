@@ -436,7 +436,7 @@ export default {
          insertscore1(scoreA04) { 
         // //console.log(scoreA04); 
         // //console.log(this.dataPor.d_date,this.dataPor.evalua,scoreA04); 
-        //     axios.post('http://survey.msu.ac.th/evaluatebackend/api/savepersentor',{
+        //     axios.post('/evaluatebackend/api/savepersentor',{
         //             p_staffid: this.staffid_Main, 
         //             p_year: this.dataPor.d_date, 
         //             evalua: this.dataPor.evalua, 
@@ -449,7 +449,7 @@ export default {
         // insertscore2(scoreB) { 
         // //console.log(scoreB); 
         // //console.log(this.dataStaffid); 
-        //     axios.post('http://survey.msu.ac.th/evaluatebackend/api/savepersentor',{
+        //     axios.post('/evaluatebackend/api/savepersentor',{
         //             p_staffid: this.staffid_Main, 
         //             p_year: this.tracking_date.d_date, 
         //             evalua: this.tracking_date.evalua, 
@@ -463,7 +463,7 @@ export default {
         // insertscore3(scoreS) { 
         // //console.log(scoreB); 
         // //console.log(this.dataStaffid); 
-        //     axios.post('http://survey.msu.ac.th/evaluatebackend/api/savepersentor',{
+        //     axios.post('/evaluatebackend/api/savepersentor',{
         //             p_staffid: this.staffid_Main, 
         //             p_year: this.tracking_date.d_date, 
         //             evalua: this.tracking_date.evalua, 
@@ -482,7 +482,7 @@ export default {
         },  
         showdatator() {  
             //console.log(this.dataPor.d_date,scoreA04); 
-            axios.post('http://survey.msu.ac.th/evaluatebackend/api/showdatator', {
+            axios.post('/evaluatebackend/api/showdatator', {
                 p_year: this.dataPor.d_date,
                 evalua: this.dataPor.evalua,
                 p_staffid: this.staffid_Main
@@ -500,7 +500,7 @@ export default {
         /*============= ความรู้/ทักษะ/สมรรถนะ ที่ต้องการพัฒนา =============*/ 
         chkp04dataXr(){  
             this.products_Tab3T4 = [];
-            axios.post('http://survey.msu.ac.th/evaluatebackend/api/showData04Tab3',{
+            axios.post('/evaluatebackend/api/showData04Tab3',{
                 staff_id: this.staffid_Main,
                 fac_id: this.facid_Main,
                 year_id: this.dataPor.d_date,

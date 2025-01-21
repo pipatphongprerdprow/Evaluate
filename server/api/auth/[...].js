@@ -32,7 +32,7 @@ export default NuxtAuthHandler({
         }
       },
       token: 'https://erp.msu.ac.th/authen/oauth/token',  // Token endpoint
-      userinfo: 'https://erp.msu.ac.th/authen/api/authuserinfo?progcode=parcelapp',  // User info endpoint
+      userinfo: 'https://erp.msu.ac.th/authen/api/authuser',  // User info endpoint
 
       // Client ID and secret for the custom provider, from environment variables
       clientId: '9e04ac52-608f-4d13-8674-1374b228d6d0',
@@ -45,11 +45,12 @@ export default NuxtAuthHandler({
         const {STAFFID, STAFFNAME, STAFFSURNAME, STAFFEMAIL1} = profile.user
         
         return {
-          id: STAFFID,           // Unique identifier
-          name: `${STAFFNAME} ${STAFFSURNAME}`,        // User's name
-          email: STAFFEMAIL1,      // User's email
-          image: STAFFID ,
-          ...profile.user
+          id: profile.STAFFID,           // Unique identifier
+          // name: `${STAFFNAME} ${STAFFSURNAME}`, 
+          name: profile,  // User's name
+          email: (profile.STAFFEMAIL1??profile.STAFFEMAIL2)??'',     // User's email
+          //image: STAFFID ,
+          //...profile.user
         }
       }
     }
@@ -65,7 +66,7 @@ export default NuxtAuthHandler({
           access_token: account?.access_token,
           expire_at: account?.expires_at,
           refresh_token: account?.refresh_token,
-          ...user
+          //...user
         }
       }
 
