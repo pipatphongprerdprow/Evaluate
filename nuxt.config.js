@@ -1,13 +1,11 @@
+
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
     typescript: false,
-    devServer :{
-        port: 3000
-    },
-    app: { 
+    app: {
         baseURL: '/evaluate/',
         head: {
-            title: 'Sakai Vue',
+            title: 'Evaluate',
             link: [
                 {
                     id: 'theme-css',
@@ -44,19 +42,36 @@ export default defineNuxtConfig({
     css: ['primeicons/primeicons.css', 'primeflex/primeflex.scss', 'primevue/resources/primevue.min.css', '@/assets/styles.scss'],
     //plugins: ['~/plugins/vue-authenticate.js'],
     auth: {
-        isEnabled: true,
-        disableServerSideAuth: false,
-        originEnvKey: 'AUTH_ORIGIN',
-        baseURL: 'https://survey.msu.ac.th/evaluate/api/auth',
+        // globalAppMiddleware: true,
+        
+        enableSessionRefreshOnWindowFocus: true,
+
         provider: {
             type: 'authjs',
-            trustHost: false,
-            defaultProvider: 'erpauth',
-            addDefaultCallbackUrl: true
+            customOAuth: {
+            id: 'custom-oauth',
+            name: 'Custom OAuth',
+            type: 'oauth',
+            authorization: {
+                url: 'https://erp.msu.ac.th/authen/oauth/_authorize',
+                params: {
+                client_id: '9cfc597a-f7ce-477c-8a72-56b40bba6dc6',
+                response_type: 'code',
+                redirect_uri: 'http://localhost:3000/evaluate/api/auth/callback/custom-oauth',
+                scope: 'email profile',
+                },
+            },
+            token: {
+                url: 'https://erp.msu.ac.th/authen/oauth/token',
+            },
+            userInfo: {
+                url: 'https://erp.msu.ac.th/authen/api/authuser',
+            },
+            clientId: '9cfc597a-f7ce-477c-8a72-56b40bba6dc6',
+            clientSecret: 'smGEGF6PuNIqFatazayEKH3X8s3nEfzc5GKnIuPK',
+            },
         },
-        sessionRefresh: {
-          //enablePeriodically: true,
-          enableOnWindowFocus: true,
-        }
     }
 });
+
+

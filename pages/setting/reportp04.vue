@@ -188,7 +188,7 @@ export default {
         },
         methods: {
             async showData(){    
-                await axios.post('http://survey.msu.ac.th/evaluatebackend/api/showUserManag',{
+                await axios.post('http://localhost:8000/api/showUserManag',{
                     fac: this.fac
                 }).then(res => { 
                     // console.log(res.data);
@@ -205,7 +205,7 @@ export default {
                     this.show_evaluator = false; 
                 }else{
                     this.show_evaluator = true; 
-                    await axios.post('http://survey.msu.ac.th/evaluatebackend/api/searchUser',{
+                    await axios.post('http://localhost:8000/api/searchUser',{
                         evaluator: this.evaluator
                     }).then(res => { 
                         this.userevaluator=res.data
@@ -222,7 +222,7 @@ export default {
                 this.evaluator_val = data.staffid
             },
             async SaveData(){
-                await axios.post('http://survey.msu.ac.th/evaluatebackend/api/saveDataManag',{
+                await axios.post('http://localhost:8000/api/saveDataManag',{
                     evaluator: this.evaluator,
                     evaluator_val: this.evaluator_val,
                     staffid: this.staffid,

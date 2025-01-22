@@ -1,7 +1,10 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
     typescript: false,
-    app: {
+    devServer :{
+        port: 3000
+    },
+    app: { 
         baseURL: '/evaluate/',
         head: {
             title: 'Sakai Vue',
@@ -14,16 +17,7 @@ export default defineNuxtConfig({
                 }
             ]
         }
-    },
-    build: {
-        transpile: ['primevue'],
-      },
-      plugins: [
-        { src: '~/plugins/primevue.js', ssr: false },
-      ],
-    // build: {
-    //     transpile: ['file-saver'],
-    //   },
+    }, 
     modules: ['nuxt-primevue','@sidebase/nuxt-auth'],
     primevue: {
         options: { ripple: true },
@@ -50,34 +44,19 @@ export default defineNuxtConfig({
     css: ['primeicons/primeicons.css', 'primeflex/primeflex.scss', 'primevue/resources/primevue.min.css', '@/assets/styles.scss'],
     //plugins: ['~/plugins/vue-authenticate.js'],
     auth: {
-        // globalAppMiddleware: true,
-        
-        enableSessionRefreshOnWindowFocus: true,
-
+        isEnabled: true,
+        disableServerSideAuth: false,
+        originEnvKey: 'AUTH_ORIGIN',
+        baseURL: 'https://localhost:3000/evaluate/api/auth',
         provider: {
             type: 'authjs',
-            customOAuth: {
-            id: 'custom-oauth',
-            name: 'Custom OAuth',
-            type: 'oauth',
-            authorization: {
-                url: 'https://erp.msu.ac.th/authen/oauth/_authorize',
-                params: {
-                client_id: '9cfc597a-f7ce-477c-8a72-56b40bba6dc6',
-                response_type: 'code',
-                redirect_uri: 'http://survey.msu.ac.th/evaluate/api/auth/callback/custom-oauth',
-                scope: 'email profile',
-                },
-            },
-            token: {
-                url: 'https://erp.msu.ac.th/authen/oauth/token',
-            },
-            userInfo: {
-                url: 'https://erp.msu.ac.th/authen/api/authuser',
-            },
-            clientId: '9cfc597a-f7ce-477c-8a72-56b40bba6dc6',
-            clientSecret: 'smGEGF6PuNIqFatazayEKH3X8s3nEfzc5GKnIuPK',
-            },
+            trustHost: false,
+            defaultProvider: 'erpauth',
+            addDefaultCallbackUrl: true
         },
+        sessionRefresh: {
+          //enablePeriodically: true,
+          enableOnWindowFocus: true,
+        }
     }
 });

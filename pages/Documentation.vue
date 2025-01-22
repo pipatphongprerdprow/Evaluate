@@ -12,7 +12,7 @@
                 <CodeHighlight>npm install</CodeHighlight>
 
                 <h6>Development</h6>
-                <p>Start the development server on <span class="font-medium bg-primary-100 text-primary-900 border-round text-sm px-2 py-1">http://survey.msu.ac.th/</span>.</p>
+                <p>Start the development server on <span class="font-medium bg-primary-100 text-primary-900 border-round text-sm px-2 py-1">http://localhost:3000/</span>.</p>
                 <CodeHighlight>npm run dev</CodeHighlight>
 
                 <h6>Production</h6>

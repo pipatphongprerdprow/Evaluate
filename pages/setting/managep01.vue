@@ -480,7 +480,7 @@ export default {
       this.displayDialog = false;
     },
     showDataP01() {
-      axios.post('http://survey.msu.ac.th/evaluatebackend/api/showDataP01', {
+      axios.post('http://localhost:8000/api/showDataP01', {
         staff_id: this.staff_id,
         facid: this.facid,
         groupid: this.groupid
@@ -491,7 +491,7 @@ export default {
       });
     },
     showDataPerson() {
-      axios.post('http://survey.msu.ac.th/evaluatebackend/api/showDataPerson', {
+      axios.post('http://localhost:8000/api/showDataPerson', {
         staff_id: this.staffid_Main,
         fac_id: this.facid_Main,
         year_id: this.year_Main,
@@ -537,7 +537,7 @@ export default {
       this.products_list = this.products_list.filter(product => product.ind_no !== data);
     },
     async saveData() {
-      await axios.post('http://survey.msu.ac.th/evaluatebackend/api/saveDataP01', {
+      await axios.post('http://localhost:8000/api/saveDataP01', {
         staff_id: this.staff_id,
         facid: this.facid,
         text_edt: this.text_edt,
@@ -559,7 +559,7 @@ export default {
       });
     },
     async savedata1() {
-      await axios.post('http://survey.msu.ac.th/evaluatebackend/api/savedatadate', {
+      await axios.post('http://localhost:8000/api/savedatadate', {
         d_date: this.d_date,
         d_evaluationround: this.d_evaluationround,
         d_enddate: this.d_enddate,
@@ -578,7 +578,7 @@ export default {
       });
     },
     async editData(data) {
-      await axios.post('http://survey.msu.ac.th/evaluatebackend/api/edtDataP01', {
+      await axios.post('http://localhost:8000/api/edtDataP01', {
         p01_id: data.p01_id
       }).then(res => {
         this.DialogAdd = true;
@@ -603,7 +603,7 @@ export default {
         confirmButtonText: "Yes, delete it!"
       }).then((result) => {
         if (result.isConfirmed) {
-          axios.post('http://survey.msu.ac.th/evaluatebackend/api/delDataP01', {
+          axios.post('http://localhost:8000/api/delDataP01', {
             p01_id: data.p01_id
           }).then(res => {
             this.showDataP01();
@@ -637,7 +637,7 @@ export default {
   methods: {
     // ดึงข้อมูลเข้าตาราง
     showDataPerson() {
-      axios.post('http://survey.msu.ac.th/evaluatebackend/api/showDataPerson', {
+      axios.post('http://localhost:8000/api/showDataPerson', {
         staff_id: this.staffid_Main,
         fac_id: this.facid_Main,
         year_id: this.year_Main, 
@@ -650,7 +650,7 @@ export default {
     },
 
     showDataP01() {
-      axios.post('http://survey.msu.ac.th/evaluatebackend/api/showDataP01', {
+      axios.post('http://localhost:8000/api/showDataP01', {
         staff_id: this.staff_id,
         facid: this.facid,
         groupid: this.groupid,
@@ -687,7 +687,7 @@ export default {
     },
 
     selectDataH(year, fac) {  
-      axios.post('http://survey.msu.ac.th/evaluatebackend/api/selectDataPersonH', {
+      axios.post('http://localhost:8000/api/selectDataPersonH', {
         year: year.value,
         fac: fac,
       }).then(res => {     
@@ -720,7 +720,7 @@ export default {
     },
 
     async saveData() {
-      await axios.post('http://survey.msu.ac.th/evaluatebackend/api/saveDataPerson', {
+      await axios.post('http://localhost:8000/api/saveDataPerson', {
         staff_id: this.staffid_Main,
         fac_id: this.facid_Main,
         year_id: this.dropdownItemYear.value,  
@@ -746,7 +746,7 @@ export default {
     },
 
     async editData(data) {   
-      await axios.post('http://survey.msu.ac.th/evaluatebackend/api/edtDataPerson', {
+      await axios.post('http://localhost:8000/api/edtDataPerson', {
         p_id: data.p_id
       }).then(res => { 
         this.DialogAdd = true; 
@@ -774,7 +774,7 @@ export default {
         confirmButtonText: "Yes, delete it!"
       }).then((result) => {
         if (result.isConfirmed) {
-          axios.post('http://survey.msu.ac.th/evaluatebackend/api/delDataPerson', {
+          axios.post('http://localhost:8000/api/delDataPerson', {
             p_id: data.p_id
           }).then(res => { 
             this.showDataPerson();
@@ -792,7 +792,7 @@ export default {
     },
 
     async selectDataHEdt(year, fac, he) {  
-      axios.post('http://survey.msu.ac.th/evaluatebackend/api/selectDataPersonH', {
+      axios.post('http://localhost:8000/api/selectDataPersonH', {
         year: year,
         fac: fac,
       }).then(res => {     
