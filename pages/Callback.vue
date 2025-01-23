@@ -12,6 +12,7 @@ const router = useRouter()
 
 onMounted(async () => {
   const vueAuth = inject('vueAuth')
+  
 
   if (vueAuth) {
     try {

@@ -27,7 +27,7 @@ export default NuxtAuthHandler({
         params: {
           grant_type: "authorization_code",
           response_type: 'code',
-          redirect_uri: 'https://survey.msu.ac.th/evaluate/api/auth/callback/erpauth',
+          redirect_uri: 'http://localhost:3000/evaluate/api/auth/callback/erpauth',
           scope: '',
         }
       },
@@ -35,8 +35,8 @@ export default NuxtAuthHandler({
       userinfo: 'https://erp.msu.ac.th/authen/api/authuserinfo?progcode=parcelapp',  // User info endpoint
 
       // Client ID and secret for the custom provider, from environment variables
-      clientId: '9e04ac52-608f-4d13-8674-1374b228d6d0',
-      clientSecret: 'vertmZth5V0el1CN4LxZfzOyOch0DZ782RI0OQqI',
+      clientId: '9e054c96-e655-4e11-90b4-24092280b0bb',
+      clientSecret: 'uDgyytgePE3hlFIV0Xm9TBwzIfpSEqhPs43h8GdY',
 
       // Function to extract the profile information from the userinfo response
       profile(profile) {
@@ -59,6 +59,7 @@ export default NuxtAuthHandler({
   },
   callbacks: {
     jwt: async ({ token, user, account, profile }) => {
+      
       if (user?.email) {
         token.providerInfo = {
           provider: account?.provider,
@@ -72,6 +73,7 @@ export default NuxtAuthHandler({
       return Promise.resolve(token);
     },
     session: async ({session, token, user}) => {
+      
       session.providerInfo = token?.providerInfo;
 
       return Promise.resolve({ ...session});

@@ -41,7 +41,7 @@
                 <!-- <TabView @click="xyz"> -->
                 <TabPanel header="แบบ ใบปะหน้า" value="0">
                     <div class="col md:col-12 text-right">
-                        <Button label="Export" icon="pi pi-file-word" class="mr-2 mb-2 " @click="printDataP01"></Button>
+                        <Button label="123" icon="pi pi-file-word" class="mr-2 mb-2 " @click="printDataP01"></Button>
                     </div> 
                     <div v-if="user.user" class="card"> 
                         <div style="display: flex; justify-content: center">
@@ -209,10 +209,10 @@ export default {
     async mounted() {
         const { signIn, getSession, signOut } = await useAuth();
         const user = await getSession();
-        const { STAFFID, SCOPES } = user.user.name;
-        const { staffdepartment, groupid, staffdepartmentname, groupname } = SCOPES;
-        console.log(staffdepartment);
+        console.log(user);
         
+        const { STAFFID, SCOPES } = user.user.name;
+        const { staffdepartment, groupid, staffdepartmentname, groupname } = SCOPES; 
 
         await this.setSession(STAFFID, staffdepartment, groupid ,user);
         await this.showDataSet(STAFFID, staffdepartment, groupid);
@@ -239,7 +239,7 @@ export default {
             };
         },
         showDataSet() {
-            axios.post('http://survey.msu.ac.th/evaluatebackend/api/showDateSet', {
+            axios.post('http://localhost:3000/evaluatebackend/api/showDateSet', {
                 staff_id: this.staffid_Main,
                 fac_id: this.facid_Main,
                 group_id: this.groupid_Main 
@@ -278,7 +278,7 @@ export default {
                         assessor_position: this. assessor_position
                     }; 
 
-                    axios.post('http://survey.msu.ac.th/evaluatebackend/api/saveDatator', 
+                    axios.post('http://localhost:3000/evaluatebackend/api/saveDatator', 
                         formData
                     ).then(response => { 
                         this.DialogScore = false; 
@@ -303,7 +303,7 @@ export default {
             } 
         },
         showdatator() { 
-            axios.post('http://survey.msu.ac.th/evaluatebackend/api/showdatator', {
+            axios.post('http://localhost:3000/evaluatebackend/api/showdatator', {
                 p_year: this.product_date.d_date,
                 evalua: this.product_date.evalua,
                 p_staffid: this.staffid_Main
@@ -358,8 +358,8 @@ export default {
 
             const queryParams = new URLSearchParams(form).toString();
             // console.log(queryParams); 
-            const url = `http://survey.msu.ac.th/evaluatebackend/printReportCoverpage?${queryParams}`;
-            window.open(url, '_blank');
+            const url = `https://localhost:3000/evaluatebackend/printReportCoverpage?${queryParams}`;
+            window.location.href = url;
  
         },  
     },  
