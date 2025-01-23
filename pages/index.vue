@@ -3,7 +3,7 @@
         <div style="border-radius: 56px; padding: 0.3rem; background: linear-gradient(180deg, rgba(33, 150, 243, 0.5) 40%, rgba(33, 150, 243, 0) 60%);width: 70%;">  
             <div class="w-full surface-card py-6 px-5 sm:px-8 flex flex-column align-items-center" style="border-radius: 53px;">
                 <span class="text-blue-500 font-bold text-3xl">ระบบประเมินบุคลากรสายสนับสนุน</span> 
-                {{ user.user?.name}} 
+                <!-- {{ user.user?.name}}  -->
                 <div class="mb-3 mt-3">
                   <img id="IMG_PICTURE" :src="`${profileImageUrl}${user.user?.name.STAFFID}.jpg`" alt="Profile Picture" style="border-radius: 70px;width: 200px;height: auto;" />   
                 </div>   

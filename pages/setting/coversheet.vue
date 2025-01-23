@@ -41,7 +41,7 @@
                 <!-- <TabView @click="xyz"> -->
                 <TabPanel header="แบบ ใบปะหน้า" value="0">
                     <div class="col md:col-12 text-right">
-                        <Button label="export" icon="pi pi-file-word" class="mr-2 mb-2 " @click="printDataP01"></Button>
+                        <Button label="Export" icon="pi pi-file-word" class="mr-2 mb-2 " @click="printDataP01"></Button>
                     </div> 
                     <div v-if="user.user" class="card"> 
                         <div style="display: flex; justify-content: center">
