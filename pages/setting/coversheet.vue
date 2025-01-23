@@ -239,7 +239,7 @@ export default {
             };
         },
         showDataSet() {
-            axios.post('http://localhost:3000/evaluatebackend/api/showDateSet', {
+            axios.post('https://lsurvey.msu.ac.th/evaluatebackend/api/showDateSet', {
                 staff_id: this.staffid_Main,
                 fac_id: this.facid_Main,
                 group_id: this.groupid_Main 
@@ -278,7 +278,7 @@ export default {
                         assessor_position: this. assessor_position
                     }; 
 
-                    axios.post('http://localhost:3000/evaluatebackend/api/saveDatator', 
+                    axios.post('https://lsurvey.msu.ac.th/evaluatebackend/api/saveDatator', 
                         formData
                     ).then(response => { 
                         this.DialogScore = false; 
@@ -303,7 +303,7 @@ export default {
             } 
         },
         showdatator() { 
-            axios.post('http://localhost:3000/evaluatebackend/api/showdatator', {
+            axios.post('https://lsurvey.msu.ac.th/evaluatebackend/api/showdatator', {
                 p_year: this.product_date.d_date,
                 evalua: this.product_date.evalua,
                 p_staffid: this.staffid_Main
@@ -358,7 +358,7 @@ export default {
 
             const queryParams = new URLSearchParams(form).toString();
             // console.log(queryParams); 
-            const url = `https://localhost:3000/evaluatebackend/printReportCoverpage?${queryParams}`;
+            const url = `https://lsurvey.msu.ac.th/evaluatebackend/printReportCoverpage?${queryParams}`;
             window.location.href = url;
  
         },  

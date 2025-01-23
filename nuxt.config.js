@@ -47,7 +47,7 @@ export default defineNuxtConfig({
         isEnabled: true,
         disableServerSideAuth: false,
         originEnvKey: 'AUTH_ORIGIN',
-        baseURL: 'http://localhost:3000/evaluate/api/auth',
+        baseURL: 'https://lsurvey.msu.ac.th/evaluate/api/auth',
         provider: {
             type: 'authjs',
             trustHost: false,
