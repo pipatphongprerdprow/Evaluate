@@ -49,6 +49,7 @@ export default NuxtAuthHandler({
           name: `${STAFFNAME} ${STAFFSURNAME}`,        // User's name
           email: STAFFEMAIL1,      // User's email
           image: STAFFID ,
+          test:profile,
           ...profile.user
         }
       }
