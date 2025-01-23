@@ -27,7 +27,7 @@ export default NuxtAuthHandler({
         params: {
           grant_type: "authorization_code",
           response_type: 'code',
-          redirect_uri: 'https://lsurvey.msu.ac.th/evaluate/api/auth/callback/erpauth',
+          redirect_uri: 'https://survey.msu.ac.th/evaluate/api/auth/callback/erpauth',
           scope: '',
         }
       },

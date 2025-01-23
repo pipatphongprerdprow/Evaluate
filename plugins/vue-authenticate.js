@@ -12,7 +12,7 @@ export default defineNuxtPlugin(nuxtApp => {
           name: 'msu',
           url: 'https://erp.msu.ac.th/authen/api/authuser?progcode=TEST',
           clientId: '99aa3ef7-dc1f-4e64-a5ed-46ccd0b9fea9',
-          redirectUri: 'https://lsurvey.msu.ac.th/callback', // Adjust this URL
+          redirectUri: 'https://survey.msu.ac.th/callback', // Adjust this URL
           authorizationEndpoint: 'https://erp.msu.ac.th/authen/api/authuser?progcode=TEST',
           responseType: 'code',
           requiredUrlParams: ['scope', 'state'],
