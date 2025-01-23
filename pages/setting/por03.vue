@@ -63,7 +63,7 @@
                                 </td>
                                 <td style="text-align: left;"> 
                                     <p v-for="(subIitemDoc, inDoc) in subP01.subITemP03doc" :key="inDoc" style="padding-left: 8px;margin-bottom: 5px;"> 
-                                        <a v-if="subIitemDoc.doc_file!=null && subIitemDoc.doc_link==null" :href="'http://survey.msu.ac.th/evaluatebackend/storage/uploadsP03/'+subIitemDoc.doc_file" target="_blank"><b>ระดับ</b> <b>{{subIitemDoc.doc_no }}</b> {{ subIitemDoc.doc_name }}</a> 
+                                        <a v-if="subIitemDoc.doc_file!=null && subIitemDoc.doc_link==null" :href="'https://survey.msu.ac.th/evaluatebackend/storage/uploadsP03/'+subIitemDoc.doc_file" target="_blank"><b>ระดับ</b> <b>{{subIitemDoc.doc_no }}</b> {{ subIitemDoc.doc_name }}</a> 
                                         <a v-if="subIitemDoc.doc_link!=null && subIitemDoc.doc_file==null" :href="subIitemDoc.doc_link" target="_blank"><b>ระดับ</b> <b>{{ subIitemDoc.doc_no }}</b> {{ subIitemDoc.doc_name }}</a> 
                                     </p>
                                     <p v-if="subP01.subITemP03doc.length == 0" style="padding-left: 8px;margin-bottom: 5px;">
@@ -373,7 +373,7 @@
                             </Column>
                             <Column field="doc_name" header="ชื่อไฟล์" style="text-align: left;width: 35%">
                                 <template #body="Item"> 
-                                    <a v-if="Item.data.doc_file!=null" :href="'http://survey.msu.ac.th/evaluatebackend/storage/uploadsP03/'+Item.data.doc_file" target="_blank">{{ Item.data.doc_name }}</a> 
+                                    <a v-if="Item.data.doc_file!=null" :href="'https://survey.msu.ac.th/evaluatebackend/storage/uploadsP03/'+Item.data.doc_file" target="_blank">{{ Item.data.doc_name }}</a> 
                                     <a v-if="Item.data.doc_link!=null" :href="Item.data.doc_link" target="_blank">{{ Item.data.doc_name }}</a> 
                                 </template>
                             </Column>  
@@ -589,7 +589,7 @@ import InputText from 'primevue/inputtext';
             },
             // ดึงข้อมูลเข้าตาราง
             async showDataP03(){
-                await axios.post('http://survey.msu.ac.th/evaluatebackend/api/showDataP03New',{
+                await axios.post('https://survey.msu.ac.th/evaluatebackend/api/showDataP03New',{
                     staff_id: this.staffid_Main,
                     fac_id: this.dataPor.fac_id,
                     year_id: this.dataPor.d_date, 
@@ -611,7 +611,7 @@ import InputText from 'primevue/inputtext';
                 this.list_no_p03 = null;
                 this.list_text_p03 = null;
                 this.products_list_p03 = [];
-                axios.post('http://survey.msu.ac.th/evaluatebackend/api/p03indData',{
+                axios.post('https://survey.msu.ac.th/evaluatebackend/api/p03indData',{
                     p01_id: item.p01_id,
                 }).then(res => {
                     // console.log(res.data); 
@@ -658,7 +658,7 @@ import InputText from 'primevue/inputtext';
                 if(this.products_list_p03.length == 0){
                     Swal.fire("error","กรุณาตรวจสอบตารางข้อมูล ตัวชี้วัดการประเมิน!","error");
                 }else{
-                    axios.post('http://survey.msu.ac.th/evaluatebackend/api/saveListP03', {
+                    axios.post('https://survey.msu.ac.th/evaluatebackend/api/saveListP03', {
                         p_id: this.text_edtP03,
                         products_list: this.products_list_p03
                     })
@@ -754,7 +754,7 @@ import InputText from 'primevue/inputtext';
                                 }
                             });
 
-                            instance_x.post('http://survey.msu.ac.th/evaluatebackend/api/saveDocP03', formData)
+                            instance_x.post('https://survey.msu.ac.th/evaluatebackend/api/saveDocP03', formData)
                                 .then(res => {
                                     this.showDataP03();
                                     this.Data_Doc();
@@ -785,7 +785,7 @@ import InputText from 'primevue/inputtext';
                                 }
                             });
 
-                            instance_x.post('http://survey.msu.ac.th/evaluatebackend/api/saveDocP03', formData)
+                            instance_x.post('https://survey.msu.ac.th/evaluatebackend/api/saveDocP03', formData)
                                 .then(res => {
                                     this.showDataP03();
                                     this.Data_Doc();
@@ -812,7 +812,7 @@ import InputText from 'primevue/inputtext';
             },
 
             Data_Doc(){
-                axios.post('http://survey.msu.ac.th/evaluatebackend/api/sheachDataDoc', {
+                axios.post('https://survey.msu.ac.th/evaluatebackend/api/sheachDataDoc', {
                     p_id: this.text_edtDoc
                 })
                 .then((res) => {
@@ -825,7 +825,7 @@ import InputText from 'primevue/inputtext';
             },
              // หลักฐานที่แสดงถึงผลการปฏิบัติราชการตามเกณฑ์การประเมิน(หลักฐานเชิงประจักษ์)
             delDataDocX(data){  
-                axios.post('http://survey.msu.ac.th/evaluatebackend/api/deleteDocP03', {
+                axios.post('https://survey.msu.ac.th/evaluatebackend/api/deleteDocP03', {
                     doc_id: data.doc_id, 
                     doc_file: data.doc_file??null
                 })
@@ -851,7 +851,7 @@ import InputText from 'primevue/inputtext';
                 confirmButtonText: "Yes, delete it!"
             }).then((result) => {
                 if (result.isConfirmed) {
-                    axios.post('http://survey.msu.ac.th/evaluatebackend/api/delDocP03', {
+                    axios.post('https://survey.msu.ac.th/evaluatebackend/api/delDocP03', {
                         p01_id: data.p01_id
                     }).then(res => { 
                         this.showDataP03();
@@ -883,7 +883,7 @@ import InputText from 'primevue/inputtext';
                 this.DialogScore = true;
                 this.text_edtP03Score = item.p01_id;;
                 this.score_p03 = null; 
-                axios.post('http://survey.msu.ac.th/evaluatebackend/api/p03ScoreData',{
+                axios.post('https://survey.msu.ac.th/evaluatebackend/api/p03ScoreData',{
                     p01_id: item.p01_id,
                 }).then(res => {
                     // console.log(res.data); 
@@ -900,7 +900,7 @@ import InputText from 'primevue/inputtext';
                 if(this.score_p03.length == 0){
                     Swal.fire("error","กรุณาตรวจสอบข้อมูล ระดับการประเมินตนเอง!","error");
                 }else{
-                    axios.post('http://survey.msu.ac.th/evaluatebackend/api/saveScoreP03', {
+                    axios.post('https://survey.msu.ac.th/evaluatebackend/api/saveScoreP03', {
                         p_id: this.text_edtP03Score,
                         score_p03: this.score_p03.value
                     })
@@ -922,7 +922,7 @@ import InputText from 'primevue/inputtext';
             getjobSpecificCompetencies(){
             //console.log(this.staffid_Main,this.dataPor);
             
-            axios.post('http://survey.msu.ac.th/evaluatebackend/api/showdataposp02', { 
+            axios.post('https://survey.msu.ac.th/evaluatebackend/api/showdataposp02', { 
                 p_year: this.dataPor.d_date,
                 evalua: this.dataPor.evalua,
                 p_staffid: this.staffid_Main
@@ -964,7 +964,7 @@ import InputText from 'primevue/inputtext';
                 // ตั้งค่า jobSpecificCompetencies กลับไปเป็นค่าเริ่มต้น 
                 this.showPostype(this.postypename,this.postypenameid); 
                 
-                axios.post('http://survey.msu.ac.th/evaluatebackend/api/showDataPo',{
+                axios.post('https://survey.msu.ac.th/evaluatebackend/api/showDataPo',{
                     staff_id: this.staffid_Main,
                     fac_id: this.facid_Main,
                     year_id: this.dataPor.d_date,
@@ -1008,7 +1008,7 @@ import InputText from 'primevue/inputtext';
             showPostype(postypename,postypenameid){
                 // console.log(postypename); 
                 var postypetext = `ระดับ`+postypename;
-                axios.post('http://survey.msu.ac.th/evaluatebackend/api/showdatapostypename', {
+                axios.post('https://survey.msu.ac.th/evaluatebackend/api/showdatapostypename', {
                     postypename: postypetext,
                     postypenameid: postypenameid
                 })
@@ -1035,7 +1035,7 @@ import InputText from 'primevue/inputtext';
             },
             showdatator() {  
                 //console.log(this.dataPor.d_date,scoreA04); 
-                axios.post('http://survey.msu.ac.th/evaluatebackend/api/showdatator', {
+                axios.post('https://survey.msu.ac.th/evaluatebackend/api/showdatator', {
                     p_year: this.dataPor.d_date,
                     evalua: this.dataPor.evalua,
                     p_staffid: this.staffid_Main
@@ -1051,7 +1051,7 @@ import InputText from 'primevue/inputtext';
                 });
             },
             showjobSpecificCompetencies (){
-                axios.post('http://survey.msu.ac.th/evaluatebackend/api/showdataposp02', { 
+                axios.post('https://survey.msu.ac.th/evaluatebackend/api/showdataposp02', { 
                 p_year: this.dataPor.d_date,
                 evalua: this.dataPor.evalua,
                 p_staffid: this.staffid_Main
@@ -1069,7 +1069,7 @@ import InputText from 'primevue/inputtext';
 /*============= ความรู้/ทักษะ/สมรรถนะ ที่ต้องการพัฒนา =============*/ 
             chkp03data(){ 
                 this.products_Tab3 = [];
-                axios.post('http://survey.msu.ac.th/evaluatebackend/api/showData04Tab3',{
+                axios.post('https://survey.msu.ac.th/evaluatebackend/api/showData04Tab3',{
                     staff_id: this.staffid_Main,
                     fac_id: this.facid_Main,
                     year_id: this.dataPor.d_date,
@@ -1096,7 +1096,7 @@ import InputText from 'primevue/inputtext';
                 });
             },  
             AddDatap04(){ 
-                axios.post('http://survey.msu.ac.th/evaluatebackend/api/saveEvaTab03xx',{
+                axios.post('https://survey.msu.ac.th/evaluatebackend/api/saveEvaTab03xx',{
                     staff_id: this.staffid_Main,
                     fac_id: this.facid_Main,
                     year_id: this.dataPor.d_date,
@@ -1131,7 +1131,7 @@ import InputText from 'primevue/inputtext';
             },
             DeleteRegislick(item) { 
                 // Add logic to remove the selected item  
-                axios.post('http://survey.msu.ac.th/evaluatebackend/api/delEvaTab03xx',{
+                axios.post('https://survey.msu.ac.th/evaluatebackend/api/delEvaTab03xx',{
                     id: item
                 }).then(res => {  
                     // console.log(res);
@@ -1144,7 +1144,7 @@ import InputText from 'primevue/inputtext';
             },  
             async saveAssess() {
                 try {
-                    const response = await axios.post('http://survey.msu.ac.th/evaluatebackend/api/savedataAssess', { 
+                    const response = await axios.post('https://survey.msu.ac.th/evaluatebackend/api/savedataAssess', { 
                         p_staffid: this.staffid_Main,
                         fac_id: this.facid_Main,
                         p_year: this.dataPor.d_date,
@@ -1176,7 +1176,7 @@ import InputText from 'primevue/inputtext';
                 }
             },  
             showAssess( ) {
-                axios .post('http://survey.msu.ac.th/evaluatebackend/api/showdataAssess', { 
+                axios .post('https://survey.msu.ac.th/evaluatebackend/api/showdataAssess', { 
                     staff_id:this.staffid_Main,
                     fac_id: this.facid_Main,
                     year: this.dataPor.d_date,
@@ -1255,7 +1255,7 @@ import InputText from 'primevue/inputtext';
                 } 
                 const queryParams = new URLSearchParams(form).toString();
                 // console.log(queryParams); 
-                const url = `http://survey.msu.ac.th/evaluatebackend/report_p03?${queryParams}`;
+                const url = `https://survey.msu.ac.th/evaluatebackend/report_p03?${queryParams}`;
                 window.open(url, '_blank'); 
             },     
         },

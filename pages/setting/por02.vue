@@ -189,7 +189,7 @@ export default {
         getjobSpecificCompetencies(){
             //console.log(this.staffid_Main,this.dataPor);
             
-            axios.post('http://survey.msu.ac.th/evaluatebackend/api/showdataposp02', { 
+            axios.post('https://survey.msu.ac.th/evaluatebackend/api/showdataposp02', { 
                p_year: this.dataPor.d_date,
                 evalua: this.dataPor.evalua,
                 p_staffid: this.staffid_Main
@@ -233,7 +233,7 @@ export default {
             this.showPostype(this.postypename,this.postypenameid);
   
             
-            axios.post('http://survey.msu.ac.th/evaluatebackend/api/showDataPo',{
+            axios.post('https://survey.msu.ac.th/evaluatebackend/api/showDataPo',{
                 staff_id: this.staffid_Main,
                 fac_id: this.facid_Main,
                 year_id: this.dataPor.d_date,
@@ -278,7 +278,7 @@ export default {
         showPostype(postypename,postypenameid){
             // console.log(postypename); 
             var postypetext = `ระดับ`+postypename;
-            axios.post('http://survey.msu.ac.th/evaluatebackend/api/showdatapostypename', {
+            axios.post('https://survey.msu.ac.th/evaluatebackend/api/showdatapostypename', {
                 postypename: postypetext,
                 postypenameid: postypenameid
             })
@@ -305,7 +305,7 @@ export default {
         },
         showdatator() {  
             //console.log(this.dataPor.d_date,scoreA04); 
-            axios.post('http://survey.msu.ac.th/evaluatebackend/api/showdatator', {
+            axios.post('https://survey.msu.ac.th/evaluatebackend/api/showdatator', {
                 p_year: this.dataPor.d_date,
                 evalua: this.dataPor.evalua,
                 p_staffid: this.staffid_Main
@@ -321,7 +321,7 @@ export default {
             });
         },
         showjobSpecificCompetencies (){
-            axios.post('http://survey.msu.ac.th/evaluatebackend/api/showdataposp02', { 
+            axios.post('https://survey.msu.ac.th/evaluatebackend/api/showdataposp02', { 
                p_year: this.dataPor.d_date,
                 evalua: this.dataPor.evalua,
                 p_staffid: this.staffid_Main
@@ -356,7 +356,7 @@ export default {
             } 
             const queryParams = new URLSearchParams(form).toString();
             // console.log(queryParams); 
-            const url = `http://survey.msu.ac.th/evaluatebackend/report_p02?${queryParams}`;
+            const url = `https://survey.msu.ac.th/evaluatebackend/report_p02?${queryParams}`;
             window.open(url, '_blank');
  
         },     

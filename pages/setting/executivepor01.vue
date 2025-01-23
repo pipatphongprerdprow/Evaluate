@@ -205,7 +205,7 @@ export default {
     },
     methods: {
         showDataP01(){
-            axios.post('http://survey.msu.ac.th/evaluatebackend/api/showDataP01',{
+            axios.post('https://survey.msu.ac.th/evaluatebackend/api/showDataP01',{
                 staff_id: this.staff_id,
                 facid: this.facid,
                 groupid: this.groupid,
@@ -251,7 +251,7 @@ export default {
             this.products_list = this.products_list.filter(product => product.ind_no !== data); 
         },
         async saveData(){
-            await axios.post('http://survey.msu.ac.th/evaluatebackend/api/saveDataP01',{
+            await axios.post('https://survey.msu.ac.th/evaluatebackend/api/saveDataP01',{
                 staff_id: this.staff_id,
                 facid: this.facid,
                 text_edt: this.text_edt,
@@ -278,7 +278,7 @@ export default {
         this.DialogAdd = false; 
         },
         async editData(data){ 
-            await axios.post('http://survey.msu.ac.th/evaluatebackend/api/edtDataP01',{
+            await axios.post('https://survey.msu.ac.th/evaluatebackend/api/edtDataP01',{
                 p01_id: data.p01_id
             }).then(res => { 
                 // console.log(res);     
@@ -305,7 +305,7 @@ export default {
                 confirmButtonText: "Yes, delete it!"
                 }).then((result) => {
                 if (result.isConfirmed) {
-                    axios.post('http://survey.msu.ac.th/evaluatebackend/api/delDataP01',{
+                    axios.post('https://survey.msu.ac.th/evaluatebackend/api/delDataP01',{
                         p01_id: data.p01_id
                     }).then(res => { 
                         // console.log(res);   

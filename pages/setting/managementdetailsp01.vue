@@ -552,7 +552,7 @@
               <template #body="Item"> 
                 <!-- <a :href="fileUrl" target="_blank">Open Uploaded File</a> -->
                 <p v-for="(xx, index) in Item.data.sub_ITemDoc" :key="index" class="mb-0">  
-                    <a :href="'http://survey.msu.ac.th/evaluatebackend/storage/uploads/'+xx.doc_file" target="_blank">{{ xx.doc_name }}</a> 
+                    <a :href="'https://survey.msu.ac.th/evaluatebackend/storage/uploads/'+xx.doc_file" target="_blank">{{ xx.doc_name }}</a> 
                     <!-- <Button icon="pi pi-times" severity="danger" rounded text raised class="mb-2 mr-2" @click="delDataDoc(xx)" />  -->
                   </p>
                 <!-- <Button label="เพิ่มไฟล์" severity="primary" icon="pi pi-plus" @click="OpenDialogAddfile(Item.data)" />  -->
@@ -840,7 +840,7 @@ export default {
         this.displayDialog = false;
       },
       showDataP01(){
-            axios.post('http://survey.msu.ac.th/evaluatebackend/api/showDataP01',{
+            axios.post('https://survey.msu.ac.th/evaluatebackend/api/showDataP01',{
                 staff_id: this.staff_id,
                 facid: this.facid,
                 groupid: this.groupid,
@@ -853,7 +853,7 @@ export default {
             });
           },
       showDataP03() {
-          axios.post('http://survey.msu.ac.th/evaluatebackend/api/showDataP03', {
+          axios.post('https://survey.msu.ac.th/evaluatebackend/api/showDataP03', {
                 staff_id: this.staff_id,
                 facid: this.facid,
                 groupid: this.groupid
@@ -957,7 +957,7 @@ export default {
             this.products_list = this.products_list.filter(product => product.ind_no !== data); 
         },
         async saveData(){
-            await axios.post('http://survey.msu.ac.th/evaluatebackend/api/saveDataP01',{
+            await axios.post('https://survey.msu.ac.th/evaluatebackend/api/saveDataP01',{
                 staff_id: this.staff_id,
                 facid: this.facid,
                 text_edt: this.text_edt,
@@ -984,7 +984,7 @@ export default {
             this.DialogAdd = false; 
             },
             saveData() { 
-            axios.post('http://survey.msu.ac.th/evaluatebackend/api/saveDataP03', {
+            axios.post('https://survey.msu.ac.th/evaluatebackend/api/saveDataP03', {
                 staff_id: this.staff_id,
                 facid: this.facid,
                 text_p01_id: this.text_p01_id,  
@@ -1007,7 +1007,7 @@ export default {
               });
           },
           editData(data) { 
-            axios.post('http://survey.msu.ac.th/evaluatebackend/api/edtDataP03', {
+            axios.post('https://survey.msu.ac.th/evaluatebackend/api/edtDataP03', {
                 p01_id: data.p01_id,
                 p03_id: data.p03_id
               })
@@ -1035,7 +1035,7 @@ export default {
               confirmButtonText: 'Yes, delete it!',
             }).then((result) => {
               if (result.isConfirmed) {
-                axios.post('http://survey.msu.ac.th/evaluatebackend/api/delDataP03', {
+                axios.post('https://survey.msu.ac.th/evaluatebackend/api/delDataP03', {
                     p01_id: data.p01_id,
                     p03_id: data.p03_id,
                   })
@@ -1072,7 +1072,7 @@ export default {
             formData.append('doc_name', this.doc_name);
             formData.append('doc_file', this.doc_file);
 
-            axios.post('http://survey.msu.ac.th/evaluatebackend/api/saveDatadoc', formData, {
+            axios.post('https://survey.msu.ac.th/evaluatebackend/api/saveDatadoc', formData, {
               headers: {
                 'Content-Type': 'multipart/form-data'
               }
@@ -1102,7 +1102,7 @@ export default {
               confirmButtonText: 'Yes, delete it!',
             }).then((result) => {
               if (result.isConfirmed) {
-                axios.post('http://survey.msu.ac.th/evaluatebackend/api/delDatadoc', {
+                axios.post('https://survey.msu.ac.th/evaluatebackend/api/delDatadoc', {
                   doc_file: data.doc_file, 
                   doc_id: data.doc_id,
                   p01_id: data.p01_id,
@@ -1125,7 +1125,7 @@ export default {
           async savescorep03() {
         // console.log('Save score:', this.p01_score);
         try {
-          await axios.post('http://survey.msu.ac.th/evaluatebackend/api/savescorep03', {
+          await axios.post('https://survey.msu.ac.th/evaluatebackend/api/savescorep03', {
             p01_score: this.p01_score,
           });
         } catch (error) {
@@ -1135,7 +1135,7 @@ export default {
       deletescorep03() {
         console.log('Delete score:', this.p01_score);
         try {
-          axios.post('http://survey.msu.ac.th/evaluatebackend/api/deletescorep03', {
+          axios.post('https://survey.msu.ac.th/evaluatebackend/api/deletescorep03', {
             p01_score: this.p01_score,
           });
           this.p01_score = [];
@@ -1146,7 +1146,7 @@ export default {
 
 
         async editData(data){ 
-            await axios.post('http://survey.msu.ac.th/evaluatebackend/api/edtDataP01',{
+            await axios.post('https://survey.msu.ac.th/evaluatebackend/api/edtDataP01',{
                 p01_id: data.p01_id
             }).then(res => { 
                 // console.log(res);     
@@ -1173,7 +1173,7 @@ export default {
                 confirmButtonText: "Yes, delete it!"
                 }).then((result) => {
                 if (result.isConfirmed) {
-                    axios.post('http://survey.msu.ac.th/evaluatebackend/api/delDataP01',{
+                    axios.post('https://survey.msu.ac.th/evaluatebackend/api/delDataP01',{
                         p01_id: data.p01_id
                     }).then(res => { 
                         // console.log(res);   

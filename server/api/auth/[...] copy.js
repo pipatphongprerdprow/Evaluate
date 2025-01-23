@@ -28,7 +28,7 @@ export default NuxtAuthHandler({
           state: generateState(),
           client_id: '9e04ac52-608f-4d13-8674-1374b228d6d0',
           response_type: 'code',
-          redirect_uri: 'http://survey.msu.ac.th/evaluate/api/auth/callback/custom-oauth',
+          redirect_uri: 'https://survey.msu.ac.th/evaluate/api/auth/callback/custom-oauth',
           scope: '',
         }
       },

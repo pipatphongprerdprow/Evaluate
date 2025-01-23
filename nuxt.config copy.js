@@ -65,7 +65,7 @@ export default defineNuxtConfig({
                 params: {
                 client_id: '9cfc597a-f7ce-477c-8a72-56b40bba6dc6',
                 response_type: 'code',
-                redirect_uri: 'http://survey.msu.ac.th/evaluate/api/auth/callback/custom-oauth',
+                redirect_uri: 'https://survey.msu.ac.th/evaluate/api/auth/callback/custom-oauth',
                 scope: 'email profile',
                 },
             },
