@@ -1,5 +1,5 @@
 // src/authService.ts
-import axios from 'axios';
+import axios from 'axios'; 
 
 const clientId = '9c283af5-56b1-4365-a3b2-b8cb69f22624';
 const clientSecret = 'w0nAfUzaq8A3DV43PnJzJWxvrypI5yW9FqiuvE6f';
