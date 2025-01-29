@@ -7,7 +7,7 @@ export default defineNuxtConfig({
     app: { 
         baseURL: '/evaluate/',
         head: {
-            title: 'Sakai Vue',
+            title: 'ระบบประเมินบุคลากร',
             link: [
                 {
                     id: 'theme-css',

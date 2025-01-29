@@ -255,14 +255,14 @@
                             <div class="field col-12 md:col-12"> 
                                 <label for="text_search_no">ตัวชี้วัด / เกณฑ์การประเมิน</label>
                                 <InputGroup>  
-                                    <InputText v-model="text_search_no" type="number" placeholder="ลำดับ" autocomplete="off" class="col-12 md:col-2" /> 
+                                    <InputText v-model="text_search_no" type="number" placeholder="ระดับ" autocomplete="off" class="col-12 md:col-2" /> 
                                     <InputText v-model="text_search" type="text" placeholder="ชื่อตัวชี้วัด / เกณฑ์การประเมิน" autocomplete="off"/> 
                                     <Button icon="pi pi-save" label="บันทึก" severity="warning" @click="AddDatalist" />
                                 </InputGroup>  
                             </div>   
                         </div> 
                         <DataTable :value="products_list" :rows="10" :paginator="true" responsiveLayout="scroll" dataKey="id">    
-                            <Column field="ind_no" header="ลำดับ" style="width: 10%">
+                            <Column field="ind_no" header="ระดับ" style="width: 10%">
                                 <template #body="Item">
                                     ระดับที่ {{ Item.data.ind_no }}
                                 </template>
