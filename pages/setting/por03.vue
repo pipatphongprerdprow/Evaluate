@@ -63,7 +63,7 @@
                                 </td>
                                 <td style="text-align: left;"> 
                                     <p v-for="(subIitemDoc, inDoc) in subP01.subITemP03doc" :key="inDoc" style="padding-left: 8px;margin-bottom: 5px;"> 
-                                        <a v-if="subIitemDoc.doc_file!=null && subIitemDoc.doc_link==null" :href="'https://survey.msu.ac.th/evaluatebackend/storage/uploadsP03/'+subIitemDoc.doc_file" target="_blank"><b>ระดับ</b> <b>{{subIitemDoc.doc_no }}</b> {{ subIitemDoc.doc_name }}</a> 
+                                        <a v-if="subIitemDoc.doc_file!=null && subIitemDoc.doc_link==null" :href="'http://127.0.0.1:8000/storage/uploadsP03/'+subIitemDoc.doc_file" target="_blank"><b>ระดับ</b> <b>{{subIitemDoc.doc_no }}</b> {{ subIitemDoc.doc_name }}</a> 
                                         <a v-if="subIitemDoc.doc_link!=null && subIitemDoc.doc_file==null" :href="subIitemDoc.doc_link" target="_blank"><b>ระดับ</b> <b>{{ subIitemDoc.doc_no }}</b> {{ subIitemDoc.doc_name }}</a> 
                                     </p>
                                     <p v-if="subP01.subITemP03doc.length == 0" style="padding-left: 8px;margin-bottom: 5px;">
@@ -159,7 +159,7 @@
                             </thead>
                             <tbody>
                                 <tr v-for="(row2, index) in jobSpecificCompetencies" :key="index"> 
-                                    <td style="text-align: left;">ข. {{ index+6 }} {{ row2.WORK_NAME }}</td> 
+                                    <td style="text-align: left;">ข. {{ index+1 }} {{ row2.WORK_NAME }}</td> 
                                     <td>{{ row2.COMPLEVEL }}</td>
                                     <!-- <td>
                                         <InputText 
@@ -277,8 +277,8 @@
                             <Dropdown v-model="list_no_p03" :options="list_no_p03s" optionLabel="name" placeholder="เลือกระดับ"></Dropdown>  
                         </div> 
                         <div class="col-12 md:col-8">
-                            <label for="list_text_p03">ชื่อตัวชี้วัด / เกณฑ์การประเมิน</label>
-                            <InputText v-model="list_text_p03" type="text" placeholder="ชื่อตัวชี้วัด / เกณฑ์การประเมิน" autocomplete="off"/>  
+                            <label for="list_text_p03">รายงานชื่อตัวชี้วัด / เกณฑ์การประเมิน</label>
+                            <InputText v-model="list_text_p03" type="text" placeholder="รายงานชื่อตัวชี้วัด / เกณฑ์การประเมิน" autocomplete="off"/>  
                         </div>  
                         <div class="col-12 md:col-2" style="align-self: end;">
                             <Button icon="pi pi-save" label="บันทึก" severity="warning" @click="AddDatalist" /> 
@@ -373,7 +373,7 @@
                             </Column>
                             <Column field="doc_name" header="ชื่อไฟล์" style="text-align: left;width: 35%">
                                 <template #body="Item"> 
-                                    <a v-if="Item.data.doc_file!=null" :href="'https://survey.msu.ac.th/evaluatebackend/storage/uploadsP03/'+Item.data.doc_file" target="_blank">{{ Item.data.doc_name }}</a> 
+                                    <a v-if="Item.data.doc_file!=null" :href="'http://127.0.0.1:8000/storage/uploadsP03/'+Item.data.doc_file" target="_blank">{{ Item.data.doc_name }}</a> 
                                     <a v-if="Item.data.doc_link!=null" :href="Item.data.doc_link" target="_blank">{{ Item.data.doc_name }}</a> 
                                 </template>
                             </Column>  
@@ -547,13 +547,12 @@ import InputText from 'primevue/inputtext';
             //console.log(user.user.name); 
             const {STAFFID, SCOPES} = user.user.name
             const {staffdepartment, groupid, staffdepartmentname, groupname} = SCOPES
-            await this.setSession(STAFFID,staffdepartment,groupid,user.user.name.POSTYPENAME,user.user.name.POSITIONNAMEID);   
+            await this.setSession(STAFFID,staffdepartment,groupid,user.user.name.POSTYPENAME,user.user.name.POSITIONNAMEID,user.user.name.POSITIONNAME);   
         }, 
         watch: { 
             tab3Reload(v) { 
                 // console.log("por03 tab3Reload",v);
-                this.showDataP03();  
-
+                this.showDataP03();   
             }, 
             // เฝ้าดูการเปลี่ยนแปลงของ dataPor
             dataPor: {
@@ -570,12 +569,13 @@ import InputText from 'primevue/inputtext';
             }
         },
         methods: { 
-            setSession (staffid_Main,facid_Main,groupid_Main,postypename,postypenameid) { 
+            setSession (staffid_Main,facid_Main,groupid_Main,postypename,postypenameid,positionname) { 
                 this.staffid_Main = staffid_Main
                 this.facid_Main = facid_Main
                 this.groupid_Main = groupid_Main  
                 this.postypename = postypename    
-                this.postypenameid = postypenameid 
+                this.postypenameid = postypenameid
+                this.positionname = positionname    
                 // console.log('setSession: ',staffid_Main,facid_Main,groupid_Main);  
             },
             // กรองเฉพาะตัวเลข
@@ -589,7 +589,7 @@ import InputText from 'primevue/inputtext';
             },
             // ดึงข้อมูลเข้าตาราง
             async showDataP03(){
-                await axios.post('https://survey.msu.ac.th/evaluatebackend/api/showDataP03New',{
+                await axios.post('http://127.0.0.1:8000/api/showDataP03New',{
                     staff_id: this.staffid_Main,
                     fac_id: this.dataPor.fac_id,
                     year_id: this.dataPor.d_date, 
@@ -611,7 +611,7 @@ import InputText from 'primevue/inputtext';
                 this.list_no_p03 = null;
                 this.list_text_p03 = null;
                 this.products_list_p03 = [];
-                axios.post('https://survey.msu.ac.th/evaluatebackend/api/p03indData',{
+                axios.post('http://127.0.0.1:8000/api/p03indData',{
                     p01_id: item.p01_id,
                 }).then(res => {
                     // console.log(res.data); 
@@ -658,7 +658,7 @@ import InputText from 'primevue/inputtext';
                 if(this.products_list_p03.length == 0){
                     Swal.fire("error","กรุณาตรวจสอบตารางข้อมูล ตัวชี้วัดการประเมิน!","error");
                 }else{
-                    axios.post('https://survey.msu.ac.th/evaluatebackend/api/saveListP03', {
+                    axios.post('http://127.0.0.1:8000/api/saveListP03', {
                         p_id: this.text_edtP03,
                         products_list: this.products_list_p03
                     })
@@ -754,7 +754,7 @@ import InputText from 'primevue/inputtext';
                                 }
                             });
 
-                            instance_x.post('https://survey.msu.ac.th/evaluatebackend/api/saveDocP03', formData)
+                            instance_x.post('http://127.0.0.1:8000/api/saveDocP03', formData)
                                 .then(res => {
                                     this.showDataP03();
                                     this.Data_Doc();
@@ -785,7 +785,7 @@ import InputText from 'primevue/inputtext';
                                 }
                             });
 
-                            instance_x.post('https://survey.msu.ac.th/evaluatebackend/api/saveDocP03', formData)
+                            instance_x.post('http://127.0.0.1:8000/api/saveDocP03', formData)
                                 .then(res => {
                                     this.showDataP03();
                                     this.Data_Doc();
@@ -812,7 +812,7 @@ import InputText from 'primevue/inputtext';
             },
 
             Data_Doc(){
-                axios.post('https://survey.msu.ac.th/evaluatebackend/api/sheachDataDoc', {
+                axios.post('http://127.0.0.1:8000/api/sheachDataDoc', {
                     p_id: this.text_edtDoc
                 })
                 .then((res) => {
@@ -825,7 +825,7 @@ import InputText from 'primevue/inputtext';
             },
              // หลักฐานที่แสดงถึงผลการปฏิบัติราชการตามเกณฑ์การประเมิน(หลักฐานเชิงประจักษ์)
             delDataDocX(data){  
-                axios.post('https://survey.msu.ac.th/evaluatebackend/api/deleteDocP03', {
+                axios.post('http://127.0.0.1:8000/api/deleteDocP03', {
                     doc_id: data.doc_id, 
                     doc_file: data.doc_file??null
                 })
@@ -851,7 +851,7 @@ import InputText from 'primevue/inputtext';
                 confirmButtonText: "Yes, delete it!"
             }).then((result) => {
                 if (result.isConfirmed) {
-                    axios.post('https://survey.msu.ac.th/evaluatebackend/api/delDocP03', {
+                    axios.post('http://127.0.0.1:8000/api/delDocP03', {
                         p01_id: data.p01_id
                     }).then(res => { 
                         this.showDataP03();
@@ -883,7 +883,7 @@ import InputText from 'primevue/inputtext';
                 this.DialogScore = true;
                 this.text_edtP03Score = item.p01_id;;
                 this.score_p03 = null; 
-                axios.post('https://survey.msu.ac.th/evaluatebackend/api/p03ScoreData',{
+                axios.post('http://127.0.0.1:8000/api/p03ScoreData',{
                     p01_id: item.p01_id,
                 }).then(res => {
                     // console.log(res.data); 
@@ -900,7 +900,7 @@ import InputText from 'primevue/inputtext';
                 if(this.score_p03.length == 0){
                     Swal.fire("error","กรุณาตรวจสอบข้อมูล ระดับการประเมินตนเอง!","error");
                 }else{
-                    axios.post('https://survey.msu.ac.th/evaluatebackend/api/saveScoreP03', {
+                    axios.post('http://127.0.0.1:8000/api/saveScoreP03', {
                         p_id: this.text_edtP03Score,
                         score_p03: this.score_p03.value
                     })
@@ -922,7 +922,7 @@ import InputText from 'primevue/inputtext';
             getjobSpecificCompetencies(){
             //console.log(this.staffid_Main,this.dataPor);
             
-            axios.post('https://survey.msu.ac.th/evaluatebackend/api/showdataposp02', { 
+            axios.post('http://127.0.0.1:8000/api/showdataposp02', { 
                 p_year: this.dataPor.d_date,
                 evalua: this.dataPor.evalua,
                 p_staffid: this.staffid_Main
@@ -939,8 +939,81 @@ import InputText from 'primevue/inputtext';
                 // console.log('Response', res.data);
             })
             },
+            // showdataPo(){  
+            //     let postypetext = `ระดับ${this.postypename}`;
+            //     const levelMapping = {
+            //         'ระดับปฏิบัติการ': 1,
+            //         'ระดับชำนาญการ': 2,
+            //         'ระดับชำนาญการพิเศษ': 3,
+            //         'อาจารย์': 3,
+            //         'ระดับเชี่ยวชาญ': 4,
+            //         'ระดับเชี่ยวชาญพิเศษ': 5
+            //     };
+            //     let xr = levelMapping[postypetext] || 0;
+
+            //     // ตั้งค่า coreCompetencies กลับไปเป็นค่าเริ่มต้น
+            //     this.coreCompetencies = [
+            //         { id: 1, activity: 'ก. 1 การมุ่งผลสัมฤทธิ์', indicator: xr, data_table1: '', selfAssessment: '' },
+            //         { id: 2, activity: 'ก. 2 การบริการที่ดี', indicator: xr, data_table1: '', selfAssessment: '' },
+            //         { id: 3, activity: 'ก. 3 การสั่งสมความเชี่ยวชาญในงานอาชีพ', indicator: xr, data_table1: '', selfAssessment: '' },
+            //         { id: 4, activity: 'ก. 4 การยึดมั่นในความถูกต้องชอบธรรมและจริยธรรม', indicator: xr, data_table1: '', selfAssessment: '' },
+            //         { id: 5, activity: 'ก. 5 การทำงานเป็นทีม', indicator: xr, data_table1: '', selfAssessment: '' }
+            //     ];  
+                
+                
+            //     // ตั้งค่า jobSpecificCompetencies กลับไปเป็นค่าเริ่มต้น 
+            //     this.showPostype(this.postypename,this.postypenameid); 
+                
+            //     axios.post('http://127.0.0.1:8000/api/showDataPo',{
+            //         staff_id: this.staffid_Main,
+            //         fac_id: this.facid_Main,
+            //         year_id: this.dataPor.d_date,
+            //         record: this.dataPor.evalua,
+            //         postypename: postypetext
+            //     }).then(res => {     
+            //         // console.log('showDataPo > ',res.data);    
+            //         if(res.data.length > 0){
+            //             const data = res.data[0]; 
+            //             this.coreCompetencies = this.coreCompetencies.map(item => {
+            //                 if (data[`p${item.id}`] !== undefined) {
+            //                     return {
+            //                         ...item,
+            //                         data_table1: data[`p${item.id}`]
+            //                     };
+            //                 }
+            //                 return item;
+            //             }); 
+
+            //             // this.jobSpecificCompetencies.forEach(item => {
+            //             //     if (item.id === 6) {
+            //             //         item.data_table2 = data.p6;  // Update based on the API response
+            //             //     } else if (item.id === 7) {
+            //             //         item.data_table2 = data.p7;  // Update based on the API response
+            //             //     } else if (item.id === 8) {
+            //             //         item.data_table2 = data.p8;  // Add more conditions if necessary
+            //             //     } else if (item.id === 9) {
+            //             //         item.data_table2 = data.p9;  // Add more conditions if necessary
+            //             //     } else if (item.id === 10) {
+            //             //         item.data_table2 = data.p10;  // Add more conditions if necessary
+            //             //     } else if (item.id === 11) {
+            //             //         item.data_table2 = data.p11;  // Add more conditions if necessary
+            //             //     }
+            //             // });
+            //         } 
+            //     })
+            //     .catch(error => {
+            //         console.error('Error:', error);
+            //     });
+            // },
             showdataPo(){  
-                let postypetext = `ระดับ${this.postypename}`;
+                 //console.log('positionname: ',this.positionname);
+                
+                let postypetext = this.positionname === 'ผู้บริหาร' ? `ระดับชำนาญการพิเศษ` : `ระดับ${this.postypename}`;
+                let postypenameid = this.positionname === 'ผู้บริหาร' ? 90 : this.postypenameid;
+                let positionname = this.positionname === 'ผู้บริหาร' ? `ชำนาญการพิเศษ` : `ระดับ${this.postypename}`;
+                // console.log('postypetext: ',postypetext);
+                // console.log('postypenameid: ',postypenameid);
+                
                 const levelMapping = {
                     'ระดับปฏิบัติการ': 1,
                     'ระดับชำนาญการ': 2,
@@ -953,18 +1026,20 @@ import InputText from 'primevue/inputtext';
 
                 // ตั้งค่า coreCompetencies กลับไปเป็นค่าเริ่มต้น
                 this.coreCompetencies = [
-                    { id: 1, activity: 'ก. 1 การมุ่งผลสัมฤทธิ์', indicator: xr, data_table1: '', selfAssessment: '' },
-                    { id: 2, activity: 'ก. 2 การบริการที่ดี', indicator: xr, data_table1: '', selfAssessment: '' },
-                    { id: 3, activity: 'ก. 3 การสั่งสมความเชี่ยวชาญในงานอาชีพ', indicator: xr, data_table1: '', selfAssessment: '' },
-                    { id: 4, activity: 'ก. 4 การยึดมั่นในความถูกต้องชอบธรรมและจริยธรรม', indicator: xr, data_table1: '', selfAssessment: '' },
-                    { id: 5, activity: 'ก. 5 การทำงานเป็นทีม', indicator: xr, data_table1: '', selfAssessment: '' }
-                ];  
+                    { id: 1, activity: 'ก. 1 การมุ่งผลสัมฤทธิ์', indicator: xr, data_table1: '',selfAssessment:'' },
+                    { id: 2, activity: 'ก. 2 การบริการที่ดี', indicator: xr, data_table1: '',selfAssessment:''  },
+                    { id: 3, activity: 'ก. 3 การสั่งสมความเชี่ยวชาญในงานอาชีพ', indicator: xr, data_table1: '',selfAssessment:''  },
+                    { id: 4, activity: 'ก. 4 การยึดมั่นในความถูกต้องชอบธรรมและจริยธรรม', indicator: xr, data_table1: '',selfAssessment:''  },
+                    { id: 5, activity: 'ก. 5 การทำงานเป็นทีม', indicator: xr, data_table1: '',selfAssessment:''  }
+                ];   
+                //console.log(this.coreCompetencies);
                 
                 
                 // ตั้งค่า jobSpecificCompetencies กลับไปเป็นค่าเริ่มต้น 
-                this.showPostype(this.postypename,this.postypenameid); 
+                // this.showPostype(this.postypename,this.postypenameid);
+                this.showPostype(positionname,postypenameid); 
                 
-                axios.post('https://survey.msu.ac.th/evaluatebackend/api/showDataPo',{
+                axios.post('http://127.0.0.1:8000/api/showDataPo',{
                     staff_id: this.staffid_Main,
                     fac_id: this.facid_Main,
                     year_id: this.dataPor.d_date,
@@ -978,7 +1053,8 @@ import InputText from 'primevue/inputtext';
                             if (data[`p${item.id}`] !== undefined) {
                                 return {
                                     ...item,
-                                    data_table1: data[`p${item.id}`]
+                                    data_table1: data[`p${item.id}`],
+                                    selfAssessment: data[`pa_${item.id}`]
                                 };
                             }
                             return item;
@@ -1008,7 +1084,7 @@ import InputText from 'primevue/inputtext';
             showPostype(postypename,postypenameid){
                 // console.log(postypename); 
                 var postypetext = `ระดับ`+postypename;
-                axios.post('https://survey.msu.ac.th/evaluatebackend/api/showdatapostypename', {
+                axios.post('http://127.0.0.1:8000/api/showdatapostypename', {
                     postypename: postypetext,
                     postypenameid: postypenameid
                 })
@@ -1035,7 +1111,7 @@ import InputText from 'primevue/inputtext';
             },
             showdatator() {  
                 //console.log(this.dataPor.d_date,scoreA04); 
-                axios.post('https://survey.msu.ac.th/evaluatebackend/api/showdatator', {
+                axios.post('http://127.0.0.1:8000/api/showdatator', {
                     p_year: this.dataPor.d_date,
                     evalua: this.dataPor.evalua,
                     p_staffid: this.staffid_Main
@@ -1051,7 +1127,7 @@ import InputText from 'primevue/inputtext';
                 });
             },
             showjobSpecificCompetencies (){
-                axios.post('https://survey.msu.ac.th/evaluatebackend/api/showdataposp02', { 
+                axios.post('http://127.0.0.1:8000/api/showdataposp02', { 
                 p_year: this.dataPor.d_date,
                 evalua: this.dataPor.evalua,
                 p_staffid: this.staffid_Main
@@ -1069,7 +1145,7 @@ import InputText from 'primevue/inputtext';
 /*============= ความรู้/ทักษะ/สมรรถนะ ที่ต้องการพัฒนา =============*/ 
             chkp03data(){ 
                 this.products_Tab3 = [];
-                axios.post('https://survey.msu.ac.th/evaluatebackend/api/showData04Tab3',{
+                axios.post('http://127.0.0.1:8000/api/showData04Tab3',{
                     staff_id: this.staffid_Main,
                     fac_id: this.facid_Main,
                     year_id: this.dataPor.d_date,
@@ -1096,7 +1172,7 @@ import InputText from 'primevue/inputtext';
                 });
             },  
             AddDatap04(){ 
-                axios.post('https://survey.msu.ac.th/evaluatebackend/api/saveEvaTab03xx',{
+                axios.post('http://127.0.0.1:8000/api/saveEvaTab03xx',{
                     staff_id: this.staffid_Main,
                     fac_id: this.facid_Main,
                     year_id: this.dataPor.d_date,
@@ -1131,7 +1207,7 @@ import InputText from 'primevue/inputtext';
             },
             DeleteRegislick(item) { 
                 // Add logic to remove the selected item  
-                axios.post('https://survey.msu.ac.th/evaluatebackend/api/delEvaTab03xx',{
+                axios.post('http://127.0.0.1:8000/api/delEvaTab03xx',{
                     id: item
                 }).then(res => {  
                     // console.log(res);
@@ -1144,7 +1220,7 @@ import InputText from 'primevue/inputtext';
             },  
             async saveAssess() {
                 try {
-                    const response = await axios.post('https://survey.msu.ac.th/evaluatebackend/api/savedataAssess', { 
+                    const response = await axios.post('http://127.0.0.1:8000/api/savedataAssess', { 
                         p_staffid: this.staffid_Main,
                         fac_id: this.facid_Main,
                         p_year: this.dataPor.d_date,
@@ -1176,7 +1252,7 @@ import InputText from 'primevue/inputtext';
                 }
             },  
             showAssess( ) {
-                axios .post('https://survey.msu.ac.th/evaluatebackend/api/showdataAssess', { 
+                axios .post('http://127.0.0.1:8000/api/showdataAssess', { 
                     staff_id:this.staffid_Main,
                     fac_id: this.facid_Main,
                     year: this.dataPor.d_date,
@@ -1255,13 +1331,12 @@ import InputText from 'primevue/inputtext';
                 } 
                 const queryParams = new URLSearchParams(form).toString();
                 // console.log(queryParams); 
-                const url = `https://survey.msu.ac.th/evaluatebackend/report_p03?${queryParams}`;
+                const url = `http://127.0.0.1:8000/report_p03?${queryParams}`;
                 window.open(url, '_blank'); 
             },     
         },
     } 
-    
-
+     
     </script>
 
     <style scoped>

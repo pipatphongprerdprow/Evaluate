@@ -181,7 +181,7 @@ export default {
             this.groupid_Main = groupid_Main
         },
         showDataSet(){  
-            axios.post('https://survey.msu.ac.th/evaluatebackend/api/showDateSet',{
+            axios.post('http://127.0.0.1:8000/api/showDateSet',{
                 staff_id: this.staffid_Main,
                 fac_id: this.facid_Main,
                 group_id: this.groupid_Main,
@@ -233,7 +233,7 @@ export default {
                 confirmButtonText: "Yes, delete it!"
                 }).then((result) => {
                 if (result.isConfirmed) {
-                    axios.post('https://survey.msu.ac.th/evaluatebackend/api/delDateSet',{
+                    axios.post('http://127.0.0.1:8000/api/delDateSet',{
                         data: data
                     }).then(res => { 
                         // console.log(res.data);   
@@ -265,7 +265,7 @@ export default {
         },
         saveDataset(){
             // console.log(this.dropdownItemYear.code); 
-            axios.post('https://survey.msu.ac.th/evaluatebackend/api/saveDateSet',{
+            axios.post('http://127.0.0.1:8000/api/saveDateSet',{
                 staff_id: this.staffid_Main,
                 fac_id: this.facid_Main,
                 group_id: this.groupid_Main,

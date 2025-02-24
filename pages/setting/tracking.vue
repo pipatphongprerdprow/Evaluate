@@ -29,7 +29,9 @@
                     <tbody>
                         <tr v-for="(Item, index) in products" :key="index">
                             <td style="padding-left: 5px;width: 30%;text-align: left;">  
-                                <!-- {{ Item }} -->
+
+                                <!-- {{ Item.tb_tor}} -->
+ 
                                 <b style="color: blue;">{{ Item.prefixfullname }} {{ Item.namefully }} </b> 
                             </td> 
                             <td class="text-center" style="color: blue;"><b>{{ Item.tb_tor?Item.tb_tor.persen: '' }}</b></td>  
@@ -120,7 +122,7 @@
                                                             <!-- {{ subP01 }} -->
                                                             <td style="text-align: left;"> 
                                                                 <p v-for="(subIitemDoc, inDoc) in subP01.subITemP03doc" :key="inDoc" style="padding-left: 8px;margin-bottom: 5px;"> 
-                                                                    <a v-if="subIitemDoc.doc_file!=null" :href="'https://survey.msu.ac.th/evaluatebackend/storage/uploadsP03/'+subIitemDoc.doc_file" target="_blank"><b>ระดับ</b> <b>{{subIitemDoc.doc_no }}</b> {{ subIitemDoc.doc_name }}</a> 
+                                                                    <a v-if="subIitemDoc.doc_file!=null" :href="'http://127.0.0.1:8000/storage/uploadsP03/'+subIitemDoc.doc_file" target="_blank"><b>ระดับ</b> <b>{{subIitemDoc.doc_no }}</b> {{ subIitemDoc.doc_name }}</a> 
                                                                     <a v-if="subIitemDoc.doc_link!=null" :href="subIitemDoc.doc_link" target="_blank"><b>ระดับ</b> <b>{{ subIitemDoc.p03ind_no }}</b> {{ subIitemDoc.doc_name }}</a> 
                                                                 </p>
                                                                 <p v-if="subP01.subITemP03doc.length == 0" style="padding-left: 8px;margin-bottom: 5px;">
@@ -207,13 +209,13 @@
                                                                 <th style="width: 50%;">ข. สมรรถนะเฉพาะตามลักษณะงานที่ปฏิบัติ (สำหรับข้าราชการและพนักงานเฉพาะตามตำแหน่งที่รับผิดชอบตามที่ ก.บ.ม. กำหนด)</th>
                                                                 <th style="width: 20%;">(3)ระดับ<br>สมรรถนะ<br>ที่คาดหวัง</th>
                                                                 <th style="width: 20%;">(1)ระดับ<br>สมรรถนะ<br>ประเมินตนเอง</th> 
-                                                                <th style="width: 20%;">(4)ระดับ<br>สมรรถนะ<br>ที่แสดงออก</th>
+                                                                <th style="width: 20%;">(4)ระดับ<br>สมรรถนะ<br>ที่แสดงออก111</th>
                                                             </tr>
                                                         </thead>
                                                         <tbody>
                                                             <!-- {{ row2jobSpecificCompetencies }} -->
                                                             <tr v-for="(row2, index) in jobSpecificCompetencies" :key="index">
-                                                                <td style="text-align: left;"> ข. {{ index+6 }} {{ row2.WORK_NAME }}</td> 
+                                                                <td style="text-align: left;"> ข. {{ index+1 }} {{ row2.WORK_NAME }}</td> 
                                                                 <td> {{ row2.COMPLEVEL }}</td>
                                                                 <!-- <td style="color: blue"> <b>{{ row2.SCOREPERSON }}</b></td>  -->
                                                                 <td>  
@@ -309,9 +311,11 @@
                                                 <tbody>
                                                     <template v-for="(h, ind) in products_Tab2" :key="ind">
                                                         <tr>
-                                                            <td style="text-align: left;" colspan="12">
+                                                            <td style="text-align: left;" colspan="10">
                                                                 <b style="color: blue;">{{ h.id }}. {{ h.nameH }}</b> 
                                                             </td> 
+                                                            <td class="text-center" style="color: blue;"> <b>{{ h.p01_weight??0 }}%</b></td>
+                                                            <td></td>
                                                         </tr> 
                                                         <tr v-for="(subP01, idx) in h.subP01sX" :key="idx" style="vertical-align: baseline;">
                                                             <td style="text-align: left;">{{ subP01.p01_no }} {{ subP01.p01_subject }}</td>
@@ -339,7 +343,7 @@
                                                             </td> 
                                                             <td style="text-align: left;"> 
                                                                 <p v-for="(subIitemDoc, inDoc) in subP01.subITemP03doc" :key="inDoc" style="padding-left: 8px;margin-bottom: 5px;"> 
-                                                                    <a v-if="subIitemDoc.doc_file!=null" :href="'https://survey.msu.ac.th/evaluatebackend/storage/uploadsP03/'+subIitemDoc.doc_file" target="_blank"><b>ระดับ</b> <b>{{subIitemDoc.doc_no }}</b> {{ subIitemDoc.doc_name }}</a> 
+                                                                    <a v-if="subIitemDoc.doc_file!=null" :href="'http://127.0.0.1:8000/storage/uploadsP03/'+subIitemDoc.doc_file" target="_blank"><b>ระดับ</b> <b>{{subIitemDoc.doc_no }}</b> {{ subIitemDoc.doc_name }}</a> 
                                                                     <a v-if="subIitemDoc.doc_link!=null" :href="subIitemDoc.doc_link" target="_blank"><b>ระดับ</b> <b>{{ subIitemDoc.p03ind_no }}</b> {{ subIitemDoc.doc_name }}</a> 
                                                                 </p>
                                                                 <p v-if="subP01.subITemP03doc.length == 0" style="padding-left: 8px;margin-bottom: 5px;">
@@ -377,13 +381,13 @@
                                                                 <b style="color: blue;">(7) ผลรวม</b> 
                                                             </td>
                                                             <td class="text-center" style="color: blue;">
-                                                                <b>{{ totalscoretrack }}</b> <!-- แสดงผลรวม p01_weight -->
+                                                                <b>{{ totalscoretrack??0 }}</b> <!-- แสดงผลรวม p01_weight -->
                                                             </td>
                                                             <td class="text-center" style="color: blue;">
-                                                                <b>{{ totalWeighttrack }}%</b> <!-- แสดงผลรวม p01_weight -->
+                                                                <b>{{ totalWeighttrack??0 }}%</b> <!-- แสดงผลรวม p01_weight -->
                                                             </td>
                                                             <td class="text-center" style="color: blue;">
-                                                                <b>{{ WeightedScoreSumtrack }}</b> <!-- แสดงผลรวมคะแนนที่คำนวณ -->
+                                                                <b>{{ WeightedScoreSumtrack??0 }}</b> <!-- แสดงผลรวมคะแนนที่คำนวณ -->
                                                             </td> 
                                                         </tr>
                                                         <tr>
@@ -452,7 +456,7 @@
                                                         </thead>
                                                         <tbody>
                                                             <tr v-for="(row2, index) in jobSpecificCompetencies" :key="index">
-                                                                <td style="text-align: left;"> ข. {{ index+6 }} {{ row2.WORK_NAME }}</td> 
+                                                                <td style="text-align: left;"> ข. {{ index+1 }} {{ row2.WORK_NAME }}</td> 
                                                                 <td> {{ row2.COMPLEVEL }}</td> 
                                                                 <!-- <td style="color: blue"> <b>{{ row2 }}</b></td> -->
                                                                 <td>  
@@ -507,48 +511,57 @@
                                                     <tr>
                                                         <td style=" vertical-align: middle;" class="text-left">จำนวนสมรรถนะหลัก /สมรรถนะเฉพาะตามลักษณะงานที่ปฏิบัติ /สมรรถนะทางการบริหาร ที่มีระดับสมรรถนะที่แสดงออก สูงกว่าหรือเท่ากับ ระดับสมรรถนะที่คาดหวัง X 3 คะแนน</td>
                                                             <td class="text-center" style="color: blue;">
-                                                                <b>{{ totalCoreCompetenciesX3 }}</b>  
+                                                                <b>{{ totalcorecompetenciesX3 }}</b>  
                                                             </td>
                                                             <td class="text-center" style="color: blue;"><b>3</b></td>   
                                                             <td class="text-center" style="color: blue;">
-                                                                <b>{{ totalScoreSum }}</b>  
+                                                                <b>{{ totalScoreSumX3 }}</b>  
                                                             </td>                                                    
                                                     </tr>
                                                     <tr>
                                                         <td style=" vertical-align: middle;" class="text-left">จำนวนสมรรถนะหลัก /สมรรถนะเฉพาะตามลักษณะงานที่ปฏิบัติ /สมรรถนะทางการบริหาร ที่มีระดับสมรรถนะที่แสดงออก ต่ำกว่า ระดับสมรรถนะที่คาดหวัง 1 ระดับ X 2 คะแนน</td>
                                                             <td class="text-center" style="color: blue;">
-                                                                <b>{{ totallowerthanscore }}</b> 
+                                                                <b>{{ totalcorecompetenciesX2 }}</b> 
                                                             </td>
                                                             <td class="text-center" style="color: blue;"><b>2</b></td> 
                                                             <td class="text-center" style="color: blue;">
-                                                                <b>{{ totalScorelowSum }}</b>  
+                                                                <b>{{ totalScoreSumX2 }}</b>  
                                                             </td>
                                                     </tr>
                                                     <tr>
                                                         <td style=" vertical-align: middle;" class="text-left">จำนวนสมรรถนะหลัก /สมรรถนะเฉพาะตามลักษณะงานที่ปฏิบัติ /สมรรถนะทางการบริหาร ที่มีระดับสมรรถนะที่แสดงออก ต่ำกว่า ระดับสมรรถนะที่คาดหวัง 2 ระดับ X 1 คะแนน</td>
-                                                            <td class="text-center" style="color: blue;"><b>0</b></td> 
+                                                            <td class="text-center" style="color: blue;">
+                                                                <b>{{ totalcorecompetenciesX1 }}</b> 
+                                                            </td> 
                                                             <td class="text-center" style="color: blue;"><b>1</b></td> 
-                                                            <td class="text-center" style="color: blue;"><b>0</b></td> 
+                                                            <td class="text-center" style="color: blue;">
+                                                                <b>{{ totalScoreSumX1 }}</b> 
+                                                            </td>   
+                                                            
                                                     </tr>
                                                     <tr>
                                                         <td style=" vertical-align: middle;" class="text-left">จำนวนสมรรถนะหลัก /สมรรถนะเฉพาะตามลักษณะงานที่ปฏิบัติ /สมรรถนะทางการบริหาร ที่มีระดับสมรรถนะที่แสดงออก ต่ำกว่า ระดับสมรรถนะที่คาดหวัง 3 ระดับ X 0 คะแนน</td>
+                                                        <td class="text-center" style="color: blue;">
+                                                                <b>{{ totalcorecompetenciesX0 }}</b> 
+                                                            </td> 
                                                             <td class="text-center" style="color: blue;"><b>0</b></td> 
-                                                            <td class="text-center" style="color: blue;"><b>0</b></td> 
-                                                            <td class="text-center" style="color: blue;"><b>0</b></td> 
+                                                            <td class="text-center" style="color: blue;">
+                                                                <b>{{ totalScoreSumX0 }}</b> 
+                                                            </td>   
                                                     </tr>
                                                     <tr>
                                                         <td style="text-align: right" colspan="3">
                                                             <b style="color: blue;"> (8) ผลรวม</b>
                                                         </td>
                                                             <td class="text-center" style="color: blue;"> 
-                                                                <b>{{ totalScoreSum+totalScorelowSum }}</b>  
+                                                                <b>{{ totalScoreSumX3+totalScoreSumX2+totalScoreSumX1 }}</b>  
                                                             </td> 
                                                     </tr>
                                                     <tr>
                                                     <td style="text-align: center; vertical-align: middle;" colspan="3">
                                                         <b style="color: blue;">(9) สรุปคะแนนส่วนพฤติกรรมการปฏิบัติราชการ   (สมรรถนะ) =	 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </b>
                                                         <b style="color: blue;">  ผลรวมคะแนน ใน (8)</b>
-                                                        <b style="display: block; text-align: right; color: blue;">{{ totalScoreSum + totalScorelowSum }}</b>   
+                                                        <b style="display: block; text-align: right; color: blue;">{{ totalScoreSumX3 + totalScoreSumX2+totalScoreSumX1 }}</b>   
                                                         <div style="display: flex; justify-content: flex-end;"> 
                                                             <hr style="border: 1px solid black; width: 70%;">
                                                         </div> 
@@ -556,7 +569,7 @@
                                                         <b style="color: blue;">จำนวนสมรรถนะที่ใช้ในการประเมิน X 3 คะแนน</b>  
                                                     </td> 
                                                     <td class="text-center" style="color: blue;"> 
-                                                         <b> = {{ ((totalScoreSum + totalScorelowSum) / 33).toFixed(2) }}</b>  
+                                                         <b> = {{ ((totalScoreSumX3 + totalScoreSumX2+totalScoreSumX1) / 33).toFixed(2) }}</b>  
                                                     </td> 
                                                 </tr>  
                                                 </tbody>
@@ -665,22 +678,24 @@
                                                         <tr v-if="dataStaffid==Item.staffid">  
                                                             <td>องค์ประกอบที่ 1 ผลสัมฤทธิ์ของงาน</td>
                                                             <td class="text-center" style="color: blue;"> 
-                                                                <!-- <b id="sumX">{{ ((totalScoreSum + totalScorelowSum) / 33).toFixed(2) }}</b>  --> 
+                                                                <!-- <b id="sumX">{{ ((totalScoreSumX3 + totalScoreSumX2) / 33).toFixed(2) }}</b>  --> 
                                                                   <b>{{ Item.tb_tor.achievement_score }}</b> 
                                                             </td> 
                                                             <td class="text-center" style="color: blue;">  
                                                                 <b>{{ Item.tb_tor?Item.tb_tor.persen.split(':')[0]: '' }}</b>
                                                             </td> 
                                                             <td class="text-center" style="color: blue;">  
-                                                                <!-- <b>{{ (((totalScoreSum + totalScorelowSum) / 33).toFixed(2) *(Item.tb_tor?Item.tb_tor.persen.split(':')[0]:0)).toFixed(2)}}</b>   --> 
+                                                                <!-- <b>{{ (((totalScoreSumX3 + totalScoreSumX2) / 33).toFixed(2) *(Item.tb_tor?Item.tb_tor.persen.split(':')[0]:0)).toFixed(2)}}</b>   --> 
                                                                 <b>{{ ( Item.tb_tor  ? Item.tb_tor.achievement_score * (parseFloat(Item.tb_tor.persen.split(':')[0]) || 0) : 0 ).toFixed(2) }}</b>  
                                                             </td> 
                                                         </tr> 
                                                         <tr v-if="dataStaffid==Item.staffid"> 
                                                             <td>องค์ประกอบที่ 2 พฤติกรรมการปฏิบัติราชการ</td>
                                                             <td class="text-center" style="color: blue;">
-                                                                <!-- {{ insert2(WeightedScoreSumXT) }} -->
-                                                                <b>{{Item.tb_tor.behavior }}</b>
+                                                                <!-- {{ insert2(WeightedScoreSumXT) }} --> 
+                                                                <!-- <b>{{ ((totalScoreSumX3 + totalScoreSumX2+totalScoreSumX1) / 33).toFixed(2) }}</b> -->
+                                                                 <b>{{Item.tb_tor.behavior }}</b>
+
 
                                                             </td>  
                                                             <td class="text-center" style="color: blue;">  
@@ -710,11 +725,11 @@
                                                 </table>
                                                 <!-- <div class="employee-info">
                                                 <h4>ระดับผลการประเมินที่ได้</h4>
-                                                        <p><strong>[&nbsp;&nbsp; <b v-if="(((totalScoreSum + totalScorelowSum) / 33 * 70) + (WeightedScoreSumXT * 30)) >= 90">&#10003;</b> &nbsp;&nbsp;] ดีเด่น (90-100)</strong></p>
-                                                        <p><strong>[&nbsp;&nbsp; <b v-if="(((totalScoreSum + totalScorelowSum) / 33 * 70) + (WeightedScoreSumXT * 30)) >= 80 && (((totalScoreSum + totalScorelowSum) / 33 * 70) + (WeightedScoreSumXT * 30)) < 90">&#10003;</b> &nbsp;&nbsp;] ดีมาก (80-89)</strong></p>
-                                                        <p><strong>[&nbsp;&nbsp; <b v-if="(((totalScoreSum + totalScorelowSum) / 33 * 70) + (WeightedScoreSumXT * 30)) >= 70 && (((totalScoreSum + totalScorelowSum) / 33 * 70) + (WeightedScoreSumXT * 30)) < 80">&#10003;</b> &nbsp;&nbsp;] ดี (70-79)</strong></p>
-                                                        <p><strong>[&nbsp;&nbsp; <b v-if="(((totalScoreSum + totalScorelowSum) / 33 * 70) + (WeightedScoreSumXT * 30)) >= 60 && (((totalScoreSum + totalScorelowSum) / 33 * 70) + (WeightedScoreSumXT * 30)) < 70">&#10003;</b> &nbsp;&nbsp;] พอใช้ (60-69)</strong></p> 
-                                                        <p><strong>[&nbsp;&nbsp; <b v-if="(((totalScoreSum + totalScorelowSum) / 33 * 70) + (WeightedScoreSumXT * 30)) < 60">&#10003;</b> &nbsp;&nbsp;] ต้องปรับปรุง (ต่ำกว่า 60)</strong></p>
+                                                        <p><strong>[&nbsp;&nbsp; <b v-if="(((totalScoreSumX3 + totalScoreSumX2) / 33 * 70) + (WeightedScoreSumXT * 30)) >= 90">&#10003;</b> &nbsp;&nbsp;] ดีเด่น (90-100)</strong></p>
+                                                        <p><strong>[&nbsp;&nbsp; <b v-if="(((totalScoreSumX3 + totalScoreSumX2) / 33 * 70) + (WeightedScoreSumXT * 30)) >= 80 && (((totalScoreSumX3 + totalScoreSumX2) / 33 * 70) + (WeightedScoreSumXT * 30)) < 90">&#10003;</b> &nbsp;&nbsp;] ดีมาก (80-89)</strong></p>
+                                                        <p><strong>[&nbsp;&nbsp; <b v-if="(((totalScoreSumX3 + totalScoreSumX2) / 33 * 70) + (WeightedScoreSumXT * 30)) >= 70 && (((totalScoreSumX3 + totalScoreSumX2) / 33 * 70) + (WeightedScoreSumXT * 30)) < 80">&#10003;</b> &nbsp;&nbsp;] ดี (70-79)</strong></p>
+                                                        <p><strong>[&nbsp;&nbsp; <b v-if="(((totalScoreSumX3 + totalScoreSumX2) / 33 * 70) + (WeightedScoreSumXT * 30)) >= 60 && (((totalScoreSumX3 + totalScoreSumX2) / 33 * 70) + (WeightedScoreSumXT * 30)) < 70">&#10003;</b> &nbsp;&nbsp;] พอใช้ (60-69)</strong></p> 
+                                                        <p><strong>[&nbsp;&nbsp; <b v-if="(((totalScoreSumX3 + totalScoreSumX2) / 33 * 70) + (WeightedScoreSumXT * 30)) < 60">&#10003;</b> &nbsp;&nbsp;] ต้องปรับปรุง (ต่ำกว่า 60)</strong></p>
                                                 </div>  -->
                                                 <template v-for="(Item, index) in products" :key="index">
                                                     <div v-if="dataStaffid == Item.staffid" class="employee-info">
@@ -940,15 +955,20 @@ export default {
             totalscoretrack: {},
             totalWeighttrack: {},
             WeightedScoreSumtrack: {},
-            WeightedScoreSumX: {},
-            WeightedScoreSumXT: {},
+            WeightedScoreSumX: 0,
+            WeightedScoreSumXT: 0,
             //รวมคะแนน เกณฑ์การประเมิน
-            totalCoreCompetenciesX3: 0,
-            totallowerthanscore: {},
-            totalScoreSum: {},
-            totalScorelowSum: {},
-            totalScoreFinalSum: {},
-
+            totalcorecompetenciesX3: 0,
+            totalcorecompetenciesX2: 0,
+            totalcorecompetenciesX1: 0,
+            totalcorecompetenciesX0: 0,
+            totalScoreSumX3: 0,
+            totalScoreSumX2: 0,
+            totalScoreSumX1: 0,
+            totalScoreSumX0: 0, 
+            totalScoreSum: 0, 
+            totalScoreFinalSum: 0,
+            
             assessorText: null,
             assessor_positionText: null,
             currentstaff: {},  
@@ -967,237 +987,11 @@ export default {
         const { staffdepartment, groupid, staffdepartmentname, groupname } = SCOPES;
         await this.setSession(STAFFID, staffdepartment, groupid, user.user.name.POSTYPENAME, user.user.name.POSITIONNAMEID);
         // this.showDataEvalu();
-        this.showDataSet(); 
+        this.showDataSet();   
         // this.showAssesstack(); 
     },  
-    computed: {
-        totalscoretrack() {
-            // ใช้ reduce เพื่อคำนวณค่ารวมของ p_weight(รวมค่าคะแนนที่ได้)
-            return this.products_Tab2.reduce((total, h) => {
-                return (
-                    total +
-                    h.subP01sX.reduce((subTotal, subP01) => {
-                        return subTotal + subP01.p01_score; // เพิ่ม p01_weight ของแต่ละ subP01
-                    }, 0)
-                );
-            }, 0);
-        },
-        totalWeighttrack() {
-            // ใช้ reduce เพื่อคำนวณค่ารวมของ p_weight*(รวมน้ำหนักความยากง่ายของงาน)
-            return this.products_Tab2.reduce((total, h) => {
-                return (
-                    total +
-                    h.subP01sX.reduce((subTotal, subP01) => {
-                        return subTotal + subP01.p01_weight; // เพิ่ม p01_weight ของแต่ละ subP01
-                    }, 0)
-                );
-            }, 0);
-        },
-        WeightedScoreSumtrack() {
-            // คำนวณค่ารวมของคะแนนที่คำนวณ และหารด้วย 5(รวมค่าคะแนนถ่วงน้ำหนัก)
-            return this.products_Tab2
-                .reduce((total, h) => {
-                    return (
-                        total +
-                        h.subP01sX.reduce((subTotal, subP01) => {
-                            // คำนวณคะแนนรวม (subP01.p01_score * subP01.p01_weight / 100) แล้วหารด้วย 5
-                            return subTotal + (subP01.p01_score * subP01.p01_weight) / 100;
-                        }, 0)
-                    );
-                }, 0)
-                .toFixed(3); // ใช้ toFixed(3) เพื่อแสดงทศนิยม 3 ตำแหน่ง
-        },
-        WeightedScoreSumX() {
-            // คำนวณค่ารวมของคะแนนที่คำนวณ(รวมน้ำหนักความยากง่ายของงาน/5)
-            return this.products_Tab2
-                .reduce((total, h) => {
-                    return (
-                        total +
-                        h.subP01sX.reduce((subTotal, subP01) => {
-                            return subTotal + subP01.p01_weight / 5;
-                        }, 0)
-                    );
-                }, 0)
-                .toFixed(2); // ใช้ toFixed(2) เพื่อให้มีทศนิยม 2 ตำแหน่ง
-        },
-        WeightedScoreSumXT() {
-            // console.log( this.products_Tab2);
-
-            // คำนวณค่ารวมของคะแนนที่คำนวณ (รวมค่าคะแนนถ่วงน้ำหนัก/5)
-            return this.products_Tab2
-                .reduce((total, h) => {
-                    return (
-                        total +
-                        h.subP01sX.reduce((subTotal, subP01) => {
-                            return subTotal + (subP01.p01_score * subP01.p01_weight) / 100 / 5;
-                        }, 0)
-                    );
-                }, 0)
-                .toFixed(2); // ใช้ toFixed(2) เพื่อให้มีทศนิยม 2 ตำแหน่ง
-        },
-        //รวมคะแนน เกณฑ์การประเมิน
-        //รวมช่องสมรรถนะ
-        totalCoreCompetenciesX3() {
-            const maxLength = Math.max(this.coreCompetencies.length, this.jobSpecificCompetencies.length);
-            let total = 0;
-
-            //กกกกก
-            for (let i = 0; i < this.coreCompetencies.length; i++) {
-                const dataTable1Value = parseFloat(this.coreCompetencies[i]?.indicator) || 0;
-                const dataTable2Value = parseFloat(this.coreCompetencies[i]?.data_table1) || 0;
-                // // ตรวจสอบเงื่อนไขและเพิ่มค่า T1 ถ้าเงื่อนไขเป็นจริง
-                if ((dataTable1Value - dataTable2Value) <= 0) {
-                    total++;
-                }
-            } 
-            //ขขข
-            for (let i = 0; i < this.jobSpecificCompetencies.length; i++) {
-                const dataTable1Value = parseFloat(this.jobSpecificCompetencies[i]?.COMPLEVEL) || 0;
-                const dataTable2Value = parseFloat(this.jobSpecificCompetencies[i]?.SCORE) || 0;
-
-                // // ตรวจสอบเงื่อนไขและเพิ่มค่า T1 ถ้าเงื่อนไขเป็นจริง
-                if ((dataTable1Value - dataTable2Value) <= 0) {
-                    total++;
-                }
-            } 
-            
-            //คคค
-            for (let i = 0; i < maxLength; i++) {
-                // const dataTable1Value = parseFloat(this.coreCompetencies[i]?.data_table1) || 0;
-                // const dataTable2Value = parseFloat(this.jobSpecificCompetencies[i]?.SCORE) || 0;
-
-                // // // ตรวจสอบเงื่อนไขและเพิ่มค่า T1 ถ้าเงื่อนไขเป็นจริง
-                // if ((dataTable1Value - dataTable2Value) <= 0) {
-                //     total++;
-                // }
-            } 
-
-            return total;
-        }, 
-        //รวมช่องสมรรถนะตำกว่าที่คาดหวัง
-        totallowerthanscore() {
-            let total1 = 0; // Initialize total1
-            let total2 = 0; // Initialize total2
-
-            // ตรวจสอบเงื่อนไขแรก: data_table1 น้อยกว่า indicator
-            for (let i = 0; i < this.coreCompetencies.length; i++) {
-                const dataTable1Value = parseFloat(this.coreCompetencies[i]?.indicator) || 0;
-                const dataTable2Value = parseFloat(this.coreCompetencies[i]?.data_table1) || 0;
-                if (dataTable2Value < dataTable1Value) {
-                    total1++; // Increment total1 when condition is met
-                }
-            }
-
-            // ตรวจสอบเงื่อนไขที่สอง: COMPLEVEL น้อยกว่า SCORE
-            for (let j = 0; j < this.jobSpecificCompetencies.length; j++) {
-                const dataTable1Value = parseFloat(this.jobSpecificCompetencies[j]?.COMPLEVEL) || 0;
-                const dataTable2Value = parseFloat(this.jobSpecificCompetencies[j]?.SCORE) || 0;
-                if (dataTable2Value < dataTable1Value) {
-                    total2++; // Increment total2 when condition is met
-                }
-            } 
-            // รวมผลลัพธ์ทั้งต่ำกว่าสมรรถนะที่คาดหวัง
-            return total1 + total2 ;  
-        }, 
-        //รวมคะแนนจำนวนสมรรถนะ*3
-        totalScoreSum() {
-            let total = 0;  
-                // ตรวจสอบและนับค่าจาก coreCompetencies
-                for (let i = 0; i < this.coreCompetencies.length; i++) {
-                    const dataTable1Value = parseFloat(this.coreCompetencies[i]?.indicator) || 0;
-                    const dataTable2Value = parseFloat(this.coreCompetencies[i]?.data_table1) || 0;
-
-                    if ((dataTable1Value - dataTable2Value) <= 0) {
-                        total++;
-                    }
-                } 
- 
-                // ตรวจสอบและนับค่าจาก jobSpecificCompetencies
-                for (let i = 0; i < this.jobSpecificCompetencies.length; i++) {
-                    const dataTable1Value = parseFloat(this.jobSpecificCompetencies[i]?.COMPLEVEL) || 0;
-                    const dataTable2Value = parseFloat(this.jobSpecificCompetencies[i]?.SCORE) || 0;
-
-                    if ((dataTable1Value - dataTable2Value) <= 0) {
-                        total++;
-                    }
-                } 
-                // คูณค่ารวมทั้งหมดด้วย 3
-            return total * 3;
-        },
-        totalScoreSumX() {
-            return this.coreCompetencies.reduce((sum, row, index) => {
-                const dataTable1Value = parseFloat(row.data_table1) || 0;
-                const dataTable2Value = parseFloat(this.jobSpecificCompetencies[index]?.SCORE) || 0;
-                return sum + dataTable1Value * 3 + dataTable2Value * 3;
-            }, 0);
-        },
-        totalScorelowSum() {
-            let total1 = 0;  
-            let total2 = 0;  
-            for (let i = 0; i < this.coreCompetencies.length; i++) {
-                const dataTable1Value = parseFloat(this.coreCompetencies[i]?.indicator) || 0;
-                const dataTable2Value = parseFloat(this.coreCompetencies[i]?.data_table1) || 0;
-                if (dataTable2Value < dataTable1Value) {
-                    total1++;  
-                }
-            } 
-            for (let j = 0; j < this.jobSpecificCompetencies.length; j++) {
-                const dataTable1Value = parseFloat(this.jobSpecificCompetencies[j]?.COMPLEVEL) || 0;
-                const dataTable2Value = parseFloat(this.jobSpecificCompetencies[j]?.SCORE) || 0;
-                if (dataTable2Value < dataTable1Value) {
-                    total2++; 
-                }
-            } 
-            // รวมผลลัพธ์ทั้งต่ำกว่าสมรรถนะที่คาดหวัง *2
-            return ((total1 + total2) * 2);  
-        } 
-    },
-    methods: {
-        insert1(scoreA) {
-            //console.log(scoreA);
-            //console.log(this.dataStaffid,scoreA);
-            axios
-                .post('https://survey.msu.ac.th/evaluatebackend/api/savepersentor', {
-                    p_staffid: this.dataStaffid,
-                    p_year: this.tracking_date.d_date,
-                    evalua: this.tracking_date.evalua,
-                    score: scoreA,
-                    insert: 'achievement_score'
-                })
-                .then((res) => {
-                    //console.log(res.data);
-                });
-        },
-        insert2(scoreB) {
-            //console.log(scoreB);
-            //console.log(this.dataStaffid);
-            axios
-                .post('https://survey.msu.ac.th/evaluatebackend/api/savepersentor', {
-                    p_staffid: this.dataStaffid,
-                    p_year: this.tracking_date.d_date,
-                    evalua: this.tracking_date.evalua,
-                    score: scoreB,
-                    insert: 'behavior'
-                })
-                .then((res) => {
-                    console.log(res.data);
-                });
-        },
-        insert3(scoreS) {
-            //console.log(scoreB);
-            //console.log(this.dataStaffid);
-            axios
-                .post('https://survey.msu.ac.th/evaluatebackend/api/savepersentor', {
-                    p_staffid: this.dataStaffid,
-                    p_year: this.tracking_date.d_date,
-                    evalua: this.tracking_date.evalua,
-                    score: scoreS,
-                    insert: 'sum_score'
-                })
-                .then((res) => {
-                    console.log(res.data);
-                });
-        },
+     
+    methods: { 
         setSession(staffid_Main, facid_Main, groupid_Main, postypename, postypenameid) {
             // console.log('postypename:',postypename);
             this.staffid_Main = staffid_Main;
@@ -1208,7 +1002,7 @@ export default {
         },
         showDataSet() {
             axios
-                .post('https://survey.msu.ac.th/evaluatebackend/api/showDateSet', {
+                .post('http://127.0.0.1:8000/api/showDateSet', {
                     staff_id: this.staffid_Main,
                     fac_id: this.facid_Main,
                     group_id: this.groupid_Main
@@ -1234,8 +1028,8 @@ export default {
             }
         },
         async showDataEvalu() {
-            try {
-                const res = await axios.get('https://survey.msu.ac.th/evaluatebackend/api/showDataEvalu', {
+            try { 
+                const res = await axios.get('http://127.0.0.1:8000/api/showDataEvalu', {  
                     params: {
                         staff_id: this.staffid_Main,
                         fac_id: this.facid_Main,
@@ -1245,7 +1039,7 @@ export default {
                     }
                 });
                 this.products = res.data;
-                //console.log(res.data);
+                // console.log(res.data);
 
                 // ใช้ Promise.all เพื่อทำการเรียก cvb พร้อมกันหลายๆ รายการ
                 //await Promise.all(res.data.map(item => this.cvb(item)));
@@ -1256,7 +1050,7 @@ export default {
         async cvb(item) {
             // console.log(this.tracking_date.evalua);
             try {
-                const response = await axios.post('https://survey.msu.ac.th/evaluatebackend/api/showdatator', {
+                const response = await axios.post('http://127.0.0.1:8000/api/showdatator', {
                     p_year: this.tracking_date.d_date,
                     evalua: this.tracking_date.evalua,
                     p_staffid: item.staffid
@@ -1280,7 +1074,7 @@ export default {
                 this.currentstaff = this.products.filter((product) => product.staffid === this.dataStaffid);
                 this.products_Tab1 = [];
                 this.p01_scores = [
-                    { name: '- ไม่ระบุ -', code: 0 },
+                    { name: '0 คะแนน', code: 0 },
                     { name: '1 คะแนน', code: 1 },
                     { name: '2 คะแนน', code: 2 },
                     { name: '3 คะแนน', code: 3 },
@@ -1298,106 +1092,47 @@ export default {
                 ];
 
                 // ตั้งค่า jobSpecificCompetencies กลับไปเป็นค่าเริ่มต้น
-                this.jobSpecificCompetencies = [
-                    // { id: 6, activity: 'ข. 1 การคิดวิเคราะห์', indicator: '1', data_table2: '' },
-                    // { id: 7, activity: 'ข. 2 การดำเนินการเชิงรุก', indicator: '1', data_table2: '' },
-                    // { id: 8, activity: 'ข. 3 ความผูกพันที่มีต่อส่วนราชการ', indicator: '1', data_table2: '' },
-                    // { id: 9, activity: 'ข. 4 การมองภาพองค์รวม', indicator: '1', data_table2: '' },
-                    // { id: 10, activity: 'ข. 5 การสืบเสาะหาข้อมูล', indicator: '1', data_table2: '' },
-                    // { id: 11, activity: 'ข. 6 การตรวจสอบความถูกต้องตามกระบวนงาน', indicator: '1', data_table2: '' }
-                ];
+                this.jobSpecificCompetencies = [];
 
                 this.improvements = null;
                 this.suggestions = null;
 
                 this.showdataPo(staff_id, this.facid_Main, this.tracking_date.d_date, this.tracking_date.evalua);
-                axios
-                    .post('https://survey.msu.ac.th/evaluatebackend/api/showDataP03New', {
-                        staff_id: staff_id,
-                        fac_id: this.tracking_date.fac_id,
-                        year_id: this.tracking_date.d_date,
-                        evalua: this.tracking_date.evalua
-                    })
-                    .then((res) => {
-                        // console.log('openDataEvalu: ',res.data);
-                        if (res.data && Array.isArray(res.data)) {
-                            this.products_Tab1 = res.data;
-                            this.products_Tab1.forEach((h) => {
-                                h.subP01sX.forEach((subP01) => {
-                                    // ตรวจสอบว่าค่า p01_score นั้นถูกต้องหรือไม่
-                                    const foundScore = this.p01_scores.find((score) => score.code === subP01.p01_score);
-                                    if (foundScore) {
-                                        subP01.p01_score = foundScore.code; // ใช้ค่าที่ถูกต้อง
-                                    } else {
-                                        subP01.p01_score = this.p01_scores[0].code; // ใช้ค่าเริ่มต้น "- ไม่ระบุ -"
-                                    }
-                                });
+                await axios.post('http://127.0.0.1:8000/api/showDataP03New', {
+                    staff_id: staff_id,
+                    fac_id: this.tracking_date.fac_id,
+                    year_id: this.tracking_date.d_date,
+                    evalua: this.tracking_date.evalua
+                })
+                .then((res) => {
+                    // console.log('openDataEvalu: ',res.data);
+                    if (res.data && Array.isArray(res.data)) {
+                        this.products_Tab1 = res.data;
+                        this.products_Tab1.forEach((h) => {
+                            h.subP01sX.forEach((subP01) => {
+                                // ตรวจสอบว่าค่า p01_score นั้นถูกต้องหรือไม่
+                                const foundScore = this.p01_scores.find((score) => score.code === subP01.p01_score);
+                                if (foundScore) {
+                                    subP01.p01_score = foundScore.code; // ใช้ค่าที่ถูกต้อง
+                                } else {
+                                    subP01.p01_score = this.p01_scores[0].code; // ใช้ค่าเริ่มต้น "- ไม่ระบุ -"
+                                }
                             });
-                        }
-                        this.DialogAdd = true;
-                    })
-                    .catch((error) => {
-                        console.error('Error:', error);
-                    });
+                        });
+                    }
+                    this.DialogAdd = true; 
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                });
             }
-        },
-/* Start Anurak 14/11/67 */
-        // showdataPo(staff_id, fac_id, year_id, record) { 
-            
-        //     this.showPostype(this.postypename, this.postypenameid);
-
-        //     axios.post('https://survey.msu.ac.th/evaluatebackend/api/showDataPo',{
-        //         staff_id: this.staffid_Main,
-        //         fac_id: this.facid_Main,
-        //         year_id: this.tracking_date.d_date,
-        //         record: this.tracking_date.evalua,
-        //         postypename: postypetext
-        //     }).then(res => {     
-        //         // console.log('showDataPo > ',res.data);
-        //         if(res.data.length > 0){
-        //             const data = res.data[0]; 
-        //             this.coreCompetencies = this.coreCompetencies.map(item => {
-        //                 if (data[`p${item.id}`] !== undefined) {
-        //                     return {
-        //                         ...item,
-        //                         data_table1: data[`p${item.id}`]
-        //                     };
-        //                 }
-        //                 return item;
-        //             });
-
-        //                 // this.jobSpecificCompetencies.forEach(item => {
-        //                 //     if (item.id === 6) {
-        //                 //         item.data_table2 = data.p6;  // Update based on the API response
-        //                 //     } else if (item.id === 7) {
-        //                 //         item.data_table2 = data.p7;  // Update based on the API response
-        //                 //     } else if (item.id === 8) {
-        //                 //         item.data_table2 = data.p8;  // Add more conditions if necessary
-        //                 //     } else if (item.id === 9) {
-        //                 //         item.data_table2 = data.p9;  // Add more conditions if necessary
-        //                 //     } else if (item.id === 10) {
-        //                 //         item.data_table2 = data.p10;  // Add more conditions if necessary
-        //                 //     } else if (item.id === 11) {
-        //                 //         item.data_table2 = data.p11;  // Add more conditions if necessary
-        //                 //     }
-        //                 // });
-
-        //                 // Update other fields
-        //                 this.improvements = data.improvements;
-        //                 this.suggestions = data.suggestions;
-        //             }
-        //         })
-        //         .catch((error) => {
-        //             console.error('Error:', error);
-        //         });
-        // },
-/* End Anurak 14/11/67 */        
+        },    
         async saveEvaTab1(subP01) {
             if (subP01.p01_score === 0) {
                 Swal.fire('แจ้งเตือน', 'กรุณาเลือกคะแนน !', 'error');
             } else {
                 await axios
-                    .post('https://survey.msu.ac.th/evaluatebackend/api/saveP03Po', {
+                    .post('http://127.0.0.1:8000/api/saveP03Po', {
                         staffid_po: this.staffid_po,
                         p01_id: subP01.p01_id,
                         p01_score: subP01.p01_score,
@@ -1456,6 +1191,7 @@ export default {
             const payload = {
                 staffid_po: this.staffid_po,
                 staff_id: this.staffid_Main,
+                dataStaffid: this.dataStaffid,
                 fac_id: this.facid_Main,
                 year: this.tracking_date.d_date,
                 record: this.tracking_date.evalua,
@@ -1465,8 +1201,8 @@ export default {
                 improvements: this.improvements,
                 suggestions: this.suggestions
             };
-            const res = await axios.post('https://survey.msu.ac.th/evaluatebackend/api/saveP03PoTab1', payload);
-            //console.log(res.data);
+            const res = await axios.post('http://127.0.0.1:8000/api/saveP03PoTab1', payload);
+            console.log(res.data);
             Swal.fire({
                 position: 'top-end',
                 icon: 'success',
@@ -1477,7 +1213,7 @@ export default {
             await this.showDataEvalu();
         },
         async onTabChange(event) {
-            // console.log(event.index);
+            // console.log('onTabChange: ',event.index);
             if (event.index == 0) {
                 //console.log('ผลสัมฤทธิ์ของงาน -',event.index);
             }
@@ -1499,28 +1235,33 @@ export default {
                 await this.showdatator();
             }
         },
-        tab2Data(staff_id) {
-            axios
-                .post('https://survey.msu.ac.th/evaluatebackend/api/showDataP03New', {
-                    staff_id: staff_id,
-                    fac_id: this.tracking_date.fac_id,
-                    year_id: this.tracking_date.d_date,
-                    evalua: this.tracking_date.evalua
-                })
-                .then((res) => {
-                    // console.log(res.data);
-                    if (res.data && Array.isArray(res.data)) {
-                        this.products_Tab2 = res.data;
-                    }
-                })
-                .catch((error) => {
-                    console.error('Error:', error);
-                });
+        async tab2Data(staff_id) {
+            await axios.post('http://127.0.0.1:8000/api/showDataP03New', {
+                staff_id: staff_id,
+                fac_id: this.tracking_date.fac_id,
+                year_id: this.tracking_date.d_date,
+                evalua: this.tracking_date.evalua
+            })
+            .then((res) => {
+                    //console.log(res.data);
+                if (res.data && Array.isArray(res.data)) {
+                    this.products_Tab2 = res.data;
+                }
+                this.function_totalscoretrack();
+                this.function_totalWeighttrack();
+                this.function_WeightedScoreSumtrack();
+                this.function_WeightedScoreSumX();
+                this.function_WeightedScoreSumXT();  
+                this.function_totalcorecompetenciesX3(); 
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
         },
         showdataPoText(staff_id, fac_id, year_id, record) {
             // console.log(staff_id);
             
-            axios .post('https://survey.msu.ac.th/evaluatebackend/api/showDataPo', {
+            axios .post('http://127.0.0.1:8000/api/showDataPo', {
                     staff_id: staff_id,
                     fac_id: fac_id,
                     year_id: year_id,
@@ -1571,7 +1312,7 @@ export default {
         },
         chkp04(staff_id, fac_id, year_id, record) {
             axios
-                .post('https://survey.msu.ac.th/evaluatebackend/api/showDataPo', {
+                .post('http://127.0.0.1:8000/api/showDataPo', {
                     staff_id: staff_id,
                     fac_id: fac_id,
                     year_id: year_id,
@@ -1606,7 +1347,7 @@ export default {
         },
         saveEvaTab3() {
             axios
-                .post('https://survey.msu.ac.th/evaluatebackend/api/saveEvaTab3', {
+                .post('http://127.0.0.1:8000/api/saveEvaTab3', {
                     staff_id: this.dataStaffid,
                     fac_id: this.facid_Main,
                     year_id: this.tracking_date.d_date,
@@ -1629,7 +1370,7 @@ export default {
         },
         chkp04data(staff_id, fac_id, year_id, record) {
             axios
-                .post('https://survey.msu.ac.th/evaluatebackend/api/showData04Tab3', {
+                .post('http://127.0.0.1:8000/api/showData04Tab3', {
                     staff_id: staff_id,
                     fac_id: fac_id,
                     year_id: year_id,
@@ -1657,7 +1398,7 @@ export default {
         },
         chkp04dataT4(staff_id, fac_id, year_id, record) {
             axios
-                .post('https://survey.msu.ac.th/evaluatebackend/api/showData04Tab3', {
+                .post('http://127.0.0.1:8000/api/showData04Tab3', {
                     staff_id: staff_id,
                     fac_id: fac_id,
                     year_id: year_id,
@@ -1678,7 +1419,7 @@ export default {
             (this.assessorText = null),
                 (this.assessor_positionText = null),
                 axios
-                    .post('https://survey.msu.ac.th/evaluatebackend/api/showdatator', {
+                    .post('http://127.0.0.1:8000/api/showdatator', {
                         p_year: this.tracking_date.d_date,
                         evalua: this.tracking_date.evalua,
                         p_staffid: this.dataStaffid
@@ -1693,10 +1434,10 @@ export default {
                     });
         },
         async showPostype(postypename, postypenameid) {
-            // console.log(postypename, postypenameid);
+            // console.log('showPostype: ',postypename, postypenameid);
             var postypetext = `ระดับ` + postypename;
             await axios
-                .post('https://survey.msu.ac.th/evaluatebackend/api/showdatapostypename', {
+                .post('http://127.0.0.1:8000/api/showdatapostypename', {
                     postypename: postypetext,
                     postypenameid: postypenameid
                 })
@@ -1725,7 +1466,7 @@ export default {
         getjobSpecificCompetencies(dataStaffid) {
             //console.log(this.staffid_Main,this.dataPor);
 
-            axios .post('https://survey.msu.ac.th/evaluatebackend/api/showdataposp02', { 
+            axios .post('http://127.0.0.1:8000/api/showdataposp02', { 
                     p_year: this.tracking_date.d_date,
                     evalua: this.tracking_date.evalua,
                     p_staffid: this.dataStaffid
@@ -1753,7 +1494,8 @@ export default {
             
             // let postypetext = `ระดับ${this.postypename}`;
             let postypetext = `ระดับ${this.currentstaff[0].postypenameth}`;
-            // console.log(`postypetext > `,this.currentstaff[0].postypenameth);
+            // console.log(`currentstaff > `,this.currentstaff[0]);
+            // console.log(`postypenameid > `,this.postypenameid);
             
             const levelMapping = {
                 'ระดับปฏิบัติการ': 1,
@@ -1764,6 +1506,24 @@ export default {
                 'ระดับเชี่ยวชาญพิเศษ': 5
             };
             let xr = levelMapping[postypetext] || 0;
+            //     const levelMapping = {
+            //     'ระดับปฏิบัติการ': 1,
+            //     'ระดับชำนาญการ': 2,
+            //     'ระดับชำนาญการพิเศษ': 3,
+            //     'อาจารย์': 3,
+            //     'ระดับเชี่ยวชาญ': 4,
+            //     'ระดับเชี่ยวชาญพิเศษ': 5
+            // };
+
+            // let xr = levelMapping[postypetext] || 0;
+
+            // if (postypetext) {
+            //     // ถ้ามีค่าของ POSTYPENAME ให้ใช้ค่าปกติ
+            //     xr = levelMapping[postypetext] || 0;
+            // } else if (positiontext === 'ผู้บริหาร') {
+            //     // ถ้าไม่มี POSTYPENAME แต่ POSITIONNAME เป็น 'ผู้บริหาร' ให้ใช้ 'ระดับชำนาญการพิเศษ'
+            //     xr = levelMapping['ระดับชำนาญการพิเศษ'];
+            // }
 
             // ตั้งค่า coreCompetencies กลับไปเป็นค่าเริ่มต้น
             this.coreCompetencies = [
@@ -1779,7 +1539,7 @@ export default {
             this.showPostype(this.currentstaff[0].postypenameth,this.postypenameid);
   
             
-            axios.post('https://survey.msu.ac.th/evaluatebackend/api/showDataPo',{
+            axios.post('http://127.0.0.1:8000/api/showDataPo',{
                 staff_id: staff_id,
                 fac_id: facid_Main,
                 year_id: d_date,
@@ -1804,12 +1564,11 @@ export default {
             .catch(error => {
                 console.error('Error:', error);
             });
-        },
-
+        }, 
         //29/10/67
         saveScore() {
             axios
-                .post('https://survey.msu.ac.th/evaluatebackend/api/saveDatator', {
+                .post('http://127.0.0.1:8000/api/saveDatator', {
                     score: this.totalScore
                 })
                 .then((response) => {
@@ -1875,7 +1634,7 @@ export default {
                 };
 
                 axios
-                    .post('https://survey.msu.ac.th/evaluatebackend/api/saveDatator', formData)
+                    .post('http://127.0.0.1:8000/api/saveDatator', formData)
                     .then((response) => {
                         this.DialogScore = false;
                         // console.log('showDataP03',res.data);
@@ -1885,15 +1644,102 @@ export default {
                     });
             }
         },
-          
-    },
+        // คำนวนคะแนน 
+        function_totalscoretrack() { 
+            this.totalscoretrack = this.products_Tab2.reduce((total, h) => {
+                return total + h.subP01sX.reduce((subTotal, subP01) => {
+                    return subTotal + subP01.p01_score;
+                }, 0);
+            }, 0);
+        },
+        function_totalWeighttrack() { 
+            this.totalWeighttrack = this.products_Tab2.reduce((total, h) => {
+                return total + h.subP01sX.reduce((subTotal, subP01) => {
+                    return subTotal + subP01.p01_weight;
+                }, 0);
+            }, 0);
+        },
+        function_WeightedScoreSumtrack() {
+            this.WeightedScoreSumtrack = this.products_Tab2
+                .reduce((total, h) => {
+                    return total + h.subP01sX.reduce((subTotal, subP01) => {
+                        return subTotal + (subP01.p01_score * subP01.p01_weight) / 100;
+                    }, 0);
+                }, 0)
+                .toFixed(3);
+        },
+        function_WeightedScoreSumX() {
+            this.WeightedScoreSumX = this.products_Tab2
+                .reduce((total, h) => {
+                    return total + h.subP01sX.reduce((subTotal, subP01) => {
+                        return subTotal + subP01.p01_weight / 5;
+                    }, 0);
+                }, 0)
+                .toFixed(2);
+        },
+        function_WeightedScoreSumXT() {
+            this.WeightedScoreSumXT = this.products_Tab2
+                .reduce((total, h) => {
+                    return total + h.subP01sX.reduce((subTotal, subP01) => {
+                        return subTotal + (subP01.p01_score * subP01.p01_weight) / 100 / 5;
+                    }, 0);
+                }, 0)
+                .toFixed(2);
+        }, 
+        function_totalcorecompetenciesX3() {
+            this.totalcorecompetenciesX3 = 0;
+            this.totalcorecompetenciesX2 = 0;
+            this.totalcorecompetenciesX1 = 0;
+            this.totalcorecompetenciesX0 = 0;
+            // console.log('coreCompetencies: ',this.coreCompetencies);
+
+            for (let i = 0; i < this.coreCompetencies.length; i++) {
+                const dataTable1Value = parseFloat(this.coreCompetencies[i]?.indicator) || 0;
+                const dataTable2Value = parseFloat(this.coreCompetencies[i]?.data_table1) || 0;
+
+                // console.log('dataTable1Value: ',dataTable1Value);
+                // console.log('dataTable2Value: ',dataTable2Value);
+                if ((dataTable1Value - dataTable2Value) <= 0) {
+                    this.totalcorecompetenciesX3++;
+                }else if ((dataTable1Value - dataTable2Value) == 1) {
+                    this.totalcorecompetenciesX2++;
+                }else if ((dataTable1Value - dataTable2Value) == 2) {
+                    this.totalcorecompetenciesX1++;
+                }else if ((dataTable1Value - dataTable2Value) >= 3) {
+                    this.totalcorecompetenciesX0++;
+                }
+            }
+            for (let i = 0; i < this.jobSpecificCompetencies.length; i++) {
+                const dataTable1Value = parseFloat(this.jobSpecificCompetencies[i]?.COMPLEVEL) || 0;
+                const dataTable2Value = parseFloat(this.jobSpecificCompetencies[i]?.SCORE) || 0;
+
+                //console.log(dataTable1Value,dataTable2Value,dataTable1Value - dataTable2Value);
+                if ((dataTable1Value - dataTable2Value) <= 0) {
+                    this.totalcorecompetenciesX3++;
+                }else if ((dataTable1Value - dataTable2Value) == 1) {
+                    this.totalcorecompetenciesX2++;
+                }else if ((dataTable1Value - dataTable2Value) == 2) {
+                    this.totalcorecompetenciesX1++;
+                }else if ((dataTable1Value - dataTable2Value) >= 3) {
+                    this.totalcorecompetenciesX0++;
+                }
+            }
+
+            // return total;
+            this.totalScoreSumX3 = this.totalcorecompetenciesX3*3;
+            this.totalScoreSumX2 = this.totalcorecompetenciesX2*2;
+            this.totalScoreSumX1 = this.totalcorecompetenciesX1*1;
+            this.totalScoreSumX0 = this.totalcorecompetenciesX0*0;
+        },//*3 
+    }, 
     filters: {
         removeC: function (value) {
             if (!value) return '';
             return value.split(':')[0];
         } 
     }
-};
+
+}
 </script>
 
 <style scoped>
@@ -1902,9 +1748,9 @@ label {
     font-weight: 500;
 }
 .card-header {
-    text-align: left; /* Aligns text to the left */
-    margin: 0; /* Removes default margins */
-    padding: 0; /* Removes default padding */
+    text-align: left;  
+    margin: 0;  
+    padding: 0;  
 }
 body {
     font-family: 'Prompt', Arial, sans-serif;
@@ -1995,9 +1841,9 @@ label {
     font-weight: 500;
 }
 .card-header {
-    text-align: left; /* Aligns text to the left */
-    margin: 0; /* Removes default margins */
-    padding: 0; /* Removes default padding */
+    text-align: left; 
+    margin: 0; 
+    padding: 0;  
 }
 .table {
     width: 100%;
@@ -2017,16 +1863,16 @@ label {
     vertical-align: top;
 }
 .button-container {
-    text-align: center; /* จัดกึ่งกลางในแนวนอน */
+    text-align: center;  
 }
 .custom-textarea {
-    width: 100%; /* ให้เต็มความกว้างของ container */
-    height: 100px; /* ปรับความสูงของ textarea */
-    padding: 10px; /* เพิ่มช่องว่างด้านใน */
-    border-radius: 5px; /* ปรับมุมให้โค้งมน */
-    border: 1px solid #ccc; /* กำหนดขอบ */
-    font-size: 1rem; /* ขนาดตัวอักษร */
-    resize: none; /* ปิดการย่อขยาย */
+    width: 100%;  
+    height: 100px;  
+    padding: 10px;  
+    border-radius: 5px;  
+    border: 1px solid #ccc;  
+    font-size: 1rem;  
+    resize: none;  
 }
 body {
     font-family: 'Prompt', Arial, sans-serif;

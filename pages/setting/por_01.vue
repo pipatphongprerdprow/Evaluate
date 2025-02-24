@@ -43,12 +43,13 @@
                     <tbody>
                         <template v-for="(h, ind) in products_personX" :key="ind">  
                             <tr>
-                                <td style="text-align: left;" colspan="9">
+                                <td style="text-align: left;" colspan="8">
                                     <b style="color: blue;">{{ h.id }}. {{ h.nameH }}</b>
                                 </td>
-                                <td class="text-center" style="color: blue;"><b></b></td> 
+                                <td class="text-center" style="color: blue;"><b>{{ h.p01_weight??0}}%</b></td> 
                                 <!-- <td class="text-center" style="color: blue;"><b>{{ h.h_weight }}%</b></td>  -->
                                 <td></td>
+                                <td></td> 
                             </tr> 
                             <tr v-for="(subP01, idx) in h.subP01sX" :key="idx" style="vertical-align: baseline;"> 
                                 <td style="text-align: left;">{{ subP01.p01_no }} {{ subP01.p01_subject }}</td>
@@ -153,13 +154,23 @@
                                 <template v-for="(item, index) in products_person" :key="index">
                                     <tr>
                                         <td style="text-align: left;" colspan="8">
-                                            <b style="color: blue;">{{ item.id }}. {{ item.nameH }}</b>
+                                            <b style="color: blue;">{{ item.id }}. {{ item.nameH }} </b>
                                         </td>
-                                        <td class="text-center" style="color: blue;"><b>{{ item.h_weight }}%</b></td>
                                         <td></td>
+                                        <!-- <td class="text-center" style="color: blue;"> <b>{{ h.p_weight??0 }}%</b></td>  --> 
+                                        <td></td> 
                                         <td></td>
                                     </tr>
                                     <tr v-for="(subP01, idx) in item.subP01s" :key="idx" style="vertical-align: baseline;">
+                                        <!-- <tr v-for="(subP01, idx) in [...item.subP01s].sort((a, b) => {
+                                            const aParts = a.p_no.split('.').map(Number);
+                                            const bParts = b.p_no.split('.').map(Number);
+
+                                            if (aParts[0] !== bParts[0]) {
+                                                return aParts[0] - bParts[0]; // เรียงตามหลักแรก (ก่อนจุด)
+                                            }
+                                            return (aParts[1] || 0) - (bParts[1] || 0); // เรียงตามหลักหลังจุด ถ้ามี
+                                        })" :key="idx" style="vertical-align: baseline;"></tr> -->
                                         <td class="text-center">
                                             <Checkbox :id="'checkOption-' + subP01.p_id" :name="'option-' + subP01.p_id" :value="subP01.p_id" v-model="checkboxValue" />
                                         </td>
@@ -224,16 +235,16 @@
                                     <InputGroupAddon>
                                         <i class="pi pi-calendar-plus"></i>
                                     </InputGroupAddon>
-                                    <InputText v-model="text_no" type="number" placeholder="ข้อ" autocomplete="off" /> 
+                                    <InputText v-model="text_no" type="text" placeholder="ข้อ" autocomplete="off" /> 
                                 </InputGroup> 
                             </div>
                             <div class="field col-12 md:col-6">
-                                <label for="text_name">เรื่อง</label>
+                                <label for="text_name">ชื่อตัวชี้วัด</label>
                                 <InputGroup>
                                     <InputGroupAddon>
                                         <i class="pi pi-book"></i>
                                     </InputGroupAddon>
-                                    <Textarea v-model="text_name" rows="1" placeholder="เรื่อง" autocomplete="off" /> 
+                                    <Textarea v-model="text_name" rows="1" placeholder="ชื่อตัวชี้วัด" autocomplete="off" /> 
                                 </InputGroup>  
                             </div> 
                             <div class="field col-12 md:col-3">
@@ -253,10 +264,10 @@
                         <hr>
                         <div class="p-fluid formgrid grid">
                             <div class="field col-12 md:col-12"> 
-                                <label for="text_search_no">ตัวชี้วัด / เกณฑ์การประเมิน</label>
+                                <label for="text_search_no">เกณฑ์การประเมิน</label>
                                 <InputGroup>  
                                     <InputText v-model="text_search_no" type="number" placeholder="ระดับ" autocomplete="off" class="col-12 md:col-2" /> 
-                                    <InputText v-model="text_search" type="text" placeholder="ชื่อตัวชี้วัด / เกณฑ์การประเมิน" autocomplete="off"/> 
+                                    <InputText v-model="text_search" type="text" placeholder="รายละเอียดเกณฑ์การประเมิน" autocomplete="off"/> 
                                     <Button icon="pi pi-save" label="บันทึก" severity="warning" @click="AddDatalist" />
                                 </InputGroup>  
                             </div>   
@@ -291,11 +302,7 @@
 <script> 
 import { ref } from 'vue';
 import axios from 'axios';  
-import Swal from 'sweetalert2'
-
- 
- 
-
+import Swal from 'sweetalert2' 
 
 export default {
     props: {
@@ -313,7 +320,7 @@ export default {
             groupid_Main: null, 
             products_personX: [],
             checkboxValue: [],
-            selectedItems: [],
+            selectedItems: [], 
             selectAll: false,
             DialogAdd: false,
             DialogAddP01: false,
@@ -423,7 +430,7 @@ export default {
         // ดึงข้อมูลเข้าตาราง 
         showDataPerson(){  
             //console.log('dataPor: ',this.dataPor); 
-            axios.post('https://survey.msu.ac.th/evaluatebackend/api/showDataPersonX',{
+            axios.post(' http://127.0.0.1:8000/api/showDataPersonX',{
             staff_id: this.staffid_Main,
             fac_id: this.dataPor.fac_id,
             year_id: this.dataPor.d_date, 
@@ -436,11 +443,11 @@ export default {
             .catch(error => {
                 console.error('Error:', error);
             });
-        },
-      
+        }, 
+
         // ดึงข้อมูลมาแก้ไข
         async editDatax(data){    
-          await axios.post('https://survey.msu.ac.th/evaluatebackend/api/edtDataPersonx',{
+          await axios.post(' http://127.0.0.1:8000/api/edtDataPersonx',{
               p01_id: data.p01_id
           }).then(res => { 
                 // console.log(data);   
@@ -460,7 +467,7 @@ export default {
         }, 
         // ดึงข้อมูลภาระงาน
         selectDataHEdt(he){  
-            axios.post('https://survey.msu.ac.th/evaluatebackend/api/selectDataPersonH').then(res => {     
+            axios.post(' http://127.0.0.1:8000/api/selectDataPersonH').then(res => {     
                 // console.log(res.data); 
                 this.dropdownItemsH=res.data;  
                 const h_f = res.data.filter(f=>f.id==he); 
@@ -481,8 +488,8 @@ export default {
                 cancelButtonColor: "#d33",
                 confirmButtonText: "Yes, delete it!"
             }).then((result) => {
-                if (result.isConfirmed) {
-                    axios.post('https://survey.msu.ac.th/evaluatebackend/api/delDataPersonx', {
+                if (result.isConfirmed) { 
+                    axios.post(' http://127.0.0.1:8000/api/delDataPersonx', {
                         p01_id: data.p01_id
                     }).then(res => { 
                         this.showDataPerson(); 
@@ -521,15 +528,15 @@ export default {
 
             const queryParams = new URLSearchParams(form).toString();
             // console.log(queryParams); 
-            const url = `https://survey.msu.ac.th/evaluatebackend/report_p01?${queryParams}`;
+            const url = ` http://127.0.0.1:8000/report_p01?${queryParams}`;
             window.open(url, '_blank');
  
         },
 
 //*================== Start เลือกข้อมูลแบบประเมิน ป.01 ==================*//
         // เปิดหน้าต่างสำหรับบันทึก *ดึงข้อมูล
-        OpenDialogP01(){ 
-            axios.post('https://survey.msu.ac.th/evaluatebackend/api/showDataPerson', { 
+        OpenDialogP01(){  
+            axios.post(' http://127.0.0.1:8000/api/showDataPerson', { 
                 fac_id: this.dataPor.fac_id,
                 year_id: this.dataPor.d_date,
                 evalua: this.dataPor.evalua 
@@ -538,6 +545,7 @@ export default {
                 
                 this.DialogAddP01 = true; 
                 this.products_person = res.data;
+                this.checkboxValue= [];
             })
             .catch(error => {
                 console.error('Error:', error);
@@ -554,11 +562,11 @@ export default {
             if(x.length == 0){
                 Swal.fire("ไม่มีข้อมูล","กรุณาเลือกข้อคำถามจาก ตัวจัดการ !","error");
             }else{
-            await axios.post('https://survey.msu.ac.th/evaluatebackend/api/savePushDataP01',{
+            await axios.post(' http://127.0.0.1:8000/api/savePushDataP01',{
                 data: x,
                 staffid_Main: this.staffid_Main,
             }).then(res => { 
-                console.log(res.data);  
+                //console.log(res.data);  
                 this.showDataPerson(); 
                 this.DialogAddP01 = false; 
                 Swal.fire({
@@ -596,7 +604,7 @@ export default {
         }, 
         // ดึงข้อมูลภาระงาน
         selectDataH(){  
-            axios.post('https://survey.msu.ac.th/evaluatebackend/api/selectDataPersonH').then(res => {     
+            axios.post(' http://127.0.0.1:8000/api/selectDataPersonH').then(res => {     
                 //console.log(res.data); 
                 this.dropdownItemsH=res.data;  
             })
@@ -624,7 +632,7 @@ export default {
         },
         // บันทึกแบบจัดการ ป.1 
         async saveDatax() {
-            await axios.post('https://survey.msu.ac.th/evaluatebackend/api/saveDataP01User',{
+            await axios.post(' http://127.0.0.1:8000/api/saveDataP01User',{
                 staff_id: this.staffid_Main,
                 fac_id: this.dataPor.fac_id,
                 year_id: this.dataPor.d_date, 
@@ -657,22 +665,26 @@ export default {
             this.DialogAdd = false;
         },   
         toggleSelectAll() {
+            if (!this.products_person) {
+                console.error("products_person เป็น undefined หรือ null");
+                return;
+            } 
+            
             if (this.selectAll) {
-                // เลือกทั้งหมด
-                this.checkboxValue = this.products_person.flatMap(item =>
-                    item.subP01s.map(subP01 => subP01.p_id)
+                this.checkboxValue = this.products_person.flatMap(person =>
+                    person.subP01s ? person.subP01s.map(subP01 => subP01.p_id) : []
                 );
             } else {
-                // ยกเลิกการเลือกทั้งหมด
-                this.checkboxValue = [];
+                this.checkboxValue = []; 
             }
-        },
-//*================== End เพิ่มข้อมูลแบบประเมิน ==================*//
 
-        // Export File
+            //console.log("selectAll:", this.selectAll);
+            //console.log("checkboxValue:", this.checkboxValue);
         }
-    } 
 
+    }
+} 
+//*================== End เพิ่มข้อมูลแบบประเมิน ==================*// 
  </script>
 
 <style scoped> 
@@ -681,9 +693,9 @@ export default {
         font-weight: 500;
     }
     .card-header {
-        text-align: left; /* Aligns text to the left */
-        margin: 0; /* Removes default margins */
-        padding: 0; /* Removes default padding */
+        text-align: left;  
+        margin: 0;  
+        padding: 0;  
     }
     .table {
         width: 100%;

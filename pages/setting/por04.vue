@@ -12,8 +12,9 @@
                         <p v-if="dataPor"><strong>รอบการประเมิน:</strong> {{dataPor.d_evaluationround}} {{ dataPor.d_date }} </p>
                         <p><strong>ชื่อผู้รับการประเมิน:</strong> {{ user.user.name.PREFIXFULLNAME }} {{ user.user.name.STAFFNAME }} {{ user.user.name.STAFFSURNAME }} </p>
                         <p><strong>ตำแหน่ง:</strong> {{ user.user.name.POSITIONNAME }} </p>
-                        <p><strong>ระดับตำแหน่ง:</strong>{{ user.user.name.POSTYPENAME }} </p>
-                        <p><strong>สังกัด:</strong> {{ user.user.name.SCOPES?.staffdepartmentname }} </p>
+                        <!-- <p><strong>ระดับตำแหน่ง:</strong>{{ user.user.name.POSTYPENAME }} </p> -->
+                        <p><strong>ระดับตำแหน่ง:</strong>{{ user.user?.name.POSITIONNAME === 'ผู้บริหาร' ? 'ชำนาญการพิเศษ' : user.user?.name.POSTYPENAME }}</p>
+                        <p><strong>สังกัด:</strong> {{ user.user.name.SCOPES?.staffdepartmentname }}</p>
                         <p><strong>ชื่อผู้ประเมิน:</strong> {{ assessorText }}</p> 
                     </div><br>
                     <div class="employee-info" style="border: groove;padding: 15px;">
@@ -106,7 +107,7 @@
                                 <td style="text-align: left;">{{ Tab3T4.p04_re3 }}</td> 
                             </tr> 
                         </tbody>
-                    </table> 
+                    </table>  
                         <h5 class="mb-4"><i class="" style="font-size: x-large;"></i> ส่วนที่ 4 การรับทราบผลการประเมิน</h5>
                         <table class="styled-table">
                         <tbody>
@@ -436,7 +437,7 @@ export default {
          insertscore1(scoreA04) { 
         // //console.log(scoreA04); 
         // //console.log(this.dataPor.d_date,this.dataPor.evalua,scoreA04); 
-        //     axios.post('https://survey.msu.ac.th/evaluatebackend/api/savepersentor',{
+        //     axios.post('http://127.0.0.1:8000/api/savepersentor',{
         //             p_staffid: this.staffid_Main, 
         //             p_year: this.dataPor.d_date, 
         //             evalua: this.dataPor.evalua, 
@@ -449,7 +450,7 @@ export default {
         // insertscore2(scoreB) { 
         // //console.log(scoreB); 
         // //console.log(this.dataStaffid); 
-        //     axios.post('https://survey.msu.ac.th/evaluatebackend/api/savepersentor',{
+        //     axios.post('http://127.0.0.1:8000/api/savepersentor',{
         //             p_staffid: this.staffid_Main, 
         //             p_year: this.tracking_date.d_date, 
         //             evalua: this.tracking_date.evalua, 
@@ -463,7 +464,7 @@ export default {
         // insertscore3(scoreS) { 
         // //console.log(scoreB); 
         // //console.log(this.dataStaffid); 
-        //     axios.post('https://survey.msu.ac.th/evaluatebackend/api/savepersentor',{
+        //     axios.post('http://127.0.0.1:8000/api/savepersentor',{
         //             p_staffid: this.staffid_Main, 
         //             p_year: this.tracking_date.d_date, 
         //             evalua: this.tracking_date.evalua, 
@@ -482,7 +483,7 @@ export default {
         },  
         showdatator() {  
             //console.log(this.dataPor.d_date,scoreA04); 
-            axios.post('https://survey.msu.ac.th/evaluatebackend/api/showdatator', {
+            axios.post('http://127.0.0.1:8000/api/showdatator', {
                 p_year: this.dataPor.d_date,
                 evalua: this.dataPor.evalua,
                 p_staffid: this.staffid_Main
@@ -500,7 +501,7 @@ export default {
         /*============= ความรู้/ทักษะ/สมรรถนะ ที่ต้องการพัฒนา =============*/ 
         chkp04dataXr(){  
             this.products_Tab3T4 = [];
-            axios.post('https://survey.msu.ac.th/evaluatebackend/api/showData04Tab3',{
+            axios.post('http://127.0.0.1:8000/api/showData04Tab3',{
                 staff_id: this.staffid_Main,
                 fac_id: this.facid_Main,
                 year_id: this.dataPor.d_date,
@@ -534,7 +535,7 @@ export default {
             } 
             const queryParams = new URLSearchParams(form).toString();
             // console.log(queryParams); 
-            const url = `https://survey.msu.ac.th/evaluatebackend/report_p04?${queryParams}`;
+            const url = `http://127.0.0.1:8000/report_p04?${queryParams}`;
             window.open(url, '_blank'); 
         },            
     }

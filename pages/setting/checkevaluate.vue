@@ -182,7 +182,7 @@
                                                         
                                                         <td style="text-align: left;"> 
                                                             <p v-for="(subIitemDoc, inDoc) in subP01.subITemP03doc" :key="inDoc" style="padding-left: 8px;margin-bottom: 5px;"> 
-                                                                <a v-if="subIitemDoc.doc_file!=null" :href="'https://survey.msu.ac.th/evaluatebackend/storage/uploadsP03/'+subIitemDoc.doc_file" target="_blank"><b>ระดับ</b> <b>{{subIitemDoc.doc_no }}</b> {{ subIitemDoc.doc_name }}</a> 
+                                                                <a v-if="subIitemDoc.doc_file!=null" :href="'http://127.0.0.1:8000/storage/uploadsP03/'+subIitemDoc.doc_file" target="_blank"><b>ระดับ</b> <b>{{subIitemDoc.doc_no }}</b> {{ subIitemDoc.doc_name }}</a> 
                                                                 <a v-if="subIitemDoc.doc_link!=null" :href="subIitemDoc.doc_link" target="_blank"><b>ระดับ</b> <b>{{ subIitemDoc.p03ind_no }}</b> {{ subIitemDoc.doc_name }}</a> 
                                                             </p>
                                                             <p v-if="subP01.subITemP03doc.length == 0" style="padding-left: 8px;margin-bottom: 5px;">
@@ -216,35 +216,40 @@
                                                     </tr>
                                                     </template>
                                                     <tr>
-                                                        <td style="text-align: right" colspan="9">
-                                                            <b style="color: blue;">(7) ผลรวม</b>
-                                                        </td>
-                                                        <td class="text-center" style="color: blue;">
-                                                                <b>{{ totalscoretrack }}</b> <!-- แสดงผลรวม p01_weight -->
+                                                            <td style="text-align: right" colspan="9">
+                                                                <b style="color: blue;">(7) ผลรวม</b> 
                                                             </td>
                                                             <td class="text-center" style="color: blue;">
-                                                                <b>{{ totalWeighttrack }}%</b> <!-- แสดงผลรวม p01_weight -->
+                                                                <b>{{ totalscoretrack??0 }}</b> <!-- แสดงผลรวม p01_weight -->
                                                             </td>
                                                             <td class="text-center" style="color: blue;">
-                                                                <b>{{ WeightedScoreSumtrack }}</b> <!-- แสดงผลรวมคะแนนที่คำนวณ -->
+                                                                <b>{{ totalWeighttrack??0 }}%</b> <!-- แสดงผลรวม p01_weight -->
+                                                            </td>
+                                                            <td class="text-center" style="color: blue;">
+                                                                <b>{{ WeightedScoreSumtrack??0 }}</b> <!-- แสดงผลรวมคะแนนที่คำนวณ -->
                                                             </td> 
-                                                    </tr>
-                                                    <tr>
-                                                        <td style="text-align: right; vertical-align: middle;" colspan="10">
-                                                            <b style="color: blue;">(8) สรุปคะแนนส่วนผลสัมฤทธิ์ของงาน =&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </b>
-                                                            <b style="color: blue;">ผลรวมของค่าคะแนนถ่วงน้ำหนัก</b>
-                                                            <div style="display: flex; justify-content: flex-end;">
-                                                                <hr style="border: 1px solid black; width: 16%;">
-                                                            </div>
-                                                            <b style="color: blue;">จำนวนระดับค่าเป้าหมาย = 5 </b>
-                                                        </td>
-                                                        <td class="text-center" style="color: blue;  vertical-align: middle;">
-                                                            <b>{{ WeightedScoreSumX }}</b> <!-- แสดงผลรวม/จำนวนระดับเป้าหมาย -->
-                                                        </td>
-                                                        <td class="text-center" style="color: blue;  vertical-align: middle;">
-                                                            <b>{{ WeightedScoreSumXT }}</b> <!-- แสดงผลรวม/จำนวนระดับเป้าหมาย -->
-                                                        </td>
-                                                    </tr>  
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="text-align: right; vertical-align: middle;" colspan="10">
+                                                                <b style="color: blue;">(8) สรุปคะแนนส่วนผลสัมฤทธิ์ของงาน =&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </b>
+                                                                <b style="color: blue;">ผลรวมของค่าคะแนนถ่วงน้ำหนัก</b> 
+                                                                <div style="display: flex; justify-content: flex-end;">
+                                                                    <hr style="border: 1px solid black; width: 16%;">
+                                                                </div>
+                                                                <b style="color: blue;">จำนวนระดับค่าเป้าหมาย = 5 </b>
+                                                            </td>
+                                                            <td class="text-center" style="color: blue;  vertical-align: middle;">
+                                                                <b>{{ WeightedScoreSumX }}</b> <!-- แสดงผลรวม/จำนวนระดับเป้าหมาย -->
+                                                            </td>
+                                                            <td class="text-center" style="color: blue;  vertical-align: middle;" >
+                                                                <b style="display: block; text-align: right; color: blue; text-align: left;">{{ WeightedScoreSumtrack }}</b>
+                                                                <hr style="border: 1px solid black; width: 60%; text-align: left;">
+                                                                <b style="display: block; text-align: right; color: blue; text-align: left;">{{5}}</b>
+                                                                <div style="text-align: right;">
+                                                                    <b>= {{ WeightedScoreSumXT }}</b>
+                                                                </div> <!-- แสดงผลรวม/จำนวนระดับเป้าหมาย -->
+                                                            </td>
+                                                        </tr>  
                                                 </tbody>
                                             </table>
                                         <hr>
@@ -290,7 +295,7 @@
                                                     </thead>
                                                     <tbody>
                                                         <tr v-for="(row2, index) in jobSpecificCompetencies" :key="index"> 
-                                                            <td style="text-align: left;">ข. {{ index+6 }} {{ row2.WORK_NAME }}</td> 
+                                                            <td style="text-align: left;">ข. {{ index+1 }} {{ row2.WORK_NAME }}</td> 
                                                             <td>{{ row2.COMPLEVEL }}</td>
                                                             <!-- <td style="color: blue"><b>{{ row2.SCORESUM }}</b></td> -->
                                                             <td>  
@@ -341,53 +346,61 @@
                                                     <th>คะแนน</th>
                                                 </tr>
                                         </thead>
-                                            <tbody>
-                                                <tr>
-                                                    <td style=" vertical-align: middle;" class="text-left">จำนวนสมรรถนะหลัก /สมรรถนะเฉพาะตามลักษณะงานที่ปฏิบัติ /สมรรถนะทางการบริหาร ที่มีระดับสมรรถนะที่แสดงออก สูงกว่าหรือเท่ากับ ระดับสมรรถนะที่คาดหวัง X 3 คะแนน</td>
-                                                        <td class="text-center" style="color: blue;"> 
-                                                            <b>{{ totalCoreCompetencies }}</b>  
-                                                        </td> 
-                                                        <td class="text-center" style="color: blue;"><b>3</b></td>   
+                                        <tbody>
+                                                    <tr>
+                                                        <td style=" vertical-align: middle;" class="text-left">จำนวนสมรรถนะหลัก /สมรรถนะเฉพาะตามลักษณะงานที่ปฏิบัติ /สมรรถนะทางการบริหาร ที่มีระดับสมรรถนะที่แสดงออก สูงกว่าหรือเท่ากับ ระดับสมรรถนะที่คาดหวัง X 3 คะแนน</td>
+                                                            <td class="text-center" style="color: blue;">
+                                                                <b>{{ totalcorecompetenciesX3 }}</b>  
+                                                            </td>
+                                                            <td class="text-center" style="color: blue;"><b>3</b></td>   
+                                                            <td class="text-center" style="color: blue;">
+                                                                <b>{{ totalScoreSumX3 }}</b>  
+                                                            </td>                                                    
+                                                    </tr>
+                                                    <tr>
+                                                        <td style=" vertical-align: middle;" class="text-left">จำนวนสมรรถนะหลัก /สมรรถนะเฉพาะตามลักษณะงานที่ปฏิบัติ /สมรรถนะทางการบริหาร ที่มีระดับสมรรถนะที่แสดงออก ต่ำกว่า ระดับสมรรถนะที่คาดหวัง 1 ระดับ X 2 คะแนน</td>
+                                                            <td class="text-center" style="color: blue;">
+                                                                <b>{{ totalcorecompetenciesX2 }}</b> 
+                                                            </td>
+                                                            <td class="text-center" style="color: blue;"><b>2</b></td> 
+                                                            <td class="text-center" style="color: blue;">
+                                                                <b>{{ totalScoreSumX2 }}</b>  
+                                                            </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style=" vertical-align: middle;" class="text-left">จำนวนสมรรถนะหลัก /สมรรถนะเฉพาะตามลักษณะงานที่ปฏิบัติ /สมรรถนะทางการบริหาร ที่มีระดับสมรรถนะที่แสดงออก ต่ำกว่า ระดับสมรรถนะที่คาดหวัง 2 ระดับ X 1 คะแนน</td>
+                                                            <td class="text-center" style="color: blue;">
+                                                                <b>{{ totalcorecompetenciesX1 }}</b> 
+                                                            </td> 
+                                                            <td class="text-center" style="color: blue;"><b>1</b></td> 
+                                                            <td class="text-center" style="color: blue;">
+                                                                <b>{{ totalScoreSumX1 }}</b> 
+                                                            </td>   
+                                                            
+                                                    </tr>
+                                                    <tr>
+                                                        <td style=" vertical-align: middle;" class="text-left">จำนวนสมรรถนะหลัก /สมรรถนะเฉพาะตามลักษณะงานที่ปฏิบัติ /สมรรถนะทางการบริหาร ที่มีระดับสมรรถนะที่แสดงออก ต่ำกว่า ระดับสมรรถนะที่คาดหวัง 3 ระดับ X 0 คะแนน</td>
                                                         <td class="text-center" style="color: blue;">
-                                                            <b>{{ totalScoreSum }}</b>  
-                                                        </td>                                                      
-                                                </tr>
-                                                <tr>
-                                                    <td style=" vertical-align: middle;" class="text-left">จำนวนสมรรถนะหลัก /สมรรถนะเฉพาะตามลักษณะงานที่ปฏิบัติ /สมรรถนะทางการบริหาร ที่มีระดับสมรรถนะที่แสดงออก ต่ำกว่า ระดับสมรรถนะที่คาดหวัง 1 ระดับ X 2 คะแนน</td>
-                                                        <td class="text-center" style="color: blue;">
-                                                            <b>{{ totallowScores }}</b> 
+                                                                <b>{{ totalcorecompetenciesX0 }}</b> 
+                                                            </td> 
+                                                            <td class="text-center" style="color: blue;"><b>0</b></td> 
+                                                            <td class="text-center" style="color: blue;">
+                                                                <b>{{ totalScoreSumX0 }}</b> 
+                                                            </td>   
+                                                    </tr>
+                                                    <tr>
+                                                        <td style="text-align: right" colspan="3">
+                                                            <b style="color: blue;"> (8) ผลรวม</b>
                                                         </td>
-                                                        <td class="text-center" style="color: blue;"><b>2</b></td> 
-                                                        <td class="text-center" style="color: blue;">
-                                                            <b>{{ totalScorelowSum }}</b>  
-                                                        </td>
-                                                </tr>
-                                                <tr>
-                                                    <td style=" vertical-align: middle;" class="text-left">จำนวนสมรรถนะหลัก /สมรรถนะเฉพาะตามลักษณะงานที่ปฏิบัติ /สมรรถนะทางการบริหาร ที่มีระดับสมรรถนะที่แสดงออก ต่ำกว่า ระดับสมรรถนะที่คาดหวัง 2 ระดับ X 1 คะแนน</td>
-                                                        <td class="text-center" style="color: blue;"><b>0</b></td> 
-                                                        <td class="text-center" style="color: blue;"><b>1</b></td> 
-                                                        <td class="text-center" style="color: blue;"><b>0</b></td>
-                                                </tr>
-                                                <tr>
-                                                    <td style=" vertical-align: middle;" class="text-left">จำนวนสมรรถนะหลัก /สมรรถนะเฉพาะตามลักษณะงานที่ปฏิบัติ /สมรรถนะทางการบริหาร ที่มีระดับสมรรถนะที่แสดงออก ต่ำกว่า ระดับสมรรถนะที่คาดหวัง 3 ระดับ X 0 คะแนน</td>
-                                                        <td class="text-center" style="color: blue;"><b>0</b></td> 
-                                                        <td class="text-center" style="color: blue;"><b>0</b></td> 
-                                                        <td class="text-center" style="color: blue;"><b>0</b></td> 
-                                                </tr>
-                                                <tr>
-                                                    <td style="text-align: right" colspan="3">
-                                                        <b style="color: blue;"> (8) ผลรวม</b>
-                                                    </td>
-                                                        <td class="text-center" style="color: blue;"> 
-                                                            <b>{{ totalScoreSum+totalScorelowSum }}</b>  
-                                                        </td>
-                                                    
-                                                </tr>
-                                                <tr>
+                                                            <td class="text-center" style="color: blue;"> 
+                                                                <b>{{ totalScoreSumX3+totalScoreSumX2+totalScoreSumX1 }}</b>  
+                                                            </td> 
+                                                    </tr>
+                                                    <tr>
                                                     <td style="text-align: center; vertical-align: middle;" colspan="3">
                                                         <b style="color: blue;">(9) สรุปคะแนนส่วนพฤติกรรมการปฏิบัติราชการ   (สมรรถนะ) =	 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </b>
                                                         <b style="color: blue;">  ผลรวมคะแนน ใน (8)</b>
-                                                        <b style="display: block; text-align: right; color: blue;">{{ totalScoreSum + totalScorelowSum }}</b>   
+                                                        <b style="display: block; text-align: right; color: blue;">{{ totalScoreSumX3 + totalScoreSumX2+totalScoreSumX1 }}</b>   
                                                         <div style="display: flex; justify-content: flex-end;"> 
                                                             <hr style="border: 1px solid black; width: 70%;">
                                                         </div> 
@@ -395,10 +408,10 @@
                                                         <b style="color: blue;">จำนวนสมรรถนะที่ใช้ในการประเมิน X 3 คะแนน</b>  
                                                     </td> 
                                                     <td class="text-center" style="color: blue;"> 
-                                                         <b> = {{ ((totalScoreSum + totalScorelowSum) / 33).toFixed(2) }}</b>  
+                                                         <b> = {{ ((totalScoreSumX3 + totalScoreSumX2+totalScoreSumX1) / 33).toFixed(2) }}</b>  
                                                     </td> 
                                                 </tr>  
-                                            </tbody>
+                                                </tbody>
                                                 <br>
                                                 <div class="p-fluid formgrid grid"> 
                                                     <B><h4>ความเห็นเพิ่มเติมของผู้ประเมิน (ระบุข้อมูลเมื่อสิ้นรอบการประเมิน)</h4></B>
@@ -456,55 +469,65 @@
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                        <tr> 
+                                                    <template v-for="(Item, index) in products" :key="index"> 
+                                                        <tr v-if="dataStaffid==Item.staffid">  
                                                             <td>องค์ประกอบที่ 1 ผลสัมฤทธิ์ของงาน</td>
                                                             <td class="text-center" style="color: blue;"> 
-                                                                <b>  {{ showscoresum.achievement_score  }} </b>  
+                                                                <!-- <b id="sumX">{{ ((totalScoreSumX3 + totalScoreSumX2) / 33).toFixed(2) }}</b>  --> 
+                                                                  <b>{{ Item.tb_tor.achievement_score }}</b> 
                                                             </td> 
-                                                            <td class="text-center" style="color: blue;"> 
-                                                                <b v-if="showscoresum.persen">{{showscoresum.persen.split(':')[0]}}</b>  
+                                                            <td class="text-center" style="color: blue;">  
+                                                                <b>{{ Item.tb_tor?Item.tb_tor.persen.split(':')[0]: '' }}</b>
                                                             </td> 
-                                                            <td class="text-center" style="color: blue;"> 
-                                                                <b v-if="showscoresum.persen">{{ ((showscoresum.achievement_score )*showscoresum.persen.split(':')[0]).toFixed(2) }} </b>  
+                                                            <td class="text-center" style="color: blue;">  
+                                                                <!-- <b>{{ (((totalScoreSumX3 + totalScoreSumX2) / 33).toFixed(2) *(Item.tb_tor?Item.tb_tor.persen.split(':')[0]:0)).toFixed(2)}}</b>   --> 
+                                                                <b>{{ ( Item.tb_tor  ? Item.tb_tor.achievement_score * (parseFloat(Item.tb_tor.persen.split(':')[0]) || 0) : 0 ).toFixed(2) }}</b>  
                                                             </td> 
-                                                        </tr>
-                                                        <tr>
+                                                        </tr> 
+                                                        <tr v-if="dataStaffid==Item.staffid"> 
                                                             <td>องค์ประกอบที่ 2 พฤติกรรมการปฏิบัติราชการ</td>
-                                                            <td class="text-center" style="color: blue;"> 
-                                                                <b>{{ showscoresum.behavior  }}</b>  
+                                                            <td class="text-center" style="color: blue;">
+                                                                <!-- {{ insert2(WeightedScoreSumXT) }} --> 
+                                                                <!-- <b>{{ ((totalScoreSumX3 + totalScoreSumX2+totalScoreSumX1) / 33).toFixed(2) }}</b> -->
+                                                                 <b>{{Item.tb_tor.behavior }}</b>
+
+
+                                                            </td>  
+                                                            <td class="text-center" style="color: blue;">  
+                                                                <b>{{ Item.tb_tor?Item.tb_tor.persen.split(':')[1]: ''}}</b>
                                                             </td> 
                                                             <td class="text-center" style="color: blue;"> 
-                                                                <b v-if="showscoresum.persen">{{showscoresum.persen.split(':')[1]}}</b>  
-                                                            </td> 
-                                                            <td class="text-center" style="color: blue;"> 
-                                                                <b v-if="showscoresum.persen">{{ ((showscoresum.behavior )*showscoresum.persen.split(':')[1]).toFixed(2) }} </b>  
-                                                            </td> 
+                                                                <b>{{ ((Item.tb_tor.behavior *(Item.tb_tor?Item.tb_tor.persen.split(':')[1]:0)).toFixed(2)) }}</b>  
+                                                            </td>  
                                                         </tr>
-                                                        <tr>
+                                                        <tr v-if="dataStaffid==Item.staffid">
                                                             <td>องค์ประกอบอื่นๆ (ถ้ามี)</td>
                                                             <td></td>
                                                             <td></td>
                                                             <td></td>
                                                         </tr>
-                                                        <tr style="font-weight: bold;">
+                                                        <tr v-if="dataStaffid==Item.staffid" style="font-weight: bold;">
                                                             <td colspan="2" style="text-align: right;">รวม</td>
                                                             <td class="text-center" style="color: blue;"> 
-                                                                <b>{{ 100}}%</b>  
+                                                                <b>{{ 100 }}%</b>  
                                                             </td> 
-                                                            <td class="text-center" style="color: blue;"> 
-                                                                {{ showscoresum.sum_score }}
-                                                            </td>
+                                                            <td class="text-center" style="color: blue;">  
+                                                                <b>{{ Item.tb_tor?Item.tb_tor.sum_score:'' }}</b>  
+                                                            </td> 
                                                         </tr>
+                                                        </template> 
                                                     </tbody>
                                             </table>
-                                            <div class="employee-info">
-                                                <h4>ระดับผลการประเมินที่ได้</h4>
-                                                    <p><strong>[&nbsp;&nbsp; <b v-if="(showscoresum.sum_score) >= 90">&#10003;</b> &nbsp;&nbsp;] ดีเด่น (90-100)</strong></p>
-                                                    <p><strong>[&nbsp;&nbsp; <b v-if="(showscoresum.sum_score) >= 80 && (showscoresum.sum_score) < 90">&#10003;</b> &nbsp;&nbsp;] ดีมาก (80-89)</strong></p>
-                                                    <p><strong>[&nbsp;&nbsp; <b v-if="(showscoresum.sum_score) >= 70 && (showscoresum.sum_score) < 80">&#10003;</b> &nbsp;&nbsp;] ดี (70-79)</strong></p>
-                                                    <p><strong>[&nbsp;&nbsp; <b v-if="(showscoresum.sum_score) >= 60 && (showscoresum.sum_score) < 70">&#10003;</b> &nbsp;&nbsp;] พอใช้ (60-69)</strong></p> 
-                                                    <p><strong>[&nbsp;&nbsp; <b v-if="(showscoresum.sum_score) < 60">&#10003;</b> &nbsp;&nbsp;] ต้องปรับปรุง (ต่ำกว่า 60)</strong></p>
-                                                </div>
+                                            <template v-for="(Item, index) in products" :key="index">
+                                                    <div v-if="dataStaffid == Item.staffid" class="employee-info">
+                                                        <h4>ระดับผลการประเมินที่ได้</h4>
+                                                            <p> <strong> [&nbsp;&nbsp;<b v-if="Item?.tb_tor?.sum_score >= 90">&#10003;</b>&nbsp;&nbsp;] ดีเด่น (90-100)</strong> </p>
+                                                            <p> <strong> [&nbsp;&nbsp; <b v-if="Item?.tb_tor?.sum_score >= 80 && Item?.tb_tor?.sum_score < 90">&#10003;</b>&nbsp;&nbsp;] ดีมาก (80-89)</strong></p>
+                                                            <p> <strong> [&nbsp;&nbsp; <b v-if="Item?.tb_tor?.sum_score >= 70 && Item?.tb_tor?.sum_score < 80">&#10003;</b> &nbsp;&nbsp;] ดี (70-79) </strong></p>
+                                                            <p> <strong> [&nbsp;&nbsp; <b v-if="Item?.tb_tor?.sum_score >= 60 && Item?.tb_tor?.sum_score < 70">&#10003;</b> &nbsp;&nbsp;] พอใช้ (60-69)</strong></p>
+                                                            <p> <strong> [&nbsp;&nbsp;  <b v-if="Item?.tb_tor?.sum_score < 60">&#10003;</b> &nbsp;&nbsp;] ต้องปรับปรุง (ต่ำกว่า 60) </strong> </p>
+                                                    </div>
+                                                </template>
                                             <h5 class="mb-4"><i class="" style="font-size: x-large;"></i> ส่วนที่ 3 แผนพัฒนาการปฏิบัติราชการรายบุคคล</h5>
                                             <table border="1" cellspacing="0" cellpadding="5">
                                                 <thead>
@@ -648,6 +671,7 @@ export default {
             ],
             jobSpecificCompetencies: [],
             otherCompetencies: [
+                { activity: 'ค. 1 สภาวะผู้นำ', indicator: '0',report: '1'},
                 { activity: 'ค. 2 วิสัยทัศน์', indicator: '0',report: '1'},
                 { activity: 'ค. 3 การวางกลยุทธ์ภาครัฐ', indicator: '0',report: '1'},
                 { activity: 'ค. 4 ศักยภาพเพื่อนำการปรับเปลี่ยน', indicator: '0',report: '1'},
@@ -679,21 +703,26 @@ export default {
             // 3
             products_Tab3T4:[],
              //total weight
-            totalscoretrack:{},
-            totalWeighttrack: {}, 
-            WeightedScoreSumtrack:{},
-            WeightedScoreSumX :{},
-            WeightedScoreSumXT: {},
+            totalscoretrack: {},
+            totalWeighttrack: {},
+            WeightedScoreSumtrack: {},
+            WeightedScoreSumX: 0,
+            WeightedScoreSumXT: 0,
             //รวมคะแนน เกณฑ์การประเมิน
-            totalCoreCompetencies:0,
-            totallowScores:{},
-            totalScoreSum:{},
-            totalScorelowSum:{},
-            totalScoreFinalSum:{},
+            totalcorecompetenciesX3: 0,
+            totalcorecompetenciesX2: 0,
+            totalcorecompetenciesX1: 0,
+            totalcorecompetenciesX0: 0,
+            totalScoreSumX3: 0,
+            totalScoreSumX2: 0,
+            totalScoreSumX1: 0,
+            totalScoreSumX0: 0, 
+            totalScoreSum: 0, 
+            totalScoreFinalSum: 0,
             //ชื่อผู้ประเมิน ตำแหน่งผู้ประเมิน
             assessorText: null,
             assessor_positionText: null,
-            showscoresum:{}, 
+            showscoresum:0, 
             currentstaff: {},
           
         };
@@ -708,166 +737,7 @@ export default {
         await this.setSession(STAFFID, staffdepartment, groupid, user.user.name.POSTYPENAME, user.user.name.POSITIONNAMEID);  
         // this.showDataEvalu();  
         this.showDataSet(); 
-    }, 
-    computed: {
-        totalscoretrack() {
-            // ใช้ reduce เพื่อคำนวณค่ารวมของ p_weight(รวมค่าคะแนนที่ได้)
-            return this.products_Tab2.reduce((total, h) => {
-                return total + h.subP01sX.reduce((subTotal, subP01) => {
-                    return subTotal + subP01.p01_score ; // เพิ่ม p01_weight ของแต่ละ subP01
-                }, 0);
-            }, 0);
-        },
-        totalWeighttrack() {
-            // ใช้ reduce เพื่อคำนวณค่ารวมของ p_weight*(รวมน้ำหนักความยากง่ายของงาน)
-            return this.products_Tab2.reduce((total, h) => {
-                return total + h.subP01sX.reduce((subTotal, subP01) => {
-                    return subTotal + subP01.p01_weight; // เพิ่ม p01_weight ของแต่ละ subP01
-                }, 0);
-            }, 0);
-        },
-        WeightedScoreSumtrack() {
-            // คำนวณค่ารวมของคะแนนที่คำนวณ และหารด้วย 5(รวมค่าคะแนนถ่วงน้ำหนัก)
-            return this.products_Tab2.reduce((total, h) => {
-                return total + h.subP01sX.reduce((subTotal, subP01) => {
-                    // คำนวณคะแนนรวม (subP01.p01_score * subP01.p01_weight / 100) แล้วหารด้วย 5
-                    return subTotal + ((subP01.p01_score * subP01.p01_weight / 100));
-                }, 0);
-            }, 0).toFixed(3); // ใช้ toFixed(3) เพื่อแสดงทศนิยม 3 ตำแหน่ง
-        },
-        WeightedScoreSumX() {
-            // คำนวณค่ารวมของคะแนนที่คำนวณ(รวมน้ำหนักความยากง่ายของงาน/5)
-            return this.products_Tab2.reduce((total, h) => {
-                return total + h.subP01sX.reduce((subTotal, subP01) => {
-                    return subTotal + (subP01.p01_weight/5 );
-                }, 0);
-            }, 0).toFixed(2); // ใช้ toFixed(2) เพื่อให้มีทศนิยม 2 ตำแหน่ง
-        },
-        WeightedScoreSumXT() {
-            // คำนวณค่ารวมของคะแนนที่คำนวณ (รวมค่าคะแนนถ่วงน้ำหนัก/5)
-            return this.products_Tab2.reduce((total, h) => {
-                return total + h.subP01sX.reduce((subTotal, subP01) => {
-                    return subTotal + ((subP01.p01_score * subP01.p01_weight / 100) / 5);
-                }, 0);
-            }, 0).toFixed(2); // ใช้ toFixed(2) เพื่อให้มีทศนิยม 2 ตำแหน่ง
-        },
-            //รวมคะแนน เกณฑ์การประเมิน
-            //รวมช่องสมรรถนะ
-        totalCoreCompetencies() { 
-            const maxLength = Math.max(this.coreCompetencies.length, this.jobSpecificCompetencies.length);
-            let total = 0;
-
-            //กกกกก
-            for (let i = 0; i < this.coreCompetencies.length; i++) {
-                const dataTable1Value = parseFloat(this.coreCompetencies[i]?.indicator) || 0;
-                const dataTable2Value = parseFloat(this.coreCompetencies[i]?.data_table1) || 0;
-                // // ตรวจสอบเงื่อนไขและเพิ่มค่า T1 ถ้าเงื่อนไขเป็นจริง
-                if ((dataTable1Value - dataTable2Value) <= 0) {
-                    total++;
-                }
-            } 
-            //ขขข
-            for (let i = 0; i < this.jobSpecificCompetencies.length; i++) {
-                const dataTable1Value = parseFloat(this.jobSpecificCompetencies[i]?.COMPLEVEL) || 0;
-                const dataTable2Value = parseFloat(this.jobSpecificCompetencies[i]?.SCORE) || 0;
-
-                // // ตรวจสอบเงื่อนไขและเพิ่มค่า T1 ถ้าเงื่อนไขเป็นจริง
-                if ((dataTable1Value - dataTable2Value) <= 0) {
-                    total++;
-                }
-            } 
-            
-            //คคค
-            for (let i = 0; i < maxLength; i++) {
-                // const dataTable1Value = parseFloat(this.coreCompetencies[i]?.data_table1) || 0;
-                // const dataTable2Value = parseFloat(this.jobSpecificCompetencies[i]?.SCORE) || 0;
-
-                // // // ตรวจสอบเงื่อนไขและเพิ่มค่า T1 ถ้าเงื่อนไขเป็นจริง
-                // if ((dataTable1Value - dataTable2Value) <= 0) {
-                //     total++;
-                // }
-            } 
-
-            return total;
-        },
-            //รวมช่องค่าที่ต่ำกว่าสมรรถนะ
-        totallowScores() { 
-            let total1 = 0; // Initialize total1
-            let total2 = 0; // Initialize total2
-
-            // ตรวจสอบเงื่อนไขแรก: data_table1 น้อยกว่า indicator
-            for (let i = 0; i < this.coreCompetencies.length; i++) {
-                const dataTable1Value = parseFloat(this.coreCompetencies[i]?.indicator) || 0;
-                const dataTable2Value = parseFloat(this.coreCompetencies[i]?.data_table1) || 0;
-                if (dataTable2Value < dataTable1Value) {
-                    total1++; // Increment total1 when condition is met
-                }
-            }
-
-            // ตรวจสอบเงื่อนไขที่สอง: COMPLEVEL น้อยกว่า SCORE
-            for (let j = 0; j < this.jobSpecificCompetencies.length; j++) {
-                const dataTable1Value = parseFloat(this.jobSpecificCompetencies[j]?.COMPLEVEL) || 0;
-                const dataTable2Value = parseFloat(this.jobSpecificCompetencies[j]?.SCORE) || 0;
-                if (dataTable2Value < dataTable1Value) {
-                    total2++; // Increment total2 when condition is met
-                }
-            } 
-            // รวมผลลัพธ์ทั้งต่ำกว่าสมรรถนะที่คาดหวัง
-            return total1 + total2 ;  
-        },
-        //รวมคะแนนจำนวนสมรรถนะ*3
-        totalScoreSum() {
-            let total = 0;  
-                // ตรวจสอบและนับค่าจาก coreCompetencies
-                for (let i = 0; i < this.coreCompetencies.length; i++) {
-                    const dataTable1Value = parseFloat(this.coreCompetencies[i]?.indicator) || 0;
-                    const dataTable2Value = parseFloat(this.coreCompetencies[i]?.data_table1) || 0;
-
-                    if ((dataTable1Value - dataTable2Value) <= 0) {
-                        total++;
-                    }
-                } 
- 
-                // ตรวจสอบและนับค่าจาก jobSpecificCompetencies
-                for (let i = 0; i < this.jobSpecificCompetencies.length; i++) {
-                    const dataTable1Value = parseFloat(this.jobSpecificCompetencies[i]?.COMPLEVEL) || 0;
-                    const dataTable2Value = parseFloat(this.jobSpecificCompetencies[i]?.SCORE) || 0;
-
-                    if ((dataTable1Value - dataTable2Value) <= 0) {
-                        total++;
-                    }
-                } 
-                // คูณค่ารวมทั้งหมดด้วย 3
-            return total * 3;
-        }, 
-        totalScoreSumX() {     
-            return this.coreCompetencies.reduce((sum, row, index) => { 
-                const dataTable1Value = parseFloat(row.data_table1) || 0;
-                const dataTable2Value = parseFloat(this.jobSpecificCompetencies[index]?.data_table2) || 0;  
-                return sum + (dataTable1Value * 3) + (dataTable2Value * 3);
-            }, 0);
-        },  
-        totalScorelowSum() { 
-            let total1 = 0;  
-            let total2 = 0;  
-            for (let i = 0; i < this.coreCompetencies.length; i++) {
-                const dataTable1Value = parseFloat(this.coreCompetencies[i]?.indicator) || 0;
-                const dataTable2Value = parseFloat(this.coreCompetencies[i]?.data_table1) || 0;
-                if (dataTable2Value < dataTable1Value) {
-                    total1++;  
-                }
-            } 
-            for (let j = 0; j < this.jobSpecificCompetencies.length; j++) {
-                const dataTable1Value = parseFloat(this.jobSpecificCompetencies[j]?.COMPLEVEL) || 0;
-                const dataTable2Value = parseFloat(this.jobSpecificCompetencies[j]?.SCORE) || 0;
-                if (dataTable2Value < dataTable1Value) {
-                    total2++; 
-                }
-            } 
-            // รวมผลลัพธ์ทั้งต่ำกว่าสมรรถนะที่คาดหวัง *2
-            return ((total1 + total2) * 2);  
-        } 
-    }, 
+    },  
     methods: { 
         setSession (staffid_Main,facid_Main,groupid_Main,postypename,postypenameid) {
             // console.log('postypename:',postypename);  
@@ -879,7 +749,7 @@ export default {
         }, 
         showDataSet() {
             axios
-                .post('https://survey.msu.ac.th/evaluatebackend/api/showDateSet', {
+                .post('http://127.0.0.1:8000/api/showDateSet', {
                     staff_id: this.staffid_Main,
                     fac_id: this.facid_Main,
                     group_id: this.groupid_Main
@@ -904,7 +774,7 @@ export default {
             }
         },
         async showDataEvalu(){
-            await axios.get('https://survey.msu.ac.th/evaluatebackend/api/showDataEvalu',{
+            await axios.get('http://127.0.0.1:8000/api/showDataEvalu',{
                 // 28 / 11 / 67
                 // params: {
                 //     staff_id: this.staffid_Main,
@@ -973,7 +843,7 @@ export default {
             // เพิ่มฟังก์ชันการอัพโหลดไฟล์
         },
         async Btnstatus(staff_id,status){   
-            await axios.post('https://survey.msu.ac.th/evaluatebackend/api/postDataChkBtn',{ 
+            await axios.post('http://127.0.0.1:8000/api/postDataChkBtn',{ 
                 year: this.dropdownItemYear ,
                 staff_id: staff_id ,
                 status: status
@@ -1036,24 +906,27 @@ export default {
 
             }
         },  
-        onTabChange(event) { 
-            // console.log(event.index);
+        async onTabChange(event) { 
+            //console.log(this.coreCompetencies);
+             //console.log('onTabChange: ',event.index);
             if (event.index==0) {
                 //console.log('แบบใบปะหน้า -',event.index); 
             }
             if(event.index==1){
+                
                 //console.log('รายงาน ป.01 - ป.03 -',event.index);  
-                this.tab2Data(this.dataStaffid);  
-                this.showdataPoText(this.dataStaffid,this.facid_Main,this.examine_date.d_date,this.examine_date.evalua); 
-            } 
+                await this.showdataPoText(this.dataStaffid,this.facid_Main,this.examine_date.d_date,this.examine_date.evalua); 
+                await this.tab2Data(this.dataStaffid);  
+                
+            }  
             if (event.index==2) {
                 //console.log('รายงาน ป.04 -',event.index);
                 this.chkp04dataT4(this.dataStaffid,this.facid_Main,this.examine_date.d_date,this.examine_date.evalua); 
                 this.showdatator();
             }
         },  
-        tab2Data(staff_id){  
-            axios.post('https://survey.msu.ac.th/evaluatebackend/api/showDataP03New',{
+       async tab2Data(staff_id){  
+            await axios.post('http://127.0.0.1:8000/api/showDataP03New',{
                 staff_id: staff_id, 
                 fac_id: this.examine_date.fac_id,
                 year_id: this.examine_date.d_date, 
@@ -1063,13 +936,19 @@ export default {
                 if (res.data && Array.isArray(res.data)) {
                     this.products_Tab2 = res.data;  
                 }   
+                this.function_totalscoretrack();
+                this.function_totalWeighttrack();
+                this.function_WeightedScoreSumtrack();
+                this.function_WeightedScoreSumX();
+                this.function_WeightedScoreSumXT();  
+                this.function_totalcorecompetenciesX3(); 
             })
             .catch(error => {
                 console.error('Error:', error);
             });
         }, 
         showdataPoText(staff_id,fac_id,year_id,record){ 
-            axios.post('https://survey.msu.ac.th/evaluatebackend/api/showDataPo',{
+            axios.post('http://127.0.0.1:8000/api/showDataPo',{
                 staff_id: staff_id,
                 fac_id: fac_id,
                 year_id: year_id,
@@ -1118,7 +997,7 @@ export default {
             });
         },
         chkp04dataT4(staff_id,fac_id,year_id,record){
-            axios.post('https://survey.msu.ac.th/evaluatebackend/api/showData04Tab3',{
+            axios.post('http://127.0.0.1:8000/api/showData04Tab3',{
                 staff_id: staff_id,
                 fac_id: fac_id,
                 year_id: year_id,
@@ -1134,7 +1013,7 @@ export default {
             });
         },
         showdatator(dataStaffid) {   
-            axios.post('https://survey.msu.ac.th/evaluatebackend/api/showdatator', {
+            axios.post('http://127.0.0.1:8000/api/showdatator', {
                 p_year: this.examine_date.d_date,
                 evalua: this.examine_date.evalua,
                 p_staffid: this.dataStaffid
@@ -1149,8 +1028,8 @@ export default {
                 //console.error('Error fetching data:', error);
             });
         },
-        getjobSpecificCompetencies(dataStaffid) {
-            axios.post('https://survey.msu.ac.th/evaluatebackend/api/showdataposp02', {
+        getjobSpecificCompetencies() {
+            axios.post('http://127.0.0.1:8000/api/showdataposp02', {
                 p_year: this.examine_date.d_date,
                 evalua: this.examine_date.evalua,
                 p_staffid: this.dataStaffid
@@ -1179,7 +1058,7 @@ export default {
         async showPostype(postypename,postypenameid){
             // console.log(postypename); 
             var postypetext = `ระดับ`+postypename;
-           await axios.post('https://survey.msu.ac.th/evaluatebackend/api/showdatapostypename', {
+           await axios.post('http://127.0.0.1:8000/api/showdatapostypename', {
                 postypename: postypetext,
                 postypenameid: postypenameid
             })
@@ -1204,6 +1083,106 @@ export default {
             });
            await this.getjobSpecificCompetencies(); 
         },
+
+        function_totalscoretrack() { 
+            this.totalscoretrack = this.products_Tab2.reduce((total, h) => {
+                return total + h.subP01sX.reduce((subTotal, subP01) => {
+                    return subTotal + subP01.p01_score;
+                }, 0);
+            }, 0);
+        },
+        function_totalWeighttrack() { 
+            this.totalWeighttrack = this.products_Tab2.reduce((total, h) => {
+                return total + h.subP01sX.reduce((subTotal, subP01) => {
+                    return subTotal + subP01.p01_weight;
+                }, 0);
+            }, 0);
+        },
+        function_WeightedScoreSumtrack() {
+            this.WeightedScoreSumtrack = this.products_Tab2
+                .reduce((total, h) => {
+                    return total + h.subP01sX.reduce((subTotal, subP01) => {
+                        return subTotal + (subP01.p01_score * subP01.p01_weight) / 100;
+                    }, 0);
+                }, 0)
+                .toFixed(3);
+        },
+        function_WeightedScoreSumX() {
+            this.WeightedScoreSumX = this.products_Tab2
+                .reduce((total, h) => {
+                    return total + h.subP01sX.reduce((subTotal, subP01) => {
+                        return subTotal + subP01.p01_weight / 5;
+                    }, 0);
+                }, 0)
+                .toFixed(2);
+        },
+        function_WeightedScoreSumXT() {
+            this.WeightedScoreSumXT = this.products_Tab2
+                .reduce((total, h) => {
+                    return total + h.subP01sX.reduce((subTotal, subP01) => {
+                        return subTotal + (subP01.p01_score * subP01.p01_weight) / 100 / 5;
+                    }, 0);
+                }, 0)
+                .toFixed(2);
+        }, 
+        function_totalcorecompetenciesX3() {
+            this.totalcorecompetenciesX3 = 0;
+            this.totalcorecompetenciesX2 = 0;
+            this.totalcorecompetenciesX1 = 0;
+            this.totalcorecompetenciesX0 = 0; 
+            
+            for (let i = 0; i < this.coreCompetencies.length; i++) {
+                const dataTable1Value = parseFloat(this.coreCompetencies[i]?.indicator) || 0;
+                const dataTable2Value = parseFloat(this.coreCompetencies[i]?.data_table1) ;
+
+                // console.log('dataTable1Value: ',dataTable1Value);
+                // console.log('dataTable2Value: ',dataTable2Value);
+                if ((dataTable1Value - dataTable2Value) <= 0) {
+                    this.totalcorecompetenciesX3++;
+                }else if ((dataTable1Value - dataTable2Value) == 1) {
+                    this.totalcorecompetenciesX2++;
+                }else if ((dataTable1Value - dataTable2Value) == 2) {
+                    this.totalcorecompetenciesX1++;
+                }else if ((dataTable1Value - dataTable2Value) >= 3) {
+                    this.totalcorecompetenciesX0++;
+                }
+            }
+            for (let i = 0; i < this.jobSpecificCompetencies.length; i++) {
+                const dataTable1Value = parseFloat(this.jobSpecificCompetencies[i]?.COMPLEVEL) || 0;
+                const dataTable2Value = parseFloat(this.jobSpecificCompetencies[i]?.SCORE) || 0;
+
+                //console.log(dataTable1Value,dataTable2Value,dataTable1Value - dataTable2Value);
+                if ((dataTable1Value - dataTable2Value) <= 0) {
+                    this.totalcorecompetenciesX3++;
+                }else if ((dataTable1Value - dataTable2Value) == 1) {
+                    this.totalcorecompetenciesX2++;
+                }else if ((dataTable1Value - dataTable2Value) == 2) {
+                    this.totalcorecompetenciesX1++;
+                }else if ((dataTable1Value - dataTable2Value) >= 3) {
+                    this.totalcorecompetenciesX0++;
+                }
+            }
+
+            // return total;
+            this.totalScoreSumX3 = this.totalcorecompetenciesX3*3;
+            this.totalScoreSumX2 = this.totalcorecompetenciesX2*2;
+            this.totalScoreSumX1 = this.totalcorecompetenciesX1*1;
+            this.totalScoreSumX0 = this.totalcorecompetenciesX0*0; 
+            
+        },
+
+        
+
+
+
+
+
+
+
+
+
+
+
         // async printDataP01() {     
         //     const form = {
         //         staff_id: this.staffid_Main,
@@ -1215,7 +1194,7 @@ export default {
 
         //     const queryParams = new URLSearchParams(form).toString();
         //     // console.log(queryParams); 
-        //     const url = `https://survey.msu.ac.th/evaluatebackend/printReportCoverpage?${queryParams}`;
+        //     const url = `http://127.0.0.1:8000/printReportCoverpage?${queryParams}`;
         //     window.open(url, '_blank');
  
         // }, 

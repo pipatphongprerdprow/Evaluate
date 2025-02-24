@@ -50,9 +50,9 @@
                     </thead>
                     <tbody>
                         <tr v-for="(row2, index) in jobSpecificCompetencies" :key="index"> 
-                            <td style="text-align: left;">ข. {{ index+6 }} {{ row2.WORK_NAME }}</td> 
-                            <td>{{ row2.COMPLEVEL }}</td>
-                            <!-- <td style="color: blue;"><b>{{ row2.SCOREPERSON}}</b></td> -->
+                            <td style="text-align: left;">ข. {{ index+1 }} {{ row2.WORK_NAME }}</td> 
+                            <td>{{ row2.COMPLEVEL  }}</td> 
+
                             <td>  
                                 <b v-if="row2.SCOREPERSON == '' || row2.SCOREPERSON == null" style="color: red;">0</b> 
                                 <b v-if="row2.SCOREPERSON != 0 " style="color: blue;" >{{ row2.SCOREPERSON }}</b> 
@@ -79,10 +79,21 @@
                     <tbody>
                         <tr v-for="(row3, index) in otherCompetencies" :key="index">
                             <td style="text-align: left;">{{ row3.activity }}</td> 
-                            <td></td>
-                            <td></td>
-                            <td></td>
+                            <td>
+                                <!-- {{ row3.indicator3 }} -->
+                                <b v-if="row3.indicator3 == '' ||  row3.indicator3 == null" style="color: red;">-</b>
+                                <span v-if="row3.indicator3 != 0">{{ row3.indicator3 }}</span>  
+                            </td>
+                            <td>  
+                                <b v-if="row3.data_table3 == '' ||  row3.data_table3 == null" style="color: red;">-</b> 
+                                <b v-if="row3.data_table3 != 0 " style="color: blue" >{{ row3.data_table3 }}</b> 
+                            </td>
+                            <td>  
+                                <b v-if="row3.selfAssessment3 == '' " style="color: red;">-</b> 
+                                <b v-if="row3.selfAssessment3 != 0 " >{{ row3.selfAssessment3 }}</b> 
+                            </td>
                         </tr>
+ 
                     </tbody>
                 </table>
             </div>
@@ -135,11 +146,11 @@ export default {
             // ],
             //ตาราง ค. สมรรถนะอื่นๆ
             otherCompetencies: [
-                { id: 12, activity: 'ค. 1 สภาวะผู้นำ', indicator: '0', data_table3: '' },
-                { id: 13, activity: 'ค. 2 วิสัยทัศน์', indicator: '0', data_table3: '' },
-                { id: 14, activity: 'ค. 3 การวางกลยุทธ์ภาครัฐ', indicator: '0', data_table3: '' },
-                { id: 15, activity: 'ค. 4 ศักยภาพเพื่อนำการปรับเปลี่ยน', indicator: '0', data_table3: '' },
-                { id: 16, activity: 'ค. 5 การสอนงานและการมอบหมายงาน', indicator: '0', data_table3: '' }
+                { id: 12, activity: 'ค. 1 สภาวะผู้นำ', indicator3: '0', data_table3: '',selfAssessment3:''},
+                { id: 13, activity: 'ค. 2 วิสัยทัศน์', indicator3: '0', data_table3: '',selfAssessment3:'' },
+                { id: 14, activity: 'ค. 3 การวางกลยุทธ์ภาครัฐ', indicator3: '0', data_table3: '',selfAssessment3:'' },
+                { id: 15, activity: 'ค. 4 ศักยภาพเพื่อนำการปรับเปลี่ยน', indicator3: '0', data_table3: '',selfAssessment3:'' },
+                { id: 16, activity: 'ค. 5 การสอนงานและการมอบหมายงาน', indicator3: '0', data_table3: '',selfAssessment3:'' }
             ],  
             postypetext: null,
              
@@ -148,11 +159,11 @@ export default {
     async mounted(){ 
         const { signIn, getSession, signOut } = await useAuth()
         const user = await getSession();
-        // console.log(user.user);
+        //console.log(user.user);
         
         const {STAFFID, SCOPES} = user.user.name 
         const {staffdepartment, groupid, staffdepartmentname, groupname} = SCOPES
-        await this.setSession(STAFFID,staffdepartment,groupid,user.user.name.POSTYPENAME,user.user.name.POSITIONNAMEID); 
+        await this.setSession(STAFFID,staffdepartment,groupid,user.user.name.POSTYPENAME,user.user.name.POSITIONNAMEID,user.user.name.POSITIONNAME); 
        
         
         // this.showdataPo(STAFFID,staffdepartment,this.dataPor.d_date,this.dataPor.evalua);
@@ -178,18 +189,19 @@ export default {
         
     },
     methods: {  
-        setSession (staffid_Main,facid_Main,groupid_Main,postypename,postypenameid) {
+        setSession (staffid_Main,facid_Main,groupid_Main,postypename,postypenameid,positionname) {
             // console.log('postypename:',postypename);  
             this.staffid_Main = staffid_Main
             this.facid_Main = facid_Main
             this.groupid_Main = groupid_Main   
             this.postypename = postypename    
             this.postypenameid = postypenameid    
+            this.positionname = positionname   
         },
         getjobSpecificCompetencies(){
             //console.log(this.staffid_Main,this.dataPor);
             
-            axios.post('https://survey.msu.ac.th/evaluatebackend/api/showdataposp02', { 
+            axios.post('http://127.0.0.1:8000/api/showdataposp02', { 
                p_year: this.dataPor.d_date,
                 evalua: this.dataPor.evalua,
                 p_staffid: this.staffid_Main
@@ -208,7 +220,41 @@ export default {
             })
         },
         showdataPo(){  
-            let postypetext = `ระดับ${this.postypename}`;
+             //console.log('positionname: ',this.positionname);
+            
+            // let postypetext = this.positionname === 'ผู้บริหาร' ? `ระดับชำนาญการพิเศษ` : `ระดับ${this.postypename}`;
+            // let postypenameid = this.positionname === 'ผู้บริหาร' ? 90 : this.postypenameid;
+            // let positionname = this.positionname === 'ผู้บริหาร' ? `ชำนาญการพิเศษ` : `ระดับ${this.postypename}`;
+            // // console.log('postypetext: ',postypetext);
+            // // console.log('postypenameid: ',postypenameid);
+            
+            // const levelMapping = {
+            //     'ระดับปฏิบัติการ': 1,
+            //     'ระดับชำนาญการ': 2,
+            //     'ระดับชำนาญการพิเศษ': 3,
+            //     'อาจารย์': 3,
+            //     'ระดับเชี่ยวชาญ': 4,
+            //     'ระดับเชี่ยวชาญพิเศษ': 5
+            // };
+            // let xr = levelMapping[postypetext] || 0;
+
+            // // ตั้งค่า coreCompetencies กลับไปเป็นค่าเริ่มต้น
+            // this.coreCompetencies = [
+            //     { id: 1, activity: 'ก. 1 การมุ่งผลสัมฤทธิ์', indicator: xr, data_table1: '',selfAssessment:'' },
+            //     { id: 2, activity: 'ก. 2 การบริการที่ดี', indicator: xr, data_table1: '',selfAssessment:''  },
+            //     { id: 3, activity: 'ก. 3 การสั่งสมความเชี่ยวชาญในงานอาชีพ', indicator: xr, data_table1: '',selfAssessment:''  },
+            //     { id: 4, activity: 'ก. 4 การยึดมั่นในความถูกต้องชอบธรรมและจริยธรรม', indicator: xr, data_table1: '',selfAssessment:''  },
+            //     { id: 5, activity: 'ก. 5 การทำงานเป็นทีม', indicator: xr, data_table1: '',selfAssessment:''  }
+            // ];  
+            //console.log(this.indicator);
+            let postypetext = this.positionname === 'ผู้บริหาร' ? `ระดับชำนาญการพิเศษ` : `ระดับ${this.postypename}`;
+            let postypenameid = this.positionname === 'ผู้บริหาร' ? 90 : this.postypenameid;
+            let positionname = this.positionname === 'ผู้บริหาร' ? `ชำนาญการพิเศษ` : `ระดับ${this.postypename}`;
+
+            console.log('postypetext:', postypetext);
+            console.log('postypenameid:', postypenameid);
+            
+             
             const levelMapping = {
                 'ระดับปฏิบัติการ': 1,
                 'ระดับชำนาญการ': 2,
@@ -217,23 +263,44 @@ export default {
                 'ระดับเชี่ยวชาญ': 4,
                 'ระดับเชี่ยวชาญพิเศษ': 5
             };
-            let xr = levelMapping[postypetext] || 0;
 
-            // ตั้งค่า coreCompetencies กลับไปเป็นค่าเริ่มต้น
+            // ตรวจสอบค่าของ postypetext ใน levelMapping
+            let xr = levelMapping[postypetext] || 0;
+            console.log('xr:', xr);
+
+            // ตั้งค่า coreCompetencies ตามระดับที่ได้จาก levelMapping
             this.coreCompetencies = [
-                { id: 1, activity: 'ก. 1 การมุ่งผลสัมฤทธิ์', indicator: xr, data_table1: '',selfAssessment:'' },
-                { id: 2, activity: 'ก. 2 การบริการที่ดี', indicator: xr, data_table1: '',selfAssessment:''  },
-                { id: 3, activity: 'ก. 3 การสั่งสมความเชี่ยวชาญในงานอาชีพ', indicator: xr, data_table1: '',selfAssessment:''  },
-                { id: 4, activity: 'ก. 4 การยึดมั่นในความถูกต้องชอบธรรมและจริยธรรม', indicator: xr, data_table1: '',selfAssessment:''  },
-                { id: 5, activity: 'ก. 5 การทำงานเป็นทีม', indicator: xr, data_table1: '',selfAssessment:''  }
-            ];  
-            
-            
+                { id: 1, activity: 'ก. 1 การมุ่งผลสัมฤทธิ์', indicator: xr, data_table1: '', selfAssessment: '' },
+                { id: 2, activity: 'ก. 2 การบริการที่ดี', indicator: xr, data_table1: '', selfAssessment: '' },
+                { id: 3, activity: 'ก. 3 การสั่งสมความเชี่ยวชาญในงานอาชีพ', indicator: xr, data_table1: '', selfAssessment: '' },
+                { id: 4, activity: 'ก. 4 การยึดมั่นในความถูกต้องชอบธรรมและจริยธรรม', indicator: xr, data_table1: '', selfAssessment: '' },
+                { id: 5, activity: 'ก. 5 การทำงานเป็นทีม', indicator: xr, data_table1: '', selfAssessment: '' }
+            ];
+
+            // ปรับ Mapping ให้ใช้ this.positionname แทน postypetext
+            const Mapping = {
+                'ผู้บริหาร': 1
+            };
+
+            // ใช้ this.positionname กับ Mapping
+            let xk = Mapping[this.positionname] || 0;
+            console.log('xk:', xk);
+
+            // ตั้งค่า otherCompetencies
+            this.otherCompetencies = [
+                { id: 12, activity: 'ค. 1 สภาวะผู้นำ', indicator3: xk, data_table3: '', selfAssessment3: '' },
+                { id: 13, activity: 'ค. 2 วิสัยทัศน์', indicator3: xk, data_table3: '', selfAssessment3: '' },
+                { id: 14, activity: 'ค. 3 การวางกลยุทธ์ภาครัฐ', indicator3: xk, data_table3: '', selfAssessment3: '' },
+                { id: 15, activity: 'ค. 4 ศักยภาพเพื่อนำการปรับเปลี่ยน', indicator3: xk, data_table3: '', selfAssessment3: '' },
+                { id: 16, activity: 'ค. 5 การสอนงานและการมอบหมายงาน', indicator3: xk, data_table3: '', selfAssessment3: '' }
+            ];
+ 
             // ตั้งค่า jobSpecificCompetencies กลับไปเป็นค่าเริ่มต้น 
-            this.showPostype(this.postypename,this.postypenameid);
+            // this.showPostype(this.postypename,this.postypenameid);
+            this.showPostype(positionname,postypenameid);
   
             
-            axios.post('https://survey.msu.ac.th/evaluatebackend/api/showDataPo',{
+            axios.post('http://127.0.0.1:8000/api/showDataPo',{
                 staff_id: this.staffid_Main,
                 fac_id: this.facid_Main,
                 year_id: this.dataPor.d_date,
@@ -276,9 +343,9 @@ export default {
             });
         },
         showPostype(postypename,postypenameid){
-            // console.log(postypename); 
+            //console.log('postypename: ',postypename); 
             var postypetext = `ระดับ`+postypename;
-            axios.post('https://survey.msu.ac.th/evaluatebackend/api/showdatapostypename', {
+            axios.post('http://127.0.0.1:8000/api/showdatapostypename', {
                 postypename: postypetext,
                 postypenameid: postypenameid
             })
@@ -305,7 +372,7 @@ export default {
         },
         showdatator() {  
             //console.log(this.dataPor.d_date,scoreA04); 
-            axios.post('https://survey.msu.ac.th/evaluatebackend/api/showdatator', {
+            axios.post('http://127.0.0.1:8000/api/showdatator', {
                 p_year: this.dataPor.d_date,
                 evalua: this.dataPor.evalua,
                 p_staffid: this.staffid_Main
@@ -321,7 +388,7 @@ export default {
             });
         },
         showjobSpecificCompetencies (){
-            axios.post('https://survey.msu.ac.th/evaluatebackend/api/showdataposp02', { 
+            axios.post('http://127.0.0.1:8000/api/showdataposp02', { 
                p_year: this.dataPor.d_date,
                 evalua: this.dataPor.evalua,
                 p_staffid: this.staffid_Main
@@ -352,11 +419,12 @@ export default {
                 GROUPTYPENAME:user.user.name.GROUPTYPENAME,
                 POSTYPENAME:user.user.name.POSTYPENAME, 
                 SCOPES:user.user.name.SCOPES.staffdepartmentname,
-                postypename: `ระดับ${this.postypename}`
+                postypename: `ระดับ${this.postypename}`,
+                postypenameid: this.postypenameid
             } 
             const queryParams = new URLSearchParams(form).toString();
             // console.log(queryParams); 
-            const url = `https://survey.msu.ac.th/evaluatebackend/report_p02?${queryParams}`;
+            const url = `http://127.0.0.1:8000/report_p02?${queryParams}`;
             window.open(url, '_blank');
  
         },     

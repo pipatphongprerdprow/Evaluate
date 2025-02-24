@@ -54,7 +54,8 @@
                             <p><strong>ผู้ปฏิบัติงาน:</strong> {{ user.user.name.PREFIXFULLNAME }} {{ user.user.name.STAFFNAME }} {{ user.user.name.STAFFSURNAME }}</p>
                             <p><strong>สังกัด:</strong> {{ user.user.name.SCOPES?.staffdepartmentname }}</p>
                             <p><strong>ตำแหน่ง:</strong>{{ user.user.name.POSITIONNAME }}</p>
-                            <p><strong>ระดับตำแหน่ง:</strong>{{ user.user.name.POSTYPENAME }}</p>
+                            <!-- <p><strong>ระดับตำแหน่ง:</strong>{{ user.user.name.POSTYPENAME }}</p> -->
+                            <p><strong>ระดับตำแหน่ง:</strong>{{ user.user?.name.POSITIONNAME === 'ผู้บริหาร' ? 'ชำนาญการพิเศษ' : user.user?.name.POSTYPENAME }}</p> 
                             <!-- <p><strong>ประเภทบุคลากร:</strong></p> --> 
                             <p><strong>ชื่อผู้ประเมิน:</strong> <InputText type="text" placeholder="ชื่อผู้ประเมิน"  v-model="assessor" style="width: 300px;"/></p> 
                             <p><strong>ตำแหน่งผู้ประเมิน :</strong> <InputText type="text" placeholder="ตำแหน่งผู้ประเมิน" v-model="assessor_position" style="width: 265px;" /></p> 
@@ -148,7 +149,7 @@ export default {
             pos_id: '',
             postype_id: '',
             evalua: '',
-            groupid_Main: '01',  // รอพี่แจ้
+            groupid_Main: '01',  
             dataP01: {},
             user: {
                 user: {
@@ -209,7 +210,7 @@ export default {
     async mounted() {
         const { signIn, getSession, signOut } = await useAuth();
         const user = await getSession();
-        console.log(user);
+        //console.log(user);
         
         const { STAFFID, SCOPES } = user.user.name;
         const { staffdepartment, groupid, staffdepartmentname, groupname } = SCOPES; 
@@ -239,7 +240,7 @@ export default {
             };
         },
         showDataSet() {
-            axios.post('https://survey.msu.ac.th/evaluatebackend/api/showDateSet', {
+            axios.post(' http://127.0.0.1:8000/api/showDateSet', {
                 staff_id: this.staffid_Main,
                 fac_id: this.facid_Main,
                 group_id: this.groupid_Main 
@@ -278,7 +279,7 @@ export default {
                         assessor_position: this. assessor_position
                     }; 
 
-                    axios.post('https://survey.msu.ac.th/evaluatebackend/api/saveDatator', 
+                    axios.post(' http://127.0.0.1:8000/api/saveDatator', 
                         formData
                     ).then(response => { 
                         this.DialogScore = false; 
@@ -303,7 +304,7 @@ export default {
             } 
         },
         showdatator() { 
-            axios.post('https://survey.msu.ac.th/evaluatebackend/api/showdatator', {
+            axios.post(' http://127.0.0.1:8000/api/showdatator', {
                 p_year: this.product_date.d_date,
                 evalua: this.product_date.evalua,
                 p_staffid: this.staffid_Main
@@ -358,7 +359,7 @@ export default {
 
             const queryParams = new URLSearchParams(form).toString();
             // console.log(queryParams); 
-            const url = `https://survey.msu.ac.th/evaluatebackend/printReportCoverpage?${queryParams}`;
+            const url = ` http://127.0.0.1:8000/printReportCoverpage?${queryParams}`;
             window.location.href = url;
  
         },  
