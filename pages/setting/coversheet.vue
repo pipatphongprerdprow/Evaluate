@@ -132,7 +132,7 @@ export default {
     name: 'ContractDetails',
     data() {
         return { 
-            //พี่บอยแก้
+           
             p01x: '',
             xxx: '2',
             por02key: 0,
@@ -240,7 +240,7 @@ export default {
             };
         },
         showDataSet() {
-            axios.post(' http://127.0.0.1:8000/api/showDateSet', {
+            axios.post(' https://survey.msu.ac.th/evaluatebackend/api/showDateSet', {
                 staff_id: this.staffid_Main,
                 fac_id: this.facid_Main,
                 group_id: this.groupid_Main 
@@ -279,7 +279,7 @@ export default {
                         assessor_position: this. assessor_position
                     }; 
 
-                    axios.post(' http://127.0.0.1:8000/api/saveDatator', 
+                    axios.post(' https://survey.msu.ac.th/evaluatebackend/api/saveDatator', 
                         formData
                     ).then(response => { 
                         this.DialogScore = false; 
@@ -304,7 +304,7 @@ export default {
             } 
         },
         showdatator() { 
-            axios.post(' http://127.0.0.1:8000/api/showdatator', {
+            axios.post(' https://survey.msu.ac.th/evaluatebackend/api/showdatator', {
                 p_year: this.product_date.d_date,
                 evalua: this.product_date.evalua,
                 p_staffid: this.staffid_Main
@@ -359,7 +359,7 @@ export default {
 
             const queryParams = new URLSearchParams(form).toString();
             // console.log(queryParams); 
-            const url = ` http://127.0.0.1:8000/printReportCoverpage?${queryParams}`;
+            const url = ` https://survey.msu.ac.th/evaluatebackend/printReportCoverpage?${queryParams}`;
             window.location.href = url;
  
         },  
@@ -387,9 +387,7 @@ export default {
     display: flex;
     justify-content: center;
 }
-.contract-image {
-    /* additional styling for the image if needed */
-}
+ 
 .explanation {
     margin-top: 20px; /* ปรับระยะห่างจากด้านบน */
     padding-left: 30px; /* ปรับการเยื้องเข้าด้านใน */

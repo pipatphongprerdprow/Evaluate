@@ -122,7 +122,7 @@
                                                             <!-- {{ subP01 }} -->
                                                             <td style="text-align: left;"> 
                                                                 <p v-for="(subIitemDoc, inDoc) in subP01.subITemP03doc" :key="inDoc" style="padding-left: 8px;margin-bottom: 5px;"> 
-                                                                    <a v-if="subIitemDoc.doc_file!=null" :href="'http://127.0.0.1:8000/storage/uploadsP03/'+subIitemDoc.doc_file" target="_blank"><b>ระดับ</b> <b>{{subIitemDoc.doc_no }}</b> {{ subIitemDoc.doc_name }}</a> 
+                                                                    <a v-if="subIitemDoc.doc_file!=null" :href="'https://survey.msu.ac.th/evaluatebackend/storage/uploadsP03/'+subIitemDoc.doc_file" target="_blank"><b>ระดับ</b> <b>{{subIitemDoc.doc_no }}</b> {{ subIitemDoc.doc_name }}</a> 
                                                                     <a v-if="subIitemDoc.doc_link!=null" :href="subIitemDoc.doc_link" target="_blank"><b>ระดับ</b> <b>{{ subIitemDoc.p03ind_no }}</b> {{ subIitemDoc.doc_name }}</a> 
                                                                 </p>
                                                                 <p v-if="subP01.subITemP03doc.length == 0" style="padding-left: 8px;margin-bottom: 5px;">
@@ -343,7 +343,7 @@
                                                             </td> 
                                                             <td style="text-align: left;"> 
                                                                 <p v-for="(subIitemDoc, inDoc) in subP01.subITemP03doc" :key="inDoc" style="padding-left: 8px;margin-bottom: 5px;"> 
-                                                                    <a v-if="subIitemDoc.doc_file!=null" :href="'http://127.0.0.1:8000/storage/uploadsP03/'+subIitemDoc.doc_file" target="_blank"><b>ระดับ</b> <b>{{subIitemDoc.doc_no }}</b> {{ subIitemDoc.doc_name }}</a> 
+                                                                    <a v-if="subIitemDoc.doc_file!=null" :href="'https://survey.msu.ac.th/evaluatebackend/storage/uploadsP03/'+subIitemDoc.doc_file" target="_blank"><b>ระดับ</b> <b>{{subIitemDoc.doc_no }}</b> {{ subIitemDoc.doc_name }}</a> 
                                                                     <a v-if="subIitemDoc.doc_link!=null" :href="subIitemDoc.doc_link" target="_blank"><b>ระดับ</b> <b>{{ subIitemDoc.p03ind_no }}</b> {{ subIitemDoc.doc_name }}</a> 
                                                                 </p>
                                                                 <p v-if="subP01.subITemP03doc.length == 0" style="padding-left: 8px;margin-bottom: 5px;">
@@ -749,7 +749,7 @@
                                                             <th>วิธีการพัฒนา</th>
                                                             <th>ช่วงเวลาที่ต้องการพัฒนา</th> 
                                                         </tr>
-                                                    </thead>
+                                                    </thead> 
                                                     <tbody>
                                                         <tr v-for="(Tab3T4, idx) in products_Tab3T4" :key="idx"  >
                                                             <td style="text-align: left;">{{ Tab3T4.p04_re1 }}</td>
@@ -758,10 +758,51 @@
                                                         </tr> 
                                                     </tbody>
                                                 </table> 
+
+
+                                                <h5 class="mb-4"><i class="" style="font-size: x-large;"></i> ความคิดเห็นของผู้ประเมิน (ผู้บริหาร)</h5> 
+                                                    <div class="card mb-0"> 
+                                                        <div class="p-fluid formgrid grid">
+                                                            <div class="field col-12 md:col-12"> 
+                                                                <label for="list_no_p03">ความรู้/ทักษะ/สมรรถนะ ที่ต้องพัฒนา<em style="color: red;"></em></label>
+                                                                <InputGroup style="text-align: center;">
+                                                                    <Textarea v-model="px04_re1" rows="4" placeholder="ความรู้/ทักษะ/สมรรถนะ ที่ต้องพัฒนา" />
+                                                                    <Textarea v-model="px04_re2" rows="4" placeholder="วิธีการพัฒนา" />
+                                                                    <Textarea v-model="px04_re3" rows="4" placeholder="ช่วงเวลาที่ต้องพัฒนา" /> 
+                                                                    <Button label="เพิ่ม" severity="warning" @click="AddDatap04X" />
+                                                                </InputGroup>
+                                                            </div>
+                                                        </div>
+                                                        <DataTable :value="products_Tab3" :rows="10" :paginator="true" responsiveLayout="scroll" dataKey="id">
+                                                            <Column field="px04_re1" header="ความรู้/ทักษะ/สมรรถนะ ที่ต้องพัฒนา" style="width: 35%">
+                                                                <template #body="slotProps">
+                                                                    {{ slotProps.data.px04_re1 }}
+                                                                </template>
+                                                            </Column>
+                                                            <Column field="px04_re2" header="วิธีการพัฒนา" style="width: 35%">
+                                                                <template #body="slotProps">
+                                                                    {{ slotProps.data.px04_re2 }}
+                                                                </template>
+                                                            </Column> 
+                                                            <Column field="px04_re3" header="ช่วงเวลาที่ต้องพัฒนา" style="text-align: center; width: 30%">
+                                                                <template #body="slotProps">
+                                                                    {{ slotProps.data.px04_re3 }}
+                                                                </template>
+                                                            </Column>
+                                                            <Column style="text-align: center; width: 10%">
+                                                                <template #body="slotProps">
+                                                                    <Button severity="danger" icon="pi pi-trash" class="p-button-text" outlined rounded @click="DeleteRegislickPX(slotProps.data.id)" />
+                                                                </template>
+                                                            </Column>
+                                                        </DataTable>  
+                                                    </div>
+
+
+
                                                     <h5 class="mb-4"><i class="" style="font-size: x-large;"></i> ส่วนที่ 4 การรับทราบผลการประเมิน</h5>
                                                     <table class="styled-table">
                                                     <tbody>
-                                                        <tr>
+                                                        <tr> 
                                                         <td>
                                                             <b>ผู้รับการประเมิน</b><br>
                                                             <label for="receiver-acknowledgment">[ &nbsp;&nbsp; ] ได้รับทราบผลการประเมินและแผนพัฒนาการปฏิบัติราชการ รายบุคคลแล้ว</label><br>
@@ -949,6 +990,14 @@ export default {
             p04_re3: null,
             products_Tab3: [],
             chkP04: 0,
+            //tap px
+            px04_re1: null,
+            px04_re2: null,
+            px04_re3: null,
+            products_Tab3: [],
+            
+
+
             //Tab 4
             products_Tab3T4: [],
             //total weight
@@ -1002,7 +1051,7 @@ export default {
         },
         showDataSet() {
             axios
-                .post('http://127.0.0.1:8000/api/showDateSet', {
+                .post('https://survey.msu.ac.th/evaluatebackend/api/showDateSet', {
                     staff_id: this.staffid_Main,
                     fac_id: this.facid_Main,
                     group_id: this.groupid_Main
@@ -1029,7 +1078,7 @@ export default {
         },
         async showDataEvalu() {
             try { 
-                const res = await axios.get('http://127.0.0.1:8000/api/showDataEvalu', {  
+                const res = await axios.get('https://survey.msu.ac.th/evaluatebackend/api/showDataEvalu', {  
                     params: {
                         staff_id: this.staffid_Main,
                         fac_id: this.facid_Main,
@@ -1050,7 +1099,7 @@ export default {
         async cvb(item) {
             // console.log(this.tracking_date.evalua);
             try {
-                const response = await axios.post('http://127.0.0.1:8000/api/showdatator', {
+                const response = await axios.post('https://survey.msu.ac.th/evaluatebackend/api/showdatator', {
                     p_year: this.tracking_date.d_date,
                     evalua: this.tracking_date.evalua,
                     p_staffid: item.staffid
@@ -1098,7 +1147,7 @@ export default {
                 this.suggestions = null;
 
                 this.showdataPo(staff_id, this.facid_Main, this.tracking_date.d_date, this.tracking_date.evalua);
-                await axios.post('http://127.0.0.1:8000/api/showDataP03New', {
+                await axios.post('https://survey.msu.ac.th/evaluatebackend/api/showDataP03New', {
                     staff_id: staff_id,
                     fac_id: this.tracking_date.fac_id,
                     year_id: this.tracking_date.d_date,
@@ -1132,7 +1181,7 @@ export default {
                 Swal.fire('แจ้งเตือน', 'กรุณาเลือกคะแนน !', 'error');
             } else {
                 await axios
-                    .post('http://127.0.0.1:8000/api/saveP03Po', {
+                    .post('https://survey.msu.ac.th/evaluatebackend/api/saveP03Po', {
                         staffid_po: this.staffid_po,
                         p01_id: subP01.p01_id,
                         p01_score: subP01.p01_score,
@@ -1201,7 +1250,7 @@ export default {
                 improvements: this.improvements,
                 suggestions: this.suggestions
             };
-            const res = await axios.post('http://127.0.0.1:8000/api/saveP03PoTab1', payload);
+            const res = await axios.post('https://survey.msu.ac.th/evaluatebackend/api/saveP03PoTab1', payload);
             console.log(res.data);
             Swal.fire({
                 position: 'top-end',
@@ -1225,6 +1274,7 @@ export default {
             if (event.index == 2) {
                 //console.log('แผนพัฒนาการปฏิบัติราชการรายบุคคล -',event.index);
                 this.products_Tab3 = [];
+                this.products_Tab3 = [];
                 this.chkp04(this.dataStaffid, this.facid_Main, this.tracking_date.d_date, this.tracking_date.evalua);
                 this.chkp04data(this.dataStaffid, this.facid_Main, this.tracking_date.d_date, this.tracking_date.evalua);
             }
@@ -1232,11 +1282,13 @@ export default {
                 //console.log('รายงาน ป.04 -',event.index);
                 this.tab2Data(this.dataStaffid);
                 await this.chkp04dataT4(this.dataStaffid, this.facid_Main, this.tracking_date.d_date, this.tracking_date.evalua);
+                await this.chkp03data(this.dataStaffid, this.facid_Main, this.tracking_date.d_date, this.tracking_date.evalua);
                 await this.showdatator();
+                
             }
         },
         async tab2Data(staff_id) {
-            await axios.post('http://127.0.0.1:8000/api/showDataP03New', {
+            await axios.post('https://survey.msu.ac.th/evaluatebackend/api/showDataP03New', {
                 staff_id: staff_id,
                 fac_id: this.tracking_date.fac_id,
                 year_id: this.tracking_date.d_date,
@@ -1261,7 +1313,7 @@ export default {
         showdataPoText(staff_id, fac_id, year_id, record) {
             // console.log(staff_id);
             
-            axios .post('http://127.0.0.1:8000/api/showDataPo', {
+            axios .post('https://survey.msu.ac.th/evaluatebackend/api/showDataPo', {
                     staff_id: staff_id,
                     fac_id: fac_id,
                     year_id: year_id,
@@ -1312,7 +1364,7 @@ export default {
         },
         chkp04(staff_id, fac_id, year_id, record) {
             axios
-                .post('http://127.0.0.1:8000/api/showDataPo', {
+                .post('https://survey.msu.ac.th/evaluatebackend/api/showDataPo', {
                     staff_id: staff_id,
                     fac_id: fac_id,
                     year_id: year_id,
@@ -1334,12 +1386,29 @@ export default {
             const newData = {
                 p04_re1: this.p04_re1,
                 p04_re2: this.p04_re2,
-                p04_re3: this.p04_re3
+                p04_re3: this.p04_re3, 
+                px04_re1: this.px04_re1,
+                px04_re2: this.px04_re2,
+                px04_re3: this.px04_re3,
             };
             this.products_Tab3.push(newData);
             this.p04_re1 = '';
             this.p04_re2 = '';
             this.p04_re3 = '';
+            this.px04_re1 = '';
+            this.px04_re2 = '';
+            this.px04_re3 = '';  
+        },
+        AddDatap04X() {
+            const newData = {
+                px04_re1: this.px04_re1,
+                px04_re2: this.px04_re2,
+                px04_re3: this.px04_re3
+            };
+            this.products_Tab3.push(newData);
+            this.px04_re1 = '';
+            this.px04_re2 = '';
+            this.px04_re3 = '';
         },
         DeleteRegislick(item) {
             // Add logic to remove the selected item
@@ -1347,12 +1416,12 @@ export default {
         },
         saveEvaTab3() {
             axios
-                .post('http://127.0.0.1:8000/api/saveEvaTab3', {
+                .post('https://survey.msu.ac.th/evaluatebackend/api/saveEvaTab3', {
                     staff_id: this.dataStaffid,
                     fac_id: this.facid_Main,
                     year_id: this.tracking_date.d_date,
                     record: this.tracking_date.evalua,
-                    products_Tab3: this.products_Tab3
+                    products_Tab3: this.products_Tab3, 
                 })
                 .then((res) => {
                     //console.log(res.data);
@@ -1370,7 +1439,7 @@ export default {
         },
         chkp04data(staff_id, fac_id, year_id, record) {
             axios
-                .post('http://127.0.0.1:8000/api/showData04Tab3', {
+                .post('https://survey.msu.ac.th/evaluatebackend/api/showData04Tab3', {
                     staff_id: staff_id,
                     fac_id: fac_id,
                     year_id: year_id,
@@ -1398,7 +1467,7 @@ export default {
         },
         chkp04dataT4(staff_id, fac_id, year_id, record) {
             axios
-                .post('http://127.0.0.1:8000/api/showData04Tab3', {
+                .post('https://survey.msu.ac.th/evaluatebackend/api/showData04Tab3', {
                     staff_id: staff_id,
                     fac_id: fac_id,
                     year_id: year_id,
@@ -1419,7 +1488,7 @@ export default {
             (this.assessorText = null),
                 (this.assessor_positionText = null),
                 axios
-                    .post('http://127.0.0.1:8000/api/showdatator', {
+                    .post('https://survey.msu.ac.th/evaluatebackend/api/showdatator', {
                         p_year: this.tracking_date.d_date,
                         evalua: this.tracking_date.evalua,
                         p_staffid: this.dataStaffid
@@ -1437,7 +1506,7 @@ export default {
             // console.log('showPostype: ',postypename, postypenameid);
             var postypetext = `ระดับ` + postypename;
             await axios
-                .post('http://127.0.0.1:8000/api/showdatapostypename', {
+                .post('https://survey.msu.ac.th/evaluatebackend/api/showdatapostypename', {
                     postypename: postypetext,
                     postypenameid: postypenameid
                 })
@@ -1466,7 +1535,7 @@ export default {
         getjobSpecificCompetencies(dataStaffid) {
             //console.log(this.staffid_Main,this.dataPor);
 
-            axios .post('http://127.0.0.1:8000/api/showdataposp02', { 
+            axios .post('https://survey.msu.ac.th/evaluatebackend/api/showdataposp02', { 
                     p_year: this.tracking_date.d_date,
                     evalua: this.tracking_date.evalua,
                     p_staffid: this.dataStaffid
@@ -1499,8 +1568,11 @@ export default {
             
             const levelMapping = {
                 'ระดับปฏิบัติการ': 1,
+                'ระดับปฏิบัติงาน': 1,
                 'ระดับชำนาญการ': 2,
+                'ระดับชำนาญงาน': 2,
                 'ระดับชำนาญการพิเศษ': 3,
+                'ระดับชำนาญงานพิเศษ': 3,
                 'อาจารย์': 3,
                 'ระดับเชี่ยวชาญ': 4,
                 'ระดับเชี่ยวชาญพิเศษ': 5
@@ -1539,7 +1611,7 @@ export default {
             this.showPostype(this.currentstaff[0].postypenameth,this.postypenameid);
   
             
-            axios.post('http://127.0.0.1:8000/api/showDataPo',{
+            axios.post('https://survey.msu.ac.th/evaluatebackend/api/showDataPo',{
                 staff_id: staff_id,
                 fac_id: facid_Main,
                 year_id: d_date,
@@ -1568,7 +1640,7 @@ export default {
         //29/10/67
         saveScore() {
             axios
-                .post('http://127.0.0.1:8000/api/saveDatator', {
+                .post('https://survey.msu.ac.th/evaluatebackend/api/saveDatator', {
                     score: this.totalScore
                 })
                 .then((response) => {
@@ -1634,7 +1706,7 @@ export default {
                 };
 
                 axios
-                    .post('http://127.0.0.1:8000/api/saveDatator', formData)
+                    .post('https://survey.msu.ac.th/evaluatebackend/api/saveDatator', formData)
                     .then((response) => {
                         this.DialogScore = false;
                         // console.log('showDataP03',res.data);
@@ -1731,6 +1803,121 @@ export default {
             this.totalScoreSumX1 = this.totalcorecompetenciesX1*1;
             this.totalScoreSumX0 = this.totalcorecompetenciesX0*0;
         },//*3 
+
+
+
+        /*============= ความรู้/ทักษะ/สมรรถนะ ที่ต้องการพัฒนาสำหรับผู้บริหาร =============*/ 
+        chkp03data(){ 
+                this.products_Tab3 = [];
+                axios.post('https://survey.msu.ac.th/evaluatebackend/api/showData04Tab3',{
+                    staff_id: this.staffid_Main,
+                    fac_id: this.facid_Main,
+                    year_id: this.tracking_date.d_date,
+                    record: this.tracking_date.evalua, 
+                }).then(res => {     
+                    // console.log('chkp03data',res.data);     
+                    if(res.data.length > 0){
+                        res.data.forEach(p04 => {
+                            const newData = {
+                                px04_re1: p04.px04_re1,
+                                px04_re2: p04.px04_re2,
+                                px04_re3: p04.px04_re3,
+                                id:p04.p02_id
+                            };
+                            this.products_Tab3.push(newData); 
+                        });  
+                    }
+                    this.px04_re1 = '';
+                    this.px04_re2 = '';
+                    this.px04_re3 = '';
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+            },  
+        AddDatap04X(){ 
+            axios.post('https://survey.msu.ac.th/evaluatebackend/api/saveEvaTab03xx',{
+                staff_id: this.staffid_Main,
+                fac_id: this.facid_Main,
+                year_id: this.tracking_date.d_date,
+                record: this.tracking_date.evalua,
+                px04_re1: this.px04_re1,
+                px04_re2: this.px04_re2,
+                px04_re3: this.px04_re3
+            }).then(res => {     
+                // console.log(res.data);    
+                const newData = {
+                    px04_re1: this.px04_re1,
+                    px04_re2: this.px04_re2,
+                    px04_re3: this.px04_re3,
+                    id: res.data
+                };
+                this.products_Tab3.push(newData); 
+                this.px04_re1 = '';
+                this.px04_re2 = '';
+                this.px04_re3 = '';
+
+                Swal.fire({
+                    position: "top-end",
+                    icon: "success",
+                    title: "บันทึก แผนพัฒนาการปฏิบัติราชการรายบุคคล เสร็จสิ้น",
+                    showConfirmButton: false,
+                    timer: 1000
+                });
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            }); 
+        },
+        DeleteRegislickPX(item) { 
+            // Add logic to remove the selected item  
+            axios.post('https://survey.msu.ac.th/evaluatebackend/api/delEvaTab03xx',{
+                id: item
+            }).then(res => {  
+                // console.log(res);
+                this.products_Tab3 = this.products_Tab3.filter(item => item.id !== res.data);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });    
+        },   
+        ///***********///
+
+
+
+        async saveAssess() {
+            try {
+                const response = await axios.post('https://survey.msu.ac.th/evaluatebackend/api/savedataAssess', { 
+                    p_staffid: this.staffid_Main,
+                    fac_id: this.facid_Main,
+                    p_year: this.tracking_date.d_date,
+                    evalua: this.tracking_date.evalua, 
+                    corecompetencies: this.coreCompetencies,
+                    jobspecificcompetencies: this.jobSpecificCompetencies,
+                    
+                }); 
+                // console.log( this.staffid_Main,this.facid_Main,this.dataPor.evalua, this.coreCompetencies,this.jobSpecificCompetencies, );
+                
+                // Assuming the response is successful
+                Swal.fire({
+                    position: 'top-end',
+                    icon: 'success',
+                    title: 'ข้ลมูลผลการประเมินถูกบันทึกเสร็จสิ้น',
+                    showConfirmButton: false,
+                    timer: 1000
+                });
+
+            } catch (error) {
+                console.error('Error saving data:', error);
+                Swal.fire({
+                    position: 'top-end',
+                    icon: 'error',
+                    title: 'เกิดข้อผิดพลาดในการบันทึกข้อมูล',
+                    showConfirmButton: false,
+                    timer: 1000
+                });
+            }
+        },  
     }, 
     filters: {
         removeC: function (value) {

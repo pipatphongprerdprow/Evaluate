@@ -261,7 +261,7 @@
       methods: { 
         // ดึงข้อมูลเข้าตาราง
         showDataPerson(year_id,fac_id,evalua){
-            axios.post('http://127.0.0.1:8000/api/showDataPerson',{  
+            axios.post('https://survey.msu.ac.th/evaluatebackend/api/showDataPerson',{  
             fac_id: fac_id,
             evalua: evalua,
             year_id: year_id
@@ -292,7 +292,7 @@
         selectDataH(year,fac){  
             //console.log('ดึงข้อมูลภาระงาน',year,fac);
             
-            axios.post('http://127.0.0.1:8000/api/selectDataPersonH',{}).then(res => {     
+            axios.post('https://survey.msu.ac.th/evaluatebackend/api/selectDataPersonH',{}).then(res => {     
                 // console.log('selectDataH',res.data); 
                 this.dropdownItemsH=res.data;  
             })
@@ -326,7 +326,7 @@
         },
         // บันทึกแบบจัดการ ป.1 
         async saveData() {  
-            await axios.post('http://127.0.0.1:8000/api/saveDataPerson', {
+            await axios.post('https://survey.msu.ac.th/evaluatebackend/api/saveDataPerson', {
                 staff_id: this.staffid_Main,
                 fac_id: this.facid_Main,
                 year_id: this.year_Main,  
@@ -360,7 +360,7 @@
             },
             // แก้ไขข้อมูล
             async editData(data){    
-            await axios.post('http://127.0.0.1:8000/api/edtDataPerson',{
+            await axios.post('https://survey.msu.ac.th/evaluatebackend/api/edtDataPerson',{
                 p_id: data.p_id
             }).then(res => { 
                     // console.log(res.data);   
@@ -381,7 +381,7 @@
             },
             // ดึงข้อมูลภาระงาน
             selectDataHEdt(year,fac,he){  
-                axios.post('http://127.0.0.1:8000/api/selectDataPersonH',{
+                axios.post('https://survey.msu.ac.th/evaluatebackend/api/selectDataPersonH',{
                     year: year,
                     fac: fac,
                 }).then(res => {     
@@ -407,7 +407,7 @@
                 confirmButtonText: "Yes, delete it!"
                 }).then((result) => {
                 if (result.isConfirmed) {
-                    axios.post('http://127.0.0.1:8000/api/delDataPerson',{
+                    axios.post('https://survey.msu.ac.th/evaluatebackend/api/delDataPerson',{
                         p_id: data.p_id
                     }).then(res => { 
                         // console.log(res);   

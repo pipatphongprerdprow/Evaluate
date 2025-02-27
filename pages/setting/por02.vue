@@ -4,8 +4,8 @@
     </div> 
     <div class="card">
         <h3 class="mb-4" style="text-align: left;"><i class="pi pi-folder-open" style="font-size: x-large;"></i> แบบ ป02</h3>
-        <h4>ข้อตกลงและแบบการประเมินผลสัมฤทธิ์ของงานของข้าราชการและพนักงาน สังกัดมหาวิทยาลัยมหาสารคาม (องค์ประกอบที่ 2)</h4><br>   
-          <!-- {{ jobSpecificCompetencies }} -->
+        <h4>ข้อตกลงและแบบการประเมินผลสัมฤทธิ์ของงานของข้าราชการและพนักงาน สังกัดมหาวิทยาลัยมหาสารคาม (องค์ประกอบที่ 2)</h4><br> 
+        <!-- {{ jobSpecificCompetencies }}   -->
         <div class="p-fluid formgrid grid">  
             <!-- ตาราง ก. สมรรถนะหลัก -->
             <div class="field col-12 md:col-4"> 
@@ -51,7 +51,7 @@
                     <tbody>
                         <tr v-for="(row2, index) in jobSpecificCompetencies" :key="index"> 
                             <td style="text-align: left;">ข. {{ index+1 }} {{ row2.WORK_NAME }}</td> 
-                            <td>{{ row2.COMPLEVEL  }}</td> 
+                            <td>{{ row2.COMPLEVEL }}</td>  
 
                             <td>  
                                 <b v-if="row2.SCOREPERSON == '' || row2.SCOREPERSON == null" style="color: red;">0</b> 
@@ -92,8 +92,7 @@
                                 <b v-if="row3.selfAssessment3 == '' " style="color: red;">-</b> 
                                 <b v-if="row3.selfAssessment3 != 0 " >{{ row3.selfAssessment3 }}</b> 
                             </td>
-                        </tr>
- 
+                        </tr> 
                     </tbody>
                 </table>
             </div>
@@ -135,7 +134,7 @@ export default {
                 { id: 5, activity: 'ก. 5 การทำงานเป็นทีม', indicator: '', data_table1: '',selfAssessment:'' }
             ],
             //ตาราง ข. สมรรถนะเฉพาะตามลักษณะงานที่ปฏิบัติ
-            jobSpecificCompetencies: [],
+            jobSpecificCompetencies: [], 
             // jobSpecificCompetencies: [
             //     { id: 6, activity: 'ข. 1 การคิดวิเคราะห์12', indicator: '0', data_table2: '' },
             //     { id: 7, activity: 'ข. 2 การดำเนินการเชิงรุก111', indicator: '0', data_table2: '' },
@@ -201,7 +200,7 @@ export default {
         getjobSpecificCompetencies(){
             //console.log(this.staffid_Main,this.dataPor);
             
-            axios.post('http://127.0.0.1:8000/api/showdataposp02', { 
+            axios.post('https://survey.msu.ac.th/evaluatebackend/api/showdataposp02', { 
                p_year: this.dataPor.d_date,
                 evalua: this.dataPor.evalua,
                 p_staffid: this.staffid_Main
@@ -251,48 +250,57 @@ export default {
             let postypenameid = this.positionname === 'ผู้บริหาร' ? 90 : this.postypenameid;
             let positionname = this.positionname === 'ผู้บริหาร' ? `ชำนาญการพิเศษ` : `ระดับ${this.postypename}`;
 
-            console.log('postypetext:', postypetext);
-            console.log('postypenameid:', postypenameid);
+            // console.log('postypetext:', postypetext);
+            // console.log('postypenameid:', postypenameid);
             
              
             const levelMapping = {
                 'ระดับปฏิบัติการ': 1,
+                'ระดับปฏิบัติงาน': 1, 
                 'ระดับชำนาญการ': 2,
+                'ระดับชำนาญงาน': 2,
                 'ระดับชำนาญการพิเศษ': 3,
+                'ระดับชำนาญงานพิเศษ': 3,
                 'อาจารย์': 3,
                 'ระดับเชี่ยวชาญ': 4,
                 'ระดับเชี่ยวชาญพิเศษ': 5
             };
 
             // ตรวจสอบค่าของ postypetext ใน levelMapping
-            let xr = levelMapping[postypetext] || 0;
-            console.log('xr:', xr);
+            let personnel = levelMapping[postypetext] || 0;
+            // console.log('personnel:', personnel);
 
             // ตั้งค่า coreCompetencies ตามระดับที่ได้จาก levelMapping
             this.coreCompetencies = [
-                { id: 1, activity: 'ก. 1 การมุ่งผลสัมฤทธิ์', indicator: xr, data_table1: '', selfAssessment: '' },
-                { id: 2, activity: 'ก. 2 การบริการที่ดี', indicator: xr, data_table1: '', selfAssessment: '' },
-                { id: 3, activity: 'ก. 3 การสั่งสมความเชี่ยวชาญในงานอาชีพ', indicator: xr, data_table1: '', selfAssessment: '' },
-                { id: 4, activity: 'ก. 4 การยึดมั่นในความถูกต้องชอบธรรมและจริยธรรม', indicator: xr, data_table1: '', selfAssessment: '' },
-                { id: 5, activity: 'ก. 5 การทำงานเป็นทีม', indicator: xr, data_table1: '', selfAssessment: '' }
+                { id: 1, activity: 'ก. 1 การมุ่งผลสัมฤทธิ์', indicator: personnel, data_table1: '', selfAssessment: '' },
+                { id: 2, activity: 'ก. 2 การบริการที่ดี', indicator: personnel, data_table1: '', selfAssessment: '' },
+                { id: 3, activity: 'ก. 3 การสั่งสมความเชี่ยวชาญในงานอาชีพ', indicator: personnel, data_table1: '', selfAssessment: '' },
+                { id: 4, activity: 'ก. 4 การยึดมั่นในความถูกต้องชอบธรรมและจริยธรรม', indicator: personnel, data_table1: '', selfAssessment: '' },
+                { id: 5, activity: 'ก. 5 การทำงานเป็นทีม', indicator: personnel, data_table1: '', selfAssessment: '' }
             ];
-
+             
+            this.jobSpecificCompetencies = []; 
+            // jobSpecificCompetencies: [
+            //     { id: 6, activity: 'ข. 1 การคิดวิเคราะห์12', indicator: '0', data_table2: '' },
+            //     { id: 7, activity: 'ข. 2 การดำเนินการเชิงรุก111', indicator: '0', data_table2: '' },
+            //     { id: 8, activity: 'ข. 3 ความผูกพันที่มีต่อส่วนราชการ111', indicator: '0', data_table2: '' },
+            //     { id: 9, activity: 'ข. 4 การมองภาพองค์รวม222', indicator: '0', data_table2: '' },
+            //     { id: 10, activity: 'ข. 5 การสืบเสาะหาข้อมูล2222', indicator: '0', data_table2: '' },
+            //     { id: 11, activity: 'ข. 6 การตรวจสอบความถูกต้องตามกระบวนงาน122222', indicator: '0', data_table2: '' }
+            // ], 
             // ปรับ Mapping ให้ใช้ this.positionname แทน postypetext
             const Mapping = {
                 'ผู้บริหาร': 1
-            };
-
-            // ใช้ this.positionname กับ Mapping
-            let xk = Mapping[this.positionname] || 0;
-            console.log('xk:', xk);
-
+            };  
+            let executive = Mapping[this.positionname] || 0;
+            // console.log('executive:', executive); 
             // ตั้งค่า otherCompetencies
             this.otherCompetencies = [
-                { id: 12, activity: 'ค. 1 สภาวะผู้นำ', indicator3: xk, data_table3: '', selfAssessment3: '' },
-                { id: 13, activity: 'ค. 2 วิสัยทัศน์', indicator3: xk, data_table3: '', selfAssessment3: '' },
-                { id: 14, activity: 'ค. 3 การวางกลยุทธ์ภาครัฐ', indicator3: xk, data_table3: '', selfAssessment3: '' },
-                { id: 15, activity: 'ค. 4 ศักยภาพเพื่อนำการปรับเปลี่ยน', indicator3: xk, data_table3: '', selfAssessment3: '' },
-                { id: 16, activity: 'ค. 5 การสอนงานและการมอบหมายงาน', indicator3: xk, data_table3: '', selfAssessment3: '' }
+                { id: 12, activity: 'ค. 1 สภาวะผู้นำ', indicator3: executive, data_table3: '', selfAssessment3: '' },
+                { id: 13, activity: 'ค. 2 วิสัยทัศน์', indicator3: executive, data_table3: '', selfAssessment3: '' },
+                { id: 14, activity: 'ค. 3 การวางกลยุทธ์ภาครัฐ', indicator3: executive, data_table3: '', selfAssessment3: '' },
+                { id: 15, activity: 'ค. 4 ศักยภาพเพื่อนำการปรับเปลี่ยน', indicator3: executive, data_table3: '', selfAssessment3: '' },
+                { id: 16, activity: 'ค. 5 การสอนงานและการมอบหมายงาน', indicator3: executive, data_table3: '', selfAssessment3: '' }
             ];
  
             // ตั้งค่า jobSpecificCompetencies กลับไปเป็นค่าเริ่มต้น 
@@ -300,7 +308,7 @@ export default {
             this.showPostype(positionname,postypenameid);
   
             
-            axios.post('http://127.0.0.1:8000/api/showDataPo',{
+            axios.post('https://survey.msu.ac.th/evaluatebackend/api/showDataPo',{
                 staff_id: this.staffid_Main,
                 fac_id: this.facid_Main,
                 year_id: this.dataPor.d_date,
@@ -343,14 +351,15 @@ export default {
             });
         },
         showPostype(postypename,postypenameid){
-            //console.log('postypename: ',postypename); 
-            var postypetext = `ระดับ`+postypename;
-            axios.post('http://127.0.0.1:8000/api/showdatapostypename', {
+            // console.log('postypename: ',postypename);  
+            // console.log('postypenameid: ',postypenameid);  
+            var postypetext =postypename;
+            axios.post('https://survey.msu.ac.th/evaluatebackend/api/showdatapostypename', {
                 postypename: postypetext,
                 postypenameid: postypenameid
             })
             .then(res => {
-                // console.log('Response',res.data);  
+                //console.log('Response',res.data);  
                 if (res.data.length > 0) { 
                     this.jobSpecificCompetencies = res.data;
                 }
@@ -372,7 +381,7 @@ export default {
         },
         showdatator() {  
             //console.log(this.dataPor.d_date,scoreA04); 
-            axios.post('http://127.0.0.1:8000/api/showdatator', {
+            axios.post('https://survey.msu.ac.th/evaluatebackend/api/showdatator', {
                 p_year: this.dataPor.d_date,
                 evalua: this.dataPor.evalua,
                 p_staffid: this.staffid_Main
@@ -388,7 +397,7 @@ export default {
             });
         },
         showjobSpecificCompetencies (){
-            axios.post('http://127.0.0.1:8000/api/showdataposp02', { 
+            axios.post('https://survey.msu.ac.th/evaluatebackend/api/showdataposp02', { 
                p_year: this.dataPor.d_date,
                 evalua: this.dataPor.evalua,
                 p_staffid: this.staffid_Main
@@ -424,7 +433,7 @@ export default {
             } 
             const queryParams = new URLSearchParams(form).toString();
             // console.log(queryParams); 
-            const url = `http://127.0.0.1:8000/report_p02?${queryParams}`;
+            const url = `https://survey.msu.ac.th/evaluatebackend/report_p02?${queryParams}`;
             window.open(url, '_blank');
  
         },     

@@ -44,7 +44,7 @@ const group_chkUser = ref(null);
 
 const fetchUserGroup = async () => {
     try {
-        const res = await axios.post(' http://127.0.0.1:8000/api/testUser', { staff, faculty }); 
+        const res = await axios.post(' https://survey.msu.ac.th/evaluatebackend/api/testUser', { staff, faculty }); 
         group_chkUser.value = res.data?.[0]?.status_user || res.data?.status_user || null;
     } catch (error) {
         console.error('Error:', error);
@@ -110,21 +110,21 @@ export default {
                     id: 'M1',
                     label: 'คู่มือใช้งานระบบ (User)',
                     icon: 'pi pi-id-card',
-                    href: ' http://127.0.0.1:8000/storage/manuals/manual_user.pdf',
+                    href: ' https://survey.msu.ac.th/evaluatebackend/storage/manuals/manual_user.pdf',
                     target: '_blank',
                 },
                 {
                     id: 'M1',
                     label: 'คู่มือใช้งานระบบ (เจ้าหน้าที่บุคคล)',
                     icon: 'pi pi-user',
-                    href: ' http://127.0.0.1:8000/storage/manuals/manual_person.pdf',
+                    href: ' https://survey.msu.ac.th/evaluatebackend/storage/manuals/manual_person.pdf',
                     target: '_blank',
                 },
                 {
                     id: 'M1',
                     label: 'คู่มือใช้งานระบบ (ผู้บริหาร)',
                     icon: 'pi pi-users',
-                    href: ' http://127.0.0.1:8000/storage/manuals/manual_executive.pdf',
+                    href: ' https://survey.msu.ac.th/evaluatebackend/storage/manuals/manual_executive.pdf',
                     target: '_blank',
                 },
             ],
