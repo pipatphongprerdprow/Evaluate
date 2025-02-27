@@ -248,7 +248,7 @@ export default {
             //console.log(this.indicator);
             let postypetext = this.positionname === 'ผู้บริหาร' ? `ระดับชำนาญการพิเศษ` : `ระดับ${this.postypename}`;
             let postypenameid = this.positionname === 'ผู้บริหาร' ? 90 : this.postypenameid;
-            let positionname = this.positionname === 'ผู้บริหาร' ? `ชำนาญการพิเศษ` : `ระดับ${this.postypename}`;
+            let positionname = this.positionname === 'ผู้บริหาร' ? `ระดับชำนาญการพิเศษ` : `ระดับ${this.postypename}`;
 
             // console.log('postypetext:', postypetext);
             // console.log('postypenameid:', postypenameid);
@@ -351,7 +351,7 @@ export default {
             });
         },
         showPostype(postypename,postypenameid){
-            // console.log('postypename: ',postypename);  
+            //console.log('postypename: ',postypename);  
             // console.log('postypenameid: ',postypenameid);  
             var postypetext =postypename;
             axios.post('https://survey.msu.ac.th/evaluatebackend/api/showdatapostypename', {
@@ -359,7 +359,7 @@ export default {
                 postypenameid: postypenameid
             })
             .then(res => {
-                //console.log('Response',res.data);  
+               // console.log('Response',res.data);  
                 if (res.data.length > 0) { 
                     this.jobSpecificCompetencies = res.data;
                 }

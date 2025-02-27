@@ -193,22 +193,32 @@
                         <table id="ratingTable">
                             <thead>
                                 <tr>
-                                    <th style="width: 40%;">ค. สมรรถนะทางการบริหาร (สำหรับตำแหน่งประเภทบริหารตามที่ ก.บ.ม. กำหนด)</th>
+                                    <th style="width: 60%;">ค. สมรรถนะทางการบริหาร (สำหรับตำแหน่งประเภทบริหารตามที่ ก.บ.ม. กำหนด)</th>
                                     <th style="width: 20%;">(5)ระดับ<br>สมรรถนะ<br>ที่คาดหวัง</th>
-                                    <th style="width: 20%;">ระดับ<br>สมรรถนะ<br>ประเมินตนเอง</th>
-                                    <th style="width: 20%;">(6)ระดับ<br>สมรรถนะ<br>ที่แสดงออก</th>
+                                    <th style="width: 20%;">ระดับ<br>สมรรถนะ<br>ประเมิน<br>ตนเอง</th>
+                                    <th style="width: 20%;">(6)ระดับ<br>สมรรถนะ<br>ที่แสดง<br>ออก</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr v-for="(row3, index) in otherCompetencies" :key="index">
                                     <td style="text-align: left;">{{ row3.activity }}</td> 
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                </tr>
+                                    <td>
+                                        <!-- {{ row3.indicator3 }} -->
+                                        <b v-if="row3.indicator3 == '' ||  row3.indicator3 == null" style="color: red;">-</b>
+                                        <span v-if="row3.indicator3 != 0">{{ row3.indicator3 }}</span>  
+                                    </td>
+                                    <td>  
+                                        <b v-if="row3.data_table3 == '' ||  row3.data_table3 == null" style="color: red;">-</b> 
+                                        <b v-if="row3.data_table3 != 0 " style="color: blue" >{{ row3.data_table3 }}</b> 
+                                    </td>
+                                    <td>  
+                                        <b v-if="row3.selfAssessment3 == '' " style="color: red;">-</b> 
+                                        <b v-if="row3.selfAssessment3 != 0 " >{{ row3.selfAssessment3 }}</b> 
+                                    </td>
+                                </tr> 
                             </tbody>
-                        </table> 
-                    </div> 
+                        </table>
+                    </div>
                 </div>
             </div> 
             <div class="ml-4 mr-4" style="text-align: center;">
@@ -1010,7 +1020,7 @@ import InputText from 'primevue/inputtext';
                 
                 let postypetext = this.positionname === 'ผู้บริหาร' ? `ระดับชำนาญการพิเศษ` : `ระดับ${this.postypename}`;
                 let postypenameid = this.positionname === 'ผู้บริหาร' ? 90 : this.postypenameid;
-                let positionname = this.positionname === 'ผู้บริหาร' ? `ชำนาญการพิเศษ` : `ระดับ${this.postypename}`;
+                let positionname = this.positionname === 'ผู้บริหาร' ? `ระดับชำนาญการพิเศษ` : `ระดับ${this.postypename}`;
                 // console.log('postypetext: ',postypetext);
                 // console.log('postypenameid: ',postypenameid);
                 
@@ -1035,6 +1045,29 @@ import InputText from 'primevue/inputtext';
                     { id: 4, activity: 'ก. 4 การยึดมั่นในความถูกต้องชอบธรรมและจริยธรรม', indicator: xr, data_table1: '',selfAssessment:''  },
                     { id: 5, activity: 'ก. 5 การทำงานเป็นทีม', indicator: xr, data_table1: '',selfAssessment:''  }
                 ];   
+                this.jobSpecificCompetencies = []; 
+                    // jobSpecificCompetencies: [
+                    //     { id: 6, activity: 'ข. 1 การคิดวิเคราะห์12', indicator: '0', data_table2: '' },
+                    //     { id: 7, activity: 'ข. 2 การดำเนินการเชิงรุก111', indicator: '0', data_table2: '' },
+                    //     { id: 8, activity: 'ข. 3 ความผูกพันที่มีต่อส่วนราชการ111', indicator: '0', data_table2: '' },
+                    //     { id: 9, activity: 'ข. 4 การมองภาพองค์รวม222', indicator: '0', data_table2: '' },
+                    //     { id: 10, activity: 'ข. 5 การสืบเสาะหาข้อมูล2222', indicator: '0', data_table2: '' },
+                    //     { id: 11, activity: 'ข. 6 การตรวจสอบความถูกต้องตามกระบวนงาน122222', indicator: '0', data_table2: '' }
+                    // ], 
+                    // ปรับ Mapping ให้ใช้ this.positionname แทน postypetext
+                    const Mapping = {
+                        'ผู้บริหาร': 1
+                    };  
+                    let executive = Mapping[this.positionname] || 0;
+                    // console.log('executive:', executive); 
+                    // ตั้งค่า otherCompetencies
+                    this.otherCompetencies = [
+                        { id: 12, activity: 'ค. 1 สภาวะผู้นำ', indicator3: executive, data_table3: '', selfAssessment3: '' },
+                        { id: 13, activity: 'ค. 2 วิสัยทัศน์', indicator3: executive, data_table3: '', selfAssessment3: '' },
+                        { id: 14, activity: 'ค. 3 การวางกลยุทธ์ภาครัฐ', indicator3: executive, data_table3: '', selfAssessment3: '' },
+                        { id: 15, activity: 'ค. 4 ศักยภาพเพื่อนำการปรับเปลี่ยน', indicator3: executive, data_table3: '', selfAssessment3: '' },
+                        { id: 16, activity: 'ค. 5 การสอนงานและการมอบหมายงาน', indicator3: executive, data_table3: '', selfAssessment3: '' }
+                    ];
                 //console.log(this.coreCompetencies);
                 
                 
