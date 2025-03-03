@@ -253,12 +253,18 @@
                             </div> 
                             <div class="field col-12 md:col-4">
                                 <label for="text_weight">น้ำหนัก(ความสำคัญ / ความยากง่ายของงาน)</label>
-                                <InputGroup>
+                                <!-- <InputGroup>
                                     <InputGroupAddon>
                                         <i class="pi pi-tags"></i>
                                     </InputGroupAddon>
                                     <InputText v-model="text_weight" type="number" placeholder="น้ำหนัก(ความสำคัญ / ความยากง่ายของงาน)" autocomplete="off" />  
-                                </InputGroup>  
+                                </InputGroup>   -->
+                                <InputGroup>
+                                    <InputGroupAddon>
+                                        <i class="pi pi-tags"></i>
+                                    </InputGroupAddon>
+                                    <InputText v-model.number="text_weight" type="number" placeholder="น้ำหนัก(ความสำคัญ / ความยากง่ายของงาน)" autocomplete="off" step="0.01" />
+                                </InputGroup>
                             </div>  
                         </div> 
                         <hr>
@@ -284,7 +290,8 @@
                                 </template>
                             </Column>  
                             <Column field="options" header="ตัวเลือก" style="text-align: center; width: 10%">
-                                <template #body="Item">   
+                                <template #body="Item"> 
+                                    <Button style="text-align: center;" severity="primary" icon="pi pi-pencil" class="p-button-text" outlined rounded @click="EditRegislick(Item.data)"></Button> &nbsp;
                                     <Button style="text-align: center;" severity="danger" icon="pi pi-trash" class="p-button-text" outlined rounded @click="DeleteRegislick(Item.data.ind_no)"></Button>
                                 </template>
                             </Column> 
@@ -297,6 +304,34 @@
                 <Button label="ยกเลิก" icon="pi pi-times" class="mb-2 mr-2" severity="danger" @click="cancelDialog" />
             </template>
         </Dialog>
+
+        <!-- แก้ไขข้อมูลเกณฑ์การประเมิน -->
+        <Dialog header="แก้ไขข้อมูลเกณฑ์การประเมิน" maximizable v-model:visible="DialogEditList" :breakpoints="{ '960px': '75vw' }" :style="{ width: '70vw' }" :modal="true" position="top">
+            <form>
+                <div class="p-fluid formgrid"> 
+                    <form> 
+                        <div class="p-fluid formgrid grid">
+                            <div class="field col-12 md:col-12"> 
+                                <label for="text_search_no">เกณฑ์การประเมิน</label>
+                            </div>
+                            <div class="field col-9 md:col-3"> 
+                                <label for="text_search_no">ระดับ</label>
+                                <InputText v-model="text_search_noEdit" type="number" placeholder="ระดับ" autocomplete="off" disabled />  
+                            </div>
+                            <div class="field col-3 md:col-9"> 
+                                <label for="text_search_no">รายละเอียดเกณฑ์การประเมิน</label>
+                                <InputText v-model="text_searchEdit" type="text" placeholder="รายละเอียดเกณฑ์การประเมิน" autocomplete="off"/>  
+                            </div>    
+                        </div> 
+                    </form>
+                </div>
+            </form>
+            <template #footer>
+                <Button label="บันทึก" icon="pi pi-check" class="mb-2 mr-2" @click="saveDataxEdit" />
+                <Button label="ยกเลิก" icon="pi pi-times" class="mb-2 mr-2" severity="danger" @click="cancelDialogEdit" />
+            </template>
+        </Dialog>
+
     </div>  
 </template> 
 <script> 
@@ -342,8 +377,7 @@ export default {
                             
                         }
                     }
-                ],
-                
+                ],  
              // Dialog
             text_edt: null,
             dropdownItemH: null ,
@@ -366,6 +400,10 @@ export default {
             totalWeight: {},
             totalCalculatedScore: {},
             WeightedScoreSum :{},
+            // 
+            DialogEditList: false,
+            text_search_noEdit: null,
+            text_searchEdit: null,
         } 
     }, 
     async mounted(){ 
@@ -395,13 +433,16 @@ export default {
     },
     computed: {
         totalWeight() {
-            // ใช้ reduce เพื่อคำนวณค่ารวมของ p_weight
-            return this.products_personX.reduce((total, h) => {
-                return total + h.subP01sX.reduce((subTotal, subP01) => {
-                    return subTotal + subP01.p01_weight; // เพิ่ม p01_weight ของแต่ละ subP01
-                }, 0);
-            }, 0);
-        },
+    // ใช้ reduce เพื่อคำนวณค่ารวมของ p_weight
+    const total = this.products_personX.reduce((total, h) => {
+        return total + h.subP01sX.reduce((subTotal, subP01) => {
+            return subTotal + parseFloat(subP01.p01_weight); // แปลง p01_weight เป็น float ก่อนคำนวณ
+        }, 0);
+    }, 0);
+
+    // ปัดเศษผลลัพธ์เป็นทศนิยม 2 ตำแหน่งก่อนคืนค่าผลลัพธ์
+    return total.toFixed(2); // ปัดเศษให้เป็น 2 ตำแหน่ง
+},
         totalCalculatedScore() {
             // คำนวณค่ารวมของคะแนนที่คำนวณ
             return this.products_personX.reduce((total, h) => {
@@ -630,6 +671,48 @@ export default {
         DeleteRegislick(data){
             this.products_list = this.products_list.filter(product => product.ind_no !== data); 
         },
+
+        
+
+        // แก้ไขตัวชี้วัด / เกณฑ์การประเมิน
+        EditRegislick(data){
+            //console.log(data);
+            this.text_search_noEdit = null;
+            this.text_searchEdit = null;
+            if(data){
+                this.DialogEditList = true; 
+                this.text_search_noEdit = data.ind_no;
+                this.text_searchEdit = data.ind_Items;
+            } 
+        },
+        cancelDialogEdit(){ 
+            this.DialogEditList = false;  
+        }, 
+        saveDataxEdit(){ 
+            // console.log({
+            //     text_search_noEdit: this.text_search_noEdit,
+            //     text_searchEdit: this.text_searchEdit
+            // });
+
+            // สมมติว่าเรามีฟังก์ชันสำหรับอัพเดตข้อมูลใน array
+            let updatedItem = {
+                ind_no: this.text_search_noEdit,
+                ind_Items: this.text_searchEdit
+            };
+
+            // ค้นหาข้อมูลที่ต้องการแก้ไขใน products_list และอัพเดต
+            const index = this.products_list.findIndex(item => item.ind_no === this.text_search_noEdit);
+            if (index !== -1) {
+                this.products_list[index] = updatedItem;
+            }
+
+            // ปิด Dialog หลังบันทึกข้อมูล
+            this.DialogEditList = false;  
+        },
+
+         
+
+        
         // บันทึกแบบจัดการ ป.1 
         async saveDatax() {
             await axios.post(' https://survey.msu.ac.th/evaluatebackend/api/saveDataP01User',{

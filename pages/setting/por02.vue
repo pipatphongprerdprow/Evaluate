@@ -85,8 +85,8 @@
                                 <span v-if="row3.indicator3 != 0">{{ row3.indicator3 }}</span>  
                             </td>
                             <td>  
-                                <b v-if="row3.data_table3 == '' ||  row3.data_table3 == null" style="color: red;">-</b> 
-                                <b v-if="row3.data_table3 != 0 " style="color: blue" >{{ row3.data_table3 }}</b> 
+                                <b v-if="row3.datatable3 == '' ||  row3.datatable3 == null" style="color: red;">-</b> 
+                                <b v-if="row3.datatable3 != 0 " style="color: blue" >{{ row3.datatable3 }}</b> 
                             </td>
                             <td>  
                                 <b v-if="row3.selfAssessment3 == '' " style="color: red;">-</b> 
@@ -145,11 +145,11 @@ export default {
             // ],
             //ตาราง ค. สมรรถนะอื่นๆ
             otherCompetencies: [
-                { id: 12, activity: 'ค. 1 สภาวะผู้นำ', indicator3: '0', data_table3: '',selfAssessment3:''},
-                { id: 13, activity: 'ค. 2 วิสัยทัศน์', indicator3: '0', data_table3: '',selfAssessment3:'' },
-                { id: 14, activity: 'ค. 3 การวางกลยุทธ์ภาครัฐ', indicator3: '0', data_table3: '',selfAssessment3:'' },
-                { id: 15, activity: 'ค. 4 ศักยภาพเพื่อนำการปรับเปลี่ยน', indicator3: '0', data_table3: '',selfAssessment3:'' },
-                { id: 16, activity: 'ค. 5 การสอนงานและการมอบหมายงาน', indicator3: '0', data_table3: '',selfAssessment3:'' }
+                { id: 12, activity: 'ค. 1 สภาวะผู้นำ', indicator3: '0', datatable3: '',selfAssessment3:''},
+                { id: 13, activity: 'ค. 2 วิสัยทัศน์', indicator3: '0', datatable3: '',selfAssessment3:'' },
+                { id: 14, activity: 'ค. 3 การวางกลยุทธ์ภาครัฐ', indicator3: '0', datatable3: '',selfAssessment3:'' },
+                { id: 15, activity: 'ค. 4 ศักยภาพเพื่อนำการปรับเปลี่ยน', indicator3: '0', datatable3: '',selfAssessment3:'' },
+                { id: 16, activity: 'ค. 5 การสอนงานและการมอบหมายงาน', indicator3: '0', datatable3: '',selfAssessment3:'' }
             ],  
             postypetext: null,
              
@@ -210,7 +210,7 @@ export default {
                     // ตรวจสอบว่า `res.data[0][`p${i+6}`]` มีค่าก่อนตั้งค่า
                     if (res.data[0] && res.data[0][`p${i+6}`] !== undefined) {
                         this.jobSpecificCompetencies[i]['SCORE'] = res.data[0][`p${i+6}`];
-                        this.jobSpecificCompetencies[i]['SCOREPERSON'] = res.data[0][`pa_${i+6}`];
+                        this.jobSpecificCompetencies[i]['SCOREPERSON'] = res.data[0][`pa_${i+6}`];  
                     } else {
                         console.warn(`Missing data for p${i+6}`);
                     }
@@ -265,7 +265,7 @@ export default {
                 'ระดับเชี่ยวชาญ': 4,
                 'ระดับเชี่ยวชาญพิเศษ': 5
             };
-
+  
             // ตรวจสอบค่าของ postypetext ใน levelMapping
             let personnel = levelMapping[postypetext] || 0;
             // console.log('personnel:', personnel);
@@ -296,11 +296,11 @@ export default {
             // console.log('executive:', executive); 
             // ตั้งค่า otherCompetencies
             this.otherCompetencies = [
-                { id: 12, activity: 'ค. 1 สภาวะผู้นำ', indicator3: executive, data_table3: '', selfAssessment3: '' },
-                { id: 13, activity: 'ค. 2 วิสัยทัศน์', indicator3: executive, data_table3: '', selfAssessment3: '' },
-                { id: 14, activity: 'ค. 3 การวางกลยุทธ์ภาครัฐ', indicator3: executive, data_table3: '', selfAssessment3: '' },
-                { id: 15, activity: 'ค. 4 ศักยภาพเพื่อนำการปรับเปลี่ยน', indicator3: executive, data_table3: '', selfAssessment3: '' },
-                { id: 16, activity: 'ค. 5 การสอนงานและการมอบหมายงาน', indicator3: executive, data_table3: '', selfAssessment3: '' }
+                { id: 12, activity: 'ค. 1 สภาวะผู้นำ', indicator3: executive, datatable3: '', selfAssessment3: '' },
+                { id: 13, activity: 'ค. 2 วิสัยทัศน์', indicator3: executive, datatable3: '', selfAssessment3: '' },
+                { id: 14, activity: 'ค. 3 การวางกลยุทธ์ภาครัฐ', indicator3: executive, datatable3: '', selfAssessment3: '' },
+                { id: 15, activity: 'ค. 4 ศักยภาพเพื่อนำการปรับเปลี่ยน', indicator3: executive, datatable3: '', selfAssessment3: '' },
+                { id: 16, activity: 'ค. 5 การสอนงานและการมอบหมายงาน', indicator3: executive, datatable3: '', selfAssessment3: '' }
             ];
  
             // ตั้งค่า jobSpecificCompetencies กลับไปเป็นค่าเริ่มต้น 
@@ -376,7 +376,7 @@ export default {
                 // }  
             })
             .catch(error => {
-                console.error('Error fetching data:', error);
+                console.error('Error fetching data:', error); 
             }); 
         },
         showdatator() {  

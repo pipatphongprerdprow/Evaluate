@@ -202,14 +202,27 @@
                             <tbody>
                                 <tr v-for="(row3, index) in otherCompetencies" :key="index">
                                     <td style="text-align: left;">{{ row3.activity }}</td> 
-                                    <td>
-                                        <!-- {{ row3.indicator3 }} -->
+                                    <td> 
                                         <b v-if="row3.indicator3 == '' ||  row3.indicator3 == null" style="color: red;">-</b>
                                         <span v-if="row3.indicator3 != 0">{{ row3.indicator3 }}</span>  
                                     </td>
-                                    <td>  
-                                        <b v-if="row3.data_table3 == '' ||  row3.data_table3 == null" style="color: red;">-</b> 
-                                        <b v-if="row3.data_table3 != 0 " style="color: blue" >{{ row3.data_table3 }}</b> 
+                                    <!-- <td>  
+                                        <b v-if="row3.datatable3 == '' ||  row3.datatable3 == null" style="color: red;">-</b> 
+                                        <b v-if="row3.datatable3 != 0 " style="color: blue" >{{ row3.datatable3 }}</b> 
+                                    </td> -->
+                                    <td>
+                                        <template v-if="positionname === 'ผู้บริหาร'">
+                                            <InputNumber 
+                                                v-model.number="row3.datatable3" 
+                                                type="text" 
+                                                placeholder="0" 
+                                                autocomplete="off" 
+                                                showButtons
+                                            />
+                                        </template>
+                                        <template v-else>
+                                            <b><span style="color: red;">-</span></b>
+                                        </template>
                                     </td>
                                     <td>  
                                         <b v-if="row3.selfAssessment3 == '' " style="color: red;">-</b> 
@@ -266,7 +279,7 @@
     </div>
        
         <!-- รางานการปฏิบัติราชการตามตัวชี้วัด/เกณฑ์การประเมิน -->
-        <Dialog header="จัดการ รางานการปฏิบัติราชการตามตัวชี้วัด/เกณฑ์การประเมิน" maximizable v-model:visible="DialogAdd" :breakpoints="{ '960px': '75vw' }" :style="{ width: '100vw' }" :modal="true" position="top">
+        <Dialog header="จัดการ รายงานการปฏิบัติราชการตามตัวชี้วัด/เกณฑ์การประเมิน" maximizable v-model:visible="DialogAdd" :breakpoints="{ '960px': '75vw' }" :style="{ width: '100vw' }" :modal="true" position="top">
             <form> 
                 <InputText v-model="text_edtP03" type="hidden" style="display: none;" /> 
                 <!-- <div class="p-fluid formgrid grid">
@@ -286,6 +299,12 @@
                             <label for="list_no_p03">ระดับ</label>
                             <Dropdown v-model="list_no_p03" :options="list_no_p03s" optionLabel="name" placeholder="เลือกระดับ"></Dropdown>  
                         </div> 
+                        <!-- <div class="col-12 md:col-2">
+                            <label for="list_no_p03">ระดับ</label>
+                            <InputText v-model="list_no_p03" type="number" placeholder="เลือกระดับ" autocomplete="off" />   
+                        </div> -->
+
+
                         <div class="col-12 md:col-8">
                             <label for="list_text_p03">รายงานชื่อตัวชี้วัด / เกณฑ์การประเมิน</label>
                             <InputText v-model="list_text_p03" type="text" placeholder="รายงานชื่อตัวชี้วัด / เกณฑ์การประเมิน" autocomplete="off"/>  
@@ -308,16 +327,44 @@
                     </Column> 
                     <Column field="options" header="ตัวเลือก" style="text-align: center; width: 10%">
                         <template #body="Item"> 
-                            <Button severity="danger" icon="pi pi-trash" class="p-button-text" outlined rounded @click="DeleteRegislicklist(Item.data)"></Button>
+                            <Button style="text-align: center;" severity="primary" icon="pi pi-pencil" class="p-button-text" outlined rounded @click="EditRegislickP03(Item.data)"></Button>&nbsp;
+                            <Button style="text-align: center;" severity="danger" icon="pi pi-trash" class="p-button-text" outlined rounded @click="DeleteRegislicklist(Item.data)"></Button> 
                         </template>
                     </Column>
                 </DataTable> 
             </form>
             <template #footer>
                 <Button label="บันทึก" icon="pi pi-check" class="mb-2 mr-2" @click="saveDataListP03" />
-                <Button label="ยกเลิก" icon="pi pi-times" class="mb-2 mr-2" severity="danger" @click="DialogAdd = false" />
+                <Button label="ยกเลิก" icon="pi pi-times" class="mb-2 mr-2" severity="danger" @click="DialogAdd= false" />
+            </template>
+        </Dialog> 
+        <!-- แก้ไขการปฏิบัติราชการตามตัวชี้วัด/เกณฑ์การประเมิน -->
+        <Dialog header="แก้ไขข้อมูลเกณฑ์การประเมิน" maximizable v-model:visible="DialogEditListP03" :breakpoints="{ '960px': '75vw' }" :style="{ width: '70vw' }" :modal="true" position="top">
+            <form>
+                <div class="p-fluid formgrid"> 
+                    <form> 
+                        <div class="p-fluid formgrid grid">
+                            <div class=" col-12 md:col-12"> 
+                                <label for="text_search_no">เกณฑ์การประเมิน</label>
+                            </div>
+                            <div class=" col-12 md:col-3"> 
+                                <label for="text_search_no">ระดับ</label>
+                                <InputText v-model="text_search_noEditP03" type="number" placeholder="ระดับ" autocomplete="off" disabled />  
+                            </div>
+                            <div class=" col-12 md:col-9"> 
+                                <label for="text_search_no">รายละเอียดเกณฑ์การประเมิน</label>
+                                <InputText v-model="text_searchEditP03" type="text" placeholder="รายละเอียดเกณฑ์การประเมิน" autocomplete="off"/>  
+                            </div>    
+                        </div> 
+                    </form>
+                </div>
+            </form>
+            <template #footer>
+                <Button label="บันทึก" icon="pi pi-check" class="mb-2 mr-2" @click="saveDataxEditP03" />&nbsp;
+                <Button label="ยกเลิก" icon="pi pi-times" class="mb-2 mr-2" severity="danger" @click="cancelDialogEdiP03" />
             </template>
         </Dialog>
+
 
         <!-- (หลักฐาน)รางานการปฏิบัติราชการตามตัวชี้วัด/เกณฑ์การประเมิน -->
         <Dialog header="จัดการ หลักฐานที่แสดงถึงผลการปฏิบัติราชการตามเกณฑ์การประเมิน(หลักฐานเชิงประจักษ์)" maximizable v-model:visible="DialogDoc" :breakpoints="{ '960px': '75vw' }" :style="{ width: '70vw' }" :modal="true" position="top">
@@ -326,7 +373,7 @@
                 <div class="p-fluid formgrid"> 
                     <div class="field col-12 md:col-6">
                         <label for="radioValueDoc">เลือกประเภทการแนปเอกสาร</label> 
-                        <b style="color: red;"> (รองรับขนาดไฟล์ไม่เกิน 10 Mb) </b>
+                        <b style="color: red;"> (รองรับขนาดไฟล์ไม่เกิน 8 Mb) </b>
 
                         <!-- <Dropdown v-model="radioValueDoc" :options="radioValueDocs" optionLabel="name" placeholder="เลือกระดับการประเมินตนเอง"></Dropdown>  -->
                         <div class="grid">
@@ -388,7 +435,8 @@
                                 </template>
                             </Column>  
                             <Column field="options" header="ตัวเลือก" style="text-align: center; width: 15%">
-                                <template #body="Item"> 
+                                <template #body="Item">
+                                    <!-- <Button severity="primary" icon="pi pi-pencil" class="p-button-text" outlined rounded @click="delDataDocX5(Item.data)"></Button> &nbsp; -->
                                     <Button severity="danger" icon="pi pi-trash" class="p-button-text" outlined rounded @click="delDataDocX(Item.data)"></Button>
                                 </template>
                             </Column>
@@ -417,6 +465,11 @@
                     <Button label="ยกเลิก" icon="pi pi-times" class="mb-2 mr-2" severity="danger" @click="DialogScore = false" />
                 </template>
         </Dialog>
+
+
+        
+
+
 </template> 
 <script>
 import { ref, onMounted } from 'vue';
@@ -496,11 +549,11 @@ import InputText from 'primevue/inputtext';
             // ],
             //ตาราง ค. สมรรถนะอื่นๆ
             otherCompetencies: [
-                { id: 12, activity: 'ค. 1 สภาวะผู้นำ', indicator: '0', data_table3: '' },
-                { id: 13, activity: 'ค. 2 วิสัยทัศน์', indicator: '0', data_table3: '' },
-                { id: 14, activity: 'ค. 3 การวางกลยุทธ์ภาครัฐ', indicator: '0', data_table3: '' },
-                { id: 15, activity: 'ค. 4 ศักยภาพเพื่อนำการปรับเปลี่ยน', indicator: '0', data_table3: '' },
-                { id: 16, activity: 'ค. 5 การสอนงานและการมอบหมายงาน', indicator: '0', data_table3: '' }
+                { id: 12, activity: 'ค. 1 สภาวะผู้นำ', indicator: '0', datatable3: '' },
+                { id: 13, activity: 'ค. 2 วิสัยทัศน์', indicator: '0', datatable3: '' },
+                { id: 14, activity: 'ค. 3 การวางกลยุทธ์ภาครัฐ', indicator: '0', datatable3: '' },
+                { id: 15, activity: 'ค. 4 ศักยภาพเพื่อนำการปรับเปลี่ยน', indicator: '0', datatable3: '' },
+                { id: 16, activity: 'ค. 5 การสอนงานและการมอบหมายงาน', indicator: '0', datatable3: '' }
             ],
 /*============= รายงานผลการปฏิบัติราชการตามตัวชี้วัด/ เกณฑ์การประเมิน =============*/
                 DialogAdd: false,
@@ -549,7 +602,12 @@ import InputText from 'primevue/inputtext';
                 p04_re2: null,
                 p04_re3: null,
                 products_Tab3: [], 
-            }
+                products_listP03:[],
+                //แก้ไขรายงานปฏิบัติราชการ
+                DialogEditListP03: false,
+                text_search_noEditP03: null,
+                text_searchEditP03: null,
+            }   
         }, 
         async mounted(){  
             const { signIn, getSession, signOut } = await useAuth()
@@ -707,7 +765,7 @@ import InputText from 'primevue/inputtext';
                 // วนลูปตรวจสอบไฟล์แต่ละไฟล์
                 Array.from(files).forEach(file => {
                     if (file.size > maxFileSize) {
-                        alert(`ไฟล์ ${file.name} ไฟล์มีขนาดเกิน 10 MB `); // แจ้งเตือนเมื่อไฟล์เกินขนาด
+                        alert(`ไฟล์ ${file.name} ไฟล์มีขนาดเกิน 15 MB `); // แจ้งเตือนเมื่อไฟล์เกินขนาด
                     } else {
                         validFiles.push(file); // เก็บไฟล์ที่ผ่านเงื่อนไข
                     }
@@ -948,73 +1006,7 @@ import InputText from 'primevue/inputtext';
                 }
                 // console.log('Response', res.data);
             })
-            },
-            // showdataPo(){  
-            //     let postypetext = `ระดับ${this.postypename}`;
-            //     const levelMapping = {
-            //         'ระดับปฏิบัติการ': 1,
-            //         'ระดับชำนาญการ': 2,
-            //         'ระดับชำนาญการพิเศษ': 3,
-            //         'อาจารย์': 3,
-            //         'ระดับเชี่ยวชาญ': 4,
-            //         'ระดับเชี่ยวชาญพิเศษ': 5
-            //     };
-            //     let xr = levelMapping[postypetext] || 0;
-
-            //     // ตั้งค่า coreCompetencies กลับไปเป็นค่าเริ่มต้น
-            //     this.coreCompetencies = [
-            //         { id: 1, activity: 'ก. 1 การมุ่งผลสัมฤทธิ์', indicator: xr, data_table1: '', selfAssessment: '' },
-            //         { id: 2, activity: 'ก. 2 การบริการที่ดี', indicator: xr, data_table1: '', selfAssessment: '' },
-            //         { id: 3, activity: 'ก. 3 การสั่งสมความเชี่ยวชาญในงานอาชีพ', indicator: xr, data_table1: '', selfAssessment: '' },
-            //         { id: 4, activity: 'ก. 4 การยึดมั่นในความถูกต้องชอบธรรมและจริยธรรม', indicator: xr, data_table1: '', selfAssessment: '' },
-            //         { id: 5, activity: 'ก. 5 การทำงานเป็นทีม', indicator: xr, data_table1: '', selfAssessment: '' }
-            //     ];  
-                
-                
-            //     // ตั้งค่า jobSpecificCompetencies กลับไปเป็นค่าเริ่มต้น 
-            //     this.showPostype(this.postypename,this.postypenameid); 
-                
-            //     axios.post('https://survey.msu.ac.th/evaluatebackend/api/showDataPo',{
-            //         staff_id: this.staffid_Main,
-            //         fac_id: this.facid_Main,
-            //         year_id: this.dataPor.d_date,
-            //         record: this.dataPor.evalua,
-            //         postypename: postypetext
-            //     }).then(res => {     
-            //         // console.log('showDataPo > ',res.data);    
-            //         if(res.data.length > 0){
-            //             const data = res.data[0]; 
-            //             this.coreCompetencies = this.coreCompetencies.map(item => {
-            //                 if (data[`p${item.id}`] !== undefined) {
-            //                     return {
-            //                         ...item,
-            //                         data_table1: data[`p${item.id}`]
-            //                     };
-            //                 }
-            //                 return item;
-            //             }); 
-
-            //             // this.jobSpecificCompetencies.forEach(item => {
-            //             //     if (item.id === 6) {
-            //             //         item.data_table2 = data.p6;  // Update based on the API response
-            //             //     } else if (item.id === 7) {
-            //             //         item.data_table2 = data.p7;  // Update based on the API response
-            //             //     } else if (item.id === 8) {
-            //             //         item.data_table2 = data.p8;  // Add more conditions if necessary
-            //             //     } else if (item.id === 9) {
-            //             //         item.data_table2 = data.p9;  // Add more conditions if necessary
-            //             //     } else if (item.id === 10) {
-            //             //         item.data_table2 = data.p10;  // Add more conditions if necessary
-            //             //     } else if (item.id === 11) {
-            //             //         item.data_table2 = data.p11;  // Add more conditions if necessary
-            //             //     }
-            //             // });
-            //         } 
-            //     })
-            //     .catch(error => {
-            //         console.error('Error:', error);
-            //     });
-            // },
+            }, 
             showdataPo(){  
                  //console.log('positionname: ',this.positionname);
                 
@@ -1062,11 +1054,11 @@ import InputText from 'primevue/inputtext';
                     // console.log('executive:', executive); 
                     // ตั้งค่า otherCompetencies
                     this.otherCompetencies = [
-                        { id: 12, activity: 'ค. 1 สภาวะผู้นำ', indicator3: executive, data_table3: '', selfAssessment3: '' },
-                        { id: 13, activity: 'ค. 2 วิสัยทัศน์', indicator3: executive, data_table3: '', selfAssessment3: '' },
-                        { id: 14, activity: 'ค. 3 การวางกลยุทธ์ภาครัฐ', indicator3: executive, data_table3: '', selfAssessment3: '' },
-                        { id: 15, activity: 'ค. 4 ศักยภาพเพื่อนำการปรับเปลี่ยน', indicator3: executive, data_table3: '', selfAssessment3: '' },
-                        { id: 16, activity: 'ค. 5 การสอนงานและการมอบหมายงาน', indicator3: executive, data_table3: '', selfAssessment3: '' }
+                        { id: 12, activity: 'ค. 1 สภาวะผู้นำ', indicator3: executive, datatable3: '', selfAssessment3: '' },
+                        { id: 13, activity: 'ค. 2 วิสัยทัศน์', indicator3: executive, datatable3: '', selfAssessment3: '' },
+                        { id: 14, activity: 'ค. 3 การวางกลยุทธ์ภาครัฐ', indicator3: executive, datatable3: '', selfAssessment3: '' },
+                        { id: 15, activity: 'ค. 4 ศักยภาพเพื่อนำการปรับเปลี่ยน', indicator3: executive, datatable3: '', selfAssessment3: '' },
+                        { id: 16, activity: 'ค. 5 การสอนงานและการมอบหมายงาน', indicator3: executive, datatable3: '', selfAssessment3: '' }
                     ];
                 //console.log(this.coreCompetencies);
                 
@@ -1263,7 +1255,7 @@ import InputText from 'primevue/inputtext';
                         evalua: this.dataPor.evalua, 
                         corecompetencies: this.coreCompetencies,
                         jobspecificcompetencies: this.jobSpecificCompetencies,
-                        
+                        otherCompetencies:this.otherCompetencies, 
                     }); 
                    // console.log( this.staffid_Main,this.facid_Main,this.dataPor.evalua, this.coreCompetencies,this.jobSpecificCompetencies, );
                     
@@ -1294,7 +1286,8 @@ import InputText from 'primevue/inputtext';
                     year: this.dataPor.d_date,
                     record: this.dataPor.evalua, 
                     coreCompetencies: this.coreCompetencies,
-                    jobSpecificCompetencies: this.jobSpecificCompetencies,   
+                    jobSpecificCompetencies: this.jobSpecificCompetencies,
+                    otherCompetencies:this.otherCompetencies,   
                 })
                 .then((res) => {
                     //console.log(res.data);
@@ -1329,6 +1322,19 @@ import InputText from 'primevue/inputtext';
                                 item.selfAssessment = data.pa_11 ?? 0;  
                             }
                         });
+                        this.otherCompetencies.forEach((item) => {
+                            if (item.id === 1) {
+                                item.datatable3 = data.px_1 ?? 0;  
+                            } else if (item.id === 7) {
+                                item.datatable3 = data.px_2 ?? 0;  
+                            } else if (item.id === 8) {
+                                item.datatable3 = data.px_3 ?? 0;  
+                            } else if (item.id === 9) {
+                                item.datatable3 = data.px_4 ?? 0;  
+                            } else if (item.id === 10) {
+                                item.datatable3 = data.px_5 ?? 0;    
+                            }
+                        });
 
                         // Update other fields
                         this.improvements = data.improvements ?? '- ไม่มีข้อมูล -';
@@ -1341,6 +1347,16 @@ import InputText from 'primevue/inputtext';
                         } else {
                             console.warn(`Missing data for pa_${i+6}`);
                         }
+                        
+                    }
+                    for (let i = 0; i < this.otherCompetencies.length; i++) { // แก้ไขเงื่อนไขที่นี่
+                        // ตรวจสอบว่า `res.data[0][`p${i+6}`]` มีค่าก่อนตั้งค่า
+                        if (res.data[0] && res.data[0][`px_${i+1}`] !== undefined) {
+                            this.otherCompetencies[i]['datatable3'] = res.data[0][`px_${i+1}`]; 
+                        } else {
+                            console.warn(`Missing data for px_${i+1}`);
+                        }
+                        
                     }
                 })
                 .catch((error) => {
@@ -1369,7 +1385,48 @@ import InputText from 'primevue/inputtext';
                 // console.log(queryParams); 
                 const url = `https://survey.msu.ac.th/evaluatebackend/report_p03?${queryParams}`;
                 window.open(url, '_blank'); 
-            },     
+            },  
+            
+            
+             // แก้ไขตัวชี้วัด / เกณฑ์การประเมิน
+             EditRegislickP03(data){
+                //console.log(data);
+                this.text_search_noEditP03 = null;
+                this.text_searchEditP03 = null;
+                if(data){
+                    this.DialogEditListP03 = true; 
+                    this.text_search_noEditP03 = data.p03ind_no;
+                    this.text_searchEditP03 = data.p03ind_Items;
+                } 
+            },
+            cancelDialogEdiP03(){ 
+                this.DialogEditListP03 = false;  
+            }, 
+            saveDataxEditP03(){ 
+                // console.log({
+                //     text_search_noEditP03: this.text_search_noEditP03,
+                //     text_searchEditP03: this.text_searchEditP03
+                // });
+
+                // สมมติว่าเรามีฟังก์ชันสำหรับอัพเดตข้อมูลใน array
+                let updatedItem = {
+                    p03ind_no: this.text_search_noEditP03,
+                    p03ind_Items: this.text_searchEditP03
+                };
+
+                // ค้นหาข้อมูลที่ต้องการแก้ไขใน products_list และอัพเดต
+                const index = this.products_list_p03.findIndex(item => item.p03ind_no === this.text_search_noEditP03);
+                console.log(index);
+                
+                if (index !== -1) {
+                    this.products_list_p03[index] = updatedItem;
+                }
+
+                // ปิด Dialog หลังบันทึกข้อมูล
+                this.DialogEditListP03 = false;  
+            },
+
+            //// แก้ไขหลักฐานเชิงประจัก 
         },
     } 
      

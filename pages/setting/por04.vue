@@ -107,7 +107,25 @@
                                 <td style="text-align: left;">{{ Tab3T4.p04_re3 }}</td> 
                             </tr> 
                         </tbody>
-                    </table>  
+                    </table> 
+                    <h5 class="mb-4"><i class="" style="font-size: x-large;"></i> ความคิดเห็นของผู้ประเมิน (ผู้บริหาร)</h5>  
+                    <table border="1" cellspacing="0" cellpadding="5">
+                        <thead>
+                            <tr style="text-align: center;">
+                                <th>ความรู้/ทักษะ/สมรรถนะ ที่ต้องพัฒนา</th>
+                                <th>วิธีการพัฒนา</th>
+                                <th>ช่วงเวลาที่ต้องพัฒนา</th> 
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="(Tab3T4, idx) in products_Tab3T4" :key="idx"  >
+                                <td style="text-align: left;">{{ Tab3T4.px04_re1 }}</td>
+                                <td style="text-align: left;">{{ Tab3T4.px04_re2 }}</td>
+                                <td style="text-align: left;">{{ Tab3T4.px04_re3 }}</td> 
+                            </tr> 
+                        </tbody>
+                    </table> 
+
                         <h5 class="mb-4"><i class="" style="font-size: x-large;"></i> ส่วนที่ 4 การรับทราบผลการประเมิน</h5>
                         <table class="styled-table">
                         <tbody>
