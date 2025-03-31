@@ -6,33 +6,13 @@ const { layoutConfig, onMenuToggle } = useLayout();
 const outsideClickListener = ref(null);
 const topbarMenuActive = ref(false);
 const router = useRouter();
-const inactivityTimeout = ref(null); // ตัวแปรเก็บ timeout
 
-const { signIn, getSession, signOut } = await useAuth();
-const sessionData = await getSession();
-
-// ฟังก์ชันรีเซ็ต timeout ทุกครั้งที่มีการใช้งาน
-const resetTimeout = () => {
-    clearTimeout(inactivityTimeout.value);
-    inactivityTimeout.value = setTimeout(() => {
-        signOut();
-    }, 1000 * 60 * 60 * 6); // 6 ชั่วโมง
-};
-
-// ดักจับเหตุการณ์ของผู้ใช้
 onMounted(() => {
     bindOutsideClickListener();
-    resetTimeout();
-    window.addEventListener('mousemove', resetTimeout);
-    window.addEventListener('keydown', resetTimeout);
 });
 onBeforeUnmount(() => {
     unbindOutsideClickListener();
-    clearTimeout(inactivityTimeout.value);
-    window.removeEventListener('mousemove', resetTimeout);
-    window.removeEventListener('keydown', resetTimeout);
 });
-
 const logoUrl = computed(() => {
     return `/layout/images/${layoutConfig.darkTheme.value ? 'logo-white' : 'kongkang'}.jpg`;
 });
@@ -66,7 +46,7 @@ const bindOutsideClickListener = () => {
 
 const unbindOutsideClickListener = () => {
     if (outsideClickListener.value) {
-        document.removeEventListener('click', outsideClickListener.value);
+        document.removeEventListener('click', outsideClickListener);
         outsideClickListener.value = null;
     }
 };
@@ -76,8 +56,13 @@ const isOutsideClicked = (event) => {
     const sidebarEl = document.querySelector('.layout-topbar-menu');
     const topbarEl = document.querySelector('.layout-topbar-menu-button');
 
-    return !(sidebarEl?.contains(event.target) || topbarEl?.contains(event.target));
+    return !(sidebarEl.isSameNode(event.target) || sidebarEl.contains(event.target) || topbarEl.isSameNode(event.target) || topbarEl.contains(event.target));
 };
+
+
+const { signIn, getSession, signOut } = await useAuth()
+const x = await getSession()
+
 </script>
 
 <template>
@@ -96,7 +81,7 @@ const isOutsideClicked = (event) => {
         </button>
 
         <div class="layout-topbar-menu" :class="topbarMenuClasses">
-            <template v-if="Object.keys(sessionData).length === 0">
+            <template v-if="Object.keys(x).length === 0">
                 <button @click="signIn('erpauth')" class="p-link layout-topbar-button pr-4">
                     <i class="pi pi-sign-in"></i>
                     <i style="font-size: 1.25em;margin-left: 0.25em;margin-right: 1em;text-wrap: nowrap;">เข้าสู่ระบบ</i>
@@ -108,6 +93,14 @@ const isOutsideClicked = (event) => {
                     <i style="font-size: 1.25em;margin-left: 0.25em;margin-right: 1em;text-wrap: nowrap;">ออกจากระบบ</i>
                 </button>
             </template>
+            <!-- <button @click="onTopBarMenuButton()" class="p-link layout-topbar-button">
+                <i class="pi pi-user"></i>
+                <span>Profile</span>
+            </button>
+            <button @click="onSettingsClick()" class="p-link layout-topbar-button">
+                <i class="pi pi-cog"></i>
+                <span>Settings</span>
+            </button> -->
         </div>
     </div>
 </template>

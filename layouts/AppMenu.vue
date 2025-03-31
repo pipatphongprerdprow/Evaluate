@@ -31,7 +31,8 @@ const allMenus = ref([
         label: 'เจ้าหน้าที่บุคคล',
         items: [
             { label: 'จัดการ รอบประเมิน', icon: 'pi pi-fw pi-calendar', to: '/setting/setting_date' },
-            { label: 'ตรวจสอบ แบบประเมิน', icon: 'pi pi-fw pi-star', to: '/setting/checkevaluate' }
+            { label: 'ตรวจสอบ แบบประเมิน', icon: 'pi pi-fw pi-star', to: '/setting/checkevaluate' },
+            { label: 'เพิ่มสิทธิ์การใช้งาน', icon: 'pi pi-fw pi-plus', to: '/setting/setting_user' },
         ]
     },
     {
@@ -44,7 +45,7 @@ const group_chkUser = ref(null);
 
 const fetchUserGroup = async () => {
     try {
-        const res = await axios.post(' https://survey.msu.ac.th/evaluatebackend/api/testUser', { staff, faculty }); 
+        const res = await axios.post('   http://127.0.0.1:8000/api/testUser', { staff, faculty }); 
         group_chkUser.value = res.data?.[0]?.status_user || res.data?.status_user || null;
     } catch (error) {
         console.error('Error:', error);
@@ -68,6 +69,8 @@ const model = computed(() => {
             return allMenus.value.filter(menu => ['home', 'tor', 'executive','manual'].includes(menu.id)); 
         case '3':
             return allMenus.value.filter(menu => ['home', 'tor', 'executive', 'hr', 'manual'].includes(menu.id));
+        case '4':
+            return allMenus.value.filter(menu => [ 'home','executive',].includes(menu.id));
         default:
             return allMenus.value.filter(menu => ['home', 'manual'].includes(menu.id));
     }
@@ -106,25 +109,25 @@ export default {
     data() {
         return {
             menuItems: [
-                {
+                { 
                     id: 'M1',
                     label: 'คู่มือใช้งานระบบ (User)',
                     icon: 'pi pi-id-card',
-                    href: ' https://survey.msu.ac.th/evaluatebackend/storage/manuals/manual_user.pdf',
+                    href: '   http://127.0.0.1:8000/storage/manuals/manual_user.pdf',
                     target: '_blank',
                 },
                 {
                     id: 'M1',
                     label: 'คู่มือใช้งานระบบ (เจ้าหน้าที่บุคคล)',
                     icon: 'pi pi-user',
-                    href: ' https://survey.msu.ac.th/evaluatebackend/storage/manuals/manual_person.pdf',
+                    href: '   http://127.0.0.1:8000/storage/manuals/manual_person.pdf',
                     target: '_blank',
                 },
                 {
                     id: 'M1',
                     label: 'คู่มือใช้งานระบบ (ผู้บริหาร)',
                     icon: 'pi pi-users',
-                    href: ' https://survey.msu.ac.th/evaluatebackend/storage/manuals/manual_executive.pdf',
+                    href: '   http://127.0.0.1:8000/storage/manuals/manual_executive.pdf',
                     target: '_blank',
                 },
             ],

@@ -42,26 +42,34 @@
                         <tbody>
                             <tr> 
                                 <td>องค์ประกอบที่ 1 ผลสัมฤทธิ์ของงาน</td>
-                                <td class="text-center" style="color: blue;"> 
-                                    <b>  {{ showscoresum.achievement_score  }} </b>  
+                                <td class="text-center" style="color: blue;">  
+                                    <div v-if="currentDate >= dataPor.d_scoringday">
+                                        <b> {{ showscoresum.achievement_score  }}</b>
+                                   </div>
                                 </td>  
                                 <td class="text-center" style="color: blue;">  
                                     <b v-if="showscoresum.persen">{{showscoresum.persen.split(':')[0]}}</b> 
                                 </td> 
-                                <td class="text-center" style="color: blue;">  
-                                   <b v-if="showscoresum.persen">{{ ((showscoresum.achievement_score )*showscoresum.persen.split(':')[0]).toFixed(2) }} </b> 
+                                <td class="text-center" style="color: blue;"> 
+                                    <div v-if="currentDate >= dataPor.d_scoringday">
+                                        <b v-if="showscoresum.persen">{{ ((showscoresum.achievement_score )*showscoresum.persen.split(':')[0]).toFixed(2) }} </b> 
+                                   </div> 
                                 </td> 
                             </tr>
                             <tr>
                                 <td>องค์ประกอบที่ 2 พฤติกรรมการปฏิบัติราชการ</td>
                                 <td class="text-center" style="color: blue;"> 
-                                    <b>{{ showscoresum.behavior  }}</b>  
+                                    <div v-if="currentDate >= dataPor.d_scoringday">
+                                        <b>{{ showscoresum.behavior  }}</b>
+                                     </div>
                                 </td> 
-                                <td class="text-center" style="color: blue;"> 
+                                <td class="text-center" style="color: blue;">  
                                     <b v-if="showscoresum.persen">{{showscoresum.persen.split(':')[1]}}</b> 
                                 </td> 
                                 <td class="text-center" style="color: blue;"> 
-                                    <b v-if="showscoresum.persen">{{ ((showscoresum.behavior )*showscoresum.persen.split(':')[1]).toFixed(2) }} </b> 
+                                    <div v-if="currentDate >= dataPor.d_scoringday"> 
+                                        <b v-if="showscoresum.persen">{{ ((showscoresum.behavior )*showscoresum.persen.split(':')[1]).toFixed(2) }} </b> 
+                                    </div>
                                 </td> 
                             </tr>
                             <tr>
@@ -72,11 +80,15 @@
                             </tr>
                             <tr style="font-weight: bold;">
                                 <td colspan="2" style="text-align: right;">รวม</td>
-                                <td class="text-center" style="color: blue;"> 
-                                    <b>{{ 100 }}%</b>  
+                                <td class="text-center" style="color: blue;">  
+                                        <b>{{ 100 }}%</b>   
                                 </td> 
                                 <td class="text-center" style="color: blue;"> 
-                                   {{ showscoresum.sum_score }} 
+                                    <div v-if="currentDate >= dataPor.d_scoringday">
+                                        {{ showscoresum.sum_score }} 
+                                        <!-- {{ Item.tb_tor?Item.tb_tor.sum_score:'' }} -->
+                                         
+                                     </div>
                                 </td>
                             </tr>
                         </tbody>
@@ -97,35 +109,19 @@
                             <tr style="text-align: center;">
                                 <th>ความรู้/ทักษะ/สมรรถนะ ที่ต้องการพัฒนา</th>
                                 <th>วิธีการพัฒนา</th>
-                                <th>ช่วงเวลาที่ต้องการพัฒนา</th> 
+                                <th>ช่วงเวลาที่ต้องการพัฒนา</th>
+                                <th>ข้อเสนอแนะ(ผู้บริหาร)</th> 
                             </tr>
                         </thead>
                         <tbody>
                             <tr v-for="(Tab3T4, idx) in products_Tab3T4" :key="idx"  >
                                 <td style="text-align: left;">{{ Tab3T4.p04_re1 }}</td>
                                 <td style="text-align: left;">{{ Tab3T4.p04_re2 }}</td>
-                                <td style="text-align: left;">{{ Tab3T4.p04_re3 }}</td> 
+                                <td style="text-align: left;">{{ Tab3T4.p04_re3 }}</td>
+                                <td style="text-align: left;">{{ Tab3T4.px04_re1 }}</td> 
                             </tr> 
                         </tbody>
-                    </table> 
-                    <h5 class="mb-4"><i class="" style="font-size: x-large;"></i> ความคิดเห็นของผู้ประเมิน (ผู้บริหาร)</h5>  
-                    <table border="1" cellspacing="0" cellpadding="5">
-                        <thead>
-                            <tr style="text-align: center;">
-                                <th>ความรู้/ทักษะ/สมรรถนะ ที่ต้องพัฒนา</th>
-                                <th>วิธีการพัฒนา</th>
-                                <th>ช่วงเวลาที่ต้องพัฒนา</th> 
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr v-for="(Tab3T4, idx) in products_Tab3T4" :key="idx"  >
-                                <td style="text-align: left;">{{ Tab3T4.px04_re1 }}</td>
-                                <td style="text-align: left;">{{ Tab3T4.px04_re2 }}</td>
-                                <td style="text-align: left;">{{ Tab3T4.px04_re3 }}</td> 
-                            </tr> 
-                        </tbody>
-                    </table> 
-
+                    </table>  
                         <h5 class="mb-4"><i class="" style="font-size: x-large;"></i> ส่วนที่ 4 การรับทราบผลการประเมิน</h5>
                         <table class="styled-table">
                         <tbody>
@@ -138,7 +134,7 @@
                                     ลงชื่อ .................................................................<br>
                                     ชื่อ: {{ user.user.name.PREFIXFULLNAME }} {{ user.user.name.STAFFNAME }} {{ user.user.name.STAFFSURNAME }}<br>
                                     ตำแหน่ง: {{ user.user.name.POSITIONNAME }}<br>
-                                    วันที่ .......... เดือน .......................... พ.ศ.
+                                    วันที่ .......... เดือน .......................... พ.ศ................
                                 </td>
                             </tr>
                             <tr>
@@ -173,9 +169,12 @@
                                 .....................................................................................................................................
                             </td>
                             <td class="center-align"><br><br>
-                                ลงชื่อ : .................................................................<br>
-                                ชื่อ : {{ user.user.name.PREFIXFULLNAME }} {{ user.user.name.STAFFNAME }} {{ user.user.name.STAFFSURNAME }}<br>
-                                ตำแหน่ง : {{ user.user.name.POSITIONNAME }}<br>
+                                
+                                ลงชื่อ .................................................................<br>
+                                        (.......................................................)<br>
+                                    ตำแหน่ง .................................................................<br>
+                                <!-- ชื่อ : {{ user.user.name.PREFIXFULLNAME }} {{ user.user.name.STAFFNAME }} {{ user.user.name.STAFFSURNAME }}<br>
+                                ตำแหน่ง : {{ user.user.name.POSITIONNAME }}<br> -->
                                 วันที่ : .......... เดือน .......................... พ.ศ.............
                             </td>
                             </tr>
@@ -191,8 +190,10 @@
                                 </td>
                                 <td class="center-align"><br><br>
                                     ลงชื่อ .................................................................<br>
-                                    ชื่อ {{ assessorText }}<br>
-                                    ตำแหน่ง {{ assessor_positionText }}<br>
+                                        (.......................................................)<br>
+                                    ตำแหน่ง .................................................................<br>
+                                    <!-- ชื่อ {{ assessorText }}<br>
+                                    ตำแหน่ง {{ assessor_positionText }}<br> -->
                                     วันที่ .......... เดือน .......................... พ.ศ...........
                                 </td>
                             </tr>
@@ -232,6 +233,7 @@ export default {
             staffid_Main: '',
             facid_Main: '',
             groupid_Main: '', 
+            currentDate: new Date().toISOString().split('T')[0], 
             // Anurak
             assessorText: [],
             assessor_positionText: [],
@@ -305,6 +307,9 @@ export default {
             p04_re1: null,
             p04_re2: null,
             p04_re3: null,
+            px04_re1: null,
+            px04_re2: null,
+            px04_re3: null,
             products_Tab3: [],
             chkP04: 0,
             //Tab 4
@@ -455,7 +460,7 @@ export default {
          insertscore1(scoreA04) { 
         // //console.log(scoreA04); 
         // //console.log(this.dataPor.d_date,this.dataPor.evalua,scoreA04); 
-        //     axios.post('https://survey.msu.ac.th/evaluatebackend/api/savepersentor',{
+        //     axios.post('  http://127.0.0.1:8000/api/savepersentor',{
         //             p_staffid: this.staffid_Main, 
         //             p_year: this.dataPor.d_date, 
         //             evalua: this.dataPor.evalua, 
@@ -468,7 +473,7 @@ export default {
         // insertscore2(scoreB) { 
         // //console.log(scoreB); 
         // //console.log(this.dataStaffid); 
-        //     axios.post('https://survey.msu.ac.th/evaluatebackend/api/savepersentor',{
+        //     axios.post('  http://127.0.0.1:8000/api/savepersentor',{
         //             p_staffid: this.staffid_Main, 
         //             p_year: this.tracking_date.d_date, 
         //             evalua: this.tracking_date.evalua, 
@@ -482,7 +487,7 @@ export default {
         // insertscore3(scoreS) { 
         // //console.log(scoreB); 
         // //console.log(this.dataStaffid); 
-        //     axios.post('https://survey.msu.ac.th/evaluatebackend/api/savepersentor',{
+        //     axios.post('  http://127.0.0.1:8000/api/savepersentor',{
         //             p_staffid: this.staffid_Main, 
         //             p_year: this.tracking_date.d_date, 
         //             evalua: this.tracking_date.evalua, 
@@ -501,7 +506,7 @@ export default {
         },  
         showdatator() {  
             //console.log(this.dataPor.d_date,scoreA04); 
-            axios.post('https://survey.msu.ac.th/evaluatebackend/api/showdatator', {
+            axios.post('  http://127.0.0.1:8000/api/showdatator', {
                 p_year: this.dataPor.d_date,
                 evalua: this.dataPor.evalua,
                 p_staffid: this.staffid_Main
@@ -519,7 +524,7 @@ export default {
         /*============= ความรู้/ทักษะ/สมรรถนะ ที่ต้องการพัฒนา =============*/ 
         chkp04dataXr(){  
             this.products_Tab3T4 = [];
-            axios.post('https://survey.msu.ac.th/evaluatebackend/api/showData04Tab3',{
+            axios.post('  http://127.0.0.1:8000/api/showData04Tab3',{
                 staff_id: this.staffid_Main,
                 fac_id: this.facid_Main,
                 year_id: this.dataPor.d_date,
@@ -549,11 +554,12 @@ export default {
                 POSITIONNAME:user.user.name.POSITIONNAME,
                 GROUPTYPENAME:user.user.name.GROUPTYPENAME,
                 POSTYPENAME:user.user.name.POSTYPENAME, 
-                SCOPES:user.user.name.SCOPES.staffdepartmentname   
+                SCOPES:user.user.name.SCOPES.staffdepartmentname  
+                
             } 
             const queryParams = new URLSearchParams(form).toString();
             // console.log(queryParams); 
-            const url = `https://survey.msu.ac.th/evaluatebackend/report_p04?${queryParams}`;
+            const url = `  http://127.0.0.1:8000/report_p04?${queryParams}`;
             window.open(url, '_blank'); 
         },            
     }

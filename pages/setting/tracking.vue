@@ -1,19 +1,31 @@
-<template>
-    <div class="grid">
+<template> 
+    <div class="grid"> 
         <div  class="col-12 lg:col-12 xl:col-12">
             <div class="card mb-0"> 
                 <div class="formgroup-inline mb-1">
-                    <div class="col md:col-6"> 
+                    <div class="col md:col-5"> 
                         <h3 class="mb-4 card-header"><i class="pi pi-credit-card" style="font-size: x-large;"></i> ตรวจติดตามแบบประเมิน</h3>    
-                    </div>   
+                    </div>
+                    <!-- {{ products }}  -->
+
+                    <!-- {{ user.user }}    -->
+
+                    <!-- <div class="col md:col-3" >  
+                         
+                        <label for="tracking_date"></label>
+                        <Dropdown  v-model="tracking_fac" :options="tracking_facuty"  optionLabel="label" placeholder="กรุณาเลือกเลือกคณะ" style="max-width: 500px; width: 100%"/> 
+                    </div>  -->
                     <div class="col md:col-5" >  
                         <!-- <h3 class="mb- card-header"><i class="" style="font-size: x-large;"></i> ปีงบประมาณ: {{ tracking_date.d_date }}</h3>   -->
                         <label for="tracking_date"></label>
-                        <Dropdown v-model="tracking_date" :options="tracking_dates" :optionLabel="(item) => `${item.d_evaluationround} ${item.d_date}`" placeholder="กรุณาเลือกรอบการประเมิน" style=" max-width: 500px; width: 100%"></Dropdown> 
+                        <!-- {{ tracking_dates }} -->
+                         
+                        <Dropdown v-model="tracking_date" :options="tracking_dates" :optionLabel="(item) => `${item.facuties} ${item.d_evaluationround} ${item.d_date}`" placeholder="กรุณาเลือกรอบการประเมิน" style=" max-width: 500px; width: 100%"></Dropdown> 
                     </div> 
-                    <div class="col md:col-1" >  
-                        <Button class="mb-2 mr-2" icon="pi pi-search" @click="xxr" /> 
-                    </div>
+                    <div class="col md:col-2" >  
+                        <Button class="mb-2 mr-2" icon="pi pi-search" @click="xxr" /> &nbsp; &nbsp; &nbsp; &nbsp;   
+                        <Button label="Export" icon="pi pi-file-word" class="mr-2 mb-2 " @click="printDatatracking"></Button>
+                    </div> 
                 </div>  
                 <table class="table">
                     <thead> 
@@ -27,11 +39,8 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr v-for="(Item, index) in products" :key="index">
-                            <td style="padding-left: 5px;width: 30%;text-align: left;">  
-
-                                <!-- {{ Item.tb_tor}} -->
- 
+                        <!-- <tr v-for="(Item, index) in products" :key="index">
+                            <td style="padding-left: 5px;width: 30%;text-align: left;">   
                                 <b style="color: blue;">{{ Item.prefixfullname }} {{ Item.namefully }} </b> 
                             </td> 
                             <td class="text-center" style="color: blue;"><b>{{ Item.tb_tor?Item.tb_tor.persen: '' }}</b></td>  
@@ -51,7 +60,30 @@
                                     <p style="color: brown;">-รอข้อมูลการประเมิน-</p>
                                 </div> 
                             </td> 
-                        </tr>  
+                        </tr>   -->
+                        <tr v-for="(Item, index) in products.filter(item => item.tb_tor).concat(products.filter(item => !item.tb_tor))" :key="index">
+                            <td style="padding-left: 5px;width: 30%;text-align: left;">   
+                                <b style="color: blue;">{{ Item.prefixfullname }} {{ Item.namefully }} </b> 
+                            </td> 
+                            <td class="text-center" style="color: blue;"><b>{{ Item.tb_tor ? Item.tb_tor.persen : '' }}</b></td>  
+                            <td class="text-center" style="color: blue;"><b>{{ Item.tb_tor ? Item.tb_tor.achievement_score : '' }}</b></td>    
+                            <td class="text-center" style="color: blue;"><b>{{ Item.tb_tor ? Item.tb_tor.behavior : '' }}</b></td>
+                            <td class="text-center" style="color: blue;"><b>{{ Item.tb_tor ? Item.tb_tor.sum_score : '' }} </b></td>  
+                            <td style="text-align: center;width: 10%;">  
+                                <div v-if="Item.tb_tor">
+                                    <Button 
+                                        label="ประเมิน" 
+                                        class="mb-2 mr-2" 
+                                        icon="pi pi-list" 
+                                        @click="openDataEvalu(Item)" 
+                                    />  
+                                </div>
+                                <div v-else>
+                                    <p style="color: brown;">-รอข้อมูลการประเมิน-</p>
+                                </div> 
+                            </td> 
+                        </tr>
+
                     </tbody> 
                 </table>   
                 <!-- <div style="text-align: center;">
@@ -66,9 +98,13 @@
                 <div class="col md:col-5 text-right">   
                     <Dialog header="จัดการแบบ ป01" maximizable v-model:visible="DialogAdd" :breakpoints="{ '960px': '75vw' }" :style="{ width: '100vw',height: '100vh' }" :modal="true" position="top">
                         <template v-slot:header>
-                            <h3 style="text-align: left;">แบบรายงานผลการปฏิบัติราชการของข้าราชการและพนักงาน</h3> 
-                            <InputText v-model="dataStaffid" type="hidden" autocomplete="off" style="display: none;"/>    
-                        </template> 
+                            <h3 style="text-align: left;">แบบรายงานผลการปฏิบัติราชการของข้าราชการและพนักงาน</h3>  
+                            <InputText v-model="dataStaffid" type="hidden" autocomplete="off" style="display: none;"/> 
+                           <!-- <p v-if="currentstaff?.length"> <strong>ชื่อผู้รับการประเมิน:</strong>  {{ currentstaff[0]?.prefixfullname || '-' }}  {{ currentstaff[0]?.staffname || '-' }}  {{ currentstaff[0]?.staffsurname || '-' }} </p> -->
+                           <p v-if="currentstaff?.length">
+                            <strong>ชื่อผู้รับการประเมิน:</strong> {{ currentstaff?.[0]?.prefixfullname || '-' }} {{ currentstaff?.[0]?.staffname || '-' }} {{ currentstaff?.[0]?.staffsurname || '-' }}
+                            </p>
+                        </template>  
                         <TabView :activeIndex="activeIndex" @tabChange="onTabChange"> 
                             <!-- Tab 1 -->
                             <TabPanel header="ผลสัมฤทธิ์ของงาน">
@@ -80,8 +116,8 @@
                                                     <tr>
                                                         <th rowspan="2" style="width: 15%;">กิจกรรม / โครงการ / งาน</th>
                                                         <th rowspan="2" style="width: 20%;">ตัวชี้วัด / เกณฑ์การประเมิน</th>
-                                                        <th rowspan="2" style="width: 20%;">รางานการปฏิบัติราชการ<br> ตามตัวชี้วัด/เกณฑ์การประเมิน</th>
-                                                        <th rowspan="2" style="width: 20%;">หลักฐานที่แสดงถึงผลการปฏิบัติราชการตามเกณฑ์การประเมิน(หลักฐานเชิงประจักษ์)</th> 
+                                                        <th rowspan="2" style="width: 20%;">รายงานการปฏิบัติราชการ</th>
+                                                        <th rowspan="2" style="width: 20%;">หลักฐานเชิงประจักษ์</th> 
                                                         <th rowspan="2" style="width: 10%;">ค่าคะแนนประเมินตนเอง</th>  
                                                         <th colspan="5" style="width: 15%;">ค่าคะแนนที่ได้</th>  
                                                     </tr> 
@@ -96,59 +132,57 @@
                                                 <tbody>
                                                     <template v-for="(h, ind) in products_Tab1" :key="ind">
                                                         <tr>
-                                                            <td style="text-align: left;" colspan="10">
-                                                                <b style="color: blue;">{{ h.id }}. {{ h.nameH }}</b> 
+                                                            <td colspan="10" style="text-align: left;">
+                                                                <b style="color: blue;">{{ h?.id || '-' }}. {{ h?.nameH || '-' }}</b> 
                                                             </td> 
                                                         </tr> 
-                                                        <tr v-for="(subP01, idx) in h.subP01sX" :key="idx" style="vertical-align: baseline;">
-                                                            <td style="text-align: left;">{{ subP01.p01_no }} {{ subP01.p01_subject }}</td>
+                                                        <tr v-for="(subP01, idx) in h?.subP01sX || []" :key="idx">
+                                                            <td style="text-align: left;">{{ subP01?.p01_no || '-' }} {{ subP01?.p01_subject || '-' }}</td>
                                                             <td style="text-align: left;">
-                                                                <b>ตัวชี้วัดที่ {{ idx+1 }} {{ subP01.p01_subject }}</b>
-                                                                <p v-for="(subIitem, idI) in subP01.subITems" :key="idI" style="padding-left: 8px;margin-bottom: 5px;">
-                                                                    <div v-if="subIitem.ind_no!=0" ><b>ระดับ {{ subIitem.ind_no }}</b> {{ subIitem.ind_Items }}</div>
-                                                                    <div v-if="subIitem.ind_no==0" ><b>{{ subIitem.ind_Items }}</b></div>
+                                                                <b>ตัวชี้วัดที่ {{ idx+1 }} {{ subP01?.p01_subject || '-' }}</b>
+                                                                <p v-for="(subIitem, idI) in subP01?.subITems || []" :key="idI">
+                                                                    <div v-if="subIitem?.ind_no !== 0"><b>ระดับ {{ subIitem?.ind_no }}</b> {{ subIitem?.ind_Items || '-' }}</div>
+                                                                    <div v-else><b>{{ subIitem?.ind_Items || '-' }}</b></div>
                                                                 </p>
                                                             </td>
-
                                                             <td style="text-align: left;">
-                                                                <p v-for="(subIitemInd, inD) in subP01.subITemP03ind" :key="inD" style="padding-left: 8px;margin-bottom: 5px;">
-                                                                    <div v-if="subIitemInd.p03ind_no!=0"><b>ระดับ {{ subIitemInd.p03ind_no }}</b> {{ subIitemInd.p03ind_Items }}</div>
-                                                                    <div v-if="subIitemInd.p03ind_no==0"><b>{{ subIitemInd.p03ind_Items }}</b></div> 
+                                                                <p v-if="(subP01?.subITemP03ind || []).length > 0">
+                                                                    <div v-for="level in [1, 2, 3, 4, 5]" :key="level">
+                                                                        <div v-if="subP01?.subITemP03ind?.some(item => item?.p03ind_no === level + '')">
+                                                                            <b>ระดับ {{ level }}</b>
+                                                                            <div v-for="(item, index) in subP01?.subITemP03ind?.filter(item => item?.p03ind_no === level + '')" :key="index">
+                                                                                <div>{{ index + 1 }}. {{ item?.p03ind_Items || '-' }}</div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
                                                                 </p>
-                                                                <p v-if="subP01.subITemP03ind.length == 0" style="padding-left: 8px;margin-bottom: 5px;">
-                                                                    <b style="color: red;">- ไม่มีข้อมูล -</b>
-                                                                </p> 
+                                                                <p v-else style="color: red;">- ไม่มีข้อมูล -</p>
                                                             </td>
-                                                            <!-- {{ subP01 }} -->
                                                             <td style="text-align: left;"> 
-                                                                <p v-for="(subIitemDoc, inDoc) in subP01.subITemP03doc" :key="inDoc" style="padding-left: 8px;margin-bottom: 5px;"> 
-                                                                    <a v-if="subIitemDoc.doc_file!=null" :href="'https://survey.msu.ac.th/evaluatebackend/storage/uploadsP03/'+subIitemDoc.doc_file" target="_blank"><b>ระดับ</b> <b>{{subIitemDoc.doc_no }}</b> {{ subIitemDoc.doc_name }}</a> 
-                                                                    <a v-if="subIitemDoc.doc_link!=null" :href="subIitemDoc.doc_link" target="_blank"><b>ระดับ</b> <b>{{ subIitemDoc.p03ind_no }}</b> {{ subIitemDoc.doc_name }}</a> 
+                                                                <p v-for="(subIitemDoc, inDoc) in (subP01?.subITemP03doc || []).slice().sort((a, b) => a.doc_no - b.doc_no)" 
+                                                                :key="inDoc"> 
+                                                                    <a v-if="subIitemDoc?.doc_file" 
+                                                                    :href="'http://127.0.0.1:8000/storage/uploadsP03/' + subIitemDoc?.doc_file" target="_blank">
+                                                                        <b>เอกสารลำดับที่ {{ subIitemDoc?.doc_no }}</b> {{ subIitemDoc?.doc_name || '-' }}
+                                                                    </a> 
+                                                                    <a v-else-if="subIitemDoc?.doc_link" 
+                                                                    :href="subIitemDoc?.doc_link" target="_blank">
+                                                                        <b>เอกสารลำดับที่ {{ subIitemDoc?.doc_no }}</b> {{ subIitemDoc?.doc_name || '-' }}
+                                                                    </a>
                                                                 </p>
-                                                                <p v-if="subP01.subITemP03doc.length == 0" style="padding-left: 8px;margin-bottom: 5px;">
-                                                                    <b style="color: red;">- ไม่มีข้อมูล -</b>
-                                                                </p>
-                                                            </td>  
-                                                            <td style=" vertical-align: middle;" class="text-center">{{ subP01.score }}</td>
-                                                            
-                                                            
+                                                                <p v-if="(subP01?.subITemP03doc || []).length === 0" style="color: red;">- ไม่มีข้อมูล -</p>
+                                                            </td> 
+                                                            <td style="text-align: center;">{{ subP01?.score || '-' }}</td>   
                                                             <td class="text-center" colspan="5">  
-                                                           
                                                                 <Dropdown 
-                                                                    class="mb-1" 
                                                                     v-model="subP01.p01_score" 
                                                                     :options="p01_scores" 
                                                                     optionLabel="name" 
                                                                     optionValue="code" 
                                                                     placeholder="เลือกคะแนน" 
-                                                                    :value="subP01.p01_score || p01_scores[0]" 
                                                                 />  
-                                                                <!-- <div class="mb-1">
-                                                                    <InputText v-model="subP01.p01_score" :options="p01_scores"  optionLabel="name" optionValue="code"  :value="subP01.p01_score || p01_scores[0]"></InputText>
-                                                                </div> -->
-
-                                                                <textarea v-model="subP01.p01_detail" rows="3" class="custom-textarea" ></textarea> 
-                                                                <Button label="บันทึกผล" icon="pi pi-save" class="mb-2 mr-2" @click="saveEvaTab1(subP01)" />  
+                                                                <textarea  class="p-inputtextarea p-inputtext p-component" v-model="subP01.p01_detail" rows="3"></textarea> 
+                                                                <Button label="บันทึกผล" icon="pi pi-save" @click="saveEvaTab1(subP01)" />  
                                                             </td> 
                                                         </tr>
                                                     </template>
@@ -160,129 +194,133 @@
                                             <div class="p-fluid formgrid grid">
                                                 <!-- ตาราง ก. สมรรถนะหลัก -->
                                                 <div class="field col-12 md:col-4"> 
-                                                   
                                                     <table id="ratingTable">
                                                         <thead>
                                                             <tr>
-                                                                <th style="width: 50%;">ก. สมรรถนะหลัก (สำหรับข้าราชการและพนักงานทุกคน)</th>
-                                                                <th style="width: 20%;">(1)ระดับ<br>สมรรถนะ<br>ที่คาดหวัง</th>
-                                                                <th style="width: 20%;">(1)ระดับ<br>สมรรถนะ<br>ประเมินตนเอง</th> 
-                                                                <th style="width: 20%;">(2)ระดับ<br>สมรรถนะ<br>ที่แสดงออก</th>
+                                                                <th>ก. สมรรถนะหลัก</th>
+                                                                <th>(1)ระดับสมรรถนะที่คาดหวัง</th>
+                                                                <th>ระดับสมรรถนะประเมินตนเอง</th> 
+                                                                <th>(2)ระดับสมรรถนะที่แสดงออก</th>
                                                             </tr>
                                                         </thead>
                                                         <tbody> 
                                                             <tr v-for="(row1, index) in coreCompetencies" :key="index">
                                                                 <td style="text-align: left;">{{ row1.activity }}</td> 
                                                                 <td>{{ row1.indicator }}</td>
-                                                                <!-- <td style="color: blue;"><b>{{ row1.selfAssessment}}</b></td>  -->
-                                                                <td>  
-                                                                    <b v-if="row1.selfAssessment == '' ||  row1.selfAssessment == null" style="color: red;">0</b> 
-                                                                    <b v-if="row1.selfAssessment != 0 " style="color: blue" >{{ row1.selfAssessment }}</b> 
+                                                                <td>
+                                                                    <b v-if="!row1.selfAssessment" style="color: red;">0</b> 
+                                                                    <b v-else style="color: blue">{{ row1.selfAssessment }}</b> 
                                                                 </td>
                                                                 <td>
                                                                     <InputNumber 
                                                                         v-model.number="row1.data_table1" 
-                                                                        type="text" 
                                                                         placeholder="0" 
-                                                                        autocomplete="off" 
-                                                                         showButtons
-                                                                    />   
-                                                                    <!--                                                                     
-                                                                    <InputNumber 
-                                                                        v-model.number="row1.data_table1" 
-                                                                        type="text" 
-                                                                        placeholder="0" 
-                                                                        autocomplete="off"
-                                                                        @input="(event) => event.target.value = event.target.value.replace(/[^0-9]/g, '') " 
                                                                         showButtons
-                                                                    />  -->
+                                                                    />   
                                                                 </td>
                                                             </tr>
                                                         </tbody>
                                                     </table>
                                                 </div>
-                                                <!-- ตาราง ข. สมรรถนะเฉพาะตามลักษณะงานที่ปฏิบัติ -->
+
+                                                <!-- ตาราง ข. สมรรถนะเฉพาะ -->
                                                 <div class="field col-12 md:col-4"> 
                                                     <table id="ratingTable">
                                                         <thead>
                                                             <tr>
-                                                                <th style="width: 50%;">ข. สมรรถนะเฉพาะตามลักษณะงานที่ปฏิบัติ (สำหรับข้าราชการและพนักงานเฉพาะตามตำแหน่งที่รับผิดชอบตามที่ ก.บ.ม. กำหนด)</th>
-                                                                <th style="width: 20%;">(3)ระดับ<br>สมรรถนะ<br>ที่คาดหวัง</th>
-                                                                <th style="width: 20%;">(1)ระดับ<br>สมรรถนะ<br>ประเมินตนเอง</th> 
-                                                                <th style="width: 20%;">(4)ระดับ<br>สมรรถนะ<br>ที่แสดงออก111</th>
+                                                                <th>ข. สมรรถนะเฉพาะ</th>
+                                                                <th>(3)ระดับสมรรถนะที่คาดหวัง</th>
+                                                                <th>ระดับสมรรถนะประเมินตนเอง</th> 
+                                                                <th>(4)ระดับสมรรถนะที่แสดงออก</th>
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            <!-- {{ row2jobSpecificCompetencies }} -->
                                                             <tr v-for="(row2, index) in jobSpecificCompetencies" :key="index">
                                                                 <td style="text-align: left;"> ข. {{ index+1 }} {{ row2.WORK_NAME }}</td> 
                                                                 <td> {{ row2.COMPLEVEL }}</td>
-                                                                <!-- <td style="color: blue"> <b>{{ row2.SCOREPERSON }}</b></td>  -->
-                                                                <td>  
-                                                                    <b v-if="row2.SCOREPERSON == '' || row2.SCOREPERSON == null" style="color: red;">0</b> 
-                                                                    <b v-if="row2.SCOREPERSON != 0 " style="color: blue;" >{{ row2.SCOREPERSON }}</b> 
+                                                                <td>
+                                                                    <b v-if="!row2.SCOREPERSON" style="color: red;">0</b> 
+                                                                    <b v-else style="color: blue;">{{ row2.SCOREPERSON }}</b> 
                                                                 </td>
                                                                 <td>
-                                                                    <!-- <InputText 
-                                                                        v-model.number="row2.data_table2" 
-                                                                        type="text" 
-                                                                        placeholder="0" 
-                                                                        autocomplete="off"
-                                                                        @input="(event) => event.target.value = event.target.value.replace(/[^0-9]/g, '') " 
-                                                                    /> -->
                                                                     <InputNumber 
                                                                         v-model.number="row2.SCORE"
-                                                                        type="text" 
                                                                         placeholder="0" 
-                                                                        autocomplete="off" 
-                                                                         showButtons
+                                                                        showButtons
                                                                     />    
                                                                 </td>
                                                             </tr>
                                                         </tbody>
                                                     </table>
                                                 </div>
-                                                <!-- ตาราง ค. สมรรถนะอื่นๆ -->
+
+                                                <!-- ตาราง ค. สมรรถนะทางการบริหาร -->
                                                 <div class="field col-12 md:col-4"> 
                                                     <table id="ratingTable">
                                                         <thead>
                                                             <tr>
-                                                                <th style="width: 50%;">ค. สมรรถนะทางการบริหาร (สำหรับตำแหน่งประเภทบริหารตามที่ ก.บ.ม. กำหนด)</th>
-                                                                <th style="width: 20%;">(5)ระดับ<br>สมรรถนะ<br>ที่คาดหวัง</th>
-                                                                <th style="width: 20%;">(5)ระดับ<br>สมรรถนะ<br>ประเมินตนเอง</th>
-                                                                <th style="width: 20%;">(6)ระดับ<br>สมรรถนะ<br>ที่แสดงออก</th>
+                                                                <th>ค. สมรรถนะทางการบริหาร</th>
+                                                                <th>(5)ระดับสมรรถนะที่คาดหวัง</th>
+                                                                <th>ระดับสมรรถนะประเมินตนเอง</th>
+                                                                <th>(6)ระดับสมรรถนะที่แสดงออก</th>
                                                             </tr>
                                                         </thead>
                                                         <tbody>
                                                             <tr v-for="(row3, index) in otherCompetencies" :key="index">
                                                                 <td style="text-align: left;">{{ row3.activity }}</td> 
-                                                                <td></td>
-                                                                <td></td>
-                                                                <td></td>
-                                                            </tr>
+                                                                <td> 
+                                                                    <b v-if="!row3.indicator3" style="color: red;">-</b>
+                                                                    <span v-else>{{ row3.indicator3 }}</span>  
+                                                                </td>
+                                                                <td>  
+                                                                    <b v-if="!row3.datatable3" style="color: red;">-</b> 
+                                                                    <b v-else style="color: blue">{{ row3.datatable3 }}</b> 
+                                                                </td>
+                                                                <!-- <td>
+                                                                    <InputNumber 
+                                                                        v-model.number="row3.selfAssessment3" 
+                                                                        placeholder="0" 
+                                                                        showButtons
+                                                                    />
+                                                                </td> -->
+                                                                <td>
+                                                                    <template v-if="postypenameth === 'ผู้บริหาร' || (currentstaff && currentstaff[0] && currentstaff[0].posnameth 	=== 'ผู้บริหาร')"> 
+                                                                        <InputNumber 
+                                                                            v-model.number="row3.selfAssessment3" 
+                                                                            type="text" 
+                                                                            placeholder="0" 
+                                                                            autocomplete="off" 
+                                                                            showButtons
+                                                                        />
+                                                                    </template>
+                                                                    <template v-else>
+                                                                        <b><span style="color: red;">-</span></b>
+                                                                    </template>
+                                                                </td>
+                                                            </tr> 
                                                         </tbody>
                                                     </table>
                                                 </div>
                                             </div>
-
-                                            <div class="p-fluid formgrid grid"> 
-                                                <B><h4>ความเห็นเพิ่มเติมของผู้ประเมิน (ระบุข้อมูลเมื่อสิ้นรอบการประเมิน)</h4></B>
-                                                <div class="field col-12 md:col-12">  
-                                                    <label for="improvements">1) จุดเด่น และ/หรือ สิ่งที่ควรปรับปรุงแก้ไข</label>
-                                                    <textarea v-model="improvements" rows="4" class="custom-textarea" ></textarea> 
+                                            <div class="p-fluid formgrid grid">
+                                                <div class="field col-12">
+                                                    <h4>ความเห็นเพิ่มเติมของผู้ประเมิน</h4>
+                                                    <label>1) จุดเด่น และ/หรือ สิ่งที่ควรปรับปรุงแก้ไข</label>
+                                                    <textarea class="p-inputtextarea p-inputtext p-component" v-model="improvements" rows="4"></textarea> 
                                                 </div>
-                                                <div class="field col-12 md:col-12">  
-                                                    <label for="suggestions">2) ข้อเสนอแนะเกี่ยวกับวิธีส่งเสริมและพัฒนา</label>
-                                                    <textarea v-model="suggestions" rows="4" class="custom-textarea" ></textarea> 
+                                                <div class="field col-12">  
+                                                    <label>2) ข้อเสนอแนะเกี่ยวกับวิธีส่งเสริมและพัฒนา</label>
+                                                    <textarea class="p-inputtextarea p-inputtext p-component" v-model="suggestions" rows="4"></textarea> 
                                                 </div> 
-                                            </div>  
+                                            </div>   
                                             <div class="button-container">
-                                                <Button label="บันทึกข้อมูลสมรรถนะ / ความเห็นเพิ่มเติม" icon="pi pi-save" class="mb-2 mr-2" @click="saveEvaTab1_1" /> 
+                                                <Button label="บันทึกข้อมูลสมรรถนะ / ความเห็นเพิ่มเติม" icon="pi pi-save" @click="saveEvaTab1_1" /> 
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                            </TabPanel> 
+                            </TabPanel>
+
                             <!-- Tab 2 -->
                             <TabPanel header="รายงาน ป.01 - ป.03" >
                                 <div class="grid">
@@ -332,7 +370,7 @@
                                                                     <em style="color: red;">{{ subP01.p01_detail }}</em>
                                                                 </p>
                                                             </td> 
-                                                            <td style="text-align: left;">
+                                                            <!-- <td style="text-align: left;">
                                                                 <p v-for="(subIitemInd, inD) in subP01.subITemP03ind" :key="inD" style="padding-left: 8px;margin-bottom: 5px;">
                                                                     <div v-if="subIitemInd.p03ind_no!=0"><b>ระดับ {{ subIitemInd.p03ind_no }}</b> {{ subIitemInd.p03ind_Items }}</div>
                                                                     <div v-if="subIitemInd.p03ind_no==0"><b>{{ subIitemInd.p03ind_Items }}</b></div> 
@@ -340,16 +378,57 @@
                                                                 <p v-if="subP01.subITemP03ind.length == 0" style="padding-left: 8px;margin-bottom: 5px;">
                                                                     <b style="color: red;">- ไม่มีข้อมูล -</b>
                                                                 </p>  
-                                                            </td> 
-                                                            <td style="text-align: left;"> 
+                                                            </td>  -->
+                                                            <td style="text-align: left;">
+                                                                <!-- วนลูปแสดงระดับ 1 ถึง 5 -->
+                                                                <div v-for="level in [1, 2, 3, 4, 5]" :key="level">
+                                                                    <div v-if="subP01.subITemP03ind.some(item => item.p03ind_no === level+'')">
+                                                                        <b>ระดับ {{ level }}</b>
+                                                                        <div v-for="(item, index) in subP01.subITemP03ind.filter(item => item.p03ind_no === level+'')" :key="index">
+                                                                            <!-- แสดงรายการที่มีระดับเดียวกัน -->
+                                                                            <div>
+                                                                                {{ index + 1 }}. {{ item.p03ind_Items }}
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+
+                                                                <p v-if="subP01.subITemP03ind.length == 0" style="padding-left: 8px;margin-bottom: 5px;">
+                                                                    <b style="color: red;">- ไม่มีข้อมูล -</b>
+                                                                </p>
+                                                            </td>
+                                                            
+                                                            <!-- //รายงานป.01 --> 
+                                                            <!-- <td style="text-align: left;"> 
                                                                 <p v-for="(subIitemDoc, inDoc) in subP01.subITemP03doc" :key="inDoc" style="padding-left: 8px;margin-bottom: 5px;"> 
-                                                                    <a v-if="subIitemDoc.doc_file!=null" :href="'https://survey.msu.ac.th/evaluatebackend/storage/uploadsP03/'+subIitemDoc.doc_file" target="_blank"><b>ระดับ</b> <b>{{subIitemDoc.doc_no }}</b> {{ subIitemDoc.doc_name }}</a> 
+                                                                    <a v-if="subIitemDoc.doc_file!=null" :href="'  http://127.0.0.1:8000/storage/uploadsP03/'+subIitemDoc.doc_file" target="_blank"><b>ระดับ</b> <b>{{subIitemDoc.doc_no }}</b> {{ subIitemDoc.doc_name }}</a> 
                                                                     <a v-if="subIitemDoc.doc_link!=null" :href="subIitemDoc.doc_link" target="_blank"><b>ระดับ</b> <b>{{ subIitemDoc.p03ind_no }}</b> {{ subIitemDoc.doc_name }}</a> 
                                                                 </p>
                                                                 <p v-if="subP01.subITemP03doc.length == 0" style="padding-left: 8px;margin-bottom: 5px;">
                                                                     <b style="color: red;">- ไม่มีข้อมูล -</b>
                                                                 </p>
-                                                            </td>  
+                                                            </td>    -->
+                                                            <td style="text-align: left;"> 
+                                                                <p v-for="(subIitemDoc, inDoc) in subP01.subITemP03doc.slice().sort((a, b) => a.doc_no - b.doc_no)" 
+                                                                :key="inDoc" 
+                                                                style="padding-left: 8px;margin-bottom: 5px;"> 
+                                                                
+                                                                    <a v-if="subIitemDoc.doc_file!=null && subIitemDoc.doc_link==null" 
+                                                                    :href="'http://127.0.0.1:8000/storage/uploadsP03/' + subIitemDoc.doc_file" target="_blank">
+                                                                        <b>เอกสารลำดับที่</b> <b>{{ subIitemDoc.doc_no }}</b> {{ subIitemDoc.doc_name }}
+                                                                    </a> 
+                                                                    
+                                                                    <a v-if="subIitemDoc.doc_link!=null && subIitemDoc.doc_file==null" 
+                                                                    :href="subIitemDoc.doc_link" target="_blank">
+                                                                        <b>เอกสารลำดับที่</b> <b>{{ subIitemDoc.doc_no }}</b> {{ subIitemDoc.doc_name }}
+                                                                    </a> 
+                                                                </p>
+
+                                                                <p v-if="subP01.subITemP03doc.length == 0" style="padding-left: 8px;margin-bottom: 5px;">
+                                                                    <b style="color: red;">- ไม่มีข้อมูล -</b>
+                                                                </p>
+                                                            </td> 
+                                                            
                                                             <td style=" vertical-align: middle;" class="text-center">
                                                                 <b v-if="subP01.p01_target==1">&#10003;</b> 
                                                                 <b v-if="subP01.p01_target!=1"></b> 
@@ -457,7 +536,8 @@
                                                         <tbody>
                                                             <tr v-for="(row2, index) in jobSpecificCompetencies" :key="index">
                                                                 <td style="text-align: left;"> ข. {{ index+1 }} {{ row2.WORK_NAME }}</td> 
-                                                                <td> {{ row2.COMPLEVEL }}</td> 
+                                                                <td> {{ row2.COMPLEVEL }} 
+                                                                </td> 
                                                                 <!-- <td style="color: blue"> <b>{{ row2 }}</b></td> -->
                                                                 <td>  
                                                                     <b v-if="row2.SCOREPERSON == '' ||  row2.SCOREPERSON == null " style="color: red;">0</b> 
@@ -472,7 +552,7 @@
                                                     </table>
                                                 </div>
                                                 <!-- ตาราง ค. สมรรถนะอื่นๆ -->
-                                                <div class="field col-12 md:col-4"> 
+                                                <!-- <div class="field col-12 md:col-4"> 
                                                     <table id="ratingTable">
                                                         <thead>
                                                             <tr>
@@ -489,6 +569,36 @@
                                                                 <td></td>
                                                                 <td></td>
                                                             </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div> -->
+
+                                                <div class="field col-12 md:col-4"> 
+                                                    <table id="ratingTable">
+                                                        <thead>
+                                                            <tr>
+                                                                <th style="width: 60%;">ค. สมรรถนะทางการบริหาร (สำหรับตำแหน่งประเภทบริหารตามที่ ก.บ.ม. กำหนด)</th>
+                                                                <th style="width: 20%;">(5)ระดับ<br>สมรรถนะ<br>ที่คาดหวัง</th>
+                                                                <th style="width: 20%;">ระดับ<br>สมรรถนะ<br>ประเมิน<br>ตนเอง</th>
+                                                                <th style="width: 20%;">(6)ระดับ<br>สมรรถนะ<br>ที่แสดง<br>ออก</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr v-for="(row3, index) in otherCompetencies" :key="index">
+                                                                <td style="text-align: left;">{{ row3.activity }}</td> 
+                                                                <td> 
+                                                                    <b v-if="row3.indicator3 == '' ||  row3.indicator3 == null" style="color: red;">0</b>
+                                                                    <span v-if="row3.indicator3 != 0">{{ row3.indicator3 }}</span>  
+                                                                </td>
+                                                                <td>  
+                                                                    <b v-if="row3.datatable3 == '' ||  row3.datatable3 == null" style="color: red;">0</b> 
+                                                                    <b v-if="row3.datatable3 != 0 " style="color: blue" >{{ row3.datatable3 }}</b> 
+                                                                </td>
+                                                                <td>  
+                                                                    <b v-if="row3.selfAssessment3 == '' " style="color: red;">0</b> 
+                                                                    <b v-if="row3.selfAssessment3 != 0 " >{{ row3.selfAssessment3 }}</b> 
+                                                                </td>
+                                                            </tr> 
                                                         </tbody>
                                                     </table>
                                                 </div>
@@ -565,11 +675,12 @@
                                                         <div style="display: flex; justify-content: flex-end;"> 
                                                             <hr style="border: 1px solid black; width: 70%;">
                                                         </div> 
-                                                        <b style="display: block; text-align: right; color: blue;">{{ 33}}</b>
+                                                        <b style="display: block; text-align: right; color: blue;"> {{ calculateTotalCoreCompetenciesX() }} </b>
+                                                        <!-- <b style="display: block; text-align: right; color: blue;"> {{ 33}} </b> -->
                                                         <b style="color: blue;">จำนวนสมรรถนะที่ใช้ในการประเมิน X 3 คะแนน</b>  
                                                     </td> 
                                                     <td class="text-center" style="color: blue;"> 
-                                                         <b> = {{ ((totalScoreSumX3 + totalScoreSumX2+totalScoreSumX1) / 33).toFixed(2) }}</b>  
+                                                         <b> = {{ ((totalScoreSumX3 + totalScoreSumX2+totalScoreSumX1) / calculateTotalCoreCompetenciesX()).toFixed(2) }}</b>   
                                                     </td> 
                                                 </tr>  
                                                 </tbody>
@@ -635,102 +746,105 @@
                                 </div>
                             </TabPanel>
                             <!-- Tab 4 --> 
-                            <TabPanel header="รายงาน ป.04" >
+                            <TabPanel header="รายงาน ป.04">
                                 <div class="card">
                                     <h4 style="text-align: left">แบบสรุปการประเมินผล</h4>
-                                        <div class="p-fluid formgrid grid">
-                                            <div class="card">                      
-                                                <h5 class="mb-4"><i class="" style="font-size: x-large;"></i> ส่วนที่ 1 ข้อมูลของผู้รับการประเมิน</h5>
-                                                <!-- ตาราง ก. สมรรถนะหลัก -->  
-                                                <div class="employee-info">  
-                                                    <p v-if="tracking_date.d_evaluationround"> <strong>รอบการประเมิน:</strong> {{ tracking_date.d_evaluationround }} {{ tracking_date.d_date }} </p>
-                                                    <p><strong>ชื่อผู้รับการประเมิน:</strong>  {{ currentstaff[0].prefixfullname }} {{ currentstaff[0].staffname }} {{   currentstaff[0].staffsurname }} </p>
-                                                    <p><strong>ตำแหน่ง:</strong> {{ currentstaff[0].posnameth }} </p>
-                                                    <p><strong>ระดับตำแหน่ง:</strong>{{ currentstaff[0].postypenameth }} </p>
-                                                    <p v-if="currentstaff[0].facultyid==201092700000"><strong>สังกัด:</strong> {{ currentstaff[0].departmentname }} </p>
-                                                    <p v-else><strong>สังกัด:</strong> {{ currentstaff[0].facultyname }} </p>
-                                                    <p><strong>ชื่อผู้ประเมิน:</strong>  {{ assessorText??'-' }}</p>  
-                                                </div><br>
-                                                <div class="employee-info" style="border: groove;padding: 15px;">
-                                                    <h4>คำชี้แจง</h4>
-                                                    <h5>แบบสรุปการประเมินผลการปฏิบัติราชการนี้มีด้วยกัน 5 ส่วน ดังนี้</h5>
-                                                    <p><strong>ส่วนที่ 1 ข้อมูลของผู้รับการประเมิน</strong> เพื่อระบุรายละเอียดต่างๆ ที่เกี่ยวข้องกับตัวผู้รับการประเมิน</p>
-                                                    <p> <strong>ส่วนที่ 2 การสรุปผลการประเมิน</strong> ใช้เพื่อกรอกค่าคะแนนการประเมินในองค์ประกอบด้านผลสัมฤทธิ์ของงาน 
-                                                        องค์ประกอบด้านพฤติกรรมการปฏิบัติราชการ และน้ำหนักของทั้งสององค์ประกอบในแบบสรุปส่วนที่ 2 นี้ ยังใช้สำหรับคำนวณคะแนนผลการปฏิบัติราชการรวมด้วย<br>
-                                                        - สำหรับคะแนนองค์ประกอบด้านผลสัมฤทธิ์ของงาน ให้นำมาจากแบบประเมินผลสัมฤทธิ์ของงาน โดยให้แนบท้ายแบบสรุปฉบับนี้<br>
-                                                        - สำหรับคะแนนองค์ประกอบด้านพฤติกรรมการปฏิบัติราชการ ให้นำมาจากแบบประเมิน สมรรถนะโดยให้แนบท้ายแบบสรุปฉบับนี้</p>
-                                                    <p><strong>ส่วนที่ 3 แผนพัฒนาการปฏิบัติราชการรายบุคคล</strong> ผู้ประเมินและผู้รับการประเมินร่วมกันจัดทำแผนพัฒนา ผลการปฏิบัติราชการ</p>
-                                                    <p><strong>ส่วนที่ 4 การรับทราบผลการประเมิน</strong> ผู้รับการประเมินลงนามรับทราบผลการประเมิน</p>
-                                                    <p><strong>ส่วนที่ 5 ความเห็นของผู้บังคับบัญชาเหนือขึ้นไป</strong> ผู้บังคับบัญชาเหนือขึ้นไปกลั่นกรองผลการประเมิน แผนพัฒนาผลการปฏิบัติราชการ และให้ความเห็น</p>
-                                                </div>                                                       
-                                                <h5 class="mb-4"><i class="" style="font-size: x-large;"></i> ส่วนที่ 2 ข้อมูลของผู้รับการประเมิน</h5> 
-                                                <table border="1" cellspacing="0" cellpadding="5">
-                                                    <thead>
-                                                        <tr style="background-color: #F4B366;">
-                                                            <th rowspan="2">องค์ประกอบการประเมิน</th>
-                                                            <th rowspan="2">ค่าคะแนนที่ได้หลังถ่วงน้ำหนัก (ก)</th>
-                                                            <th rowspan="2">สัดส่วนคะแนน (ข)</th>
-                                                            <th rowspan="2">สรุปคะแนน (ก) X (ข)</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>  
-                                                        <template v-for="(Item, index) in products" :key="index"> 
-                                                        <tr v-if="dataStaffid==Item.staffid">  
-                                                            <td>องค์ประกอบที่ 1 ผลสัมฤทธิ์ของงาน</td>
-                                                            <td class="text-center" style="color: blue;"> 
-                                                                <!-- <b id="sumX">{{ ((totalScoreSumX3 + totalScoreSumX2) / 33).toFixed(2) }}</b>  --> 
-                                                                  <b>{{ Item.tb_tor.achievement_score }}</b> 
-                                                            </td> 
-                                                            <td class="text-center" style="color: blue;">  
-                                                                <b>{{ Item.tb_tor?Item.tb_tor.persen.split(':')[0]: '' }}</b>
-                                                            </td> 
-                                                            <td class="text-center" style="color: blue;">  
-                                                                <!-- <b>{{ (((totalScoreSumX3 + totalScoreSumX2) / 33).toFixed(2) *(Item.tb_tor?Item.tb_tor.persen.split(':')[0]:0)).toFixed(2)}}</b>   --> 
-                                                                <b>{{ ( Item.tb_tor  ? Item.tb_tor.achievement_score * (parseFloat(Item.tb_tor.persen.split(':')[0]) || 0) : 0 ).toFixed(2) }}</b>  
-                                                            </td> 
-                                                        </tr> 
-                                                        <tr v-if="dataStaffid==Item.staffid"> 
-                                                            <td>องค์ประกอบที่ 2 พฤติกรรมการปฏิบัติราชการ</td>
-                                                            <td class="text-center" style="color: blue;">
-                                                                <!-- {{ insert2(WeightedScoreSumXT) }} --> 
-                                                                <!-- <b>{{ ((totalScoreSumX3 + totalScoreSumX2+totalScoreSumX1) / 33).toFixed(2) }}</b> -->
-                                                                 <b>{{Item.tb_tor.behavior }}</b>
+                                    <div class="p-fluid formgrid grid">
+                                        <div class="card">                      
+                                            <h5 class="mb-4">ส่วนที่ 1 ข้อมูลของผู้รับการประเมิน</h5>
+                                            <div class="employee-info">  
+                                                <p v-if="tracking_date?.d_evaluationround"> 
+                                                    <strong>รอบการประเมิน:</strong> {{ tracking_date?.d_evaluationround || '-' }} {{ tracking_date?.d_date || '-' }} 
+                                                </p>
+                                                <p v-if="currentstaff?.length">
+                                                    <strong>ชื่อผู้รับการประเมิน:</strong>  
+                                                    {{ currentstaff[0]?.prefixfullname || '-' }} 
+                                                    {{ currentstaff[0]?.staffname || '-' }} 
+                                                    {{ currentstaff[0]?.staffsurname || '-' }}
+                                                </p>
+                                                <p><strong>ตำแหน่ง:</strong> {{ currentstaff[0]?.posnameth || '-' }}</p>
+                                                <p v-if="currentstaff?.length">
+                                                    <strong>ระดับตำแหน่ง:</strong>
+                                                    <!-- {{ (currentstaff[0]?.postypenameth === 'ผู้บริหาร' ? 'ชำนาญการพิเศษ' :currentstaff[0]?.postypenameth) }} --> 
+                                                    <!-- {{ posnameth === 'ผู้บริหาร' || currentstaff?.[0]?.postypenameth === 'ชำนาญการ' }} -->
+                                                    <!-- {{ currentstaff[0] }} -->
+                                                    {{ currentstaff[0]?.posnameth=='ผู้บริหาร'&& !currentstaff[0]?.postypenameth   ? 'ชำนาญการพิเศษ' : currentstaff[0]?.postypenameth}}
 
-
-                                                            </td>  
-                                                            <td class="text-center" style="color: blue;">  
-                                                                <b>{{ Item.tb_tor?Item.tb_tor.persen.split(':')[1]: ''}}</b>
-                                                            </td> 
-                                                            <td class="text-center" style="color: blue;"> 
-                                                                <b>{{ ((Item.tb_tor.behavior *(Item.tb_tor?Item.tb_tor.persen.split(':')[1]:0)).toFixed(2)) }}</b>  
-                                                            </td>  
-                                                        </tr>
-                                                        <tr v-if="dataStaffid==Item.staffid">
-                                                            <td>องค์ประกอบอื่นๆ (ถ้ามี)</td>
-                                                            <td></td>
-                                                            <td></td>
-                                                            <td></td>
-                                                        </tr>
-                                                        <tr v-if="dataStaffid==Item.staffid" style="font-weight: bold;">
-                                                            <td colspan="2" style="text-align: right;">รวม</td>
-                                                            <td class="text-center" style="color: blue;"> 
-                                                                <b>{{ 100 }}%</b>  
-                                                            </td> 
-                                                            <td class="text-center" style="color: blue;">  
-                                                                <b>{{ Item.tb_tor?Item.tb_tor.sum_score:'' }}</b>  
-                                                            </td> 
-                                                        </tr>
-                                                        </template>   
+                                                </p>
+                                                <p v-if="currentstaff[0]?.facultyid == 201092700000">
+                                                    <strong>สังกัด:</strong> {{ currentstaff[0]?.departmentname || '-' }}
+                                                </p>
+                                                <p v-else>
+                                                    <strong>สังกัด:</strong> {{ currentstaff[0]?.facultyname || '-' }}
+                                                </p>
+                                                <p><strong>ชื่อผู้ประเมิน:</strong>  {{ assessorText || '-' }}</p>  
+                                            </div>
+                                            <br>
+                                            <div class="employee-info" style="border: groove;padding: 15px;">
+                                                <h4>คำชี้แจง</h4>
+                                                <h5>แบบสรุปการประเมินผลการปฏิบัติราชการนี้มี 5 ส่วน ดังนี้</h5>
+                                                <p><strong>ส่วนที่ 1 ข้อมูลของผู้รับการประเมิน</strong> เพื่อระบุรายละเอียดต่างๆ ที่เกี่ยวข้องกับตัวผู้รับการประเมิน</p>
+                                                <p><strong>ส่วนที่ 2 การสรุปผลการประเมิน</strong> ใช้เพื่อกรอกค่าคะแนนการประเมินในองค์ประกอบด้านผลสัมฤทธิ์ของงาน 
+                                                    องค์ประกอบด้านพฤติกรรมการปฏิบัติราชการ และน้ำหนักของทั้งสององค์ประกอบ
+                                                </p>
+                                                <p><strong>ส่วนที่ 3 แผนพัฒนาการปฏิบัติราชการรายบุคคล</strong> ผู้ประเมินและผู้รับการประเมินร่วมกันจัดทำแผนพัฒนา</p>
+                                                <p><strong>ส่วนที่ 4 การรับทราบผลการประเมิน</strong> ผู้รับการประเมินลงนามรับทราบผลการประเมิน</p>
+                                                <p><strong>ส่วนที่ 5 ความเห็นของผู้บังคับบัญชาเหนือขึ้นไป</strong> ผู้บังคับบัญชาให้ความเห็น</p>
+                                            </div>
+                                            <h5 class="mb-4">ส่วนที่ 2 การสรุปผลการประเมิน</h5> 
+                                            <table border="1" cellspacing="0" cellpadding="5">
+                                                <thead>
+                                                    <tr style="background-color: #F4B366;">
+                                                        <th rowspan="2">องค์ประกอบการประเมิน</th>
+                                                        <th rowspan="2">ค่าคะแนนที่ได้หลังถ่วงน้ำหนัก (ก)</th>
+                                                        <th rowspan="2">สัดส่วนคะแนน (ข)</th>
+                                                        <th rowspan="2">สรุปคะแนน (ก) X (ข)</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>  
+                                                    <template v-for="(Item, index) in products" :key="index"> 
+                                                    <tr v-if="dataStaffid==Item?.staffid">  
+                                                        <td>องค์ประกอบที่ 1 ผลสัมฤทธิ์ของงาน</td>
+                                                        <td class="text-center" style="color: blue;"> 
+                                                            <b>{{ Item?.tb_tor?.achievement_score || '-' }}</b> 
+                                                        </td> 
+                                                        <td class="text-center" style="color: blue;">  
+                                                            <b>{{ Item?.tb_tor?.persen?.split(':')[0] || '-' }}</b>
+                                                        </td> 
+                                                        <td class="text-center" style="color: blue;">  
+                                                            <b>{{ (Item?.tb_tor?.achievement_score * (parseFloat(Item?.tb_tor?.persen?.split(':')[0]) || 0)).toFixed(2) || '-' }}</b>  
+                                                        </td> 
+                                                    </tr> 
+                                                    <tr v-if="dataStaffid==Item?.staffid"> 
+                                                        <td>องค์ประกอบที่ 2 พฤติกรรมการปฏิบัติราชการ</td>
+                                                        <td class="text-center" style="color: blue;"> 
+                                                            <b>{{ Item?.tb_tor?.behavior || '-' }}</b>
+                                                        </td>  
+                                                        <td class="text-center" style="color: blue;">  
+                                                            <b>{{ Item?.tb_tor?.persen?.split(':')[1] || '-' }}</b>
+                                                        </td> 
+                                                        <td class="text-center" style="color: blue;"> 
+                                                            <b>{{ ((Item?.tb_tor?.behavior * (parseFloat(Item?.tb_tor?.persen?.split(':')[1]) || 0)).toFixed(2)) || '-' }}</b>  
+                                                        </td>  
+                                                    </tr>
+                                                    <tr v-if="dataStaffid==Item.staffid">
+                                                                <td>องค์ประกอบอื่นๆ (ถ้ามี)</td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                            </tr>
+                                                            <tr v-if="dataStaffid==Item.staffid" style="font-weight: bold;">
+                                                                <td colspan="2" style="text-align: right;">รวม</td>
+                                                                <td class="text-center" style="color: blue;"> 
+                                                                    <b>{{ 100 }}%</b>  
+                                                                </td> 
+                                                                <td class="text-center" style="color: blue;">  
+                                                                    <b>{{ Item.tb_tor?Item.tb_tor.sum_score:'' }}</b>  
+                                                                </td> 
+                                                            </tr>
+                                                            </template>  
                                                     </tbody>
-                                                </table>
-                                                <!-- <div class="employee-info">
-                                                <h4>ระดับผลการประเมินที่ได้</h4>
-                                                        <p><strong>[&nbsp;&nbsp; <b v-if="(((totalScoreSumX3 + totalScoreSumX2) / 33 * 70) + (WeightedScoreSumXT * 30)) >= 90">&#10003;</b> &nbsp;&nbsp;] ดีเด่น (90-100)</strong></p>
-                                                        <p><strong>[&nbsp;&nbsp; <b v-if="(((totalScoreSumX3 + totalScoreSumX2) / 33 * 70) + (WeightedScoreSumXT * 30)) >= 80 && (((totalScoreSumX3 + totalScoreSumX2) / 33 * 70) + (WeightedScoreSumXT * 30)) < 90">&#10003;</b> &nbsp;&nbsp;] ดีมาก (80-89)</strong></p>
-                                                        <p><strong>[&nbsp;&nbsp; <b v-if="(((totalScoreSumX3 + totalScoreSumX2) / 33 * 70) + (WeightedScoreSumXT * 30)) >= 70 && (((totalScoreSumX3 + totalScoreSumX2) / 33 * 70) + (WeightedScoreSumXT * 30)) < 80">&#10003;</b> &nbsp;&nbsp;] ดี (70-79)</strong></p>
-                                                        <p><strong>[&nbsp;&nbsp; <b v-if="(((totalScoreSumX3 + totalScoreSumX2) / 33 * 70) + (WeightedScoreSumXT * 30)) >= 60 && (((totalScoreSumX3 + totalScoreSumX2) / 33 * 70) + (WeightedScoreSumXT * 30)) < 70">&#10003;</b> &nbsp;&nbsp;] พอใช้ (60-69)</strong></p> 
-                                                        <p><strong>[&nbsp;&nbsp; <b v-if="(((totalScoreSumX3 + totalScoreSumX2) / 33 * 70) + (WeightedScoreSumXT * 30)) < 60">&#10003;</b> &nbsp;&nbsp;] ต้องปรับปรุง (ต่ำกว่า 60)</strong></p>
-                                                </div>  -->
+                                            </table>
                                                 <template v-for="(Item, index) in products" :key="index">
                                                     <div v-if="dataStaffid == Item.staffid" class="employee-info">
                                                         <h4>ระดับผลการประเมินที่ได้</h4>
@@ -740,69 +854,37 @@
                                                             <p> <strong> [&nbsp;&nbsp; <b v-if="Item?.tb_tor?.sum_score >= 60 && Item?.tb_tor?.sum_score < 70">&#10003;</b> &nbsp;&nbsp;] พอใช้ (60-69)</strong></p>
                                                             <p> <strong> [&nbsp;&nbsp;  <b v-if="Item?.tb_tor?.sum_score < 60">&#10003;</b> &nbsp;&nbsp;] ต้องปรับปรุง (ต่ำกว่า 60) </strong> </p>
                                                     </div>
-                                                </template> 
-                                                <h5 class="mb-4"><i class="" style="font-size: x-large;"></i> ส่วนที่ 3 แผนพัฒนาการปฏิบัติราชการรายบุคคล</h5>
-                                                <table border="1" cellspacing="0" cellpadding="5">
-                                                    <thead>
-                                                        <tr style="text-align: center;">
-                                                            <th>ความรู้/ทักษะ/สมรรถนะ ที่ต้องการพัฒนา</th>
-                                                            <th>วิธีการพัฒนา</th>
-                                                            <th>ช่วงเวลาที่ต้องการพัฒนา</th> 
-                                                        </tr>
-                                                    </thead> 
-                                                    <tbody>
-                                                        <tr v-for="(Tab3T4, idx) in products_Tab3T4" :key="idx"  >
-                                                            <td style="text-align: left;">{{ Tab3T4.p04_re1 }}</td>
-                                                            <td style="text-align: left;">{{ Tab3T4.p04_re2 }}</td>
-                                                            <td style="text-align: left;">{{ Tab3T4.p04_re3 }}</td> 
-                                                        </tr> 
-                                                    </tbody>
-                                                </table> 
-
-
-                                                <h5 class="mb-4"><i class="" style="font-size: x-large;"></i> ความคิดเห็นของผู้ประเมิน (ผู้บริหาร)</h5> 
-                                                    <div class="card mb-0"> 
-                                                        <div class="p-fluid formgrid grid">
-                                                            <div class="field col-12 md:col-12"> 
-                                                                <label for="list_no_p03">ความรู้/ทักษะ/สมรรถนะ ที่ต้องพัฒนา<em style="color: red;"></em></label>
-                                                                <InputGroup style="text-align: center;">
-                                                                    <Textarea v-model="px04_re1" rows="4" placeholder="ความรู้/ทักษะ/สมรรถนะ ที่ต้องพัฒนา" />
-                                                                    <Textarea v-model="px04_re2" rows="4" placeholder="วิธีการพัฒนา" />
-                                                                    <Textarea v-model="px04_re3" rows="4" placeholder="ช่วงเวลาที่ต้องพัฒนา" /> 
-                                                                    <Button label="เพิ่ม" severity="warning" @click="AddDatap04X" />
-                                                                </InputGroup>
-                                                            </div>
-                                                        </div>
-                                                        <DataTable :value="products_Tab3" :rows="10" :paginator="true" responsiveLayout="scroll" dataKey="id">
-                                                            <Column field="px04_re1" header="ความรู้/ทักษะ/สมรรถนะ ที่ต้องพัฒนา" style="width: 35%">
-                                                                <template #body="slotProps">
-                                                                    {{ slotProps.data.px04_re1 }}
-                                                                </template>
-                                                            </Column>
-                                                            <Column field="px04_re2" header="วิธีการพัฒนา" style="width: 35%">
-                                                                <template #body="slotProps">
-                                                                    {{ slotProps.data.px04_re2 }}
-                                                                </template>
-                                                            </Column> 
-                                                            <Column field="px04_re3" header="ช่วงเวลาที่ต้องพัฒนา" style="text-align: center; width: 30%">
-                                                                <template #body="slotProps">
-                                                                    {{ slotProps.data.px04_re3 }}
-                                                                </template>
-                                                            </Column>
-                                                            <Column style="text-align: center; width: 10%">
-                                                                <template #body="slotProps">
-                                                                    <Button severity="danger" icon="pi pi-trash" class="p-button-text" outlined rounded @click="DeleteRegislickPX(slotProps.data.id)" />
-                                                                </template>
-                                                            </Column>
-                                                        </DataTable>  
-                                                    </div>
-
-
-
-                                                    <h5 class="mb-4"><i class="" style="font-size: x-large;"></i> ส่วนที่ 4 การรับทราบผลการประเมิน</h5>
+                                                </template>
+                                            <h5 class="mb-4">ส่วนที่ 3 แผนพัฒนาการปฏิบัติราชการรายบุคคล</h5>
+                                            <table border="1" cellspacing="0" cellpadding="5">
+                                                <thead>
+                                                    <tr style="text-align: center;">
+                                                        <th>ความรู้/ทักษะ/สมรรถนะ ที่ต้องการพัฒนา</th>
+                                                        <th>วิธีการพัฒนา</th>
+                                                        <th>ช่วงเวลาที่ต้องการพัฒนา</th> 
+                                                        <th>ผู้บริหาร</th> 
+                                                    </tr>
+                                                </thead> 
+                                                <tbody>
+                                                    <tr v-for="(Tab3T4, idx) in products_Tab3T4" :key="idx">
+                                                        <td style="text-align: left;">{{ Tab3T4?.p04_re1 || '-' }}</td>
+                                                        <td style="text-align: left;">{{ Tab3T4?.p04_re2 || '-' }}</td>
+                                                        <td style="text-align: left;">{{ Tab3T4?.p04_re3 || '-' }}</td> 
+                                                        <td style="text-align: left;"> 
+                                                            <Textarea 
+                                                                class="p-inputtextarea p-inputtext p-component" 
+                                                                v-on:blur="AddDataXXR" 
+                                                                v-model="Tab3T4.px04_re1" 
+                                                                rows="4" 
+                                                                placeholder="ความคิดเห็นจากผู้บริหาร" />
+                                                        </td> 
+                                                    </tr> 
+                                                </tbody>
+                                            </table> 
+                                            <h5 class="mb-4"><i class="" style="font-size: x-large;"></i> ส่วนที่ 4 การรับทราบผลการประเมิน</h5>
                                                     <table class="styled-table">
                                                     <tbody>
-                                                        <tr> 
+                                                        <tr>
                                                         <td>
                                                             <b>ผู้รับการประเมิน</b><br>
                                                             <label for="receiver-acknowledgment">[ &nbsp;&nbsp; ] ได้รับทราบผลการประเมินและแผนพัฒนาการปฏิบัติราชการ รายบุคคลแล้ว</label><br>
@@ -810,7 +892,7 @@
                                                             <td class="center-align"><br><br>
                                                                 ลงชื่อ .................................................................<br>
                                                                 ชื่อ {{ currentstaff[0].prefixfullname }} {{ currentstaff[0].staffname }} {{   currentstaff[0].staffsurname }}<br>
-                                                                ตำแหน่ง {{ currentstaff[0].posnameth }} <br>
+                                                                ตำแหน่ง {{ currentstaff[0].posnameth }}<br>
                                                                 วันที่ .......... เดือน .......................... พ.ศ.
                                                             </td>
                                                         </tr>
@@ -818,8 +900,7 @@
                                                             <td>
                                                                 <b>ผู้ประเมิน</b><br>
                                                                 <label for="evaluator-acknowledgment-1">[ &nbsp;&nbsp; ] ได้แจ้งผลการประเมินและผู้รับการประเมินได้ลงนามรับทราบ รายบุคคลแล้ว</label><br>
-                                                                <label for="evaluator-acknowledgment-2">[ &nbsp;&nbsp; ] ได้แจ้งผลการประเมินเมื่อวันที่ ..............................แต่ผู้รับการประเมินไม่ลงนามรับทราบผลการประเมิน 
-                                                                    โดยมี ....................................... เป็นพยาน และ....................................... เป็นพยาน</label><br>
+                                                                <label for="evaluator-acknowledgment-2">[ &nbsp;&nbsp; ] ได้แจ้งผลการประเมินเมื่อวันที่ ..............................แต่ผู้รับการประเมินไม่ลงนามรับทราบผลการประเมิน โดยมี .......................... เป็นพยาน</label><br>
                                                                 ลงชื่อ .................................................................<br>
                                                                 ชื่อ {{assessorText}}<br>
                                                                 ตำแหน่ง {{assessor_positionText}}<br>
@@ -836,46 +917,51 @@
                                                     </table>
                                                     <h5 class="mb-4"><i class="" style="font-size: x-large;"></i> ส่วนที่ 5  ความเห็นของผู้บังคับบัญชาเหนือขึ้นไป</h5>
                                                     <table class="styled-table">
-                                                    <tbody>
-                                                        <tr>
-                                                        <td>
-                                                            <b>ผู้บังคับบัญชาเหนือขึ้นไป</b><br>
-                                                            <label for="evaluator-acknowledgment-3">[ &nbsp;&nbsp;] เห็นด้วยกับผลการประเมิน</label><br>
-                                                            <label for="evaluator-acknowledgment-3">[ &nbsp;&nbsp;] มีความเห็นต่าง ดังนี้<br>..............................................................................................................</label><br>
-                                                            .....................................................................................................................................<br>
-                                                            .....................................................................................................................................
-                                                        </td>
-                                                        <td class="center-align"><br><br>
-                                                            ลงชื่อ : .................................................................<br>
-                                                            ชื่อ : {{ currentstaff[0].prefixfullname }} {{ currentstaff[0].staffname }} {{   currentstaff[0].staffsurname }}<br>
-                                                            ตำแหน่ง : {{ currentstaff[0].posnameth }}<br>
-                                                            วันที่ : .......... เดือน .......................... พ.ศ.............
-                                                        </td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td>
-                                                                <b>ผู้บังคับบัญชาเหนือขึ้นไปอีกชั้นหนึ่ง (ถ้ามี)</b><br>
-                                                               
-                                                                <label for="evaluator-acknowledgment-5">[ &nbsp;&nbsp;] เห็นด้วยกับผลการประเมิน</label><br>
-                                                                
-                                                                <label for="evaluator-acknowledgment-6">[ &nbsp;&nbsp;] มีความเห็นต่าง ดังนี้<br>...............................................................................................................</label><br>
-                                                                .......................................................................................................................................<br>
-                                                                .......................................................................................................................................
-                                                            </td>
-                                                            <td class="center-align"><br><br>
-                                                                ลงชื่อ .................................................................<br>
-                                                                ชื่อ {{assessorText}}<br>
-                                                                ตำแหน่ง {{assessor_positionText}}<br>
-                                                                วันที่ .......... เดือน .......................... พ.ศ...........
-                                                            </td>
-                                                        </tr>
+                                                        <tbody>
+                                                            <tr>
+                                                                <td>
+                                                                    <b>ผู้บังคับบัญชาเหนือขึ้นไป</b><br>
+                                                                    <label for="evaluator-acknowledgment-3">[ &nbsp;&nbsp;] เห็นด้วยกับผลการประเมิน</label><br>
+                                                                    <label for="evaluator-acknowledgment-3">[ &nbsp;&nbsp;] มีความเห็นต่าง ดังนี้<br>..............................................................................................................</label><br>
+                                                                    .....................................................................................................................................<br>
+                                                                    .....................................................................................................................................
+                                                                </td>
+                                                                <td class="center-align"><br><br>
+                                                                    
+                                                                    ลงชื่อ .................................................................<br>
+                                                                            (.......................................................)<br>
+                                                                        ตำแหน่ง .................................................................<br>
+                                                                    <!-- ชื่อ : {{ user.user.name.PREFIXFULLNAME }} {{ user.user.name.STAFFNAME }} {{ user.user.name.STAFFSURNAME }}<br>
+                                                                    ตำแหน่ง : {{ user.user.name.POSITIONNAME }}<br> -->
+                                                                    วันที่ : .......... เดือน .......................... พ.ศ.............
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>
+                                                                    <b>ผู้บังคับบัญชาเหนือขึ้นไปอีกชั้นหนึ่ง (ถ้ามี)</b><br>
+                                                                    
+                                                                    <label for="evaluator-acknowledgment-5">[ &nbsp;&nbsp;] เห็นด้วยกับผลการประเมิน</label><br>
+                                                                    
+                                                                    <label for="evaluator-acknowledgment-6">[ &nbsp;&nbsp;] มีความเห็นต่าง ดังนี้<br>...............................................................................................................</label><br>
+                                                                    .......................................................................................................................................<br>
+                                                                    .......................................................................................................................................
+                                                                </td>
+                                                                <td class="center-align"><br><br>
+                                                                    ลงชื่อ .................................................................<br>
+                                                                        (.......................................................)<br>
+                                                                    ตำแหน่ง .................................................................<br>
+                                                                    <!-- ชื่อ {{ assessorText }}<br>
+                                                                    ตำแหน่ง {{ assessor_positionText }}<br> -->
+                                                                    วันที่ .......... เดือน .......................... พ.ศ...........
+                                                                </td>
+                                                            </tr>
                                                     </tbody>
-                                                </table>
+                                                </table> 
                                             </div>
                                         </div>  
-                                </div>
-                            </TabPanel>
-                        </TabView>
+                                    </div>
+                            </TabPanel> 
+                            </TabView>
                         <template #footer>
                             <Button label="ตกลง" severity="secondary" class="mb-2 mr-2" @click="DialogAdd = false " />
                         </template>
@@ -884,7 +970,7 @@
             </div>
         </div>
     </div>     
-</template>
+</template> 
 
 <script setup>
 const { signIn, getSession, signOut } = await useAuth();
@@ -898,7 +984,7 @@ import Swal from 'sweetalert2';
 import TabView from 'primevue/tabview';
 import TabPanel from 'primevue/tabpanel';
 import { LogarithmicScale } from 'chart.js';
-import InputNumber from 'primevue/inputnumber';
+import InputNumber from 'primevue/inputnumber'; 
 export default {
     // props: {
     //     dataPor: {
@@ -912,6 +998,8 @@ export default {
     // },
     data() {
         return {
+            dataList: [], // ข้อมูลทั้งหมด
+            filteredData: [], // ข้อมูลที่กรองแล้ว
             staffid_po: 130102,
             staffid_Main: '',
             facid_Main: '',
@@ -933,6 +1021,8 @@ export default {
             ],
             tracking_date: '',
             tracking_dates: null,
+            tracking_fac: '',
+            //tracking_facuty: null,
             
 
             // ตารางรายชื่อ
@@ -945,6 +1035,9 @@ export default {
             //Tab 1
             products_Tab1: [],
             p01_score: null,
+                        
+            postypenameth:[],
+
             p01_scores: [
                 { name: '- ไม่ระบุ -', code: 0 },
                 { name: '1 คะแนน', code: 1 },
@@ -979,6 +1072,11 @@ export default {
                 { id: 14, activity: 'ค. 3 การวางกลยุทธ์ภาครัฐ', indicator: '0', data_table3: '' },
                 { id: 15, activity: 'ค. 4 ศักยภาพเพื่อนำการปรับเปลี่ยน', indicator: '0', data_table3: '' },
                 { id: 16, activity: 'ค. 5 การสอนงานและการมอบหมายงาน', indicator: '0', data_table3: '' }
+                // { id: 12, activity: 'ค. 1 สภาวะผู้นำ', indicator3: executive, datatable3: '', selfAssessment3: '' },
+                // { id: 13, activity: 'ค. 2 วิสัยทัศน์', indicator3: executive, datatable3: '', selfAssessment3: '' },
+                // { id: 14, activity: 'ค. 3 การวางกลยุทธ์ภาครัฐ', indicator3: executive, datatable3: '', selfAssessment3: '' },
+                // { id: 15, activity: 'ค. 4 ศักยภาพเพื่อนำการปรับเปลี่ยน', indicator3: executive, datatable3: '', selfAssessment3: '' },
+                // { id: 16, activity: 'ค. 5 การสอนงานและการมอบหมายงาน', indicator3: executive, datatable3: '', selfAssessment3: '' }
             ],
             improvements: null,
             suggestions: null,
@@ -994,8 +1092,7 @@ export default {
             px04_re1: null,
             px04_re2: null,
             px04_re3: null,
-            products_Tab3: [],
-            
+            products_Tab3: [], 
 
 
             //Tab 4
@@ -1016,11 +1113,11 @@ export default {
             totalScoreSumX1: 0,
             totalScoreSumX0: 0, 
             totalScoreSum: 0, 
-            totalScoreFinalSum: 0,
-            
+            totalScoreFinalSum: 0, 
             assessorText: null,
             assessor_positionText: null,
             currentstaff: {},  
+            //datatable3: []
         };
     },
     components: {
@@ -1038,8 +1135,7 @@ export default {
         // this.showDataEvalu();
         this.showDataSet();   
         // this.showAssesstack(); 
-    },  
-     
+    },   
     methods: { 
         setSession(staffid_Main, facid_Main, groupid_Main, postypename, postypenameid) {
             // console.log('postypename:',postypename);
@@ -1051,7 +1147,7 @@ export default {
         },
         showDataSet() {
             axios
-                .post('https://survey.msu.ac.th/evaluatebackend/api/showDateSet', {
+                .post('  http://127.0.0.1:8000/api/showDateSetleader', {
                     staff_id: this.staffid_Main,
                     fac_id: this.facid_Main,
                     group_id: this.groupid_Main
@@ -1065,23 +1161,43 @@ export default {
                 });
         },
         // ตารางรายชื่อ
+        // xxr() {
+        //     if (this.tracking_date.evalua === undefined) {
+        //         Swal.fire({
+        //             title: 'แจ้งเตือนจากระบบ!',
+        //             text: 'กรุณาเลือก รอบประเมิน ก่อน!',
+        //             icon: 'error'
+        //         });
+        //     } else {
+        //         this.showDataEvalu();
+        //     }
+        // },
         xxr() {
-            if (this.tracking_date.evalua === undefined) {
+            if (this.tracking_date?.evalua === undefined) {
                 Swal.fire({
                     title: 'แจ้งเตือนจากระบบ!',
                     text: 'กรุณาเลือก รอบประเมิน ก่อน!',
                     icon: 'error'
                 });
             } else {
-                this.showDataEvalu();
+                // เช็คว่า dataList เป็น array หรือไม่
+                if (Array.isArray(this.dataList)) {  
+                    // กรองข้อมูลที่ไม่ใช่ "ลูกจ้างชั่วคราว"
+                    // this.filteredData = this.dataList.filter(item => item.stftypename !== "ลูกจ้างชั่วคราว");
+                    this.filteredData = this.dataList.filter(item => item.stftypename !== "ลูกจ้างชั่วคราว" && item.stftypename !== "พนักงานราชการ"); 
+                    // เรียกใช้ฟังก์ชัน showDataEvalu()
+                    this.showDataEvalu();
+                } else {
+                    console.error("dataList is not an array:", this.dataList);
+                }
             }
-        },
+        }, 
         async showDataEvalu() {
             try { 
-                const res = await axios.get('https://survey.msu.ac.th/evaluatebackend/api/showDataEvalu', {  
+                const res = await axios.get('  http://127.0.0.1:8000/api/showDataEvalu', {  
                     params: {
                         staff_id: this.staffid_Main,
-                        fac_id: this.facid_Main,
+                        fac_id: this.tracking_date.fac_id,
                         group_id: this.groupid_Main,
                         evalua: this.tracking_date.evalua,
                         p_year: this.tracking_date.d_date
@@ -1099,7 +1215,7 @@ export default {
         async cvb(item) {
             // console.log(this.tracking_date.evalua);
             try {
-                const response = await axios.post('https://survey.msu.ac.th/evaluatebackend/api/showdatator', {
+                const response = await axios.post('  http://127.0.0.1:8000/api/showdatator', {
                     p_year: this.tracking_date.d_date,
                     evalua: this.tracking_date.evalua,
                     p_staffid: item.staffid
@@ -1111,15 +1227,18 @@ export default {
                 console.error('Error fetching data for staff:', error);
             }
         },
-        // เพิ่มคะแนนประเมิน
-        async openDataEvalu(staff_id) {
-            // console.log(staff_id);
+        // XX One
+        async openDataEvalu(data) {
+            // console.log('posnameid: ',data.posnameid);
+            // console.log('staffid: ',data.staffid);
             
             if (this.tracking_date.d_date === undefined) {
                 Swal.fire('แจ้งเตือนจากระบบ', 'กรุณาเลือกรอบประเมิน', 'error');
             } else {
-                this.dataStaffid = staff_id;
+                this.dataStaffid = data.staffid;
+
                 await this.showDataEvalu();
+
                 this.currentstaff = this.products.filter((product) => product.staffid === this.dataStaffid);
                 this.products_Tab1 = [];
                 this.p01_scores = [
@@ -1146,9 +1265,10 @@ export default {
                 this.improvements = null;
                 this.suggestions = null;
 
-                this.showdataPo(staff_id, this.facid_Main, this.tracking_date.d_date, this.tracking_date.evalua);
-                await axios.post('https://survey.msu.ac.th/evaluatebackend/api/showDataP03New', {
-                    staff_id: staff_id,
+                this.showdataPo(data.staffid, this.facid_Main, this.tracking_date.d_date, this.tracking_date.evalua,data.posnameid);
+
+                await axios.post('  http://127.0.0.1:8000/api/showDataP03New', {
+                    staff_id: data.staffid,
                     fac_id: this.tracking_date.fac_id,
                     year_id: this.tracking_date.d_date,
                     evalua: this.tracking_date.evalua
@@ -1176,18 +1296,83 @@ export default {
                 });
             }
         },    
+        // เพิ่มคะแนนประเมิน biwgin
+        // async openDataEvalu(staff_id) {
+        //     // console.log(staff_id);
+            
+        //     if (this.tracking_date.d_date === undefined) {
+        //         Swal.fire('แจ้งเตือนจากระบบ', 'กรุณาเลือกรอบประเมิน', 'error');
+        //     } else {
+        //         this.dataStaffid = staff_id;
+        //         await this.showDataEvalu();
+        //         this.currentstaff = this.products.filter((product) => product.staffid === this.dataStaffid);
+        //         this.products_Tab1 = [];
+        //         this.p01_scores = [
+        //             { name: '0 คะแนน', code: 0 },
+        //             { name: '1 คะแนน', code: 1 },
+        //             { name: '2 คะแนน', code: 2 },
+        //             { name: '3 คะแนน', code: 3 },
+        //             { name: '4 คะแนน', code: 4 },
+        //             { name: '5 คะแนน', code: 5 }
+        //         ];
+
+        //         // ตั้งค่า coreCompetencies กลับไปเป็นค่าเริ่มต้น
+        //         this.coreCompetencies = [
+        //             { id: 1, activity: 'ก. 1 การมุ่งผลสัมฤทธิ์', indicator: '1', data_table1: '',selfAssessment:'' },
+        //             { id: 2, activity: 'ก. 2 การบริการที่ดี', indicator: '1', data_table1: '',selfAssessment:'' },
+        //             { id: 3, activity: 'ก. 3 การสั่งสมความเชี่ยวชาญในงานอาชีพ', indicator: '1', data_table1: '',selfAssessment:'' },
+        //             { id: 4, activity: 'ก. 4 การยึดมั่นในความถูกต้องชอบธรรมและจริยธรรม', indicator: '1', data_table1: '',selfAssessment:'' },
+        //             { id: 5, activity: 'ก. 5 การทำงานเป็นทีม', indicator: '1', data_table1: '',selfAssessment:'' }
+        //         ];
+
+        //         // ตั้งค่า jobSpecificCompetencies กลับไปเป็นค่าเริ่มต้น
+        //         this.jobSpecificCompetencies = [];
+
+        //         this.improvements = null;
+        //         this.suggestions = null;
+
+        //         this.showdataPo(staff_id, this.facid_Main, this.tracking_date.d_date, this.tracking_date.evalua);
+        //         await axios.post('  http://127.0.0.1:8000/api/showDataP03New', {
+        //             staff_id: staff_id,
+        //             fac_id: this.tracking_date.fac_id,
+        //             year_id: this.tracking_date.d_date,
+        //             evalua: this.tracking_date.evalua
+        //         })
+        //         .then((res) => {
+        //             // console.log('openDataEvalu: ',res.data);
+        //             if (res.data && Array.isArray(res.data)) {
+        //                 this.products_Tab1 = res.data;
+        //                 this.products_Tab1.forEach((h) => {
+        //                     h.subP01sX.forEach((subP01) => {
+        //                         // ตรวจสอบว่าค่า p01_score นั้นถูกต้องหรือไม่
+        //                         const foundScore = this.p01_scores.find((score) => score.code === subP01.p01_score);
+        //                         if (foundScore) {
+        //                             subP01.p01_score = foundScore.code; // ใช้ค่าที่ถูกต้อง
+        //                         } else {
+        //                             subP01.p01_score = this.p01_scores[0].code; // ใช้ค่าเริ่มต้น "- ไม่ระบุ -"
+        //                         }
+        //                     });
+        //                 });
+        //             }
+        //             this.DialogAdd = true; 
+        //         })
+        //         .catch((error) => {
+        //             console.error('Error:', error);
+        //         });
+        //     }
+        // },    
         async saveEvaTab1(subP01) {
             if (subP01.p01_score === 0) {
                 Swal.fire('แจ้งเตือน', 'กรุณาเลือกคะแนน !', 'error');
             } else {
                 await axios
-                    .post('https://survey.msu.ac.th/evaluatebackend/api/saveP03Po', {
+                    .post('  http://127.0.0.1:8000/api/saveP03Po', {
                         staffid_po: this.staffid_po,
                         p01_id: subP01.p01_id,
                         p01_score: subP01.p01_score,
                         p01_detail: subP01.p01_detail,
                         p01_evalua: this.tracking_date.evalua,
-                        p01_staffid: this.staffid_Main,
+                        p01_staffid: subP01.p01_staffid,
                         p01_year: this.tracking_date.d_date
                     })
                     .then((res) => {
@@ -1237,6 +1422,21 @@ export default {
                     item.SCORE = item.SCORE ?? 0; // Add more conditions if necessary
                 }
             });
+            this.otherCompetencies.forEach((item, index) => {
+                if (index === 0) {
+                    item.selfAssessment3 = item.selfAssessment3 ?? 0; // Update based on the API response
+                } else if (index === 1) {
+                    item.selfAssessment3 = item.selfAssessment3 ?? 0; // Update based on the API response
+                } else if (index === 2) {
+                    item.selfAssessment3 = item.selfAssessment3 ?? 0; // Add more conditions if necessary
+                } else if (index === 3) {
+                    item.selfAssessment3 = item.selfAssessment3 ?? 0; // Add more conditions if necessary
+                } else if (index === 4) {
+                    item.selfAssessment3 = item.selfAssessment3 ?? 0; // Add more conditions if necessary
+                } else if (index === 5) {
+                    item.selfAssessment3 = item.selfAssessment3 ?? 0; // Add more conditions if necessary
+                }
+            });
             const payload = {
                 staffid_po: this.staffid_po,
                 staff_id: this.staffid_Main,
@@ -1250,8 +1450,8 @@ export default {
                 improvements: this.improvements,
                 suggestions: this.suggestions
             };
-            const res = await axios.post('https://survey.msu.ac.th/evaluatebackend/api/saveP03PoTab1', payload);
-            console.log(res.data);
+            const res = await axios.post('  http://127.0.0.1:8000/api/saveP03PoTab1', payload);
+            //console.log(res.data);
             Swal.fire({
                 position: 'top-end',
                 icon: 'success',
@@ -1273,8 +1473,7 @@ export default {
             }
             if (event.index == 2) {
                 //console.log('แผนพัฒนาการปฏิบัติราชการรายบุคคล -',event.index);
-                this.products_Tab3 = [];
-                this.products_Tab3 = [];
+                this.products_Tab3 = []; 
                 this.chkp04(this.dataStaffid, this.facid_Main, this.tracking_date.d_date, this.tracking_date.evalua);
                 this.chkp04data(this.dataStaffid, this.facid_Main, this.tracking_date.d_date, this.tracking_date.evalua);
             }
@@ -1288,7 +1487,7 @@ export default {
             }
         },
         async tab2Data(staff_id) {
-            await axios.post('https://survey.msu.ac.th/evaluatebackend/api/showDataP03New', {
+            await axios.post('  http://127.0.0.1:8000/api/showDataP03New', {
                 staff_id: staff_id,
                 fac_id: this.tracking_date.fac_id,
                 year_id: this.tracking_date.d_date,
@@ -1313,7 +1512,7 @@ export default {
         showdataPoText(staff_id, fac_id, year_id, record) {
             // console.log(staff_id);
             
-            axios .post('https://survey.msu.ac.th/evaluatebackend/api/showDataPo', {
+            axios .post('  http://127.0.0.1:8000/api/showDataPo', {
                     staff_id: staff_id,
                     fac_id: fac_id,
                     year_id: year_id,
@@ -1352,6 +1551,19 @@ export default {
                                 item.data_table2 = data.p11 ?? 0; // Add more conditions if necessary
                             }
                         });
+                        this.otherCompetencies.forEach((item) => {
+                            if (item.id === 6) {
+                                item.selfAssessment3 = data.pSE_1 ?? 0; // Update based on the API response
+                            } else if (item.id === 7) {
+                                item.selfAssessment3 = data.pSE_2 ?? 0; // Update based on the API response
+                            } else if (item.id === 8) {
+                                item.selfAssessment3 = data.pSE_3 ?? 0; // Add more conditions if necessary
+                            } else if (item.id === 9) {
+                                item.selfAssessment3 = data.pSE_4 ?? 0; // Add more conditions if necessary
+                            } else if (item.id === 10) {
+                                item.selfAssessment3 = data.pSE_5 ?? 0; // Add more conditions if necessary 
+                            }
+                        });
 
                         // Update other fields
                         this.improvements = data.improvements ?? '- ไม่มีข้อมูล -';
@@ -1364,7 +1576,7 @@ export default {
         },
         chkp04(staff_id, fac_id, year_id, record) {
             axios
-                .post('https://survey.msu.ac.th/evaluatebackend/api/showDataPo', {
+                .post('  http://127.0.0.1:8000/api/showDataPo', {
                     staff_id: staff_id,
                     fac_id: fac_id,
                     year_id: year_id,
@@ -1416,7 +1628,7 @@ export default {
         },
         saveEvaTab3() {
             axios
-                .post('https://survey.msu.ac.th/evaluatebackend/api/saveEvaTab3', {
+                .post('  http://127.0.0.1:8000/api/saveEvaTab3', {
                     staff_id: this.dataStaffid,
                     fac_id: this.facid_Main,
                     year_id: this.tracking_date.d_date,
@@ -1439,7 +1651,7 @@ export default {
         },
         chkp04data(staff_id, fac_id, year_id, record) {
             axios
-                .post('https://survey.msu.ac.th/evaluatebackend/api/showData04Tab3', {
+                .post('  http://127.0.0.1:8000/api/showData04Tab3', {
                     staff_id: staff_id,
                     fac_id: fac_id,
                     year_id: year_id,
@@ -1467,7 +1679,7 @@ export default {
         },
         chkp04dataT4(staff_id, fac_id, year_id, record) {
             axios
-                .post('https://survey.msu.ac.th/evaluatebackend/api/showData04Tab3', {
+                .post('  http://127.0.0.1:8000/api/showData04Tab3', {
                     staff_id: staff_id,
                     fac_id: fac_id,
                     year_id: year_id,
@@ -1488,7 +1700,7 @@ export default {
             (this.assessorText = null),
                 (this.assessor_positionText = null),
                 axios
-                    .post('https://survey.msu.ac.th/evaluatebackend/api/showdatator', {
+                    .post('  http://127.0.0.1:8000/api/showdatator', {
                         p_year: this.tracking_date.d_date,
                         evalua: this.tracking_date.evalua,
                         p_staffid: this.dataStaffid
@@ -1502,40 +1714,32 @@ export default {
                         console.error('Error fetching data:', error);
                     });
         },
-        async showPostype(postypename, postypenameid) {
-            // console.log('showPostype: ',postypename, postypenameid);
-            var postypetext = `ระดับ` + postypename;
-            await axios
-                .post('https://survey.msu.ac.th/evaluatebackend/api/showdatapostypename', {
+        async showPostype(postypename,postypenameid) {
+            //console.log('showPostype: ',postypename, postypenameid);
+            //let postypenameText = postypename ? postypename : `ชำนาญการพิเศษ`;
+            let postypenameText = this.postypenameth ;
+            // var postypetext =postypename;
+            var postypetext = `ระดับ` + postypenameText;
+            // var postypetext = `ระดับ` + postypename;
+            await axios .post('  http://127.0.0.1:8000/api/showdatapostypenameAdmin', {
                     postypename: postypetext,
                     postypenameid: postypenameid
                 })
                 .then((res) => {
-                    // console.log('Response',res.data);
-                    if (res.data.length > 0) {
+                   // console.log('showPostype',res.data);
+                    if (res.data.length > 0) {  
                         this.jobSpecificCompetencies = res.data;
-                    }
-                    // } else {
-                    //     // Fallback to default data if response doesn't contain expected data
-                    //     this.jobSpecificCompetencies = [
-                    //         { id: 6, activity: 'ข. 1 การคิดวิเคราะห์', indicator: '1', data_table2: '' },
-                    //         { id: 7, activity: 'ข. 2 การดำเนินการเชิงรุก', indicator: '1', data_table2: '' },
-                    //         { id: 8, activity: 'ข. 3 ความผูกพันที่มีต่อส่วนราชการ', indicator: '1', data_table2: '' },
-                    //         { id: 9, activity: 'ข. 4 การมองภาพองค์รวม', indicator: '1', data_table2: '' },
-                    //         { id: 10, activity: 'ข. 5 การสืบเสาะหาข้อมูล', indicator: '1', data_table2: '' },
-                    //         { id: 11, activity: 'ข. 6 การตรวจสอบความถูกต้องตามกระบวนงาน', indicator: '1', data_table2: '' }
-                    //     ];
-                    // }
+                    } 
                 })
                 .catch((error) => {
                     console.error('Error fetching data:', error);
                 });
             await this.getjobSpecificCompetencies();
-        },
+        }, 
         getjobSpecificCompetencies(dataStaffid) {
             //console.log(this.staffid_Main,this.dataPor);
 
-            axios .post('https://survey.msu.ac.th/evaluatebackend/api/showdataposp02', { 
+            axios .post('  http://127.0.0.1:8000/api/showdataposp02', { 
                     p_year: this.tracking_date.d_date,
                     evalua: this.tracking_date.evalua,
                     p_staffid: this.dataStaffid
@@ -1548,9 +1752,25 @@ export default {
                         if (res.data[0] && res.data[0][`p${i+6}`] !== undefined) {
                             this.jobSpecificCompetencies[i]['SCORE'] = res.data[0][`p${i+6}`];
                             this.jobSpecificCompetencies[i]['SCOREPERSON'] = res.data[0][`pa_${i+6}`];
+                            // this.otherCompetencies[i]['datatable3'] = res.data[0][`px_${i+1}`];
+                            // this.otherCompetencies[i]['selfAssessment3'] = res.data[0][`pSE_${i+1}`]; 
                         } else {
-                            console.warn(`Missing data for p${i+6}`);
-                        }
+                             console.warn(`Missing data for p${i+6}`); 
+                             
+                        }  
+                    }
+                    for (let i = 0; i < this.otherCompetencies.length; i++) { // แก้ไขเงื่อนไขที่นี่
+                        // ตรวจสอบว่า `res.data[0][`p${i+6}`]` มีค่าก่อนตั้งค่า
+                        if (res.data[0] && res.data[0][`px_${i+1}`] !== undefined) {
+                            // this.jobSpecificCompetencies[i]['SCORE'] = res.data[0][`p${i+6}`];
+                            // this.jobSpecificCompetencies[i]['SCOREPERSON'] = res.data[0][`pa_${i+6}`];
+                            this.otherCompetencies[i]['datatable3'] = res.data[0][`px_${i+1}`];
+                            this.otherCompetencies[i]['selfAssessment3'] = res.data[0][`pSE_${i+1}`]; 
+                        } else {
+                             console.warn(`Missing data for px_${i+1}`); 
+                            //  console.warn(`Missing data for pSE_${i+1}`); 
+                             
+                        }  
                     }
                     // console.log('Response', res.data);
                 })
@@ -1558,14 +1778,19 @@ export default {
                     console.error('Error fetching data:', error);
                 });
         },
-        showdataPo(staff_id,facid_Main,d_date,evalua){  
-            // console.log(staff_id,facid_Main,d_date,evalua);
-            
-            // let postypetext = `ระดับ${this.postypename}`;
-            let postypetext = `ระดับ${this.currentstaff[0].postypenameth}`;
-            // console.log(`currentstaff > `,this.currentstaff[0]);
-            // console.log(`postypenameid > `,this.postypenameid);
-            
+        showdataPo(staff_id, facid_Main, d_date, evalua, posnameid) {  
+            // ตรวจสอบว่า currentstaff มีค่าหรือไม่
+            if (!this.currentstaff || this.currentstaff.length === 0) {
+                console.error("Error: currentstaff is undefined or empty.");
+                return;
+            }
+
+            this.postypenameth = this.currentstaff[0]?.postypenameth  ?? (this.currentstaff[0]?.posnameth === 'ผู้บริหาร' ? 'ชำนาญการพิเศษ' : 'ปฏิบัติการ');
+
+        // console.log("postypenameth:", this.postypenameth);
+
+            let postypetext = `ระดับ${this.postypenameth}`;  
+
             const levelMapping = {
                 'ระดับปฏิบัติการ': 1,
                 'ระดับปฏิบัติงาน': 1,
@@ -1577,49 +1802,41 @@ export default {
                 'ระดับเชี่ยวชาญ': 4,
                 'ระดับเชี่ยวชาญพิเศษ': 5
             };
-            let xr = levelMapping[postypetext] || 0;
-            //     const levelMapping = {
-            //     'ระดับปฏิบัติการ': 1,
-            //     'ระดับชำนาญการ': 2,
-            //     'ระดับชำนาญการพิเศษ': 3,
-            //     'อาจารย์': 3,
-            //     'ระดับเชี่ยวชาญ': 4,
-            //     'ระดับเชี่ยวชาญพิเศษ': 5
-            // };
+            let xr = levelMapping[postypetext] || 0; 
 
-            // let xr = levelMapping[postypetext] || 0;
-
-            // if (postypetext) {
-            //     // ถ้ามีค่าของ POSTYPENAME ให้ใช้ค่าปกติ
-            //     xr = levelMapping[postypetext] || 0;
-            // } else if (positiontext === 'ผู้บริหาร') {
-            //     // ถ้าไม่มี POSTYPENAME แต่ POSITIONNAME เป็น 'ผู้บริหาร' ให้ใช้ 'ระดับชำนาญการพิเศษ'
-            //     xr = levelMapping['ระดับชำนาญการพิเศษ'];
-            // }
-
-            // ตั้งค่า coreCompetencies กลับไปเป็นค่าเริ่มต้น
             this.coreCompetencies = [
-                { id: 1, activity: 'ก. 1 การมุ่งผลสัมฤทธิ์', indicator: xr, data_table1: '',selfAssessment:'' },
-                { id: 2, activity: 'ก. 2 การบริการที่ดี', indicator: xr, data_table1: '',selfAssessment:'' },
-                { id: 3, activity: 'ก. 3 การสั่งสมความเชี่ยวชาญในงานอาชีพ', indicator: xr, data_table1: '',selfAssessment:'' },
-                { id: 4, activity: 'ก. 4 การยึดมั่นในความถูกต้องชอบธรรมและจริยธรรม', indicator: xr, data_table1: '',selfAssessment:'' },
-                { id: 5, activity: 'ก. 5 การทำงานเป็นทีม', indicator: xr, data_table1: '',selfAssessment:'' }
+                { id: 1, activity: 'ก. 1 การมุ่งผลสัมฤทธิ์', indicator: xr, data_table1: '', selfAssessment: '' },
+                { id: 2, activity: 'ก. 2 การบริการที่ดี', indicator: xr, data_table1: '', selfAssessment: '' },
+                { id: 3, activity: 'ก. 3 การสั่งสมความเชี่ยวชาญในงานอาชีพ', indicator: xr, data_table1: '', selfAssessment: '' },
+                { id: 4, activity: 'ก. 4 การยึดมั่นในความถูกต้องชอบธรรมและจริยธรรม', indicator: xr, data_table1: '', selfAssessment: '' },
+                { id: 5, activity: 'ก. 5 การทำงานเป็นทีม', indicator: xr, data_table1: '', selfAssessment: '' }
             ];  
-            
-            
-            // ตั้งค่า jobSpecificCompetencies กลับไปเป็นค่าเริ่มต้น 
-            this.showPostype(this.currentstaff[0].postypenameth,this.postypenameid);
-  
-            
-            axios.post('https://survey.msu.ac.th/evaluatebackend/api/showDataPo',{
+            this.jobSpecificCompetencies = [];
+
+            const Mapping = {
+                'ผู้บริหาร': 1
+            };  
+            let executive = Mapping[this.postypenameth, this.currentstaff[0]?.posnameth] || 0;
+
+            this.otherCompetencies = [
+                { id: 12, activity: 'ค. 1 สภาวะผู้นำ', indicator3: executive, datatable3: '', selfAssessment3: '' },
+                { id: 13, activity: 'ค. 2 วิสัยทัศน์', indicator3: executive, datatable3: '', selfAssessment3: '' },
+                { id: 14, activity: 'ค. 3 การวางกลยุทธ์ภาครัฐ', indicator3: executive, datatable3: '', selfAssessment3: '' },
+                { id: 15, activity: 'ค. 4 ศักยภาพเพื่อนำการปรับเปลี่ยน', indicator3: executive, datatable3: '', selfAssessment3: '' },
+                { id: 16, activity: 'ค. 5 การสอนงานและการมอบหมายงาน', indicator3: executive, datatable3: '', selfAssessment3: '' }
+            ]; 
+
+            // this.showPostype(this.currentstaff[0]?.postypenameth, this.postypenameid); // แก้ไข ตัวป2
+            this.showPostype(this.currentstaff[0]?.postypenameth, posnameid);
+
+            axios.post('http://127.0.0.1:8000/api/showDataPo', {
                 staff_id: staff_id,
                 fac_id: facid_Main,
                 year_id: d_date,
                 record: evalua,
                 postypename: postypetext
             }).then(res => {     
-                // console.log('showDataPo > ',res.data);    
-                if(res.data.length > 0){
+                if (res.data.length > 0) {
                     const data = res.data[0]; 
                     this.coreCompetencies = this.coreCompetencies.map(item => {
                         if (data[`p${item.id}`] !== undefined) {
@@ -1637,10 +1854,11 @@ export default {
                 console.error('Error:', error);
             });
         }, 
+ 
         //29/10/67
         saveScore() {
             axios
-                .post('https://survey.msu.ac.th/evaluatebackend/api/saveDatator', {
+                .post('  http://127.0.0.1:8000/api/saveDatator', {
                     score: this.totalScore
                 })
                 .then((response) => {
@@ -1706,7 +1924,7 @@ export default {
                 };
 
                 axios
-                    .post('https://survey.msu.ac.th/evaluatebackend/api/saveDatator', formData)
+                    .post('  http://127.0.0.1:8000/api/saveDatator', formData)
                     .then((response) => {
                         this.DialogScore = false;
                         // console.log('showDataP03',res.data);
@@ -1723,11 +1941,11 @@ export default {
                     return subTotal + subP01.p01_score;
                 }, 0);
             }, 0);
-        },
+        }, 
         function_totalWeighttrack() { 
             this.totalWeighttrack = this.products_Tab2.reduce((total, h) => {
                 return total + h.subP01sX.reduce((subTotal, subP01) => {
-                    return subTotal + subP01.p01_weight;
+                    return subTotal + parseFloat (subP01.p01_weight);
                 }, 0);
             }, 0);
         },
@@ -1758,12 +1976,14 @@ export default {
                 }, 0)
                 .toFixed(2);
         }, 
+
         function_totalcorecompetenciesX3() {
+            //this.totalcorecompetenciesX4 = 0; 
             this.totalcorecompetenciesX3 = 0;
             this.totalcorecompetenciesX2 = 0;
             this.totalcorecompetenciesX1 = 0;
             this.totalcorecompetenciesX0 = 0;
-            // console.log('coreCompetencies: ',this.coreCompetencies);
+            //console.log('coreCompetencies: ',this.coreCompetencies);
 
             for (let i = 0; i < this.coreCompetencies.length; i++) {
                 const dataTable1Value = parseFloat(this.coreCompetencies[i]?.indicator) || 0;
@@ -1784,8 +2004,10 @@ export default {
             for (let i = 0; i < this.jobSpecificCompetencies.length; i++) {
                 const dataTable1Value = parseFloat(this.jobSpecificCompetencies[i]?.COMPLEVEL) || 0;
                 const dataTable2Value = parseFloat(this.jobSpecificCompetencies[i]?.SCORE) || 0;
+               // console.log('jobSpecificCompetencies[i]?.SCORE: ',dataTable2Value);
 
-                //console.log(dataTable1Value,dataTable2Value,dataTable1Value - dataTable2Value);
+
+                //console.log('jobSpecificCompetencies: ',dataTable1Value,dataTable2Value,dataTable1Value - dataTable2Value);
                 if ((dataTable1Value - dataTable2Value) <= 0) {
                     this.totalcorecompetenciesX3++;
                 }else if ((dataTable1Value - dataTable2Value) == 1) {
@@ -1794,6 +2016,18 @@ export default {
                     this.totalcorecompetenciesX1++;
                 }else if ((dataTable1Value - dataTable2Value) >= 3) {
                     this.totalcorecompetenciesX0++;
+                }  
+
+                }
+            for (let i = 0; i < this.otherCompetencies.length; i++) {
+                const dataTable1Value = parseFloat(this.otherCompetencies[i]?.indicator3) || 0;
+                const dataTable2Value = parseFloat(this.otherCompetencies[i]?.selfAssessment3) || 0;
+
+                //console.log('otherCompetencies: ',dataTable1Value,dataTable2Value,dataTable1Value - dataTable2Value);
+                if ((dataTable1Value - dataTable2Value) <= 0  && dataTable2Value >= 1) {
+                    this.totalcorecompetenciesX3++;
+                }else if ((dataTable1Value - dataTable2Value) == 1 ) {
+                    this.totalcorecompetenciesX2++;
                 }
             }
 
@@ -1802,20 +2036,27 @@ export default {
             this.totalScoreSumX2 = this.totalcorecompetenciesX2*2;
             this.totalScoreSumX1 = this.totalcorecompetenciesX1*1;
             this.totalScoreSumX0 = this.totalcorecompetenciesX0*0;
-        },//*3 
-
-
+        }, 
+        //รวมคะแนนสมรรถนะ*3 
+        calculateTotalCoreCompetenciesX() {
+            return (
+            (this.totalcorecompetenciesX3 || 0) +
+            (this.totalcorecompetenciesX2 || 0) +
+            (this.totalcorecompetenciesX1 || 0) +
+            (this.totalcorecompetenciesX0 || 0)
+            ) * 3;
+        },
 
         /*============= ความรู้/ทักษะ/สมรรถนะ ที่ต้องการพัฒนาสำหรับผู้บริหาร =============*/ 
         chkp03data(){ 
                 this.products_Tab3 = [];
-                axios.post('https://survey.msu.ac.th/evaluatebackend/api/showData04Tab3',{
+                axios.post('  http://127.0.0.1:8000/api/showData04Tab3',{
                     staff_id: this.staffid_Main,
                     fac_id: this.facid_Main,
                     year_id: this.tracking_date.d_date,
                     record: this.tracking_date.evalua, 
                 }).then(res => {     
-                    // console.log('chkp03data',res.data);     
+                   // console.log('showData04Tab3',res.data);     
                     if(res.data.length > 0){
                         res.data.forEach(p04 => {
                             const newData = {
@@ -1836,7 +2077,7 @@ export default {
                 });
             },  
         AddDatap04X(){ 
-            axios.post('https://survey.msu.ac.th/evaluatebackend/api/saveEvaTab03xx',{
+            axios.post('  http://127.0.0.1:8000/api/saveEvaTab03xx',{
                 staff_id: this.staffid_Main,
                 fac_id: this.facid_Main,
                 year_id: this.tracking_date.d_date,
@@ -1871,7 +2112,7 @@ export default {
         },
         DeleteRegislickPX(item) { 
             // Add logic to remove the selected item  
-            axios.post('https://survey.msu.ac.th/evaluatebackend/api/delEvaTab03xx',{
+            axios.post('  http://127.0.0.1:8000/api/delEvaTab03xx',{
                 id: item
             }).then(res => {  
                 // console.log(res);
@@ -1881,19 +2122,47 @@ export default {
                 console.error('Error:', error);
             });    
         },   
+        AddDataXXR(){
+            console.log('📤 Sending data:', this.products_Tab3T4);  
+
+            if (!this.products_Tab3T4.length) {
+                console.warn('❗ No data to send');
+                return;
+            }
+
+            let self = this.products_Tab3T4[0];  // ✅ ดึง object แรกจาก array
+
+            axios.post('http://127.0.0.1:8000/api/saveexcucive', {
+                p02_id: self.p02_id,
+                px04_re1: self.px04_re1, 
+                record: self.record, 
+                fac_id: self.fac_id, 
+                year: self.year, 
+                staff_id: self.staff_id, 
+            })
+            .then((res) => {
+                console.log('✅ Response data:', res.data);
+            })
+            .catch((error) => {
+                console.error('❌ Error:', error);
+            }); 
+        },
+
+
         ///***********///
 
 
 
         async saveAssess() {
             try {
-                const response = await axios.post('https://survey.msu.ac.th/evaluatebackend/api/savedataAssess', { 
+                const response = await axios.post('  http://127.0.0.1:8000/api/savedataAssess', { 
                     p_staffid: this.staffid_Main,
                     fac_id: this.facid_Main,
                     p_year: this.tracking_date.d_date,
                     evalua: this.tracking_date.evalua, 
                     corecompetencies: this.coreCompetencies,
                     jobspecificcompetencies: this.jobSpecificCompetencies,
+                    otherCompetencies: this.otherCompetencies
                     
                 }); 
                 // console.log( this.staffid_Main,this.facid_Main,this.dataPor.evalua, this.coreCompetencies,this.jobSpecificCompetencies, );
@@ -1918,7 +2187,34 @@ export default {
                 });
             }
         },  
+        async printDatatracking() { 
+            const { signIn, getSession, signOut } = await useAuth() 
+            const user = await getSession();   
+            const form = {
+                staff_id: this.staffid_Main,
+                group_id: this.groupid_Main,
+                fac_id: this.tracking_date.fac_id,
+                year_id: this.tracking_date.d_date,
+                evalua: this.tracking_date.evalua,
+                PREFIXFULLNAME:user.user.name.PREFIXFULLNAME,
+                STAFFNAME :user.user.name.STAFFNAME,
+                STAFFSURNAME:user.user.name.STAFFSURNAME,
+                POSITIONNAME:user.user.name.POSITIONNAME,
+                GROUPTYPENAME:user.user.name.GROUPTYPENAME,
+                POSTYPENAME:user.user.name.POSTYPENAME, 
+                SCOPES:user.user.name.SCOPES.staffdepartmentname,
+                postypename: `ระดับ${this.postypename}`,
+                postypenameid: this.postypenameid,
+                stftypename: this.stftypename,
+            } 
+            const queryParams = new URLSearchParams(form).toString();
+            // console.log(queryParams); 
+            const url = `  http://127.0.0.1:8000/report_tracking?${queryParams}`;
+            window.open(url, '_blank');
+ 
+        },     
     }, 
+    
     filters: {
         removeC: function (value) {
             if (!value) return '';

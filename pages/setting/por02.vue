@@ -57,10 +57,10 @@
                                 <b v-if="row2.SCOREPERSON == '' || row2.SCOREPERSON == null" style="color: red;">0</b> 
                                 <b v-if="row2.SCOREPERSON != 0 " style="color: blue;" >{{ row2.SCOREPERSON }}</b> 
                             </td>
-                            <td>
-                                <b v-if="row2.SCORE == null ||row2.SCORE == '' " style="color: red;">0</b> 
+                            <td> 
+                                <b v-if="row2.SCORE == null ||row2.SCORE == '' " style="color: red;">-</b> 
                                 <b v-if="row2.SCORE != 0 " >{{ row2.SCORE }}</b> 
-                            </td>
+                            </td> 
                         </tr>
                     </tbody>
                 </table>
@@ -200,7 +200,7 @@ export default {
         getjobSpecificCompetencies(){
             //console.log(this.staffid_Main,this.dataPor);
             
-            axios.post('https://survey.msu.ac.th/evaluatebackend/api/showdataposp02', { 
+            axios.post('  http://127.0.0.1:8000/api/showdataposp02', { 
                p_year: this.dataPor.d_date,
                 evalua: this.dataPor.evalua,
                 p_staffid: this.staffid_Main
@@ -210,11 +210,26 @@ export default {
                     // ตรวจสอบว่า `res.data[0][`p${i+6}`]` มีค่าก่อนตั้งค่า
                     if (res.data[0] && res.data[0][`p${i+6}`] !== undefined) {
                         this.jobSpecificCompetencies[i]['SCORE'] = res.data[0][`p${i+6}`];
-                        this.jobSpecificCompetencies[i]['SCOREPERSON'] = res.data[0][`pa_${i+6}`];  
+                        this.jobSpecificCompetencies[i]['SCOREPERSON'] = res.data[0][`pa_${i+6}`];
+                        // this.otherCompetencies[i]['datatable3'] = res.data[0][`px_${i+1}`];   
+                        // this.otherCompetencies[i]['selfAssessment3'] = res.data[0][`pSE_${i+1}`];   
                     } else {
                         console.warn(`Missing data for p${i+6}`);
                     }
                 }
+                for (let i = 0; i < this.otherCompetencies.length; i++) { // แก้ไขเงื่อนไขที่นี่
+                        // ตรวจสอบว่า `res.data[0][`p${i+6}`]` มีค่าก่อนตั้งค่า
+                        if (res.data[0] && res.data[0][`px_${i+1}`] !== undefined) {
+                            // this.jobSpecificCompetencies[i]['SCORE'] = res.data[0][`p${i+6}`];
+                            // this.jobSpecificCompetencies[i]['SCOREPERSON'] = res.data[0][`pa_${i+6}`];
+                            this.otherCompetencies[i]['datatable3'] = res.data[0][`px_${i+1}`];
+                            this.otherCompetencies[i]['selfAssessment3'] = res.data[0][`pSE_${i+1}`]; 
+                        } else {
+                             console.warn(`Missing data for px_${i+1}`); 
+                            //  console.warn(`Missing data for pSE_${i+1}`); 
+                             
+                        }  
+                    }
                 // console.log('Response', res.data);
             })
         },
@@ -268,7 +283,7 @@ export default {
   
             // ตรวจสอบค่าของ postypetext ใน levelMapping
             let personnel = levelMapping[postypetext] || 0;
-            // console.log('personnel:', personnel);
+             //console.log('personnel:', personnel);
 
             // ตั้งค่า coreCompetencies ตามระดับที่ได้จาก levelMapping
             this.coreCompetencies = [
@@ -308,7 +323,7 @@ export default {
             this.showPostype(positionname,postypenameid);
   
             
-            axios.post('https://survey.msu.ac.th/evaluatebackend/api/showDataPo',{
+            axios.post('  http://127.0.0.1:8000/api/showDataPo',{
                 staff_id: this.staffid_Main,
                 fac_id: this.facid_Main,
                 year_id: this.dataPor.d_date,
@@ -354,12 +369,12 @@ export default {
             //console.log('postypename: ',postypename);  
             // console.log('postypenameid: ',postypenameid);  
             var postypetext =postypename;
-            axios.post('https://survey.msu.ac.th/evaluatebackend/api/showdatapostypename', {
+            axios.post('  http://127.0.0.1:8000/api/showdatapostypenameAdmin', {
                 postypename: postypetext,
                 postypenameid: postypenameid
             })
             .then(res => {
-               // console.log('Response',res.data);  
+               //console.log('showPostype: ',res.data);  
                 if (res.data.length > 0) { 
                     this.jobSpecificCompetencies = res.data;
                 }
@@ -381,7 +396,7 @@ export default {
         },
         showdatator() {  
             //console.log(this.dataPor.d_date,scoreA04); 
-            axios.post('https://survey.msu.ac.th/evaluatebackend/api/showdatator', {
+            axios.post('  http://127.0.0.1:8000/api/showdatator', {
                 p_year: this.dataPor.d_date,
                 evalua: this.dataPor.evalua,
                 p_staffid: this.staffid_Main
@@ -397,7 +412,7 @@ export default {
             });
         },
         showjobSpecificCompetencies (){
-            axios.post('https://survey.msu.ac.th/evaluatebackend/api/showdataposp02', { 
+            axios.post('  http://127.0.0.1:8000/api/showdataposp02', { 
                p_year: this.dataPor.d_date,
                 evalua: this.dataPor.evalua,
                 p_staffid: this.staffid_Main
@@ -433,7 +448,7 @@ export default {
             } 
             const queryParams = new URLSearchParams(form).toString();
             // console.log(queryParams); 
-            const url = `https://survey.msu.ac.th/evaluatebackend/report_p02?${queryParams}`;
+            const url = `  http://127.0.0.1:8000/report_p02?${queryParams}`;
             window.open(url, '_blank');
  
         },     

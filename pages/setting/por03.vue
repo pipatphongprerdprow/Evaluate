@@ -13,7 +13,7 @@
                         </h3>
                         <B><h4>1.ผลสัมฤทธิ์ของงาน</h4></B>
                     </div> 
-                </div>
+                </div> 
                 <!-- แสดงข้อมูลบันทึก --> 
                 <table class="table">
                     <thead>
@@ -23,7 +23,8 @@
                             <th rowspan="2" style="width: 25%;">รายงานการปฏิบัติราชการ<br> ตามตัวชี้วัด/เกณฑ์การประเมิน</th>
                             <th rowspan="2" style="width: 20%;">หลักฐานที่แสดงถึง<br> ผลการปฏิบัติราชการ<br>ตามเกณฑ์การประเมิน<br>(หลักฐานเชิงประจักษ์)</th>
                             <th colspan="5" style="width: 11%;">ระดับการประเมินตนเอง<br> (ค่าคะแนนที่ได้)</th>
-                            <th rowspan="2" style="width: 19%;"><br> ตัวเลือก <br></th>
+                            <th v-if="currentDate >= dataPor.d_scoringday" rowspan="2" style="width: 9%;">ค่าคะแนนที่ได้</th>
+                            <th rowspan="2" style="width: 10%;"><br> ตัวเลือก <br></th>
                         </tr>
                         <tr>
                             <th>1</th>
@@ -50,26 +51,65 @@
                                         <div v-if="subIitem.ind_no!=0"><b>ระดับ {{ subIitem.ind_no }}</b> {{ subIitem.ind_Items }}</div>
                                         <div v-if="subIitem.ind_no==0"><b>{{ subIitem.ind_Items }}</b></div>
                                     </p>
-                                </td>
-
-                                <td style="text-align: left;">
-                                    <p v-for="(subIitemInd, inD) in subP01.subITemP03ind" :key="inD" style="padding-left: 8px;margin-bottom: 5px;">
-                                        <div v-if="subIitemInd.p03ind_no!=0"><b>ระดับ {{ subIitemInd.p03ind_no }}</b> {{ subIitemInd.p03ind_Items }}</div>
-                                        <div v-if="subIitemInd.p03ind_no==0"><b>{{ subIitemInd.p03ind_Items }}</b></div> 
+                                    <!-- <p v-if="subP01.p01_detail != null">  
+                                        <b style="color: red;">ข้อเสนอแนะ</b>
+                                        <br>
+                                        <em style="color: red;">{{ subP01.p01_detail }}</em>
+                                    </p> -->
+                                    <p v-if="subP01.p01_detail !== null && currentDate >= dataPor.d_scoringday">  
+                                        <b style="color: red;">ข้อเสนอแนะ</b>
+                                        <br>
+                                        <em style="color: red;">{{ subP01.p01_detail }}</em>
                                     </p>
+                                </td>
+                                <td style="text-align: left;">
+                                    <!-- วนลูปแสดงระดับ 1 ถึง 5 -->
+                                    <div v-for="level in [1, 2, 3, 4, 5]" :key="level">
+                                        <div v-if="subP01.subITemP03ind.some(item => item.p03ind_no === level+'')">
+                                            <b>ระดับ {{ level }}</b>
+                                            <div v-for="(item, index) in subP01.subITemP03ind.filter(item => item.p03ind_no === level+'')" :key="index">
+                                                <!-- แสดงรายการที่มีระดับเดียวกัน -->
+                                                <div>
+                                                    <b>{{ index + 1 }}.</b> {{ item.p03ind_Items }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
                                     <p v-if="subP01.subITemP03ind.length == 0" style="padding-left: 8px;margin-bottom: 5px;">
                                         <b style="color: red;">- ไม่มีข้อมูล -</b>
-                                    </p> 
-                                </td>
-                                <td style="text-align: left;"> 
+                                    </p>
+                                </td> 
+
+
+                                <!-- <td style="text-align: left;"> 
                                     <p v-for="(subIitemDoc, inDoc) in subP01.subITemP03doc" :key="inDoc" style="padding-left: 8px;margin-bottom: 5px;"> 
-                                        <a v-if="subIitemDoc.doc_file!=null && subIitemDoc.doc_link==null" :href="'https://survey.msu.ac.th/evaluatebackend/storage/uploadsP03/'+subIitemDoc.doc_file" target="_blank"><b>ระดับ</b> <b>{{subIitemDoc.doc_no }}</b> {{ subIitemDoc.doc_name }}</a> 
+                                        <a v-if="subIitemDoc.doc_file!=null && subIitemDoc.doc_link==null" :href="'  http://127.0.0.1:8000/storage/uploadsP03/'+subIitemDoc.doc_file" target="_blank"><b>ระดับ</b> <b>{{subIitemDoc.doc_no }}</b> {{ subIitemDoc.doc_name }}</a> 
                                         <a v-if="subIitemDoc.doc_link!=null && subIitemDoc.doc_file==null" :href="subIitemDoc.doc_link" target="_blank"><b>ระดับ</b> <b>{{ subIitemDoc.doc_no }}</b> {{ subIitemDoc.doc_name }}</a> 
                                     </p>
                                     <p v-if="subP01.subITemP03doc.length == 0" style="padding-left: 8px;margin-bottom: 5px;">
                                         <b style="color: red;">- ไม่มีข้อมูล -</b>
                                     </p>
-                                </td> 
+                                </td>  -->
+                                <td style="text-align: left;"> 
+                                    <p v-for="(subIitemDoc, inDoc) in subP01.subITemP03doc.slice().sort((a, b) => a.doc_no - b.doc_no)" 
+                                    :key="inDoc" 
+                                    style="padding-left: 8px;margin-bottom: 5px;"> 
+                                    
+                                        <a v-if="subIitemDoc.doc_file!=null && subIitemDoc.doc_link==null" 
+                                        :href="'http://127.0.0.1:8000/storage/uploadsP03/' + subIitemDoc.doc_file" target="_blank">
+                                            <b>เอกสารลำดับที่</b> <b>{{ subIitemDoc.doc_no }}</b> {{ subIitemDoc.doc_name }}
+                                        </a>  
+                                        <a v-if="subIitemDoc.doc_link!=null && subIitemDoc.doc_file==null" 
+                                        :href="subIitemDoc.doc_link" target="_blank">
+                                            <b>เอกสารลำดับที่</b> <b>{{ subIitemDoc.doc_no }}</b> {{ subIitemDoc.doc_name }}
+                                        </a> 
+                                    </p>
+
+                                    <p v-if="subP01.subITemP03doc.length == 0" style="padding-left: 8px;margin-bottom: 5px;">
+                                        <b style="color: red;">- ไม่มีข้อมูล -</b>
+                                    </p>
+                                </td>
                                 <td style=" vertical-align: middle;" class="text-center"> 
                                     <b v-if="subP01.score==1">&#10003;</b>
                                     <b v-if="subP01.score!=1"></b>
@@ -90,8 +130,14 @@
                                     <b v-if="subP01.score==5">&#10003;</b>
                                     <b v-if="subP01.score!=5"></b>
                                 </td> 
+                                <td v-if="currentDate >= dataPor.d_scoringday" style="vertical-align: middle;" class="text-center">
+                                    {{ subP01.p01_score }}
+                                </td> 
                                 <td style=" vertical-align: middle;" class="text-center">
-                                    <SplitButton label="เลือก" :model="itemsBtu(subP01)" severity="warning" class="mb-2 mr-2"></SplitButton>
+                                    <!-- {{ currentDate }} -- {{ dataPor.d_enddate }} -->
+                                    <div v-if="currentDate < dataPor.d_enddate"> 
+                                        <SplitButton label="เลือก" :model="itemsBtu(subP01)" severity="warning" class="mb-2 mr-2"></SplitButton>
+                                    </div>
                                 </td>
                             </tr>
                         </template>
@@ -312,11 +358,15 @@
                         <div class="col-12 md:col-2" style="align-self: end;">
                             <Button icon="pi pi-save" label="บันทึก" severity="warning" @click="AddDatalist" /> 
                         </div> 
+                        <!-- <div class="field col-12 md:col-12">  
+                            <label for="improvements">1) จุดเด่น และ/หรือ สิ่งที่ควรปรับปรุงแก้ไข</label>
+                                <textarea v-model="improvements" rows="4" class="custom-textarea" ></textarea> 
+                        </div> -->
                     </div>   
                 </div>   
                 <DataTable :value="products_list_p03" :rows="10" :paginator="true" responsiveLayout="scroll" dataKey="id">
                     <Column field="p03ind_no" header="ลำดับ" style="width: 10%">
-                        <template #body="Item">
+                        <template #body="Item"> 
                             ระดับที่ {{ Item.data.p03ind_no }}
                         </template>
                     </Column>
@@ -324,11 +374,11 @@
                         <template #body="Item">
                         {{ Item.data.p03ind_Items }}
                         </template>
-                    </Column> 
+                    </Column>  
                     <Column field="options" header="ตัวเลือก" style="text-align: center; width: 10%">
                         <template #body="Item"> 
                             <Button style="text-align: center;" severity="primary" icon="pi pi-pencil" class="p-button-text" outlined rounded @click="EditRegislickP03(Item.data)"></Button>&nbsp;
-                            <Button style="text-align: center;" severity="danger" icon="pi pi-trash" class="p-button-text" outlined rounded @click="DeleteRegislicklist(Item.data)"></Button> 
+                            <Button style="text-align: center;" severity="danger" icon="pi pi-trash" class="p-button-text" outlined rounded @click="DeleteRegislicklist(Item.index)"></Button> 
                         </template>
                     </Column>
                 </DataTable> 
@@ -351,9 +401,9 @@
                                 <label for="text_search_no">ระดับ</label>
                                 <InputText v-model="text_search_noEditP03" type="number" placeholder="ระดับ" autocomplete="off" disabled />  
                             </div>
-                            <div class=" col-12 md:col-9"> 
-                                <label for="text_search_no">รายละเอียดเกณฑ์การประเมิน</label>
-                                <InputText v-model="text_searchEditP03" type="text" placeholder="รายละเอียดเกณฑ์การประเมิน" autocomplete="off"/>  
+                            <div class="col-12 md:col-9"> 
+                                <label for="text_search_no">รายละเอียดเกณฑ์การประเมิน</label> 
+                                <textarea id="text_search_no" v-model="text_searchEditP03" placeholder="รายละเอียดเกณฑ์การประเมิน" autocomplete="off" class="w-full p-2 border rounded-md" rows="4" ></textarea>
                             </div>    
                         </div> 
                     </form>
@@ -423,20 +473,20 @@
                 <div class="p-fluid formgrid grid">  
                     <div class="field col-12 md:col-12">  
                         <DataTable :value="products_doc_p03" :rows="10" :paginator="true" responsiveLayout="scroll" dataKey="id">
-                            <Column field="doc_no" header="ลำดับ" style="width: 15%">
+                            <Column field="doc_no" header="ลำดับเอกสาร" style="width: 15%">
                                 <template #body="Item">
-                                    ลำดับ {{ Item.data.doc_no }}
+                                    เอกสารลำดับที่ {{ Item.data.doc_no }}
                                 </template>
                             </Column>
                             <Column field="doc_name" header="ชื่อไฟล์" style="text-align: left;width: 35%">
                                 <template #body="Item"> 
-                                    <a v-if="Item.data.doc_file!=null" :href="'https://survey.msu.ac.th/evaluatebackend/storage/uploadsP03/'+Item.data.doc_file" target="_blank">{{ Item.data.doc_name }}</a> 
+                                    <a v-if="Item.data.doc_file!=null" :href="'  http://127.0.0.1:8000/storage/uploadsP03/'+Item.data.doc_file" target="_blank">{{ Item.data.doc_name }}</a> 
                                     <a v-if="Item.data.doc_link!=null" :href="Item.data.doc_link" target="_blank">{{ Item.data.doc_name }}</a> 
                                 </template>
                             </Column>  
                             <Column field="options" header="ตัวเลือก" style="text-align: center; width: 15%">
                                 <template #body="Item">
-                                    <!-- <Button severity="primary" icon="pi pi-pencil" class="p-button-text" outlined rounded @click="delDataDocX5(Item.data)"></Button> &nbsp; -->
+                                    <Button severity="primary" icon="pi pi-pencil" class="p-button-text" outlined rounded @click="EditDataDocFilename(Item.data)"></Button> &nbsp; 
                                     <Button severity="danger" icon="pi pi-trash" class="p-button-text" outlined rounded @click="delDataDocX(Item.data)"></Button>
                                 </template>
                             </Column>
@@ -447,6 +497,39 @@
                 <template #footer> 
                     <Button label="ตกลง"  class="mb-2 mr-2" severity="contrast" @click="DialogDoc = false" />
                 </template>
+        </Dialog>
+
+         <!-- แก้ไขชื่อหลักฐานเชิงปนะจักษ์ -->
+         <Dialog header="แก้ไขข้อมูลชื่อหลักฐานเชิงประจักษ์" maximizable v-model:visible="DialogEditFileP03" :breakpoints="{ '960px': '75vw' }" :style="{ width: '70vw' }" :modal="true" position="top">
+            <form>
+                <div class="p-fluid formgrid"> 
+                    <form> 
+                        <InputText v-model="text_docid" type="hidden" style="display: none;" /> 
+                        <InputText v-model="text_p01id" type="hidden" style="display: none;" /> 
+                        <div class="p-fluid formgrid grid">
+                            <div class=" col-12 md:col-12"> 
+                                <label for="text_search_no"></label>
+                            </div>
+                            <div class=" col-12 md:col-3"> 
+                                <label for="text_search_no">ลำดับเอกสาร</label>
+                                <InputText v-model="text_search_noEditFileP03" type="number" placeholder="ลำดับเอกสาร" autocomplete="off" />  
+                            </div>
+                            <!-- <div class=" col-12 md:col-9"> 
+                                <label for="text_search_no">รายละเอียดชื่อเอกสารแนบ</label>
+                                <InputText v-model="text_searchEditFileP03" type="text" placeholder="รายละเอียดเกณฑ์การประเมิน" autocomplete="off"/>  
+                            </div>  -->
+                            <div class="col-12 md:col-9"> 
+                                <label for="text_search_no">รายละเอียดชื่อเอกสารแนบ</label> 
+                                <textarea id="text_search_no" v-model="text_searchEditFileP03" placeholder="รายละเอียดเกณฑ์การประเมิน" autocomplete="off" class="w-full p-2 border rounded-md" rows="4" ></textarea>
+                            </div>   
+                        </div> 
+                    </form>
+                </div>
+            </form>
+            <template #footer>
+                <Button label="บันทึก" icon="pi pi-check" class="mb-2 mr-2" @click="saveDataxEditFileP03" />&nbsp;
+                <Button label="ยกเลิก" icon="pi pi-times" class="mb-2 mr-2" severity="danger" @click="cancelDialogEditFileP03" />
+            </template>
         </Dialog>
 
         <!-- /*============= ระดับการประเมินตนเอง (ค่าคะแนนที่ได้) =============*/ -->  
@@ -465,9 +548,6 @@
                     <Button label="ยกเลิก" icon="pi pi-times" class="mb-2 mr-2" severity="danger" @click="DialogScore = false" />
                 </template>
         </Dialog>
-
-
-        
 
 
 </template> 
@@ -496,6 +576,7 @@ import InputText from 'primevue/inputtext';
                 year_Main: null,
                 facid_Main: null,
                 groupid_Main: null, 
+                currentDate: new Date().toISOString().split('T')[0], 
 /*=========== 1.ผลสัมฤทธิ์ของงาน =============*/                
             products_personP03: [], 
             itemsBtu: (item) => [
@@ -564,6 +645,41 @@ import InputText from 'primevue/inputtext';
                     { name: 'ระดับที่ 3', value: 3 },
                     { name: 'ระดับที่ 4', value: 4 },
                     { name: 'ระดับที่ 5', value: 5 },
+                    // { name: 'ระดับที่ 6', value: 6 },
+                    // { name: 'ระดับที่ 7', value: 7 },
+                    // { name: 'ระดับที่ 8', value: 8 },
+                    // { name: 'ระดับที่ 9', value: 9 },
+                    // { name: 'ระดับที่ 10', value: 10 },
+                    // { name: 'ระดับที่ 11', value: 11 },
+                    // { name: 'ระดับที่ 12', value: 12 },
+                    // { name: 'ระดับที่ 13', value: 13 },
+                    // { name: 'ระดับที่ 14', value: 14 },
+                    // { name: 'ระดับที่ 15', value: 15 },
+                    // { name: 'ระดับที่ 16', value: 16 },
+                    // { name: 'ระดับที่ 17', value: 17 },
+                    // { name: 'ระดับที่ 18', value: 18 },
+                    // { name: 'ระดับที่ 19', value: 19 },
+                    // { name: 'ระดับที่ 20', value: 20 },
+                    // { name: 'ระดับที่ 21', value: 21 },
+                    // { name: 'ระดับที่ 22', value: 22 },
+                    // { name: 'ระดับที่ 23', value: 23 },
+                    // { name: 'ระดับที่ 24', value: 24 },
+                    // { name: 'ระดับที่ 25', value: 25 },
+                    // { name: 'ระดับที่ 26', value: 26 },
+                    // { name: 'ระดับที่ 27', value: 27 },
+                    // { name: 'ระดับที่ 28', value: 28 },
+                    // { name: 'ระดับที่ 29', value: 29 },
+                    // { name: 'ระดับที่ 30', value: 30 },
+                    // { name: 'ระดับที่ 31', value: 31 },
+                    // { name: 'ระดับที่ 32', value: 32 },
+                    // { name: 'ระดับที่ 33', value: 33 },
+                    // { name: 'ระดับที่ 34', value: 34 },
+                    // { name: 'ระดับที่ 35', value: 35 },
+                    // { name: 'ระดับที่ 36', value: 36 },
+                    // { name: 'ระดับที่ 37', value: 37 },
+                    // { name: 'ระดับที่ 38', value: 38 },
+                    // { name: 'ระดับที่ 39', value: 39 },
+                    // { name: 'ระดับที่ 40', value: 40 }, 
                 ],
                 text_edtP03: null,
                 list_no_p03: null,
@@ -601,12 +717,19 @@ import InputText from 'primevue/inputtext';
                 p04_re1: null,
                 p04_re2: null,
                 p04_re3: null,
-                products_Tab3: [], 
-                products_listP03:[],
+                products_Tab3: [],  
                 //แก้ไขรายงานปฏิบัติราชการ
                 DialogEditListP03: false,
                 text_search_noEditP03: null,
+                text_search_idEditP03: null,
                 text_searchEditP03: null,
+                //แก้ไขชื่อไฟล์
+                DialogEditFileP03: false,
+                text_search_noEditFileP03: null,
+                text_searchEditFileP03: null,
+                text_docid: null,
+                text_p01id: null, 
+
             }   
         }, 
         async mounted(){  
@@ -657,7 +780,7 @@ import InputText from 'primevue/inputtext';
             },
             // ดึงข้อมูลเข้าตาราง
             async showDataP03(){
-                await axios.post('https://survey.msu.ac.th/evaluatebackend/api/showDataP03New',{
+                await axios.post('  http://127.0.0.1:8000/api/showDataP03New',{
                     staff_id: this.staffid_Main,
                     fac_id: this.dataPor.fac_id,
                     year_id: this.dataPor.d_date, 
@@ -679,7 +802,7 @@ import InputText from 'primevue/inputtext';
                 this.list_no_p03 = null;
                 this.list_text_p03 = null;
                 this.products_list_p03 = [];
-                axios.post('https://survey.msu.ac.th/evaluatebackend/api/p03indData',{
+                axios.post('  http://127.0.0.1:8000/api/p03indData',{
                     p01_id: item.p01_id,
                 }).then(res => {
                     // console.log(res.data); 
@@ -717,16 +840,17 @@ import InputText from 'primevue/inputtext';
                 
             }, 
             // ลบรายงานผลการปฏิบัติราชการตามตัวชี้วัด/ เกณฑ์การประเมิน
-            DeleteRegislicklist(data){ 
+            DeleteRegislicklist(index){ 
                 // console.log(data); 
-                 this.products_list_p03 = this.products_list_p03.filter(product => product.p03ind_no !== data.p03ind_no); 
+                 //this.products_list_p03 = this.products_list_p03.filter(product => product.p03ind_no !== data.p03ind_no); 
+                 this.products_list_p03.splice(index, 1); // ลบรายการจาก products_list_p03 ที่ตำแหน่ง index
             },
             // บันทึกรายงานผลการปฏิบัติราชการตามตัวชี้วัด/ เกณฑ์การประเมิน
             saveDataListP03() {   
                 if(this.products_list_p03.length == 0){
                     Swal.fire("error","กรุณาตรวจสอบตารางข้อมูล ตัวชี้วัดการประเมิน!","error");
                 }else{
-                    axios.post('https://survey.msu.ac.th/evaluatebackend/api/saveListP03', {
+                    axios.post('  http://127.0.0.1:8000/api/saveListP03', {
                         p_id: this.text_edtP03,
                         products_list: this.products_list_p03
                     })
@@ -795,10 +919,10 @@ import InputText from 'primevue/inputtext';
                         reject(error);
                     };
                 });
-            },
+            }, 
             async saveDataDoc() {
                 const file = this.selectedFiles[0];
-                console.log(file);
+                //console.log(file);
                 try {
                     if (this.radioValue === 'doc') {
                         if (!this.doc_no) {
@@ -822,7 +946,7 @@ import InputText from 'primevue/inputtext';
                                 }
                             });
 
-                            instance_x.post('https://survey.msu.ac.th/evaluatebackend/api/saveDocP03', formData)
+                            instance_x.post('  http://127.0.0.1:8000/api/saveDocP03', formData)
                                 .then(res => {
                                     this.showDataP03();
                                     this.Data_Doc();
@@ -853,7 +977,7 @@ import InputText from 'primevue/inputtext';
                                 }
                             });
 
-                            instance_x.post('https://survey.msu.ac.th/evaluatebackend/api/saveDocP03', formData)
+                            instance_x.post('  http://127.0.0.1:8000/api/saveDocP03', formData)
                                 .then(res => {
                                     this.showDataP03();
                                     this.Data_Doc();
@@ -880,7 +1004,7 @@ import InputText from 'primevue/inputtext';
             },
 
             Data_Doc(){
-                axios.post('https://survey.msu.ac.th/evaluatebackend/api/sheachDataDoc', {
+                axios.post('  http://127.0.0.1:8000/api/sheachDataDoc', {
                     p_id: this.text_edtDoc
                 })
                 .then((res) => {
@@ -893,7 +1017,7 @@ import InputText from 'primevue/inputtext';
             },
              // หลักฐานที่แสดงถึงผลการปฏิบัติราชการตามเกณฑ์การประเมิน(หลักฐานเชิงประจักษ์)
             delDataDocX(data){  
-                axios.post('https://survey.msu.ac.th/evaluatebackend/api/deleteDocP03', {
+                axios.post('  http://127.0.0.1:8000/api/deleteDocP03', {
                     doc_id: data.doc_id, 
                     doc_file: data.doc_file??null
                 })
@@ -919,7 +1043,7 @@ import InputText from 'primevue/inputtext';
                 confirmButtonText: "Yes, delete it!"
             }).then((result) => {
                 if (result.isConfirmed) {
-                    axios.post('https://survey.msu.ac.th/evaluatebackend/api/delDocP03', {
+                    axios.post('  http://127.0.0.1:8000/api/delDocP03', {
                         p01_id: data.p01_id
                     }).then(res => { 
                         this.showDataP03();
@@ -951,7 +1075,7 @@ import InputText from 'primevue/inputtext';
                 this.DialogScore = true;
                 this.text_edtP03Score = item.p01_id;;
                 this.score_p03 = null; 
-                axios.post('https://survey.msu.ac.th/evaluatebackend/api/p03ScoreData',{
+                axios.post('  http://127.0.0.1:8000/api/p03ScoreData',{
                     p01_id: item.p01_id,
                 }).then(res => {
                     // console.log(res.data); 
@@ -968,7 +1092,7 @@ import InputText from 'primevue/inputtext';
                 if(this.score_p03.length == 0){
                     Swal.fire("error","กรุณาตรวจสอบข้อมูล ระดับการประเมินตนเอง!","error");
                 }else{
-                    axios.post('https://survey.msu.ac.th/evaluatebackend/api/saveScoreP03', {
+                    axios.post('  http://127.0.0.1:8000/api/saveScoreP03', {
                         p_id: this.text_edtP03Score,
                         score_p03: this.score_p03.value
                     })
@@ -990,7 +1114,7 @@ import InputText from 'primevue/inputtext';
             getjobSpecificCompetencies(){
             //console.log(this.staffid_Main,this.dataPor);
             
-            axios.post('https://survey.msu.ac.th/evaluatebackend/api/showdataposp02', { 
+            axios.post('  http://127.0.0.1:8000/api/showdataposp02', { 
                 p_year: this.dataPor.d_date,
                 evalua: this.dataPor.evalua,
                 p_staffid: this.staffid_Main
@@ -1004,6 +1128,15 @@ import InputText from 'primevue/inputtext';
                         console.warn(`Missing data for p${i+6}`);
                     }
                 }
+                for (let i = 0; i < this.otherCompetencies.length; i++) { // แก้ไขเงื่อนไขที่นี่
+                    // ตรวจสอบว่า `res.data[0][`p${i+6}`]` มีค่าก่อนตั้งค่า
+                    if (res.data[0] && res.data[0][`pSE_${i+1}`] !== undefined) {
+                        this.otherCompetencies[i]['selfAssessment3'] = res.data[0][`pSE_${i+1}`]; 
+                    } else {
+                        console.warn(`Missing data for p${i+6}`);
+                    }
+                }
+                
                 // console.log('Response', res.data);
             })
             }, 
@@ -1067,7 +1200,7 @@ import InputText from 'primevue/inputtext';
                 // this.showPostype(this.postypename,this.postypenameid);
                 this.showPostype(positionname,postypenameid); 
                 
-                axios.post('https://survey.msu.ac.th/evaluatebackend/api/showDataPo',{
+                axios.post('  http://127.0.0.1:8000/api/showDataPo',{
                     staff_id: this.staffid_Main,
                     fac_id: this.facid_Main,
                     year_id: this.dataPor.d_date,
@@ -1112,7 +1245,7 @@ import InputText from 'primevue/inputtext';
             showPostype(postypename,postypenameid){
                 // console.log(postypename); 
                 var postypetext = postypename;
-                axios.post('https://survey.msu.ac.th/evaluatebackend/api/showdatapostypename', {
+                axios.post('  http://127.0.0.1:8000/api/showdatapostypenameAdmin', {
                     postypename: postypetext,
                     postypenameid: postypenameid
                 })
@@ -1139,7 +1272,7 @@ import InputText from 'primevue/inputtext';
             },
             showdatator() {  
                 //console.log(this.dataPor.d_date,scoreA04); 
-                axios.post('https://survey.msu.ac.th/evaluatebackend/api/showdatator', {
+                axios.post('  http://127.0.0.1:8000/api/showdatator', {
                     p_year: this.dataPor.d_date,
                     evalua: this.dataPor.evalua,
                     p_staffid: this.staffid_Main
@@ -1155,7 +1288,7 @@ import InputText from 'primevue/inputtext';
                 });
             },
             showjobSpecificCompetencies (){
-                axios.post('https://survey.msu.ac.th/evaluatebackend/api/showdataposp02', { 
+                axios.post('  http://127.0.0.1:8000/api/showdataposp02', { 
                 p_year: this.dataPor.d_date,
                 evalua: this.dataPor.evalua,
                 p_staffid: this.staffid_Main
@@ -1173,7 +1306,7 @@ import InputText from 'primevue/inputtext';
 /*============= ความรู้/ทักษะ/สมรรถนะ ที่ต้องการพัฒนา =============*/ 
             chkp03data(){ 
                 this.products_Tab3 = [];
-                axios.post('https://survey.msu.ac.th/evaluatebackend/api/showData04Tab3',{
+                axios.post('  http://127.0.0.1:8000/api/showData04Tab3',{
                     staff_id: this.staffid_Main,
                     fac_id: this.facid_Main,
                     year_id: this.dataPor.d_date,
@@ -1200,7 +1333,7 @@ import InputText from 'primevue/inputtext';
                 });
             },  
             AddDatap04(){ 
-                axios.post('https://survey.msu.ac.th/evaluatebackend/api/saveEvaTab03xx',{
+                axios.post('  http://127.0.0.1:8000/api/saveEvaTab03xx',{
                     staff_id: this.staffid_Main,
                     fac_id: this.facid_Main,
                     year_id: this.dataPor.d_date,
@@ -1235,7 +1368,7 @@ import InputText from 'primevue/inputtext';
             },
             DeleteRegislick(item) { 
                 // Add logic to remove the selected item  
-                axios.post('https://survey.msu.ac.th/evaluatebackend/api/delEvaTab03xx',{
+                axios.post('  http://127.0.0.1:8000/api/delEvaTab03xx',{
                     id: item
                 }).then(res => {  
                     // console.log(res);
@@ -1248,7 +1381,7 @@ import InputText from 'primevue/inputtext';
             },  
             async saveAssess() {
                 try {
-                    const response = await axios.post('https://survey.msu.ac.th/evaluatebackend/api/savedataAssess', { 
+                    const response = await axios.post('  http://127.0.0.1:8000/api/savedataAssess', { 
                         p_staffid: this.staffid_Main,
                         fac_id: this.facid_Main,
                         p_year: this.dataPor.d_date,
@@ -1280,7 +1413,7 @@ import InputText from 'primevue/inputtext';
                 }
             },  
             showAssess( ) {
-                axios .post('https://survey.msu.ac.th/evaluatebackend/api/showdataAssess', { 
+                axios .post('  http://127.0.0.1:8000/api/showdataAssess', { 
                     staff_id:this.staffid_Main,
                     fac_id: this.facid_Main,
                     year: this.dataPor.d_date,
@@ -1383,18 +1516,20 @@ import InputText from 'primevue/inputtext';
                 } 
                 const queryParams = new URLSearchParams(form).toString();
                 // console.log(queryParams); 
-                const url = `https://survey.msu.ac.th/evaluatebackend/report_p03?${queryParams}`;
+                const url = `  http://127.0.0.1:8000/report_p03?${queryParams}`;
                 window.open(url, '_blank'); 
             },  
             
             
              // แก้ไขตัวชี้วัด / เกณฑ์การประเมิน
-             EditRegislickP03(data){
+            EditRegislickP03(data){
                 //console.log(data);
+                this.text_search_idEditP03 = null;
                 this.text_search_noEditP03 = null;
                 this.text_searchEditP03 = null;
                 if(data){
                     this.DialogEditListP03 = true; 
+                    this.text_search_idEditP03 = data.p03ind_id;
                     this.text_search_noEditP03 = data.p03ind_no;
                     this.text_searchEditP03 = data.p03ind_Items;
                 } 
@@ -1410,13 +1545,14 @@ import InputText from 'primevue/inputtext';
 
                 // สมมติว่าเรามีฟังก์ชันสำหรับอัพเดตข้อมูลใน array
                 let updatedItem = {
+                    p03ind_id: this.text_search_idEditP03,
                     p03ind_no: this.text_search_noEditP03,
                     p03ind_Items: this.text_searchEditP03
                 };
 
                 // ค้นหาข้อมูลที่ต้องการแก้ไขใน products_list และอัพเดต
-                const index = this.products_list_p03.findIndex(item => item.p03ind_no === this.text_search_noEditP03);
-                console.log(index);
+                const index = this.products_list_p03.findIndex(item => item.p03ind_id === this.text_search_idEditP03);
+                //console.log(index);
                 
                 if (index !== -1) {
                     this.products_list_p03[index] = updatedItem;
@@ -1426,7 +1562,73 @@ import InputText from 'primevue/inputtext';
                 this.DialogEditListP03 = false;  
             },
 
-            //// แก้ไขหลักฐานเชิงประจัก 
+
+            //// แก้ไขหลักฐานเชิงประจัก เฉพาะชื่อไฟล์ 
+
+            EditDataDocFilename(data){
+                // console.log(data);
+                this.text_docid = null;
+                this.text_p01id = null; 
+                this.text_search_noEditFileP03 = null;
+                this.text_searchEditFileP03 = null;
+                if(data){ 
+                    this.DialogEditFileP03 = true; 
+                    this.text_docid = data.doc_id;
+                    this.text_p01id = data.p01_id; 
+                    this.text_search_noEditFileP03 = data.doc_no;
+                    this.text_searchEditFileP03 = data.doc_name;
+                } 
+            }, 
+            cancelDialogEditFileP03(){ 
+                this.DialogEditFileP03 = false;  
+            }, 
+            // saveDataxEditFileP03(){ 
+            //     console.log({
+            //         text_search_noEditFileP03: this.text_search_noEditFileP03,
+            //         text_searchEditFileP03: this.text_searchEditFileP03
+            //     });
+
+            //     // สมมติว่าเรามีฟังก์ชันสำหรับอัพเดตข้อมูลใน array
+            //     let updatedItem = {
+            //         doc_no: this.text_search_noEditFileP03,
+            //         doc_name: this.text_searchEditFileP03
+            //     };
+
+            //     // ค้นหาข้อมูลที่ต้องการแก้ไขใน products_list และอัพเดต
+            //     const index = this.products_doc_p03.findIndex(item => item.doc_no === this.text_search_noEditFileP03);
+            //     console.log(index);
+                
+            //     if (index !== -1) {
+            //         this.products_doc_p03[index] = updatedItem;
+            //     }
+
+            //     // ปิด Dialog หลังบันทึกข้อมูล
+            //     this.DialogEditFileP03 = false;  
+            // },
+            saveDataxEditFileP03() {
+                // console.log({
+                //     text_docid: this.text_docid,
+                //     text_p01id: this.text_p01id, 
+                //     text_search_noEditFileP03: this.text_search_noEditFileP03,
+                //     text_searchEditFileP03: this.text_searchEditFileP03
+                // }); 
+                axios.post('  http://127.0.0.1:8000/api/edtDataTitalFile', {
+                    doc_id: this.text_docid, 
+                    p01_id: this.text_p01id, 
+                    doc_no: this.text_search_noEditFileP03, 
+                    doc_name: this.text_searchEditFileP03, 
+                })
+                .then((res) => {
+                    // console.log(res.data);   
+                    this.DialogEditFileP03 = false;
+                    this.Data_Doc(); 
+                    this.showDataP03();
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                }); 
+            }
+
         },
     } 
      

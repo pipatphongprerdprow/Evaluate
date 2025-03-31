@@ -9,7 +9,7 @@
                         </h5>  
                         <small style="color: red;font-size: larger;">* กรุณาเลือกรอบประเมิน เพื่อทำแบบประเมิน</small>
                     </div>   
-                    <!-- {{ product_date.d_evaluationround}} {{ product_date.d_date}} -->
+                    <!-- {{ product_date }}  -->
                     <div class="col md:col-6">  
                         <label for="product_date"></label>
                         <Dropdown  id="product_date" 
@@ -101,7 +101,7 @@
                 <TabPanel header="แบบ ป04" value="4">
                     <Por04 :dataPor="product_date" :tab4Reload="por04key"></Por04>
                     <!-- รอข้อมูล -->
-                </TabPanel>
+                </TabPanel> 
             </TabView>
         </div>
     </div>
@@ -120,14 +120,14 @@ import Swal from 'sweetalert2';
 import Por01 from './pages/setting/por_01.vue';
 import Por02 from './pages/setting/por02.vue';
 import Por03 from './pages/setting/por03.vue';
-import Por04 from './pages/setting/por04.vue';
-
+import Por04 from './pages/setting/por04.vue'; 
 export default {
     components: {
         Por01,
         Por02,
         Por03,
-        Por04
+        Por04, 
+
     },
     name: 'ContractDetails',
     data() {
@@ -137,7 +137,7 @@ export default {
             xxx: '2',
             por02key: 0,
             por03key: 0,
-            por04key: 0,
+            por04key: 0, 
             // Anurak
             activeIndex: 0,
 //----------------------------
@@ -240,7 +240,7 @@ export default {
             };
         },
         showDataSet() {
-            axios.post(' https://survey.msu.ac.th/evaluatebackend/api/showDateSet', {
+            axios.post('   http://127.0.0.1:8000/api/showDateSet', {
                 staff_id: this.staffid_Main,
                 fac_id: this.facid_Main,
                 group_id: this.groupid_Main 
@@ -279,7 +279,7 @@ export default {
                         assessor_position: this. assessor_position
                     }; 
 
-                    axios.post(' https://survey.msu.ac.th/evaluatebackend/api/saveDatator', 
+                    axios.post('   http://127.0.0.1:8000/api/saveDatator', 
                         formData
                     ).then(response => { 
                         this.DialogScore = false; 
@@ -304,7 +304,7 @@ export default {
             } 
         },
         showdatator() { 
-            axios.post(' https://survey.msu.ac.th/evaluatebackend/api/showdatator', {
+            axios.post('   http://127.0.0.1:8000/api/showdatator', {
                 p_year: this.product_date.d_date,
                 evalua: this.product_date.evalua,
                 p_staffid: this.staffid_Main
@@ -333,7 +333,7 @@ export default {
                 }else if(event.index==3) {   
                     this.por03key++; 
                 }else if(event.index==4) {   
-                    this.por04key++; 
+                    this.por04key++;  
                 } 
                 this.currenttap=event.index
                 //console.log(this.currenttap);  
@@ -359,7 +359,7 @@ export default {
 
             const queryParams = new URLSearchParams(form).toString();
             // console.log(queryParams); 
-            const url = ` https://survey.msu.ac.th/evaluatebackend/printReportCoverpage?${queryParams}`;
+            const url = `   http://127.0.0.1:8000/printReportCoverpage?${queryParams}`;
             window.location.href = url;
  
         },  

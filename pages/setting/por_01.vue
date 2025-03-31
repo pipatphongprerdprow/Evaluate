@@ -12,9 +12,13 @@
                             <i class="pi pi-fw pi-folder-open" style="font-size: x-large;"></i> แบบ ป01
                         </h3>
                     </div>
-                    <div class="col md:col-6">
-                        <Button icon="pi pi-search" severity="help" class="mb-2 mr-6" label="เลือกข้อมูลแบบประเมิน ป.01" @click="OpenDialogP01" /> 
-                        <Button icon="pi pi-plus" severity="info" class="mb-2 mr-6" label="เพิ่มข้อมูลแบบประเมิน" @click="OpenDialogAdd" />
+                    <div class="col md:col-6"> 
+                        <!-- {{ currentDate }} -- {{ dataPor.d_recordingday }} -->
+                        <!-- <div v-if="!isCurrentDateAfter"> -->
+                        <div v-if="currentDate < dataPor.d_recordingday">
+                            <Button icon="pi pi-search" severity="help" class="mb-2 mr-6" label="เลือกข้อมูลแบบประเมิน ป.01" @click="OpenDialogP01" /> 
+                            <Button icon="pi pi-plus" severity="info" class="mb-2 mr-6" label="เพิ่มข้อมูลแบบประเมิน" @click="OpenDialogAdd" />
+                        </div> 
                     </div>  
                 </div>  
                 <!-- แสดงข้อมูลบันทึก -->
@@ -85,7 +89,10 @@
                                 <td style=" vertical-align: middle;" class="text-center">{{ (subP01.p01_score * subP01.p01_weight / 100).toFixed(2) }}</td>
                                 
                                 <td style=" vertical-align: middle;" class="text-center">
-                                    <SplitButton label="เลือก" :model="itemsBtu(subP01)" severity="warning" class="mb-2 mr-2"></SplitButton>
+                                    <!-- <div v-if="!isCurrentDateAfter"> -->
+                                    <div v-if="currentDate < dataPor.d_recordingday">
+                                        <SplitButton label="เลือก" :model="itemsBtu(subP01)" severity="warning" class="mb-2 mr-2"></SplitButton>
+                                    </div> 
                                 </td> 
                             </tr>
                         </template>
@@ -114,7 +121,9 @@
                             </td>
                             <td class="text-center" style="color: blue;  vertical-align: middle;">
                                 <!-- <b>{{ totalCalculatedScore }}</b> = --> 
-                                <b> = {{ WeightedScoreSum }}</b> 
+                                <div v-if="currentDate >= dataPor.d_scoringday">
+                                    <b> = {{ WeightedScoreSum }}</b> 
+                                </div>
                             </td>
                             <td></td>
                         </tr>  
@@ -252,13 +261,7 @@
                                 <Dropdown id="dropdownItemTarget" v-model="dropdownItemTarget" :options="dropdownItemsTarget" optionLabel="name" placeholder="เลือกระดับค่าเป้าหมาย"></Dropdown>
                             </div> 
                             <div class="field col-12 md:col-4">
-                                <label for="text_weight">น้ำหนัก(ความสำคัญ / ความยากง่ายของงาน)</label>
-                                <!-- <InputGroup>
-                                    <InputGroupAddon>
-                                        <i class="pi pi-tags"></i>
-                                    </InputGroupAddon>
-                                    <InputText v-model="text_weight" type="number" placeholder="น้ำหนัก(ความสำคัญ / ความยากง่ายของงาน)" autocomplete="off" />  
-                                </InputGroup>   -->
+                                <label for="text_weight">น้ำหนัก(ความสำคัญ / ความยากง่ายของงาน)</label> 
                                 <InputGroup>
                                     <InputGroupAddon>
                                         <i class="pi pi-tags"></i>
@@ -353,6 +356,7 @@ export default {
             year_Main: null,
             facid_Main: null,
             groupid_Main: null, 
+            currentDate: new Date().toISOString().split('T')[0],
             products_personX: [],
             checkboxValue: [],
             selectedItems: [], 
@@ -432,16 +436,27 @@ export default {
         },
     },
     computed: {
+        // isCurrentDateAfter() {
+        //     return new Date(this.currentDate).getTime() > new Date(this.dataPor.d_recordingday).getTime();
+        // },
         totalWeight() {
-    // ใช้ reduce เพื่อคำนวณค่ารวมของ p_weight
     const total = this.products_personX.reduce((total, h) => {
         return total + h.subP01sX.reduce((subTotal, subP01) => {
-            return subTotal + parseFloat(subP01.p01_weight); // แปลง p01_weight เป็น float ก่อนคำนวณ
+            return subTotal + parseFloat(subP01.p01_weight);
         }, 0);
     }, 0);
 
-    // ปัดเศษผลลัพธ์เป็นทศนิยม 2 ตำแหน่งก่อนคืนค่าผลลัพธ์
-    return total.toFixed(2); // ปัดเศษให้เป็น 2 ตำแหน่ง
+    const roundedTotal = parseFloat(total.toFixed(2));
+
+    if (roundedTotal > 100) {
+        Swal.fire({
+            icon: "warning",
+            title: "คะแนนเกินกำหนด",
+            text: "คะแนนรวมเกิน 100% กรุณาปรับค่าใหม่!",
+        });
+    }
+
+    return roundedTotal;
 },
         totalCalculatedScore() {
             // คำนวณค่ารวมของคะแนนที่คำนวณ
@@ -471,7 +486,7 @@ export default {
         // ดึงข้อมูลเข้าตาราง 
         showDataPerson(){  
             //console.log('dataPor: ',this.dataPor); 
-            axios.post(' https://survey.msu.ac.th/evaluatebackend/api/showDataPersonX',{
+            axios.post('   http://127.0.0.1:8000/api/showDataPersonX',{
             staff_id: this.staffid_Main,
             fac_id: this.dataPor.fac_id,
             year_id: this.dataPor.d_date, 
@@ -488,7 +503,7 @@ export default {
 
         // ดึงข้อมูลมาแก้ไข
         async editDatax(data){    
-          await axios.post(' https://survey.msu.ac.th/evaluatebackend/api/edtDataPersonx',{
+          await axios.post('   http://127.0.0.1:8000/api/edtDataPersonx',{
               p01_id: data.p01_id
           }).then(res => { 
                 // console.log(data);   
@@ -508,7 +523,7 @@ export default {
         }, 
         // ดึงข้อมูลภาระงาน
         selectDataHEdt(he){  
-            axios.post(' https://survey.msu.ac.th/evaluatebackend/api/selectDataPersonH').then(res => {     
+            axios.post('   http://127.0.0.1:8000/api/selectDataPersonH').then(res => {     
                 // console.log(res.data); 
                 this.dropdownItemsH=res.data;  
                 const h_f = res.data.filter(f=>f.id==he); 
@@ -530,7 +545,7 @@ export default {
                 confirmButtonText: "Yes, delete it!"
             }).then((result) => {
                 if (result.isConfirmed) { 
-                    axios.post(' https://survey.msu.ac.th/evaluatebackend/api/delDataPersonx', {
+                    axios.post('   http://127.0.0.1:8000/api/delDataPersonx', {
                         p01_id: data.p01_id
                     }).then(res => { 
                         this.showDataPerson(); 
@@ -569,7 +584,7 @@ export default {
 
             const queryParams = new URLSearchParams(form).toString();
             // console.log(queryParams); 
-            const url = ` https://survey.msu.ac.th/evaluatebackend/report_p01?${queryParams}`;
+            const url = `   http://127.0.0.1:8000/report_p01?${queryParams}`;
             window.open(url, '_blank');
  
         },
@@ -577,7 +592,7 @@ export default {
 //*================== Start เลือกข้อมูลแบบประเมิน ป.01 ==================*//
         // เปิดหน้าต่างสำหรับบันทึก *ดึงข้อมูล
         OpenDialogP01(){  
-            axios.post(' https://survey.msu.ac.th/evaluatebackend/api/showDataPerson', { 
+            axios.post('   http://127.0.0.1:8000/api/showDataPerson', { 
                 fac_id: this.dataPor.fac_id,
                 year_id: this.dataPor.d_date,
                 evalua: this.dataPor.evalua 
@@ -603,7 +618,7 @@ export default {
             if(x.length == 0){
                 Swal.fire("ไม่มีข้อมูล","กรุณาเลือกข้อคำถามจาก ตัวจัดการ !","error");
             }else{
-            await axios.post(' https://survey.msu.ac.th/evaluatebackend/api/savePushDataP01',{
+            await axios.post('   http://127.0.0.1:8000/api/savePushDataP01',{
                 data: x,
                 staffid_Main: this.staffid_Main,
             }).then(res => { 
@@ -645,7 +660,7 @@ export default {
         }, 
         // ดึงข้อมูลภาระงาน
         selectDataH(){  
-            axios.post(' https://survey.msu.ac.th/evaluatebackend/api/selectDataPersonH').then(res => {     
+            axios.post('   http://127.0.0.1:8000/api/selectDataPersonH').then(res => {     
                 //console.log(res.data); 
                 this.dropdownItemsH=res.data;  
             })
@@ -671,9 +686,7 @@ export default {
         DeleteRegislick(data){
             this.products_list = this.products_list.filter(product => product.ind_no !== data); 
         },
-
-        
-
+ 
         // แก้ไขตัวชี้วัด / เกณฑ์การประเมิน
         EditRegislick(data){
             //console.log(data);
@@ -708,14 +721,10 @@ export default {
 
             // ปิด Dialog หลังบันทึกข้อมูล
             this.DialogEditList = false;  
-        },
-
-         
-
-        
+        },  
         // บันทึกแบบจัดการ ป.1 
         async saveDatax() {
-            await axios.post(' https://survey.msu.ac.th/evaluatebackend/api/saveDataP01User',{
+            await axios.post('   http://127.0.0.1:8000/api/saveDataP01User',{
                 staff_id: this.staffid_Main,
                 fac_id: this.dataPor.fac_id,
                 year_id: this.dataPor.d_date, 

@@ -6,7 +6,7 @@
                     <div class="col md:col-6">  
                         <h3 class="mb-4 card-header"><i class="pi pi-calendar" style="font-size: x-large;"></i> จัดการ รอบประเมิน</h3>
                     </div> 
-                    <!-- {{ user }} -->
+                    <!-- {{ user.user }} -->
                     <br> 
                     <div class="col md:col-16 text-right"> 
                         <Button icon="pi pi-plus" severity="info" class="mb-2 mr-2" label="เพิ่มข้อมูลรอบประเมิน" @click="OpenDialogAdd" /> 
@@ -26,15 +26,15 @@
                                 </div>
                                 <div class="p-fluid formgrid grid"> 
                                     <div class="field col-12 md:col-4">
-                                        <label for="dateStart_text">วันที่กำหนด (เริ่ม)</label>  
+                                        <label for="dateStart_text" style="color: red;font-weight: 600;">วันที่ครบกำหนดบันทึกแบบ ป.01</label>  
                                         <InputText type="date" id="inputgroup" v-model="dateStart" />
                                     </div> 
                                     <div class="field col-12 md:col-4">
-                                        <label for="dateEnd_text">วันที่ครบกำหนด (สิ้นสุด)</label>  
+                                        <label for="dateEnd_text" style="color: red;font-weight: 600;" >วันที่ครบกำหนดบันทึกแบบ ป.03</label>  
                                         <InputText type="date" id="inputgroup" v-model="dateEnd" />
                                     </div>
                                     <div class="field col-12 md:col-4">
-                                        <label for="announce_text" style="color: red;font-weight: 600;">วันที่ประกาศคะแนน **</label>  
+                                        <label for="announce_text" style="color: red;font-weight: 600;">วันที่ประกาศคะแนน</label>  
                                         <InputText type="date" id="inputgroup" v-model="dateAnnounce" />
                                     </div>
                                 </div> 
@@ -75,19 +75,18 @@
                             </div>
                         </template>
                     </Column>
-                    <Column field="Tb_target" header="วันที่กำหนด" style="width: 12%; text-align: center;">
+                    <Column field="Tb_target" header="วันที่ครบกำหนดบันทึกแบบ ป.01" style="width: 12%; text-align: center;">
                         <template #body="Item"> 
-                            <div style="display: flex; justify-content: center; align-items: center;">
-                                <!-- {{ Item.data.d_recordingday }}    -->
+                            <div style="display: flex; justify-content: center; align-items: center;"> 
                                 {{ formatDateToThai(Item.data.d_recordingday) }}
                             </div>
                         </template>
                     </Column>
-                    <Column field="Tb_score" header="วันที่ครบกำหนด" style="width: 12%; text-align: center;">
+                    <Column field="Tb_score" header="วันที่ครบกำหนดบันทึกแบบ ป.03" style="width: 12%; text-align: center;">
                         <template #body="Item">  
                             <div style="display: flex; justify-content: center; align-items: center;">
                                 <em style="color: red;">{{ formatDateToThai(Item.data.d_enddate) }}</em>
-                                 
+                                <!-- {{ Item.data.d_scoringday }}    -->
                             </div>
                         </template>
                     </Column>
@@ -181,7 +180,7 @@ export default {
             this.groupid_Main = groupid_Main
         },
         showDataSet(){  
-            axios.post('https://survey.msu.ac.th/evaluatebackend/api/showDateSet',{
+            axios.post('  http://127.0.0.1:8000/api/showDateSet',{
                 staff_id: this.staffid_Main,
                 fac_id: this.facid_Main,
                 group_id: this.groupid_Main,
@@ -233,7 +232,7 @@ export default {
                 confirmButtonText: "Yes, delete it!"
                 }).then((result) => {
                 if (result.isConfirmed) {
-                    axios.post('https://survey.msu.ac.th/evaluatebackend/api/delDateSet',{
+                    axios.post('  http://127.0.0.1:8000/api/delDateSet',{
                         data: data
                     }).then(res => { 
                         // console.log(res.data);   
@@ -265,7 +264,7 @@ export default {
         },
         saveDataset(){
             // console.log(this.dropdownItemYear.code); 
-            axios.post('https://survey.msu.ac.th/evaluatebackend/api/saveDateSet',{
+            axios.post('  http://127.0.0.1:8000/api/saveDateSet',{
                 staff_id: this.staffid_Main,
                 fac_id: this.facid_Main,
                 group_id: this.groupid_Main,
@@ -318,4 +317,12 @@ export default {
       background-color: #edf2bb;
       font-weight: bold;
   }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+}
+th, td {
+    border: 1px solid rgb(206, 203, 203);
+    text-align: center;
+}
 </style>
