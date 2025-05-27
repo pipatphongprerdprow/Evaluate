@@ -4,11 +4,11 @@
             <div class="card mb-0"> 
                 <div class="formgroup-inline mb-1">
                    
-                    <div class="col md:col-9"> 
-                        <h3 v-if="dataP01" class="mb-4 card-header"><i class="pi pi-fw pi-sliders-h" style="font-size: x-large;"></i>  
+                    <div class="col md:col-8"> 
+                        <h4 v-if="dataP01" class="mb-4 card-header"><i class="pi pi-fw pi-sliders-h" style="font-size: x-large;"></i>  
                             จัดการ แบบประเมิน {{ dataP01.d_evaluationround }} ปีงบประมาณ : {{ dataP01.year }}  
                             <!-- {{ dataP01 }} -->
-                        </h3> 
+                        </h4> 
                     </div>
                     <!-- <div class="col md:col-4 text-left"> 
                         <label for="dropdownItemYear">รอบประเมิน : {{ dataP01.evalua }} </label> 
@@ -16,8 +16,9 @@
                     <div class="col md:col-3 text-left"> 
                         <label for="dropdownItemYear">ปีงบประมาณ : {{ dataP01.year }}  {{ user.user.name.SCOPES?.staffdepartment }}</label> 
                     </div>     -->
-                    <div class="col md:col-3 text-right"> 
-                        <Button icon="pi pi-plus" severity="info" class="mb-2 mr-2" label="เพิ่มข้อมูลแบบประเมิน" @click="OpenDialogAdd" /> 
+                    <div class="col md:col-4 text-right"> 
+                        <Button icon="pi pi-plus" severity="warning" class="mb-2 mr-2" label="เพิ่มประเภทภาระงาน" @click="OpenDialogAddwork" /> 
+                        <Button icon="pi pi-plus" severity="help" class="mb-2 mr-2" label="เพิ่มข้อมูลแบบประเมิน" @click="OpenDialogAdd" /> 
                         <Dialog header="จัดการแบบ ป01" maximizable v-model:visible="DialogAdd" :breakpoints="{ '960px': '75vw' }" :style="{ width: '100vw' }" :modal="true" position="top">
                             <form>
                                 <InputText v-model="text_edt" type="hidden" style="display: none;" />
@@ -92,6 +93,46 @@
                                 <Button label="ยกเลิก" icon="pi pi-times" class="mb-2 mr-2" severity="danger" @click="resetDialog" />
                             </template>
                         </Dialog> 
+
+                        <!-- เพิ่มภาระงาน -->
+                        <Dialog header="จัดการภาระงาน" maximizable v-model:visible="DialogAddwork" :breakpoints="{ '960px': '75vw' }" :style="{ width: '70vw' }" :modal="true" position="top">
+                            <form>
+                                <InputText v-model="text_edt" type="hidden" style="display: none;" /> 
+                                    <div class="field col-12 md:col-2" v-show="false">
+                                        <InputGroup>
+                                            <InputGroupAddon>
+                                                <i class="pi pi-sort-numeric-up"></i>
+                                            </InputGroupAddon>
+                                            <InputText v-model="text_search_nowork" type="number" placeholder="ลำดับที่" autocomplete="off" /> 
+                                        </InputGroup> 
+                                    </div> 
+                                <div class="p-fluid formgrid grid">
+                                    <div class="field col-12 md:col-2">
+                                        <label for="text_search_nowork">ลำดับ</label>
+                                        <InputGroup>
+                                            <InputGroupAddon>
+                                                <i class="pi pi-sort-numeric-up"></i>
+                                            </InputGroupAddon>
+                                            <InputText v-model="text_nowork" type="number" placeholder="ลำดับที่" autocomplete="off" /> 
+                                        </InputGroup> 
+                                    </div>
+                                    <div class="field col-12 md:col-10"> 
+                                        <label for="text_search_nowork">เพิ่มประเภทภาระงาน</label> 
+                                        <InputGroup>
+                                            <InputGroupAddon>
+                                                <i class="pi pi-book"></i>
+                                            </InputGroupAddon>
+                                            <Textarea v-model="text_searchwork" rows="1" placeholder="ชื่อภาระงาน" autocomplete="off" /> 
+                                        </InputGroup> 
+                                    </div>   
+                                </div>  
+                            </form>
+                            <template #footer>
+                                <Button label="บันทึก" icon="pi pi-check" class="mb-2 mr-2" @click="saveDatawork" /> 
+                                <Button label="ยกเลิก" icon="pi pi-times" class="mb-2 mr-2" severity="danger" @click="resetDialogwork" />
+                            </template>
+                        </Dialog> 
+
                     </div> 
                 </div>  
                 <!-- <table class="table table-bordered"> -->
@@ -121,12 +162,16 @@
                         <template v-for="(item, index) in products_person" :key="index"> 
                                 <tr >
                                     <td style="text-align: left;" colspan="8">
-                                        <b style="color: blue;">{{ item.id }}. {{ item.nameH }}</b>
+                                        <b style="color: blue;"> {{ item.h_no }}. {{ item.nameH }}</b>
+                                        <!-- {{ item.id }}. -->
                                     </td>  
                                     <!-- <td class="text-center" style="color: blue;"><b>{{ item.h_weight }}%</b></td> -->
                                     <td></td>
                                     <td></td>
-                                    <td></td>
+                                    <td>
+                                        <Button severity="primary" icon="pi pi-pencil" class="p-button-text" outlined rounded  @click="Edtwork(item)"></Button>&nbsp; 
+                                        <Button severity="danger" icon="pi pi-trash" class="p-button-text" outlined rounded @click="Delework(item)"></Button>
+                                    </td>
                                 </tr>
                                 <!-- P01 -->
                                 <tr v-for="(subP01, idx) in item.subP01s" :key="idx" style="vertical-align: baseline;"> 
@@ -135,7 +180,7 @@
                                         <b>ตัวชี้วัดที่ {{ idx+1 }} {{ subP01.p_subject }}</b>
                                         <p v-for="(subIitem, idI) in subP01.subITems" :key="idI" style="padding-left: 8px;margin-bottom: 5px;">
                                             <div v-if="subIitem.ind_no!=0"><b>ระดับ {{ subIitem.ind_no }}</b> {{ subIitem.ind_Items }}</div>
-                                            <div v-if="subIitem.ind_no==0"><b>{{ subIitem.ind_Items }}</b></div>
+                                            <div v-if="subIitem.ind_no==0"><b>{{ subIitem.ind_Items }}</b></div> 
                                         </p>
                                     </td>
                                     <td style=" vertical-align: middle;" class="text-center"> 
@@ -156,13 +201,13 @@
                                     </td>  
                                     <td style=" vertical-align: middle;" class="text-center"> 
                                         <b v-if="subP01.p_target==5">&#10003;</b> 
-                                        <b v-if="subP01.p_target!=5"></b> 
+                                        <b v-if="subP01.p_target!=5"></b>  
                                     </td>
                                     <td style=" vertical-align: middle;" class="text-center">{{ subP01.p_score }}</td>
                                     <td style=" vertical-align: middle;" class="text-center">{{ subP01.p_weight }}%</td> 
                                     <td style=" vertical-align: middle;" class="text-center">{{ (subP01.p_score * subP01.p_weight / 100).toFixed(2) }}</td>
                                     
-                                    <td style=" vertical-align: middle;" class="text-center">
+                                    <td style=" vertical-align: middle;" class="text-center"> 
                                         <SplitButton label="เลือก" :model="itemsBtu(subP01)" severity="warning" class="mb-2 mr-2"></SplitButton>
                                     </td> 
                                 </tr> 
@@ -225,6 +270,7 @@
                 ],
                 // Dialog
                 DialogAdd: false, 
+                DialogAddwork: false,
                 text_edt: null,
                 dropdownItemH: null ,
                 dropdownItemsH: [],
@@ -242,6 +288,14 @@
                 text_search_no: null,
                 text_search: null,
                 products_list: [],
+
+                //เพิ่มภาระงาน
+                text_search_nowork: null,
+                text_searchwork: null,
+                text_nowork:null,
+                products_listwork: [],
+
+                
                 
   
             }
@@ -261,10 +315,12 @@
       methods: { 
         // ดึงข้อมูลเข้าตาราง
         showDataPerson(year_id,fac_id,evalua){
-            axios.post('  http://127.0.0.1:8000/api/showDataPerson',{  
+            axios.post('   http://127.0.0.1:8000/api/showDataPerson',{  
             fac_id: fac_id,
             evalua: evalua,
-            year_id: year_id
+            year_id: year_id,
+            //เพิ่มล่าสุด
+            //staff_id: staff_id
             }).then(res => {     
                // console.log(res.data);  
                 this.products_person=res.data;
@@ -288,11 +344,23 @@
             this.products_list = [];
             this.selectDataH(this.dropdownItemYear,this.facid_Main);
         },
+
+         // เปิดหน้าต่างสำหรับบันทึก 
+         OpenDialogAddwork(){
+            this.DialogAddwork = true; 
+            this.text_edt = null; 
+            this.text_search_nowork = null;
+            this.text_searchwork = null;
+            this.text_nowork = null
+            this.products_listwork = [];
+            //this.selectDataH(this.dropdownItemYear,this.facid_Main);
+        },
+
         // ดึงข้อมูลภาระงาน
         selectDataH(year,fac){  
             //console.log('ดึงข้อมูลภาระงาน',year,fac);
             
-            axios.post('  http://127.0.0.1:8000/api/selectDataPersonH',{}).then(res => {     
+            axios.post('   http://127.0.0.1:8000/api/selectDataPersonH',{fac_id : this.dataP01.staffdepartment }).then(res => {     
                 // console.log('selectDataH',res.data); 
                 this.dropdownItemsH=res.data;  
             })
@@ -320,13 +388,39 @@
                 this.text_search = null;
             }
         },
+        //บันทึกภาระงาน
+        AddDatalistwork(){
+            if(this.text_search_nowork == null || this.text_searchwork == null){
+                Swal.fire("กรุณาตรวจสอบข้อมูล ลำดับ - ชื่อตัวชี้วัด / เกณฑ์การประเมิน!");
+            }else{   
+                if (this.products_listwork.length < 5) { 
+                    this.products_listwork.push({
+                        id: this.text_search_nowork,
+                        nameH: this.text_searchwork,
+                        staff_id: this.staffid_Main,
+                        fac_id: this.facid_Main,
+                        year_id: this.year_Main, 
+                    });  
+
+                    this.products_listwork.sort((a, b) => a.id - b.id);  
+                } else {
+                    Swal.fire("ตัวชี้วัด / เกณฑ์การประเมิน ครบ 5 ระดับแล้ว!");
+                }
+            }
+        },
         // ลบตัวชี้วัด / เกณฑ์การประเมิน
         DeleteRegislick(data){
             this.products_list = this.products_list.filter(product => product.ind_no !== data); 
         },
+
+        //ลบชื่อภาระงาน 
+        DeleteRegislickwork(data){
+            this.products_listwork = this.products_listwork.filter(product => product.id!== data); 
+        },
+
         // บันทึกแบบจัดการ ป.1 
         async saveData() {  
-            await axios.post('  http://127.0.0.1:8000/api/saveDataPerson', {
+            await axios.post('   http://127.0.0.1:8000/api/saveDataPerson', {
                 staff_id: this.staffid_Main,
                 fac_id: this.facid_Main,
                 year_id: this.year_Main,  
@@ -354,13 +448,39 @@
                 });
             },
 
+            // บันทึกประเภทภาระงาน   
+            saveDatawork() {
+                axios.post(' http://127.0.0.1:8000/api/saveWork', {
+                    id: this.text_search_nowork, 
+                    h_no: this.text_nowork,
+                    nameH: this.text_searchwork,
+                    fac_id: this.facid_Main,
+                    year_id: this.year_Main
+                }).then(res => {
+                    //console.log(res.data);
+                    Swal.fire({
+                        title: "เรียบร้อย!",
+                        text: "บันทึกข้อมูลภาระงานเรียบร้อย!",
+                        icon: "success"
+                    });
+                    this.DialogAddwork = false;  
+                    this.showDataPerson(this.dataP01.year,this.dataP01.staffdepartment,this.dataP01.evalua);
+                }).catch(error => {
+                    console.error('Error:', error);
+                    Swal.fire("เกิดข้อผิดพลาด!", "ไม่สามารถบันทึกข้อมูลได้", "error");
+                });
+            },
+ 
             // ปิดหน้าต่างบันทึก
             resetDialog(){
                 this.DialogAdd = false; 
             },
+            resetDialogwork(){
+                this.DialogAddwork = false; 
+            },
             // แก้ไขข้อมูล
             async editData(data){    
-            await axios.post('  http://127.0.0.1:8000/api/edtDataPerson',{
+            await axios.post('   http://127.0.0.1:8000/api/edtDataPerson',{
                 p_id: data.p_id
             }).then(res => { 
                     // console.log(res.data);   
@@ -372,16 +492,64 @@
                     this.dropdownItemTarget = target_f.length > 0 ? target_f[0] : null;    
                     this.text_weight = res.data[0].p_weight;  
                     this.products_list = res.data[0].sub_ITem; 
-                    this.selectDataHEdt(res.data[0].p_year,res.data[0].p_facid,res.data[0].h_id);
-                    
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
+                    this.selectDataHEdt(res.data[0].p_year,res.data[0].p_facid,res.data[0].h_id);   
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
             },
+            //แก้ไขประเภทภาระงาน 
+            async Edtwork(data) {
+                    try {
+                        const res = await axios.post(' http://127.0.0.1:8000/api/Edtwork', {
+                        id: data.id,
+                        h_no:data.h_no,
+                        nameH:data.nameH
+
+                        }); 
+                        //console.log("ข้อมูลที่ได้:", res.data); 
+                        this.DialogAddwork = true;
+                        this.text_search_nowork = res.data.id;
+                        this.text_searchwork = res.data.nameH;
+                        this.facid_Main = res.data.fac_id; 
+                        this.text_nowork = res.data.h_no;
+                    } catch (error) {
+                        console.error('Error:', error);
+                    }
+                }, 
+                async Delework(id){  
+                    Swal.fire({
+                        title: "คุณต้องการลบแบบ ป01 ใช่หรือไม่ ?",
+                        text: "เมื่อคลิกปุ่ม Yes, delete it! ข้อมูลจะถูกลบทันที!",
+                        icon: "warning",
+                        showCancelButton: true,
+                        confirmButtonColor: "#3085d6",
+                        cancelButtonColor: "#d33",
+                        confirmButtonText: "Yes, delete it!"
+                        }).then((result) => {
+                        if (result.isConfirmed) {
+                            axios.post(' http://127.0.0.1:8000/api/Delework',{
+                                id:id
+                            }).then(res => { 
+                                 //console.log(res.data);   
+                                this.showDataPerson(this.dataP01.year,this.dataP01.staffdepartment,this.dataP01.evalua);
+                                Swal.fire({
+                                title: "ลบข้อมูลเสร็จสิ้น!",
+                                text: "ข้อมูลของคุณถูกลบแล้ว",
+                                icon: "success"
+                                });
+                            })
+                            .catch(error => {
+                                console.error('Error:', error);
+                            }); 
+                        }
+                    }); 
+                },   
+                
+
             // ดึงข้อมูลภาระงาน
             selectDataHEdt(year,fac,he){  
-                axios.post('  http://127.0.0.1:8000/api/selectDataPersonH',{
+                axios.post('   http://127.0.0.1:8000/api/selectDataPersonH',{
                     year: year,
                     fac: fac,
                 }).then(res => {     
@@ -395,38 +563,37 @@
                     console.error('Error:', error);
                 });
             },
-        // ลบข้อมูล
-        async delData(data){  
-            Swal.fire({
-                title: "คุณต้องการลบแบบ ป01 ใช่หรือไม่ ?",
-                text: "เมื่อคลิกปุ่ม Yes, delete it! ข้อมูลจะถูกลบทันที!",
-                icon: "warning",
-                showCancelButton: true,
-                confirmButtonColor: "#3085d6",
-                cancelButtonColor: "#d33",
-                confirmButtonText: "Yes, delete it!"
-                }).then((result) => {
-                if (result.isConfirmed) {
-                    axios.post('  http://127.0.0.1:8000/api/delDataPerson',{
-                        p_id: data.p_id
-                    }).then(res => { 
-                        // console.log(res);   
-                        this.showDataPerson(this.dataP01.year,this.dataP01.staffdepartment,this.dataP01.evalua);
-                        Swal.fire({
-                        title: "ลบข้อมูลเสร็จสิ้น!",
-                        text: "ข้อมูลของคุณถูกลบแล้ว",
-                        icon: "success"
-                        });
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                    }); 
-                }
-            }); 
-        }, 
-
-    } 
- }
+            // ลบข้อมูล
+            async delData(data){  
+                Swal.fire({
+                    title: "คุณต้องการลบแบบ ป01 ใช่หรือไม่ ?",
+                    text: "เมื่อคลิกปุ่ม Yes, delete it! ข้อมูลจะถูกลบทันที!",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#3085d6",
+                    cancelButtonColor: "#d33",
+                    confirmButtonText: "Yes, delete it!"
+                    }).then((result) => {
+                    if (result.isConfirmed) {
+                        axios.post('   http://127.0.0.1:8000/api/delDataPerson',{
+                            p_id: data.p_id
+                        }).then(res => { 
+                            // console.log(res);   
+                            this.showDataPerson(this.dataP01.year,this.dataP01.staffdepartment,this.dataP01.evalua);
+                            Swal.fire({
+                            title: "ลบข้อมูลเสร็จสิ้น!",
+                            text: "ข้อมูลของคุณถูกลบแล้ว",
+                            icon: "success"
+                            });
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                        }); 
+                    }
+                }); 
+            },   
+        } 
+    }
   
   </script>
   

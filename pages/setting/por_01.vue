@@ -48,7 +48,8 @@
                         <template v-for="(h, ind) in products_personX" :key="ind">  
                             <tr>
                                 <td style="text-align: left;" colspan="8">
-                                    <b style="color: blue;">{{ h.id }}. {{ h.nameH }}</b>
+                                    <b style="color: blue;">{{ h.h_no }}. {{ h.nameH }}</b>
+                                    <!-- {{ h.id }} -->
                                 </td>
                                 <td class="text-center" style="color: blue;"><b>{{ h.p01_weight??0}}%</b></td> 
                                 <!-- <td class="text-center" style="color: blue;"><b>{{ h.h_weight }}%</b></td>  -->
@@ -123,7 +124,7 @@
                                 <!-- <b>{{ totalCalculatedScore }}</b> = --> 
                                 <div v-if="currentDate >= dataPor.d_scoringday">
                                     <b> = {{ WeightedScoreSum }}</b> 
-                                </div>
+                                </div>  
                             </td>
                             <td></td>
                         </tr>  
@@ -144,8 +145,8 @@
                                     <th rowspan="2" style="width: 20%;">(1) <br> กิจกรรม / โครงการ / งาน</th>
                                     <th rowspan="2" style="width: 24%;">
                                         (2) <br> ตัวชี้วัด / เกณฑ์การประเมิน <br>
-                                        (1.ถูกต้อง 2.ครบถ้วน <br> 3.ตรงเวลา)
-                                    </th>
+                                        (1.ถูกต้อง 2.ครบถ้วน <br> 3.ตรงเวลา)  
+                                    </th> 
                                     <th colspan="5" style="width: 15%;">(3) <br> ระดับค่าเป้าหมาย</th>
                                     <th rowspan="2" style="width: 7%;">(4) <br> ค่าคะแนน ที่ได้</th>
                                     <th rowspan="2" style="width: 10%;">(5) <br> น้ำหนัก (ความสำคัญ/ <br> ความยากง่ายของงาน)</th>
@@ -163,7 +164,8 @@
                                 <template v-for="(item, index) in products_person" :key="index">
                                     <tr>
                                         <td style="text-align: left;" colspan="8">
-                                            <b style="color: blue;">{{ item.id }}. {{ item.nameH }} </b>
+                                            <b style="color: blue;">{{ item.h_no }}. {{ item.nameH }} </b>
+                                            <!-- {{ item.id }}. -->
                                         </td>
                                         <td></td>
                                         <!-- <td class="text-center" style="color: blue;"> <b>{{ h.p_weight??0 }}%</b></td>  --> 
@@ -486,7 +488,7 @@ export default {
         // ดึงข้อมูลเข้าตาราง 
         showDataPerson(){  
             //console.log('dataPor: ',this.dataPor); 
-            axios.post('   http://127.0.0.1:8000/api/showDataPersonX',{
+            axios.post('    http://127.0.0.1:8000/api/showDataPersonX',{
             staff_id: this.staffid_Main,
             fac_id: this.dataPor.fac_id,
             year_id: this.dataPor.d_date, 
@@ -503,16 +505,20 @@ export default {
 
         // ดึงข้อมูลมาแก้ไข
         async editDatax(data){    
-          await axios.post('   http://127.0.0.1:8000/api/edtDataPersonx',{
-              p01_id: data.p01_id
+          await axios.post(' http://127.0.0.1:8000/api/edtDataPersonx',{
+              p01_id: data.p01_id, 
           }).then(res => { 
-                // console.log(data);   
+                  //console.log(data);   
                 this.DialogAdd = true; 
                 this.text_edt = res.data[0].p01_id;   
                 this.text_no = res.data[0].p01_no; 
                 this.text_name = res.data[0].p01_subject;  
                 const target_f = this.dropdownItemsTarget.filter(f=>f.value==res.data[0].p01_target)
-                this.dropdownItemTarget = target_f.length > 0 ? target_f[0] : null;    
+                this.dropdownItemTarget = target_f.length > 0 ? target_f[0] : null; 
+
+                const h_f = this.dropdownItemsH.filter(f => f.value == res.data[0].p01_h)
+                this.dropdownItemH = h_f.length > 0 ? h_f[0] : null; 
+
                 this.text_weight = res.data[0].p01_weight;  
                 this.products_list = res.data[0].sub_ITem; 
                 this.selectDataHEdt(res.data[0].p01_h); 
@@ -523,7 +529,9 @@ export default {
         }, 
         // ดึงข้อมูลภาระงาน
         selectDataHEdt(he){  
-            axios.post('   http://127.0.0.1:8000/api/selectDataPersonH').then(res => {     
+            axios.post('    http://127.0.0.1:8000/api/selectDataPersonH',{
+                fac_id : this.dataPor.fac_id,
+            }).then(res => {     
                 // console.log(res.data); 
                 this.dropdownItemsH=res.data;  
                 const h_f = res.data.filter(f=>f.id==he); 
@@ -545,7 +553,7 @@ export default {
                 confirmButtonText: "Yes, delete it!"
             }).then((result) => {
                 if (result.isConfirmed) { 
-                    axios.post('   http://127.0.0.1:8000/api/delDataPersonx', {
+                    axios.post('    http://127.0.0.1:8000/api/delDataPersonx', {
                         p01_id: data.p01_id
                     }).then(res => { 
                         this.showDataPerson(); 
@@ -584,7 +592,7 @@ export default {
 
             const queryParams = new URLSearchParams(form).toString();
             // console.log(queryParams); 
-            const url = `   http://127.0.0.1:8000/report_p01?${queryParams}`;
+            const url = `    http://127.0.0.1:8000/report_p01?${queryParams}`;
             window.open(url, '_blank');
  
         },
@@ -592,7 +600,7 @@ export default {
 //*================== Start เลือกข้อมูลแบบประเมิน ป.01 ==================*//
         // เปิดหน้าต่างสำหรับบันทึก *ดึงข้อมูล
         OpenDialogP01(){  
-            axios.post('   http://127.0.0.1:8000/api/showDataPerson', { 
+            axios.post('    http://127.0.0.1:8000/api/showDataPerson', { 
                 fac_id: this.dataPor.fac_id,
                 year_id: this.dataPor.d_date,
                 evalua: this.dataPor.evalua 
@@ -618,7 +626,7 @@ export default {
             if(x.length == 0){
                 Swal.fire("ไม่มีข้อมูล","กรุณาเลือกข้อคำถามจาก ตัวจัดการ !","error");
             }else{
-            await axios.post('   http://127.0.0.1:8000/api/savePushDataP01',{
+            await axios.post('    http://127.0.0.1:8000/api/savePushDataP01',{
                 data: x,
                 staffid_Main: this.staffid_Main,
             }).then(res => { 
@@ -660,8 +668,9 @@ export default {
         }, 
         // ดึงข้อมูลภาระงาน
         selectDataH(){  
-            axios.post('   http://127.0.0.1:8000/api/selectDataPersonH').then(res => {     
-                //console.log(res.data); 
+            axios.post(' http://127.0.0.1:8000/api/selectDataPersonH',{ fac_id : this.dataPor.fac_id }).then(res => {     
+               //console.log(res.data); 
+               
                 this.dropdownItemsH=res.data;  
             })
             .catch(error => {
@@ -724,7 +733,7 @@ export default {
         },  
         // บันทึกแบบจัดการ ป.1 
         async saveDatax() {
-            await axios.post('   http://127.0.0.1:8000/api/saveDataP01User',{
+            await axios.post('    http://127.0.0.1:8000/api/saveDataP01User',{
                 staff_id: this.staffid_Main,
                 fac_id: this.dataPor.fac_id,
                 year_id: this.dataPor.d_date, 

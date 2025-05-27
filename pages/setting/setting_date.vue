@@ -37,7 +37,97 @@
                                         <label for="announce_text" style="color: red;font-weight: 600;">วันที่ประกาศคะแนน</label>  
                                         <InputText type="date" id="inputgroup" v-model="dateAnnounce" />
                                     </div>
-                                </div> 
+                                </div>
+                                <h5 class="mb-4 card-header">กำหนดสิทธิ์การประเมิน</h5>
+                                <div class="p-fluid formgrid grid"> 
+                                    <div class="field col-12 md:col-4">
+                                        <label for="text_user1">ผู้ประเมินคนที่ 1</label>
+                                        <InputGroup>
+                                            <InputGroupAddon>
+                                                <i class="pi pi-user"></i>
+                                            </InputGroupAddon>
+                                            <InputText v-model="text_user1" type="text" placeholder="ชื่อผู้ประเมิน" autocomplete="off" @keyup="searchUserStaffid1" />  
+                                        </InputGroup> 
+                                        <span v-if="seen">
+                                            <ul id="country-list">
+                                                <li v-for="(li) in listshoeusername1" :key="li.id" @click="nameUserclick1(li)">{{li.staffid}} : {{li.namefully}}</li>
+                                            </ul>
+                                        </span>
+                                        <input type="hidden" v-model="text_namefully1"> 
+                                        <input type="hidden" v-model="text_staff1"> 
+                                        <input type="hidden" v-model="text_position1"> 
+                                       
+                                        
+                                    </div> 
+                                    <div class="field col-12 md:col-4">
+                                        <label for="text_user2">ผู้ประเมินคนที่ 2</label>
+                                        <InputGroup>
+                                            <InputGroupAddon>
+                                                <i class="pi pi-user"></i>
+                                            </InputGroupAddon>
+                                            <InputText v-model="text_user2" type="text" placeholder="ชื่อผู้ประเมิน" autocomplete="off" @keyup="searchUserStaffid2" />  
+                                        </InputGroup> 
+                                        <span v-if="seen2">
+                                            <ul id="country-list">
+                                                <li v-for="(li) in listshoeusername2" :key="li.id" @click="nameUserclick2(li)">{{li.staffid}} : {{li.namefully}}</li>
+                                            </ul>
+                                        </span>
+                                        <input type="hidden" v-model="text_namefully2">  
+                                        <input type="hidden" v-model="text_staff2"> 
+                                        <input type="hidden" v-model="text_position2"> 
+                                    </div> 
+                                    <div class="field col-12 md:col-4">
+                                        <label for="text_user3">ผู้ประเมินคนที่ 3</label>
+                                        <InputGroup>
+                                            <InputGroupAddon>
+                                                <i class="pi pi-user"></i>
+                                            </InputGroupAddon>
+                                            <InputText v-model="text_user3" type="text" placeholder="ชื่อผู้ประเมิน" autocomplete="off" @keyup="searchUserStaffid3" />  
+                                        </InputGroup> 
+                                        <span v-if="seen3">
+                                            <ul id="country-list">
+                                                <li v-for="(li) in listshoeusername3" :key="li.id" @click="nameUserclick3(li)">{{li.staffid}} : {{li.namefully}}</li>
+                                            </ul>
+                                        </span>
+                                        <input type="hidden" v-model="text_namefully3">   
+                                        <input type="hidden" v-model="text_staff3"> 
+                                        <input type="hidden" v-model="text_position3"> 
+                                    </div> 
+                                    <div class="field col-12 md:col-4">
+                                        <label for="text_user4">ผู้ประเมินคนที่ 4</label>
+                                        <InputGroup>
+                                            <InputGroupAddon>
+                                                <i class="pi pi-user"></i>
+                                            </InputGroupAddon>
+                                            <InputText v-model="text_user4" type="text" placeholder="ชื่อผู้ประเมิน" autocomplete="off" @keyup="searchUserStaffid4" />  
+                                        </InputGroup> 
+                                        <span v-if="seen4">
+                                            <ul id="country-list">
+                                                <li v-for="(li) in listshoeusername4" :key="li.id" @click="nameUserclick4(li)">{{li.staffid}} : {{li.namefully}}</li>
+                                            </ul>
+                                        </span>
+                                        <input type="hidden" v-model="text_namefully4">   
+                                        <input type="hidden" v-model="text_staff4"> 
+                                        <input type="hidden" v-model="text_position4"> 
+                                    </div> 
+                                    <div class="field col-12 md:col-4">
+                                        <label for="text_user5">ผู้ประเมินคนที่ 5</label>
+                                        <InputGroup>
+                                            <InputGroupAddon>
+                                                <i class="pi pi-user"></i>
+                                            </InputGroupAddon>
+                                            <InputText v-model="text_user5" type="text" placeholder="ชื่อผู้ประเมิน" autocomplete="off" @keyup="searchUserStaffid5" />  
+                                        </InputGroup> 
+                                        <span v-if="seen5">
+                                            <ul id="country-list">
+                                                <li v-for="(li) in listshoeusername5" :key="li.id" @click="nameUserclick5(li)">{{li.staffid}} : {{li.namefully}}</li>
+                                            </ul>
+                                        </span>
+                                        <input type="hidden" v-model="text_namefully5">   
+                                        <input type="hidden" v-model="text_staff5"> 
+                                        <input type="hidden" v-model="text_position5"> 
+                                    </div> 
+                                </div>  
                             </form>
                             <template #footer>
                                 <Button label="บันทึก" icon="pi pi-check" class="mb-2 mr-2" @click="saveDataset" /> 
@@ -160,6 +250,40 @@ export default {
             dateEnd: null, 
             dateAnnounce: null, 
             dataP01:{}, 
+            // คนที่ 1
+            seen: false,
+            text_user1: null,
+            listshoeusername1: null,
+            text_staff1: null,
+            text_position1: null,
+            text_namefully1 : null,
+            // คนที่ 2
+            seen2: false,
+            text_user2: null,
+            listshoeusername2: null,
+            text_staff2: null,
+            text_position2: null,
+            text_namefully2 : null,
+
+            // คนที่ 3
+            seen3: false,
+            text_user3: null,
+            listshoeusername3: null,
+            text_staff3: null,
+            text_position3: null,
+            // คนที่ 4
+            seen4: false,
+            text_user4: null,
+            listshoeusername4: null,
+            text_staff4: null,
+            text_position4: null,
+            // คนที่ 5
+            seen5: false,
+            text_user5: null,
+            listshoeusername5: null,
+            text_staff5: null,
+            text_position5: null, 
+             
         }
     },
     async mounted(){
@@ -180,7 +304,7 @@ export default {
             this.groupid_Main = groupid_Main
         },
         showDataSet(){  
-            axios.post('  http://127.0.0.1:8000/api/showDateSet',{
+            axios.post('   http://127.0.0.1:8000/api/showDateSet',{
                 staff_id: this.staffid_Main,
                 fac_id: this.facid_Main,
                 group_id: this.groupid_Main,
@@ -207,19 +331,42 @@ export default {
         },
 
         editData(data){ 
-            // console.log(data);
+            //console.log(data); 
             this.DialogAdd = true;  
             this.text_edt = data.id;
-
+            
             const year_ob = this.dropdownItemsYear.filter(f=>f.code==data.d_date)
             this.dropdownItemYear = year_ob.length > 0 ? year_ob[0] : null;   
 
             const evalua_ob = this.dropdownItemsEvalua.filter(f=>f.code==data.evalua)
-            this.dropdownItemEvalua = evalua_ob.length > 0 ? evalua_ob[0] : null;   
- 
+            this.dropdownItemEvalua = evalua_ob.length > 0 ? evalua_ob[0] : null;    
+
             this.dateStart = data.d_recordingday;
             this.dateEnd = data.d_enddate;
             this.dateAnnounce = data.d_scoringday; 
+
+            this.text_user1 =data.leader1+' : '+ data.leader_name1;
+            this.text_staff1 = data.leader1; 
+            this.text_position1 = data.leader_position1; 
+            this.text_namefully1 = data.leader_name1; 
+            this.text_user2 =data.leader2+' : '+ data.leader_name2; 
+            this.text_staff2 = data.leader2; 
+            this.text_position2 = data.leader_position2; 
+            this.text_namefully2 = data.leader_name2; 
+            this.text_user3 =data.leader3+' : '+ data.leader_name3; 
+            this.text_staff3 = data.leader3; 
+            this.text_position3 = data.leader_position3;
+            this.text_namefully3 = data.leader_name3;
+            this.text_user4 =data.leader4+' : '+ data.leader_name4; 
+            this.text_staff4 = data.leader4; 
+            this.text_position4 = data.leader_position4;
+            this.text_namefully4 = data.leader_name4; 
+            this.text_user5 =data.leader5+' : '+ data.leader_name5; 
+            this.text_staff5 = data.leader5; 
+            this.text_position5 = data.leader_position5;
+            this.text_namefully5 = data.leader_name5; 
+
+
         },
         delData(data){ 
             Swal.fire({
@@ -232,7 +379,7 @@ export default {
                 confirmButtonText: "Yes, delete it!"
                 }).then((result) => {
                 if (result.isConfirmed) {
-                    axios.post('  http://127.0.0.1:8000/api/delDateSet',{
+                    axios.post('   http://127.0.0.1:8000/api/delDateSet',{
                         data: data
                     }).then(res => { 
                         // console.log(res.data);   
@@ -264,7 +411,7 @@ export default {
         },
         saveDataset(){
             // console.log(this.dropdownItemYear.code); 
-            axios.post('  http://127.0.0.1:8000/api/saveDateSet',{
+            axios.post('   http://127.0.0.1:8000/api/saveDateSet',{
                 staff_id: this.staffid_Main,
                 fac_id: this.facid_Main,
                 group_id: this.groupid_Main,
@@ -274,6 +421,22 @@ export default {
                 dateStart: this.dateStart,
                 dateEnd: this.dateEnd,
                 dateAnnounce: this.dateAnnounce,  
+                // user
+                text_staff1: this.text_staff1,
+                text_position1: this.text_position1,
+                text_namefully1: this.text_namefully1, 
+                text_staff2: this.text_staff2,
+                text_position2: this.text_position2,
+                text_namefully2: this.text_namefully2,  
+                text_staff3: this.text_staff3,
+                text_position3: this.text_position3,
+                text_namefully3: this.text_namefully3,   
+                text_staff4: this.text_staff4,
+                text_position4: this.text_position4,
+                text_namefully4: this.text_namefully4,  
+                text_staff5: this.text_staff5,
+                text_position5: this.text_position5,
+                text_namefully5: this.text_namefully5,  
  
             }).then(res => {     
                  //console.log(res.data); 
@@ -302,8 +465,151 @@ export default {
 
             return new Intl.DateTimeFormat('th-TH', options).format(new Date(date));
         },
-    }
+        // User 1
+        async searchUserStaffid1(){  
+            try { 
+                if (this.previousName && this.text_user1.length < this.previousName.length) {  
+                    this.text_staff1 = null;
+                    this.text_position1 = null;
+                    this.text_namefully1 = null;
+                }
 
+                if(this.text_user1.length > 3){
+                    const res = await axios.get(' http://127.0.0.1:8000/api/searchDataStaff', {  
+                        params: {
+                            staffid: this.text_user1
+                        }
+                    }); 
+                    //console.log('searchUserStaffid1: ',res.data);  
+                    this.seen = true; 
+                    this.listshoeusername1=res.data  
+                }
+                this.previousName = this.text_user1;
+            } catch (error) {
+                console.error('Error fetching evaluation data:', error);
+            } 
+        },  
+        nameUserclick1(data){   
+            //console.log('nameUserclick1: ',data);
+            this.seen = false; 
+            this.text_user1 = data.staffid+' : '+data.namefully; 
+            this.text_staff1 = data.staffid;
+            this.text_position1 = data.posnameth;
+            this.text_namefully1 = data.namefully;
+        },
+
+        // User 2
+        async searchUserStaffid2(){  
+            try { 
+                if (this.previousName && this.text_user2.length < this.previousName.length) {  
+                    this.text_staff2 = null;
+                    this.text_position2 = null;
+                    this.text_namefully2 = null; 
+                }
+                if(this.text_user2.length > 3){
+                    const res = await axios.get(' http://127.0.0.1:8000/api/searchDataStaff', {  
+                        params: {
+                            staffid: this.text_user2
+                        }
+                    }); 
+                    //console.log('searchUserStaffid2: ',res.data);  
+                    this.seen2 = true; 
+                    this.listshoeusername2=res.data  
+                }
+            } catch (error) {
+                console.error('Error fetching evaluation data:', error);
+            } 
+        },  
+        nameUserclick2(data){   
+            //console.log('nameUserclick1: ',data);
+            this.seen2 = false; 
+            this.text_user2 = data.staffid+' : '+data.namefully; 
+            this.text_staff2 = data.staffid;
+            this.text_position2 = data.posnameth;
+            this.text_namefully2 = data.namefully;
+        },
+             // User 3
+        async searchUserStaffid3(){  
+            try { 
+                if (this.previousName && this.text_user3.length < this.previousName.length) {  
+                    this.text_staff3 = null;
+                    this.text_position3 = null;
+                    this.text_namefully3 = null; 
+                }
+                if(this.text_user3.length > 3){
+                    const res = await axios.get(' http://127.0.0.1:8000/api/searchDataStaff', {  
+                        params: {
+                            staffid: this.text_user3
+                        }
+                    }); 
+                    //console.log('searchUserStaffid3: ',res.data);  
+                    this.seen3 = true; 
+                    this.listshoeusername3=res.data  
+                }
+            } catch (error) {
+                console.error('Error fetching evaluation data:', error);
+            } 
+        },  
+        nameUserclick3(data){   
+            //console.log('nameUserclick3: ',data);
+            this.seen3 = false; 
+            this.text_user3 = data.staffid+' : '+data.namefully; 
+            this.text_staff3 = data.staffid;
+            this.text_position3 = data.posnameth;
+            this.text_namefully3 = data.namefully;
+        },
+             // User 4
+        async searchUserStaffid4(){  
+            try { 
+                if(this.text_user4.length > 3){
+                    const res = await axios.get(' http://127.0.0.1:8000/api/searchDataStaff', {  
+                        params: {
+                            staffid: this.text_user4
+                        }
+                    }); 
+                    //console.log('searchUserStaffid1: ',res.data);  
+                    this.seen4 = true; 
+                    this.listshoeusername4=res.data  
+                }
+            } catch (error) {
+                console.error('Error fetching evaluation data:', error);
+            } 
+        },  
+        nameUserclick4(data){   
+            //console.log('nameUserclick4: ',data);
+            this.seen4 = false; 
+            this.text_user4 = data.staffid+' : '+data.namefully; 
+            this.text_staff4 = data.staffid;
+            this.text_position4 = data.posnameth;
+            this.text_namefully4 = data.namefully;
+        },
+             // User 5
+        async searchUserStaffid5(){  
+            try { 
+                if(this.text_user5.length > 3){
+                    const res = await axios.get(' http://127.0.0.1:8000/api/searchDataStaff', {  
+                        params: {
+                            staffid: this.text_user5
+                        }
+                    }); 
+                    //console.log('searchUserStaffid1: ',res.data);  
+                    this.seen5 = true; 
+                    this.listshoeusername5=res.data  
+                }
+            } catch (error) {
+                console.error('Error fetching evaluation data:', error);
+            } 
+        },  
+        nameUserclick5(data){   
+            //console.log('nameUserclick1: ',data);
+            this.seen5 = false; 
+            this.text_user5 = data.staffid+' : '+data.namefully; 
+            this.text_staff5 = data.staffid;
+            this.text_position5 = data.posnameth;
+            this.text_namefully5 = data.namefully;
+        },  
+    }
+     
 }
 </script>
 
@@ -315,14 +621,17 @@ export default {
 }
 .table th {
       background-color: #edf2bb;
-      font-weight: bold;
+      font-weight: bold; 
   }
   table {
     border-collapse: collapse;
-    width: 100%;
+    width: 100%; 
 }
 th, td {
     border: 1px solid rgb(206, 203, 203);
     text-align: center;
 }
+#country-list{float:left;list-style:none;margin-top:-3px;padding:0;width:25%;position: absolute; z-index:9999 !important;}
+#country-list li{padding: 10px; background: #f0f0f0; border-bottom: #bbb9b9 1px solid;}
+#country-list li:hover{background:#ece3d2;cursor: pointer;}
 </style>

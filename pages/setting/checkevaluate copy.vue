@@ -187,7 +187,7 @@
                                                         
                                                         <td style="text-align: left;"> 
                                                             <p v-for="(subIitemDoc, inDoc) in subP01.subITemP03doc" :key="inDoc" style="padding-left: 8px;margin-bottom: 5px;"> 
-                                                                <a v-if="subIitemDoc.doc_file!=null" :href="'  http://127.0.0.1:8000/storage/uploadsP03/'+subIitemDoc.doc_file" target="_blank"><b>ระดับ</b> <b>{{subIitemDoc.doc_no }}</b> {{ subIitemDoc.doc_name }}</a> 
+                                                                <a v-if="subIitemDoc.doc_file!=null" :href="'   http://127.0.0.1:8000/storage/uploadsP03/'+subIitemDoc.doc_file" target="_blank"><b>ระดับ</b> <b>{{subIitemDoc.doc_no }}</b> {{ subIitemDoc.doc_name }}</a> 
                                                                 <a v-if="subIitemDoc.doc_link!=null" :href="subIitemDoc.doc_link" target="_blank"><b>ระดับ</b> <b>{{ subIitemDoc.p03ind_no }}</b> {{ subIitemDoc.doc_name }}</a> 
                                                             </p>
                                                             <p v-if="subP01.subITemP03doc.length == 0" style="padding-left: 8px;margin-bottom: 5px;">
@@ -797,7 +797,7 @@ export default {
         }, 
         showDataSet() {
             axios
-                .post('  http://127.0.0.1:8000/api/showDateSet', {
+                .post('   http://127.0.0.1:8000/api/showDateSet', {
                     staff_id: this.staffid_Main,
                     fac_id: this.facid_Main,
                     group_id: this.groupid_Main
@@ -822,7 +822,7 @@ export default {
             }
         },
         async showDataEvalu(){
-            await axios.get('  http://127.0.0.1:8000/api/showDataEvalu',{
+            await axios.get('   http://127.0.0.1:8000/api/showDataEvalu',{
                 // 28 / 11 / 67
                 // params: {
                 //     staff_id: this.staffid_Main,
@@ -891,7 +891,7 @@ export default {
             // เพิ่มฟังก์ชันการอัพโหลดไฟล์
         },
         async Btnstatus(staff_id,status){   
-            await axios.post('  http://127.0.0.1:8000/api/postDataChkBtn',{ 
+            await axios.post('   http://127.0.0.1:8000/api/postDataChkBtn',{ 
                 year: this.dropdownItemYear ,
                 staff_id: staff_id ,
                 status: status
@@ -978,7 +978,7 @@ export default {
             }
         },  
         async tab2Data(staff_id){  
-            await axios.post('  http://127.0.0.1:8000/api/showDataP03New',{
+            await axios.post('   http://127.0.0.1:8000/api/showDataP03New',{
                 staff_id: staff_id, 
                 fac_id: this.examine_date.fac_id,
                 year_id: this.examine_date.d_date, 
@@ -1000,7 +1000,7 @@ export default {
             });
         }, 
         // showdataPoText(staff_id,fac_id,year_id,record){ 
-        //     axios.post('  http://127.0.0.1:8000/api/showDataPo',{
+        //     axios.post('   http://127.0.0.1:8000/api/showDataPo',{
         //         staff_id: staff_id,
         //         fac_id: fac_id,
         //         year_id: year_id,
@@ -1100,7 +1100,7 @@ export default {
             // this.showPostype(this.currentstaff[0]?.postypenameth, this.postypenameid);  แก้ไขวันที่ 20 /03 67
             this.showPostype(this.currentstaff[0]?.postypenameth, this.postypenameidXX);
 
-            axios.post('http://127.0.0.1:8000/api/showDataPo', {
+            axios.post(' http://127.0.0.1:8000/api/showDataPo', {
                 staff_id: staff_id,
                 fac_id: facid_Main,
                 year_id: d_date,
@@ -1127,7 +1127,7 @@ export default {
             });
         }, 
         chkp04dataT4(staff_id,fac_id,year_id,record){
-            axios.post('  http://127.0.0.1:8000/api/showData04Tab3',{
+            axios.post('   http://127.0.0.1:8000/api/showData04Tab3',{
                 staff_id: staff_id,
                 fac_id: fac_id,
                 year_id: year_id,
@@ -1143,7 +1143,7 @@ export default {
             });
         },
         showdatator(dataStaffid) {   
-            axios.post('  http://127.0.0.1:8000/api/showdatator', {
+            axios.post('   http://127.0.0.1:8000/api/showdatator', {
                 p_year: this.examine_date.d_date,
                 evalua: this.examine_date.evalua,
                 p_staffid: this.dataStaffid
@@ -1159,7 +1159,7 @@ export default {
             });
         },
         getjobSpecificCompetencies() {
-            axios.post('  http://127.0.0.1:8000/api/showdataposp02', {
+            axios.post('   http://127.0.0.1:8000/api/showdataposp02', {
                 p_year: this.examine_date.d_date,
                 evalua: this.examine_date.evalua,
                 p_staffid: this.dataStaffid
@@ -1201,7 +1201,7 @@ export default {
         // async showPostype(postypename,postypenameid){
         //     // console.log(postypename); 
         //     var postypetext = `ระดับ`+postypename;
-        //    await axios.post('  http://127.0.0.1:8000/api/showdatapostypename', {
+        //    await axios.post('   http://127.0.0.1:8000/api/showdatapostypename', {
         //         postypename: postypetext,
         //         postypenameid: postypenameid
         //     })
@@ -1224,7 +1224,7 @@ export default {
             // var postypetext =postypename;
             var postypetext = `ระดับ` + postypenameText;
             // var postypetext = `ระดับ` + postypename;
-            await axios .post('  http://127.0.0.1:8000/api/showdatapostypenameAdmin', {
+            await axios .post('   http://127.0.0.1:8000/api/showdatapostypenameAdmin', {
                     postypename: postypetext,
                     postypenameid: postypenameid
                 })

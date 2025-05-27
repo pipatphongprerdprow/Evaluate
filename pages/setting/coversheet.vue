@@ -240,7 +240,7 @@ export default {
             };
         },
         showDataSet() {
-            axios.post('   http://127.0.0.1:8000/api/showDateSet', {
+            axios.post('    http://127.0.0.1:8000/api/showDateSet', {
                 staff_id: this.staffid_Main,
                 fac_id: this.facid_Main,
                 group_id: this.groupid_Main 
@@ -279,7 +279,7 @@ export default {
                         assessor_position: this. assessor_position
                     }; 
 
-                    axios.post('   http://127.0.0.1:8000/api/saveDatator', 
+                    axios.post('    http://127.0.0.1:8000/api/saveDatator', 
                         formData
                     ).then(response => { 
                         this.DialogScore = false; 
@@ -304,7 +304,7 @@ export default {
             } 
         },
         showdatator() { 
-            axios.post('   http://127.0.0.1:8000/api/showdatator', {
+            axios.post('    http://127.0.0.1:8000/api/showdatator', {
                 p_year: this.product_date.d_date,
                 evalua: this.product_date.evalua,
                 p_staffid: this.staffid_Main
@@ -359,7 +359,7 @@ export default {
 
             const queryParams = new URLSearchParams(form).toString();
             // console.log(queryParams); 
-            const url = `   http://127.0.0.1:8000/printReportCoverpage?${queryParams}`;
+            const url = `    http://127.0.0.1:8000/printReportCoverpage?${queryParams}`;
             window.location.href = url;
  
         },  

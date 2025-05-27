@@ -200,7 +200,7 @@ export default {
         getjobSpecificCompetencies(){
             //console.log(this.staffid_Main,this.dataPor);
             
-            axios.post('  http://127.0.0.1:8000/api/showdataposp02', { 
+            axios.post('   http://127.0.0.1:8000/api/showdataposp02', { 
                p_year: this.dataPor.d_date,
                 evalua: this.dataPor.evalua,
                 p_staffid: this.staffid_Main
@@ -323,7 +323,7 @@ export default {
             this.showPostype(positionname,postypenameid);
   
             
-            axios.post('  http://127.0.0.1:8000/api/showDataPo',{
+            axios.post('   http://127.0.0.1:8000/api/showDataPo',{
                 staff_id: this.staffid_Main,
                 fac_id: this.facid_Main,
                 year_id: this.dataPor.d_date,
@@ -369,7 +369,7 @@ export default {
             //console.log('postypename: ',postypename);  
             // console.log('postypenameid: ',postypenameid);  
             var postypetext =postypename;
-            axios.post('  http://127.0.0.1:8000/api/showdatapostypenameAdmin', {
+            axios.post('   http://127.0.0.1:8000/api/showdatapostypenameAdmin', {
                 postypename: postypetext,
                 postypenameid: postypenameid
             })
@@ -396,7 +396,7 @@ export default {
         },
         showdatator() {  
             //console.log(this.dataPor.d_date,scoreA04); 
-            axios.post('  http://127.0.0.1:8000/api/showdatator', {
+            axios.post('   http://127.0.0.1:8000/api/showdatator', {
                 p_year: this.dataPor.d_date,
                 evalua: this.dataPor.evalua,
                 p_staffid: this.staffid_Main
@@ -412,7 +412,7 @@ export default {
             });
         },
         showjobSpecificCompetencies (){
-            axios.post('  http://127.0.0.1:8000/api/showdataposp02', { 
+            axios.post('   http://127.0.0.1:8000/api/showdataposp02', { 
                p_year: this.dataPor.d_date,
                 evalua: this.dataPor.evalua,
                 p_staffid: this.staffid_Main
@@ -448,7 +448,7 @@ export default {
             } 
             const queryParams = new URLSearchParams(form).toString();
             // console.log(queryParams); 
-            const url = `  http://127.0.0.1:8000/report_p02?${queryParams}`;
+            const url = `   http://127.0.0.1:8000/report_p02?${queryParams}`;
             window.open(url, '_blank');
  
         },     

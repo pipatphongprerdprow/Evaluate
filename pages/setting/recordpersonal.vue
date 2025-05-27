@@ -107,7 +107,7 @@
         
         methods: { 
             async showDataEvalu(){
-                await axios.get('  http://127.0.0.1:8000/api/showDataEvalu',{
+                await axios.get('   http://127.0.0.1:8000/api/showDataEvalu',{
                     params: {
                         staff_id: this.staffid_Main,
                         fac_id: this.facid_Main, 
@@ -168,7 +168,7 @@
                 // เพิ่มฟังก์ชันการอัพโหลดไฟล์
             },
             async Btnstatus(staff_id,status){   
-                await axios.post('  http://127.0.0.1:8000/api/postDataChkBtn',{ 
+                await axios.post('   http://127.0.0.1:8000/api/postDataChkBtn',{ 
                     year: this.dropdownItemYear ,
                     staff_id: staff_id ,
                     status: status
@@ -190,7 +190,7 @@
             },
     
             openDataEvalu(staff_id){  
-                axios.post('  http://127.0.0.1:8000/api/showDataValuate',{
+                axios.post('   http://127.0.0.1:8000/api/showDataValuate',{
                     staff_id: staff_id,
                     fac_id: this.facid_Main,
                     year_id: this.dropdownItemYear.code,

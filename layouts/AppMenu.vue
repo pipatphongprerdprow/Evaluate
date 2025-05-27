@@ -21,6 +21,11 @@ const allMenus = ref([
         label: 'แบบบันทึกข้อตกลง(TOR)ป.01-ป.03',
         items: [{ label: 'แบบบันทึกข้อตกลง', icon: 'pi pi-fw pi-calendar', to: '/setting/coversheet' }]
     },
+    // {
+    //     id: 'history',
+    //     label: 'ประวัติการประเมิน',
+    //     items: [{ label: 'ประวัติการประเมิน', icon: 'pi pi-fw pi-clock', to: '/setting/history' }]
+    // },
     {
         id: 'executive',
         label: 'ผู้บริหาร',
@@ -32,7 +37,7 @@ const allMenus = ref([
         items: [
             { label: 'จัดการ รอบประเมิน', icon: 'pi pi-fw pi-calendar', to: '/setting/setting_date' },
             { label: 'ตรวจสอบ แบบประเมิน', icon: 'pi pi-fw pi-star', to: '/setting/checkevaluate' },
-            { label: 'เพิ่มสิทธิ์การใช้งาน', icon: 'pi pi-fw pi-plus', to: '/setting/setting_user' },
+            { label: 'เพิ่มสิทธิ์การใช้งาน', icon: 'pi pi-fw pi-user-plus', to: '/setting/setting_user' },
         ]
     },
     {
@@ -45,7 +50,11 @@ const group_chkUser = ref(null);
 
 const fetchUserGroup = async () => {
     try {
-        const res = await axios.post('   http://127.0.0.1:8000/api/testUser', { staff, faculty }); 
+        //console.log('user: ',user);
+        
+        const res = await axios.post('    http://127.0.0.1:8000/api/testUser', { staff, faculty }); 
+        //console.log('fetchUserGroup: ',res.data);
+        
         group_chkUser.value = res.data?.[0]?.status_user || res.data?.status_user || null;
     } catch (error) {
         console.error('Error:', error);
@@ -64,13 +73,15 @@ const model = computed(() => {
     //console.log("Computed model for group:", group);
     switch (group) {
         case '99':
-            return allMenus.value.filter(menu => ['home', 'tor', 'manual'].includes(menu.id));
+            return allMenus.value.filter(menu => ['home', 'tor', 'manual','history'].includes(menu.id));//ผู้ใช้งานทั่วไป
         case '2':
-            return allMenus.value.filter(menu => ['home', 'tor', 'executive','manual'].includes(menu.id)); 
+           // return allMenus.value.filter(menu => ['home', 'tor', 'executive','manual'].includes(menu.id)); //ฝ่ายบุคคล
+            return allMenus.value.filter(menu => ['home', 'tor', 'executive', 'hr', 'manual','history'].includes(menu.id));//ฝ่ายบุคคล
         case '3':
-            return allMenus.value.filter(menu => ['home', 'tor', 'executive', 'hr', 'manual'].includes(menu.id));
+            //return allMenus.value.filter(menu => ['home', 'tor', 'executive', 'hr', 'manual'].includes(menu.id));//หน หน่วยงาน
+            return allMenus.value.filter(menu => ['home', 'tor', 'executive','manual','history'].includes(menu.id));//หน หน่วยงาน
         case '4':
-            return allMenus.value.filter(menu => [ 'home','executive',].includes(menu.id));
+            return allMenus.value.filter(menu => [ 'home','executive',].includes(menu.id));//ผู้บริหารสูงขึ้นไป
         default:
             return allMenus.value.filter(menu => ['home', 'manual'].includes(menu.id));
     }
@@ -113,21 +124,21 @@ export default {
                     id: 'M1',
                     label: 'คู่มือใช้งานระบบ (User)',
                     icon: 'pi pi-id-card',
-                    href: '   http://127.0.0.1:8000/storage/manuals/manual_user.pdf',
+                    href: '    http://127.0.0.1:8000/storage/manuals/manual_user.pdf',
                     target: '_blank',
                 },
                 {
                     id: 'M1',
                     label: 'คู่มือใช้งานระบบ (เจ้าหน้าที่บุคคล)',
                     icon: 'pi pi-user',
-                    href: '   http://127.0.0.1:8000/storage/manuals/manual_person.pdf',
+                    href: '    http://127.0.0.1:8000/storage/manuals/manual_person.pdf',
                     target: '_blank',
                 },
                 {
                     id: 'M1',
                     label: 'คู่มือใช้งานระบบ (ผู้บริหาร)',
                     icon: 'pi pi-users',
-                    href: '   http://127.0.0.1:8000/storage/manuals/manual_executive.pdf',
+                    href: '    http://127.0.0.1:8000/storage/manuals/manual_executive.pdf',
                     target: '_blank',
                 },
             ],

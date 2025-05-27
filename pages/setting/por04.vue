@@ -144,8 +144,10 @@
                                     <label for="evaluator-acknowledgment-2">[ &nbsp;&nbsp; ] ได้แจ้งผลการประเมินเมื่อวันที่ ..............................แต่ผู้รับการประเมินไม่ลงนามรับทราบผลการประเมิน 
                                         โดยมี ....................................... เป็นพยาน และ....................................... เป็นพยาน</label><br>
                                     ลงชื่อ .................................................................<br>
-                                    ชื่อ {{ assessorText }}<br>
-                                    ตำแหน่ง {{ assessor_positionText }}<br>
+                                            (.......................................................)<br>
+                                    วันที่ .......... เดือน .......................... พ.ศ...........<br>
+                                    ลงชื่อ .................................................................<br>
+                                            (.......................................................)<br>
                                     วันที่ .......... เดือน .......................... พ.ศ...........
                                 </td>
                             <td class="center-align"><br><br>
@@ -460,7 +462,7 @@ export default {
          insertscore1(scoreA04) { 
         // //console.log(scoreA04); 
         // //console.log(this.dataPor.d_date,this.dataPor.evalua,scoreA04); 
-        //     axios.post('  http://127.0.0.1:8000/api/savepersentor',{
+        //     axios.post('   http://127.0.0.1:8000/api/savepersentor',{
         //             p_staffid: this.staffid_Main, 
         //             p_year: this.dataPor.d_date, 
         //             evalua: this.dataPor.evalua, 
@@ -473,7 +475,7 @@ export default {
         // insertscore2(scoreB) { 
         // //console.log(scoreB); 
         // //console.log(this.dataStaffid); 
-        //     axios.post('  http://127.0.0.1:8000/api/savepersentor',{
+        //     axios.post('   http://127.0.0.1:8000/api/savepersentor',{
         //             p_staffid: this.staffid_Main, 
         //             p_year: this.tracking_date.d_date, 
         //             evalua: this.tracking_date.evalua, 
@@ -487,7 +489,7 @@ export default {
         // insertscore3(scoreS) { 
         // //console.log(scoreB); 
         // //console.log(this.dataStaffid); 
-        //     axios.post('  http://127.0.0.1:8000/api/savepersentor',{
+        //     axios.post('   http://127.0.0.1:8000/api/savepersentor',{
         //             p_staffid: this.staffid_Main, 
         //             p_year: this.tracking_date.d_date, 
         //             evalua: this.tracking_date.evalua, 
@@ -506,7 +508,7 @@ export default {
         },  
         showdatator() {  
             //console.log(this.dataPor.d_date,scoreA04); 
-            axios.post('  http://127.0.0.1:8000/api/showdatator', {
+            axios.post('   http://127.0.0.1:8000/api/showdatator', {
                 p_year: this.dataPor.d_date,
                 evalua: this.dataPor.evalua,
                 p_staffid: this.staffid_Main
@@ -524,7 +526,7 @@ export default {
         /*============= ความรู้/ทักษะ/สมรรถนะ ที่ต้องการพัฒนา =============*/ 
         chkp04dataXr(){  
             this.products_Tab3T4 = [];
-            axios.post('  http://127.0.0.1:8000/api/showData04Tab3',{
+            axios.post('   http://127.0.0.1:8000/api/showData04Tab3',{
                 staff_id: this.staffid_Main,
                 fac_id: this.facid_Main,
                 year_id: this.dataPor.d_date,
@@ -559,7 +561,7 @@ export default {
             } 
             const queryParams = new URLSearchParams(form).toString();
             // console.log(queryParams); 
-            const url = `  http://127.0.0.1:8000/report_p04?${queryParams}`;
+            const url = `   http://127.0.0.1:8000/report_p04?${queryParams}`;
             window.open(url, '_blank'); 
         },            
     }
