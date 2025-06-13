@@ -106,27 +106,39 @@
                                             <InputText v-model="text_search_nowork" type="number" placeholder="ลำดับที่" autocomplete="off" /> 
                                         </InputGroup> 
                                     </div> 
-                                <div class="p-fluid formgrid grid">
-                                    <div class="field col-12 md:col-2">
-                                        <label for="text_search_nowork">ลำดับ</label>
-                                        <InputGroup>
-                                            <InputGroupAddon>
-                                                <i class="pi pi-sort-numeric-up"></i>
-                                            </InputGroupAddon>
-                                            <InputText v-model="text_nowork" type="number" placeholder="ลำดับที่" autocomplete="off" /> 
-                                        </InputGroup> 
-                                    </div>
-                                    <div class="field col-12 md:col-10"> 
-                                        <label for="text_search_nowork">เพิ่มประเภทภาระงาน</label> 
-                                        <InputGroup>
-                                            <InputGroupAddon>
-                                                <i class="pi pi-book"></i>
-                                            </InputGroupAddon>
-                                            <Textarea v-model="text_searchwork" rows="1" placeholder="ชื่อภาระงาน" autocomplete="off" /> 
-                                        </InputGroup> 
-                                    </div>   
-                                </div>  
-                            </form>
+                                    <div class="p-fluid formgrid grid ">
+                                        <div class="field col-12 md:col-2">
+                                            <label for="text_search_nowork">ลำดับ</label>
+                                            <InputGroup>
+                                                <InputGroupAddon>
+                                                    <i class="pi pi-sort-numeric-up"></i>
+                                                </InputGroupAddon>
+                                                    <InputText v-model="text_nowork" type="number" placeholder="ลำดับที่" autocomplete="off" /> 
+                                            </InputGroup> 
+                                        </div>
+                                        
+
+                                        <div class="field col-12 md:col-3">
+                                            <label for="text_Evalua">รอบประเมิน</label>
+                                            <InputGroup>
+                                                <InputGroupAddon>
+                                                    <i class="pi pi-calendar"></i>
+                                                </InputGroupAddon>
+                                                    <Dropdown v-model="text_Evalua" :options="evaluaOptions" optionLabel="label" optionValue="value" placeholder="เลือกรอบประเมิน" class="w-full"/>
+                                            </InputGroup>
+                                        </div>
+
+                                        <div class="field col-12 md:col-7"> 
+                                            <label for="text_search_nowork">เพิ่มประเภทภาระงาน</label> 
+                                            <InputGroup>
+                                                <InputGroupAddon>
+                                                    <i class="pi pi-book"></i>
+                                                </InputGroupAddon>
+                                                <Textarea v-model="text_searchwork" rows="1" placeholder="ชื่อภาระงาน" autocomplete="off" /> 
+                                            </InputGroup> 
+                                        </div>   
+                                    </div>  
+                                </form>
                             <template #footer>
                                 <Button label="บันทึก" icon="pi pi-check" class="mb-2 mr-2" @click="saveDatawork" /> 
                                 <Button label="ยกเลิก" icon="pi pi-times" class="mb-2 mr-2" severity="danger" @click="resetDialogwork" />
@@ -268,6 +280,11 @@
                         }
                     }
                 ],
+                    text_Evalua: null, // เก็บค่าที่ผู้ใช้เลือก เช่น 1 หรือ 2
+                    evaluaOptions: [
+                    { label: 'รอบประเมินที่ 1', value: 1 },
+                    { label: 'รอบประเมินที่ 2', value: 2 }
+                ],
                 // Dialog
                 DialogAdd: false, 
                 DialogAddwork: false,
@@ -293,6 +310,7 @@
                 text_search_nowork: null,
                 text_searchwork: null,
                 text_nowork:null,
+                text_Evalua:null,
                 products_listwork: [],
 
                 
@@ -342,7 +360,7 @@
             this.text_search_no = null;
             this.text_search = null;
             this.products_list = [];
-            this.selectDataH(this.dropdownItemYear,this.facid_Main);
+            this.selectDataH(this.year_Main,this.facid_Main );
         },
 
          // เปิดหน้าต่างสำหรับบันทึก 
@@ -351,17 +369,22 @@
             this.text_edt = null; 
             this.text_search_nowork = null;
             this.text_searchwork = null;
-            this.text_nowork = null
+            this.text_nowork = null;
+            this.text_Evalua = null;
             this.products_listwork = [];
             //this.selectDataH(this.dropdownItemYear,this.facid_Main);
         },
 
         // ดึงข้อมูลภาระงาน
         selectDataH(year,fac){  
-            //console.log('ดึงข้อมูลภาระงาน',year,fac);
+            //console.log(this.dataP01);
             
-            axios.post('   http://127.0.0.1:8000/api/selectDataPersonH',{fac_id : this.dataP01.staffdepartment }).then(res => {     
-                // console.log('selectDataH',res.data); 
+            axios.post('   http://127.0.0.1:8000/api/selectDataPersonH',{
+                fac_id : this.dataP01.staffdepartment,
+                year_id :this.dataP01.year ,
+                evalua : this.dataP01.evalua ,
+            }).then(res => {     
+                 //console.log('selectDataH',res.data); 
                 this.dropdownItemsH=res.data;  
             })
             .catch(error => {
@@ -453,6 +476,7 @@
                 axios.post(' http://127.0.0.1:8000/api/saveWork', {
                     id: this.text_search_nowork, 
                     h_no: this.text_nowork,
+                    h_evalua: this.text_Evalua,
                     nameH: this.text_searchwork,
                     fac_id: this.facid_Main,
                     year_id: this.year_Main
@@ -492,7 +516,7 @@
                     this.dropdownItemTarget = target_f.length > 0 ? target_f[0] : null;    
                     this.text_weight = res.data[0].p_weight;  
                     this.products_list = res.data[0].sub_ITem; 
-                    this.selectDataHEdt(res.data[0].p_year,res.data[0].p_facid,res.data[0].h_id);   
+                    this.selectDataHEdt(res.data[0].p_year,res.data[0].p_facid,res.data[0].h_id,res.data[0].evalua);   
                 })
                 .catch(error => {
                     console.error('Error:', error);
@@ -504,8 +528,8 @@
                         const res = await axios.post(' http://127.0.0.1:8000/api/Edtwork', {
                         id: data.id,
                         h_no:data.h_no,
-                        nameH:data.nameH
-
+                        nameH:data.nameH,
+                        h_evalua:data.h_evalua 
                         }); 
                         //console.log("ข้อมูลที่ได้:", res.data); 
                         this.DialogAddwork = true;
@@ -513,6 +537,7 @@
                         this.text_searchwork = res.data.nameH;
                         this.facid_Main = res.data.fac_id; 
                         this.text_nowork = res.data.h_no;
+                        this.text_Evalua = res.data.h_evalua;
                     } catch (error) {
                         console.error('Error:', error);
                     }
@@ -548,12 +573,18 @@
                 
 
             // ดึงข้อมูลภาระงาน
-            selectDataHEdt(year,fac,he){  
+            selectDataHEdt(year,fac,he,evalua){  
+                //console.log(year,fac,he,evalua);
+                
                 axios.post('   http://127.0.0.1:8000/api/selectDataPersonH',{
-                    year: year,
-                    fac: fac,
+                    // year: year,
+                    // fac: fac,
+                    // evalua:evalua
+                    fac_id : this.dataP01.staffdepartment,
+                    year_id :this.dataP01.year ,
+                    evalua : this.dataP01.evalua 
                 }).then(res => {     
-                    // console.log(res.data); 
+                     //console.log(res.data); 
                     this.dropdownItemsH=res.data;  
                     const h_f = res.data.filter(f=>f.id==he); 
                     this.dropdownItemH = h_f.length > 0 ? h_f[0] : null;    

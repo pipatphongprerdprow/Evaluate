@@ -20,12 +20,17 @@ const allMenus = ref([
         id: 'tor',
         label: 'แบบบันทึกข้อตกลง(TOR)ป.01-ป.03',
         items: [{ label: 'แบบบันทึกข้อตกลง', icon: 'pi pi-fw pi-calendar', to: '/setting/coversheet' }]
-    },
+    }, 
     // {
     //     id: 'history',
     //     label: 'ประวัติการประเมิน',
     //     items: [{ label: 'ประวัติการประเมิน', icon: 'pi pi-fw pi-clock', to: '/setting/history' }]
     // },
+    {
+        id: 'torday',
+        label: 'แบบบันทึกภาระงานประจำวัน',
+        items: [{ label: 'แบบบันทึกภาระงานประจำวัน', icon: 'pi pi-fw pi-calendar', to: '/setting/torday' }]
+    },
     {
         id: 'executive',
         label: 'ผู้บริหาร',
@@ -73,10 +78,10 @@ const model = computed(() => {
     //console.log("Computed model for group:", group);
     switch (group) {
         case '99':
-            return allMenus.value.filter(menu => ['home', 'tor', 'manual','history'].includes(menu.id));//ผู้ใช้งานทั่วไป
+            return allMenus.value.filter(menu => ['home', 'tor', 'manual','history','torday'].includes(menu.id));//ผู้ใช้งานทั่วไป
         case '2':
            // return allMenus.value.filter(menu => ['home', 'tor', 'executive','manual'].includes(menu.id)); //ฝ่ายบุคคล
-            return allMenus.value.filter(menu => ['home', 'tor', 'executive', 'hr', 'manual','history'].includes(menu.id));//ฝ่ายบุคคล
+            return allMenus.value.filter(menu => ['home', 'tor', 'executive', 'hr', 'manual','history','torday'].includes(menu.id));//ฝ่ายบุคคล
         case '3':
             //return allMenus.value.filter(menu => ['home', 'tor', 'executive', 'hr', 'manual'].includes(menu.id));//หน หน่วยงาน
             return allMenus.value.filter(menu => ['home', 'tor', 'executive','manual','history'].includes(menu.id));//หน หน่วยงาน

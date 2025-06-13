@@ -1004,7 +1004,7 @@ export default {
         // XX One 
 
         async openDataEvalu(data) { 
-            console.log('data: ',data);
+            //console.log('data: ',data);
             //console.log('data: ',data.d_evaluationround);
             // console.log('assessorText: ',data.assessor);   
              

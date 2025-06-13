@@ -1788,11 +1788,10 @@ export default {
             if (!this.currentstaff || this.currentstaff.length === 0) {
                 console.error("Error: currentstaff is undefined or empty.");
                 return;
-            }
-
+            } 
             this.postypenameth = this.currentstaff[0]?.postypenameth  ?? (this.currentstaff[0]?.posnameth === 'ผู้บริหาร' ? 'ชำนาญการพิเศษ' : 'ปฏิบัติการ');
 
-        // console.log("postypenameth:", this.postypenameth);
+         //console.log("postypenameth:", this.postypenameth);
 
             let postypetext = `ระดับ${this.postypenameth}`;  
 

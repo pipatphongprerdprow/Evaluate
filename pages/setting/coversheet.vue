@@ -11,16 +11,28 @@
                     </div>   
                     <!-- {{ product_date }}  -->
                     <div class="col md:col-6">  
-                        <label for="product_date"></label>
-                        <Dropdown  id="product_date" 
-                            v-model="product_date" 
-                            :options="products_date"  autoFilterFocus
+                        <label for="product_date"></label> 
+
+                            <Dropdown  id="product_date" 
+                                v-model="product_date" 
+                                :options="products_date"  autoFilterFocus
+                                :optionLabel="(item) => `${item.d_evaluationround} ${item.d_date}`"
+                                placeholder="กรุณาเลือกรอบการประเมิน" 
+                                style="max-width: 500px;width: 100%;border: outset;" 
+                                @change="showdatator" 
+                            >
+                            </Dropdown>
+
+                        <!-- <Dropdown  
+                            id="product_date"
+                            v-model="product_date"
+                            :options="latestProductOnly"   
+                            autoFilterFocus
                             :optionLabel="(item) => `${item.d_evaluationround} ${item.d_date}`"
                             placeholder="กรุณาเลือกรอบการประเมิน" 
                             style="max-width: 500px;width: 100%;border: outset;" 
-                            @change="showdatator" 
-                        >
-                        </Dropdown>
+                            @change="showdatator"
+                        /> -->
                     </div>
                 </div> 
             </div>
@@ -110,9 +122,9 @@
 <script setup>
 const { signIn, getSession, signOut } = await useAuth();
 const user = await getSession();
-// console.log(user);
-</script> 
 
+// console.log(user);
+</script>   
 <script>
 import { ref } from 'vue';
 import axios from 'axios';
@@ -219,6 +231,18 @@ export default {
         await this.showDataSet(STAFFID, staffdepartment, groupid);
         //this.showDataEvalu();   
     }, 
+    
+    //เอาไว้ในการโชว์ แค่รอบให้เลือกล่าสุด
+    computed: {
+        latestProductOnly() {
+            if (!this.products_date || this.products_date.length === 0) return [];
+            
+            const sorted = [...this.products_date].sort(
+            (a, b) => new Date(b.d_date) - new Date(a.d_date)
+            );
+            return [sorted[0]]; // คืนเป็น array ที่มีแค่ 1 รายการล่าสุด
+        }
+    },
     methods: { 
         setSession(staffid_Main, facid_Main, groupid_Main ,user) {
             // console.log('user: ',user.user.name);

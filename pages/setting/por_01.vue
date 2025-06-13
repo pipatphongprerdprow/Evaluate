@@ -531,6 +531,8 @@ export default {
         selectDataHEdt(he){  
             axios.post('    http://127.0.0.1:8000/api/selectDataPersonH',{
                 fac_id : this.dataPor.fac_id,
+                year_id : this.dataPor.d_date ,
+                evalua : this.dataPor.evalua ,
             }).then(res => {     
                 // console.log(res.data); 
                 this.dropdownItemsH=res.data;  
@@ -603,7 +605,8 @@ export default {
             axios.post('    http://127.0.0.1:8000/api/showDataPerson', { 
                 fac_id: this.dataPor.fac_id,
                 year_id: this.dataPor.d_date,
-                evalua: this.dataPor.evalua 
+                evalua: this.dataPor.evalua ,
+                //staff_id: this.staffid_Main, 
             }).then(res => {     
                 //console.log(res.data);
                 
@@ -668,9 +671,12 @@ export default {
         }, 
         // ดึงข้อมูลภาระงาน
         selectDataH(){  
-            axios.post(' http://127.0.0.1:8000/api/selectDataPersonH',{ fac_id : this.dataPor.fac_id }).then(res => {     
-               //console.log(res.data); 
-               
+            axios.post(' http://127.0.0.1:8000/api/selectDataPersonH',{ 
+                fac_id : this.dataPor.fac_id ,
+                year_id : this.dataPor.d_date ,
+                evalua : this.dataPor.evalua ,
+            }).then(res => {     
+               console.log(res.data);  
                 this.dropdownItemsH=res.data;  
             })
             .catch(error => {
