@@ -64,7 +64,7 @@
                 <div class="col md:col-5 text-right">   
                     <Dialog header="จัดการแบบ ป01" maximizable v-model:visible="DialogAdd" :breakpoints="{ '960px': '75vw' }" :style="{ width: '100vw',height: '100vh' }" :modal="true" position="top">
                         <template v-slot:header>
-                            <h3 style="text-align: left;">รายงานแบบแบบประเมิน ป01-ป04</h3> 
+                            <h3 style="text-align: left;">รายงานแบบประเมิน ป01-ป04</h3> 
                             <InputText v-model="dataStaffid" type="hidden" autocomplete="off" style="display: none;"/> 
                            <!-- <p v-if="currentstaff?.length"> <strong>ชื่อผู้รับการประเมิน:</strong>  {{ currentstaff[0]?.prefixfullname || '-' }}  {{ currentstaff[0]?.staffname || '-' }}  {{ currentstaff[0]?.staffsurname || '-' }} </p> -->
                            <p v-if="currentstaff?.length">

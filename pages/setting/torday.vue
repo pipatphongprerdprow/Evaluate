@@ -1,17 +1,17 @@
 <template>
+    <div class="col md:col-12 text-right">
+        <Button label="Export" icon="pi pi-file-word" class="mr-2 mb-2 " @click="printDataDaily"></Button>
+    </div>
     <div class="grid">
         <div class="col-12 lg:col-12 xl:col-12">
             <div class="card mb-0">
                 <div class="formgroup-inline mb-1">
                     <div class="col md:col-6">
-                        <h3 class="mb-4 card-header">
-                            <i class="pi pi-file" style="font-size: x-large;"></i> บันทึกภาระงานประจำวัน
-                        </h3>
+                        <h3 class="mb-4 card-header"><i class="pi pi-file" style="font-size: x-large;"></i> บันทึกภาระงานประจำวัน </h3>
                     </div>
                     <br>
                     <div class="col md:col-16 text-right">
-                        <Button icon="pi pi-plus" severity="info" class="mb-2 mr-2" label="เพิ่มภาระงาน" @click="openDialogAdd" />
-
+                        <Button icon="pi pi-plus" severity="info" class="mb-2 mr-2" label="เพิ่มถาระงาน" @click="OpenDialogAdd" />
                         <Dialog v-model:visible="DialogAdd" :breakpoints="{ '960px': '75vw' }" :style="{ width: '80vw' }" :modal="true" position="top">
                             <template #header>
                                 <div class="flex justify-between items-start w-full">
@@ -26,8 +26,20 @@
                                     </div>
                                 </div>
                             </template>
-                            <form @submit.prevent="saveDailyTask">
+                            <form>
                                 <div class="p-fluid formgrid grid">
+                                    <div class="field col-12 md:col-2">
+                                        <label for="evaluation_round">รอบประเมิน</label>
+                                        <Dropdown
+                                            v-model="evaluadaily"
+                                            :options="evaluadailys"
+                                            optionLabel="label"
+                                            optionValue="value"
+                                            placeholder="เลือกรอบประเมิน"
+                                            class="w-full"
+                                            required
+                                        />
+                                    </div>
                                     <div class="field col-12 md:col-2">
                                         <label for="task_date">วันที่ลงบันทึก</label>
                                         <InputGroup>
@@ -44,7 +56,7 @@
                                             />
                                         </InputGroup>
                                     </div>
-                                    <div class="field col-12 md:col-5">
+                                    <div class="field col-12 md:col-4">
                                         <label for="file_upload">ชื่อไฟล์</label> &nbsp;&nbsp;
                                         <span style="color: red;">
                                             <b>(ถ้ามี)</b>
@@ -60,12 +72,8 @@
                                                 ref="fileInputRef"
                                             />
                                         </InputGroup>
-                                        <small v-if="editingTaskId && existingFilename && !currentFile" class="p-text-secondary">
-                                            ไฟล์ปัจจุบัน: {{ existingFilename }}
-                                            <Button icon="pi pi-times" severity="danger" class="p-button-sm p-button-text ml-2" @click="clearExistingFile" />
-                                        </small>
                                     </div>
-                                    <div class="field col-12 md:col-5">
+                                    <div class="field col-12 md:col-4">
                                         <label for="document_link">ลิงก์เอกสาร</label>
                                         <span style="color: red;"> &nbsp;&nbsp; <b>(ถ้ามี)</b></span>
                                         <InputGroup>
@@ -101,50 +109,50 @@
                             </form>
                             <template #footer>
                                 <Button label="บันทึก" icon="pi pi-check" class="mb-2 mr-2" @click="saveDailyTask" />
-                                <Button label="ยกเลิก" icon="pi pi-times" class="mb-2 mr-2" severity="danger" @click="resetDialog" />
+                                <Button label="ยกเลิก" icon="pi pi-times" class="mb-2 mr-2" severity="danger" @click="resetDialogdialy" />
                             </template>
                         </Dialog>
                     </div>
                 </div>
                 <DataTable :value="products_date" :rows="10" :paginator="true" responsiveLayout="scroll" dataKey="id">
                     <Column field="daily_date" header="วันที่" style="width: 15%; text-align: center;">
-                        <template #body="item">
-                            <div style="display: flex; justify-content: center; align-items: center;">
-                                <b>{{ item.data.daily_date }}</b>
-                            </div>
+                        <template #body="slotProps">
+                            <b>{{ formatDate(slotProps.data.daily_date) }}</b>
                         </template>
                     </Column>
-                    <Column field="name_dailywork" header="ภาระงาน" style="width: 35%; text-align: left; padding-left: 1rem;">
-                        <template #body="item">
-                            <b>{{ item.data.name_dailywork }}</b>
+                     <Column field="daily_evalua" header="รอบประเมิน" style="width: 15%; text-align: center;">
+                        <template #body="slotProps">
+                            <b>{{ slotProps.data.daily_evalua }}</b>
                         </template>
                     </Column>
-                    <Column field="daily_filename" header="ไฟล์เอกสาร" style="width: 15%; text-align: center;">
-                        <template #body="item">
-                            <div style="display: flex; justify-content: center; align-items: center;">
-                                <a v-if="item.data.daily_filename && item.data.daily_file_url" :href="item.data.daily_file_url" target="_blank" class="p-button p-component p-button-link p-button-text">
-                                    <i class="pi pi-file"></i> {{ item.data.daily_filename }}
+                    <Column field="name_dialywork" header="ภาระงาน" style="width: 30%; text-align: left;">
+                        <template #body="slotProps">
+                            <b>{{ slotProps.data.name_dialywork }}</b>
+                        </template>
+                    </Column>
+                    <Column field="daily_filename" header="ไฟล์เอกสาร" style="width: 20%; text-align: center;">
+                        <template #body="slotProps">
+                            <span v-if="slotProps.data.daily_filename">
+                                <a :href="getFileUrl(slotProps.data.dialy_file)" target="_blank" class="p-button p-component p-button-link">
+                                    <i class="pi pi-download"></i> {{ slotProps.data.daily_filename }}
                                 </a>
-                                <span v-else-if="item.data.daily_filename && !item.data.daily_file_url">- {{ item.data.daily_filename }} (ไฟล์ไม่พร้อม)</span>
-                                <span v-else>-</span>
-                            </div>
+                            </span>
+                            <span v-else>ไม่มีไฟล์</span>
                         </template>
                     </Column>
-                    <Column field="daily_link" header="ลิงก์เอกสาร" style="width: 15%; text-align: center;">
-                        <template #body="item">
-                            <div style="display: flex; justify-content: center; align-items: center;">
-                                <a v-if="item.data.daily_link" :href="item.data.daily_link" target="_blank" class="p-button p-component p-button-info p-button-text">
-                                    <i class="pi pi-link"></i> ลิงก์
-                                </a>
-                                <span v-else>-</span>
-                            </div>
+                    <Column field="daily_link" header="ลิงก์เอกสาร" style="width: 20%; text-align: center;">
+                        <template #body="slotProps">
+                            <a v-if="slotProps.data.daily_link" :href="slotProps.data.daily_link" target="_blank" class="p-button p-component p-button-link">
+                                <i class="pi pi-external-link"></i> เปิดลิงก์
+                            </a>
+                            <span v-else>ไม่มีลิงก์</span>
                         </template>
                     </Column>
-                    <Column field="options" header="ตัวเลือก" headerStyle="text-align: center;" bodyStyle="text-align: center; width: 20%;">
-                        <template #body="item">
+                    <Column field="options" header="ตัวเลือก" headerStyle="text-align: center;" bodyStyle="text-align: center;">
+                        <template #body="slotProps">
                             <div style="display: flex; justify-content: center; align-items: center; gap: 5px;">
-                                <Button icon="pi pi-pencil" severity="success" class="p-button-sm" @click="editData(item.data)" />
-                                <Button icon="pi pi-trash" severity="danger" class="p-button-sm" @click="delData(item.data)" />
+                                <Button icon="pi pi-pencil" severity="success" class="p-button-sm" @click="editData(slotProps.data)" />
+                                <Button icon="pi pi-trash" severity="danger" class="p-button-sm" @click="delData(slotProps.data)" />
                             </div>
                         </template>
                     </Column>
@@ -155,238 +163,292 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { useAuth } from '#imports';
+const { signIn, getSession, signOut } = await useAuth();
+const user = await getSession();
+</script>
+
+<script>
 import axios from 'axios';
 import Swal from 'sweetalert2';
-import Calendar from 'primevue/calendar';
-import InputGroup from 'primevue/inputgroup';
-import InputGroupAddon from 'primevue/inputgroupaddon';
-import InputText from 'primevue/inputtext';
-import Textarea from 'primevue/textarea';
-import Button from 'primevue/button';
-import Dialog from 'primevue/dialog';
-import DataTable from 'primevue/datatable';
-import Column from 'primevue/column';
+import { ref } from 'vue';
 
+export default {
+    data() {
+        return {
+            staffid_Main: '',
+            facid_Main: '',
+            groupid_Main: '01',
+            products_date: [],
+            DialogAdd: false,
+            DialogDetail: false,
+            currentRecordId: null,
+            taskDate: null,
+            documentLink: '',
+            dailyTask: '',
+            selectedFile: null,
+            base64FileContent: null,
+            dailyFilename: '',
+            userStaffId: null,
+            userFacId: null,
+            userStaffNameDaily: null,
+            userStaffDepartmentName: null,
+            evaluadaily: null,
+            evaluadailys: [
+                { label: 'รอบประเมินที่ 1', value: 1 },
+                { label: 'รอบประเมินที่ 2', value: 2 },
+            ],
 
-const { getSession } = await useAuth();
-const user = ref(null);
+        };
+    },
+    async mounted() {
+        const session = await useAuth().getSession();
+        if (session && session.user && session.user.name) {
+            const { STAFFID, SCOPES, STAFFNAME, PREFIXFULLNAME, STAFFSURNAME } = session.user.name;
+            const { staffdepartment, groupid, staffdepartmentname } = SCOPES;
 
+            this.staffid_Main = String(STAFFID);
+            this.facid_Main = String(staffdepartment);
+            this.groupid_Main = String(groupid);
 
-const DialogAdd = ref(false);
-const editingTaskId = ref(null);
-const taskDate = ref(null);
-const documentLink = ref('');
-const dailyTask = ref('');
-const currentFile = ref(null);
-const existingFilename = ref(null);
-const fileInputRef = ref(null);
-const products_date = ref([]);
-const userStaffid = ref(null);
-const userFacid = ref(null);
-const userNameFull = ref(null);
-const userDepartmentName = ref(null);
+            this.userStaffId = String(STAFFID);
+            this.userFacId = String(staffdepartment);
+            this.userStaffNameDaily = `${PREFIXFULLNAME || ''} ${STAFFNAME || ''} ${STAFFSURNAME || ''}`.trim();
+            this.userStaffDepartmentName = String(staffdepartmentname);
 
-
-onMounted(async () => {
-    user.value = await getSession();
-    if (user.value && user.value.user && user.value.user.name) {
-        userStaffid.value = user.value.user.name.STAFFID || null;
-        userFacid.value = user.value.user.name.SCOPES?.staffdepartment || null;
-        userNameFull.value = `${user.value.user.name.PREFIXFULLNAME || ''} ${user.value.user.name.STAFFNAME || ''} ${user.value.user.name.STAFFSURNAME || ''}`.trim();
-        userDepartmentName.value = user.value.user.name.SCOPES?.staffdepartmentname || null;
-    }
-    await fetchDailyTasks();
-});
-const fetchDailyTasks = async () => {
-    try {
-        const response = await axios.get('http://127.0.0.1:8000/api/getDailyTasks', {
-            params: {
-                staffid: userStaffid.value,
-                facid: userFacid.value
-            }
-        });
-        products_date.value = response.data;
-    } catch (error) {
-        console.error('Error fetching daily tasks:', error);
-        Swal.fire({
-            icon: 'error',
-            title: 'ข้อผิดพลาดในการโหลดข้อมูล!',
-            text: 'ไม่สามารถโหลดภาระงานประจำวันได้ กรุณาลองใหม่อีกครั้ง',
-        });
-    }
-};
-
-const openDialogAdd = () => {
-    editingTaskId.value = null;
-    resetDialog();
-    DialogAdd.value = true;
-};
-
-const onFileChange = (event) => {
-    const file = event.target.files[0];
-    currentFile.value = file || null;
-};
-
-
-const clearExistingFile = () => {
-    existingFilename.value = null;
-    currentFile.value = null;
-    if (fileInputRef.value) {
-        fileInputRef.value.value = '';
-    }
-};
-//ปุ่มบันทึกข้อมูล
-const saveDailyTask = async () => {
-    if (!taskDate.value || !dailyTask.value) {
-        Swal.fire({
-            icon: 'error',
-            title: 'ข้อผิดพลาด!',
-            text: 'กรุณากรอกวันที่ลงบันทึกและภาระงานประจำวัน',
-        });
-        return;
-    }
-    // ****** การแก้ไขที่สำคัญที่สุดคือตรงนี้ ******
-    const day = String(taskDate.value.getDate()).padStart(2, '0');
-    const month = String(taskDate.value.getMonth() + 1).padStart(2, '0');
-    const year = taskDate.value.getFullYear();
-    const formattedDate = `${day}/${month}/${year}`; // <-- แก้ไขให้เป็นแบบนี้เท่านั้น
-
-    const formData = new FormData();
-    formData.append('daily_date', formattedDate);
-    formData.append('name_dailywork', dailyTask.value);
-    formData.append('daily_link', documentLink.value || '');
-    formData.append('staffid', userStaffid.value || '');
-    formData.append('facid', userFacid.value || '');
-    formData.append('name_daily', userNameFull.value || '');
-    formData.append('name_facdialy', userDepartmentName.value || '');
-
-    if (currentFile.value) {
-        formData.append('daily_file', currentFile.value);
-    } else if (editingTaskId.value && existingFilename.value === null) {
-        formData.append('daily_filename', 'CLEAR_FILE_SIGNAL');
-    } else if (editingTaskId.value && existingFilename.value) {
-        formData.append('daily_filename', existingFilename.value);
-    }
- 
-    try {
-        let response;
-        if (editingTaskId.value) {
-            formData.append('id', editingTaskId.value);
-            response = await axios.post('http://127.0.0.1:8000/api/saveDailyTask', formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data'
-                }
-            });
-            Swal.fire({
-                position: 'top-center',
-                icon: 'success',
-                title: 'อัปเดตภาระงานประจำวันเรียบร้อยแล้ว!',
-                showConfirmButton: false,
-                timer: 1500,
-            });
+            await this.showDataSetUserdialy();
         } else {
-            response = await axios.post('http://127.0.0.1:8000/api/saveDailyTask', formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data'
-                }
-            });
-            Swal.fire({
-                position: 'top-center',
-                icon: 'success',
-                title: 'บันทึกภาระงานประจำวันเรียบร้อยแล้ว!',
-                showConfirmButton: false,
-                timer: 1500,
-            });
+            console.warn("User session data not found on mounted.");
         }
+    },
+    methods: {
+        formatDate(dateString) {
+            if (!dateString) return '';
+            // New Date(dateString) ก็จะสร้าง Date object ใน Local Time ถ้า dateString เป็น 'YYYY-MM-DD'
+            const date = new Date(dateString);
+            const options = { year: 'numeric', month: '2-digit', day: '2-digit' };
+            return date.toLocaleDateString('th-TH', options);
+        },
+        getFileUrl(filename) {
+            if (!filename) return '';
+            return `http://127.0.0.1:8000/storage/uploads/daily_files/${filename}`;
+        },
 
-        DialogAdd.value = false;
-        resetDialog();
-        await fetchDailyTasks();
-
-    } catch (error) {
-        console.error('Error saving daily task:', error);
-        // เพิ่มการแสดง error จาก response ของ Axios (ถ้ามี)
-        if (error.response && error.response.data && error.response.data.errors) {
-            let errorMessages = Object.values(error.response.data.errors).flat().join('\n');
-            Swal.fire({
-                icon: 'error',
-                title: 'เกิดข้อผิดพลาด!',
-                html: `ไม่สามารถบันทึกภาระงานประจำวันได้<br>${errorMessages}<br>กรุณาลองใหม่อีกครั้ง`,
-            });
-        } else {
-            Swal.fire({
-                icon: 'error',
-                title: 'เกิดข้อผิดพลาด!',
-                text: 'ไม่สามารถบันทึกภาระงานประจำวันได้ กรุณาลองใหม่อีกครั้ง',
-            });
-        }
-    }
-};
-
-const resetDialog = () => {
-    taskDate.value = null;
-    documentLink.value = '';
-    dailyTask.value = '';
-    currentFile.value = null;
-    existingFilename.value = null;
-    editingTaskId.value = null;
-    if (fileInputRef.value) {
-        fileInputRef.value.value = '';
-    }
-
-    DialogAdd.value = false;
-};
- 
-//  กดปุ่ม "แก้ไข" — ดึงข้อมูลมาใส่ใน Dialog
-const editData = (item) => {
-    editingTaskId.value = item.id; 
-    const parts = item.daily_date.split('/'); 
-    taskDate.value = new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));
-    documentLink.value = item.daily_link || '';
-    dailyTask.value = item.name_dailywork || '';
-    existingFilename.value = item.daily_filename || null;
-    currentFile.value = null;
-    if (fileInputRef.value) {
-        fileInputRef.value.value = '';
-    }
-    DialogAdd.value = true;
-};
-// ✅ ลบข้อมูลภาระงาน
-const delData = (item) => {
-    Swal.fire({
-        title: 'คุณต้องการลบภาระงานนี้ใช่หรือไม่?',
-        text: 'เมื่อคลิก "ใช่, ลบเลย!" ข้อมูลจะถูกลบทันที!',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'ใช่, ลบเลย!',
-        cancelButtonText: 'ยกเลิก',
-    }).then(async (result) => {
-        if (result.isConfirmed) {
+        async showDataSetUserdialy() {
             try {
-                await axios.post('http://127.0.0.1:8000/api/deleteDailyTask', { id: item.id });
-                Swal.fire({
-                    icon: 'success',
-                    title: 'ลบข้อมูลเสร็จสิ้น!',
-                    text: 'ภาระงานประจำวันของคุณถูกลบแล้ว',
+                const response = await axios.post('http://127.0.0.1:8000/api/showDateSetUserdaily', {
+                    facid_Main: this.facid_Main,
+                    groupid_Main: this.groupid_Main,
+                    staffid_Main: this.staffid_Main
                 });
-                await fetchDailyTasks();
+                this.products_date = response.data;
             } catch (error) {
-                console.error('Error deleting daily task:', error);
+                console.error('Error fetching data:', error);
                 Swal.fire({
                     icon: 'error',
-                    title: 'เกิดข้อผิดพลาด!',
-                    text: 'ไม่สามารถลบภาระงานประจำวันได้ กรุณาลองใหม่อีกครั้ง',
+                    title: 'ข้อผิดพลาด',
+                    text: 'ไม่สามารถโหลดข้อมูลภาระงานได้',
                 });
             }
-        }
-    });
+        },
+        OpenDialogAdd() {
+            this.DialogAdd = true;
+            this.clearForm();
+        },
+        resetDialogdialy() {
+            this.DialogAdd = false;
+            this.DialogDetail = false;
+            this.clearForm();
+        },
+        onFileChange(event) {
+            const file = event.target.files[0];
+            this.selectedFile = file;
+
+            if (file) {
+                this.dailyFilename = file.name;
+
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    this.base64FileContent = e.target.result;
+                };
+                reader.onerror = (error) => {
+                    console.error("FileReader error:", error);
+                    this.base64FileContent = null;
+                };
+                reader.readAsDataURL(file);
+            } else {
+                this.base64FileContent = null;
+                this.dailyFilename = '';
+            }
+        },
+
+        async saveDailyTask() {
+            if (!this.taskDate || !this.dailyTask) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'ข้อมูลไม่ครบถ้วน',
+                    text: 'กรุณากรอกวันที่และภาระงานประจำวันให้ครบถ้วน',
+                });
+                return;
+            }
+            if (this.evaluadaily === null) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'ข้อมูลไม่ครบถ้วน',
+                    text: 'กรุณาเลือกรอบประเมิน',
+                });
+                return;
+            } 
+            const year = this.taskDate.getFullYear();
+            const month = (this.taskDate.getMonth() + 1).toString().padStart(2, '0'); // เดือนใน JavaScript เริ่มจาก 0 (ม.ค. = 0) จึงต้อง +1
+            const day = this.taskDate.getDate().toString().padStart(2, '0');
+            const formattedDate = `${year}-${month}-${day}`; // สร้างสตริงในรูปแบบ YYYY-MM-DD
+
+            const payload = {
+                name_dialywork: this.dailyTask,
+                daily_date: formattedDate, // ใช้ formattedDate ที่สร้างขึ้นจาก Local Time
+                daily_link: this.documentLink,
+                dialy_file: this.base64FileContent,
+                daily_filename: this.dailyFilename,
+                daily_evalua: this.evaluadaily,
+                staffid: this.staffid_Main,
+                facid: this.facid_Main,
+                name_daily: this.userStaffNameDaily,
+                name_facdialy: this.userStaffDepartmentName,
+            };
+
+            if (this.currentRecordId) {
+                payload.id = this.currentRecordId;
+            }
+            console.log("Payload being sent:", payload);
+
+            try {
+                const res = await axios.post('http://127.0.0.1:8000/api/saveWorkdaily', payload);
+
+                Swal.fire({
+                    position: "top-center",
+                    icon: "success",
+                    title: "บันทึกเรียบร้อยแล้ว !",
+                    showConfirmButton: false,
+                    timer: 1500
+                });
+                this.DialogAdd = false;
+                this.showDataSetUserdialy();
+                this.clearForm();
+            } catch (error) {
+                console.error('Error saving daily task:', error.response || error);
+                let errorMessage = "เกิดข้อผิดพลาดในการบันทึก!";
+                if (error.response && error.response.data) {
+                    if (error.response.data.error) {
+                        errorMessage = "เกิดข้อผิดพลาด: " + error.response.data.error;
+                    } else if (error.response.data.message) {
+                        errorMessage = "ข้อผิดพลาด: " + error.response.data.message;
+                        if (error.response.data.errors) {
+                            let validationErrors = '';
+                            for (const field in error.response.data.errors) {
+                                validationErrors += `\n- ${error.response.data.errors[field].join(', ')}`;
+                            }
+                            errorMessage += validationErrors;
+                        }
+                    }
+                } else if (error.request) {
+                    errorMessage = "ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้ ตรวจสอบ Network";
+                } else {
+                    errorMessage = "ข้อผิดพลาดที่ไม่รู้จัก: " + error.message;
+                }
+
+                Swal.fire({
+                    position: "top-center",
+                    icon: "error",
+                    title: errorMessage,
+                    showConfirmButton: true,
+                });
+            }
+        },
+
+        editData(data) {
+            this.DialogAdd = true;
+            this.currentRecordId = data.id; 
+            this.taskDate = data.daily_date ? new Date(data.daily_date) : null;
+            this.documentLink = data.daily_link;
+            this.evaluadaily = data.daily_evalua ? parseInt(data.daily_evalua, 10) : null;
+            this.dailyTask = data.name_dialywork;
+            this.dailyFilename = data.daily_filename || '';
+            this.base64FileContent = null; // ไม่ต้องโหลดไฟล์เก่ามาแสดงใน base64 เพราะเราจะอัปโหลดใหม่ถ้าผู้ใช้เลือกไฟล์
+        },
+        delData(data) {
+            Swal.fire({
+                title: "คุณต้องการลบรายการนี้ใช่หรือไม่ ?",
+                text: "เมื่อคลิกปุ่ม ใช่, ลบเลย! ข้อมูลจะถูกลบทันที!",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "ใช่, ลบเลย!",
+                cancelButtonText: "ยกเลิก"
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    try {
+                        await axios.post('http://127.0.0.1:8000/api/deleteWorkdaily', {
+                            id: data.id
+                        });
+                        this.showDataSetUserdialy();
+                        Swal.fire({
+                            title: "ลบข้อมูลเสร็จสิ้น!",
+                            text: "ข้อมูลของคุณถูกลบแล้ว",
+                            icon: "success"
+                        });
+                    } catch (error) {
+                        console.error('Error deleting data:', error);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'ข้อผิดพลาด',
+                            text: 'ไม่สามารถลบข้อมูลได้: ' + (error.response?.data?.error || error.message),
+                        });
+                    }
+                }
+            });
+        },
+
+        clearForm() {
+            this.currentRecordId = null;
+            this.taskDate = null;
+            this.documentLink = '';
+            this.dailyTask = '';
+            this.evaluadaily = null;
+            this.selectedFile = null;
+            this.base64FileContent = null;
+            this.dailyFilename = '';
+            if (this.$refs.fileInputRef) {
+                this.$refs.fileInputRef.value = '';
+            }
+        },
+        async printDataDaily() {
+            const { signIn, getSession, signOut } = await useAuth()
+            const user = await getSession();
+            const form = {
+                PREFIXFULLNAME:user.user.name.PREFIXFULLNAME,
+                STAFFNAME :user.user.name.STAFFNAME,
+                STAFFSURNAME:user.user.name.STAFFSURNAME,
+                POSITIONNAME:user.user.name.POSITIONNAME,
+                GROUPTYPENAME:user.user.name.GROUPTYPENAME,
+                POSTYPENAME:user.user.name.POSTYPENAME,
+                SCOPES:user.user.name.SCOPES.staffdepartmentname,
+                staffid: this.staffid_Main,
+                facid: this.facid_Main,
+                name_daily: this. userStaffNameDaily,
+                daily_date: this.taskDate ? this.taskDate.toISOString().split('T')[0] : null,  
+            }
+            const queryParams = new URLSearchParams(form).toString();
+            const url = `http://127.0.0.1:8000/report_Daily?${queryParams}`;
+            window.open(url, '_blank');
+        },  
+    }
 };
 </script>
 
 <style>
+/* CSS เดิมของคุณ */
 .card-header {
     text-align: left;
     margin: 0;
@@ -404,4 +466,17 @@ th, td {
     border: 1px solid rgb(206, 203, 203);
     text-align: center;
 }
+.p-datatable .p-column-header-content {
+    justify-content: center;
+}
+#country-list{
+    list-style:none;
+    margin-top:-3px;
+    padding:0;
+    width:25%;
+    position: absolute;
+    z-index:9999 !important;
+}
+#country-list li{padding: 10px; background: #f0f0f0; border-bottom: #bbb9b9 1px solid;}
+#country-list li:hover{background:#ece3d2;cursor: pointer;}
 </style>
