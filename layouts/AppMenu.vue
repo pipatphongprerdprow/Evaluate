@@ -26,6 +26,7 @@ const allMenus = ref([
     //     label: 'ประวัติการประเมิน',
     //     items: [{ label: 'ประวัติการประเมิน', icon: 'pi pi-fw pi-clock', to: '/setting/history' }]
     // },
+
     {
         id: 'torday',
         label: 'แบบบันทึกภาระงานประจำวัน',
@@ -39,7 +40,7 @@ const allMenus = ref([
             { label: 'ตรวจติดตามภาระงานประจำวัน', icon: 'pi pi-file', to: '/setting/checkedialy' }
 
         ],
-        // items: [{ label: 'ตรวจติดตามภาระงานประจำวัน', icon: 'pi pi-bell', to: '/setting/checkedialy' }]
+         //items: [{ label: 'ตรวจติดตามภาระงานประจำวัน', icon: 'pi pi-bell', to: '/setting/checkedialy' }]
     },
     {
         id: 'hr',

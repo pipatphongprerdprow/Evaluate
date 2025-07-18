@@ -1152,7 +1152,7 @@ export default {
         },
         showDataSet() {
             axios
-                .post('   http://127.0.0.1:8000/api/showDateSetleader', {
+                .post('http://127.0.0.1:8000/api/showDateSetleader', {
                     staff_id: this.staffid_Main,
                     fac_id: this.facid_Main,
                     group_id: this.groupid_Main
@@ -1199,7 +1199,7 @@ export default {
         }, 
         async showDataEvalu() {
             try { 
-                const res = await axios.get('   http://127.0.0.1:8000/api/showDataEvalu', {  
+                const res = await axios.get('http://127.0.0.1:8000/api/showDataEvalu', {  
                     params: {
                         staff_id: this.staffid_Main,
                         fac_id: this.tracking_date.fac_id,
@@ -1220,7 +1220,7 @@ export default {
         async cvb(item) {
             // console.log(this.tracking_date.evalua);
             try {
-                const response = await axios.post('   http://127.0.0.1:8000/api/showdatator', {
+                const response = await axios.post('http://127.0.0.1:8000/api/showdatator', {
                     p_year: this.tracking_date.d_date,
                     evalua: this.tracking_date.evalua,
                     p_staffid: item.staffid
@@ -1243,6 +1243,7 @@ export default {
                 this.dataStaffid = data.staffid;
 
                 await this.showDataEvalu();
+                //await this.showdatator();
 
                 this.currentstaff = this.products.filter((product) => product.staffid === this.dataStaffid);
                 this.products_Tab1 = [];
@@ -1272,7 +1273,7 @@ export default {
 
                 this.showdataPo(data.staffid, this.facid_Main, this.tracking_date.d_date, this.tracking_date.evalua,data.posnameid);
 
-                await axios.post('   http://127.0.0.1:8000/api/showDataP03New', {
+                await axios.post('http://127.0.0.1:8000/api/showDataP03New', {
                     staff_id: data.staffid,
                     fac_id: this.tracking_date.fac_id,
                     year_id: this.tracking_date.d_date,
@@ -1371,7 +1372,7 @@ export default {
                 Swal.fire('แจ้งเตือน', 'กรุณาเลือกคะแนน !', 'error');
             } else {
                 await axios
-                    .post('   http://127.0.0.1:8000/api/saveP03Po', {
+                    .post('http://127.0.0.1:8000/api/saveP03Po', {
                         staffid_po: this.staffid_po,
                         p01_id: subP01.p01_id,
                         p01_score: subP01.p01_score,
@@ -1455,7 +1456,7 @@ export default {
                 improvements: this.improvements,
                 suggestions: this.suggestions
             };
-            const res = await axios.post('   http://127.0.0.1:8000/api/saveP03PoTab1', payload);
+            const res = await axios.post('http://127.0.0.1:8000/api/saveP03PoTab1', payload);
             //console.log(res.data);
             Swal.fire({
                 position: 'top-end',
@@ -1492,7 +1493,7 @@ export default {
             }
         },
         async tab2Data(staff_id) {
-            await axios.post('   http://127.0.0.1:8000/api/showDataP03New', {
+            await axios.post('http://127.0.0.1:8000/api/showDataP03New', {
                 staff_id: staff_id,
                 fac_id: this.tracking_date.fac_id,
                 year_id: this.tracking_date.d_date,
@@ -1517,7 +1518,7 @@ export default {
         showdataPoText(staff_id, fac_id, year_id, record) {
             // console.log(staff_id);
             
-            axios .post('   http://127.0.0.1:8000/api/showDataPo', {
+            axios .post('http://127.0.0.1:8000/api/showDataPo', {
                     staff_id: staff_id,
                     fac_id: fac_id,
                     year_id: year_id,
@@ -1581,7 +1582,7 @@ export default {
         },
         chkp04(staff_id, fac_id, year_id, record) {
             axios
-                .post('   http://127.0.0.1:8000/api/showDataPo', {
+                .post('http://127.0.0.1:8000/api/showDataPo', {
                     staff_id: staff_id,
                     fac_id: fac_id,
                     year_id: year_id,
@@ -1633,7 +1634,7 @@ export default {
         },
         saveEvaTab3() {
             axios
-                .post('   http://127.0.0.1:8000/api/saveEvaTab3', {
+                .post('http://127.0.0.1:8000/api/saveEvaTab3', {
                     staff_id: this.dataStaffid,
                     fac_id: this.facid_Main,
                     year_id: this.tracking_date.d_date,
@@ -1656,7 +1657,7 @@ export default {
         },
         chkp04data(staff_id, fac_id, year_id, record) {
             axios
-                .post('   http://127.0.0.1:8000/api/showData04Tab3', {
+                .post('http://127.0.0.1:8000/api/showData04Tab3', {
                     staff_id: staff_id,
                     fac_id: fac_id,
                     year_id: year_id,
@@ -1684,7 +1685,7 @@ export default {
         },
         chkp04dataT4(staff_id, fac_id, year_id, record) {
             axios
-                .post('   http://127.0.0.1:8000/api/showData04Tab3', {
+                .post('http://127.0.0.1:8000/api/showData04Tab3', {
                     staff_id: staff_id,
                     fac_id: fac_id,
                     year_id: year_id,
@@ -1705,7 +1706,7 @@ export default {
             (this.assessorText = null),
                 (this.assessor_positionText = null),
                 axios
-                    .post('   http://127.0.0.1:8000/api/showdatator', {
+                    .post('http://127.0.0.1:8000/api/showdatator', {
                         p_year: this.tracking_date.d_date,
                         evalua: this.tracking_date.evalua,
                         p_staffid: this.dataStaffid
@@ -1726,7 +1727,7 @@ export default {
             // var postypetext =postypename;
             var postypetext = `ระดับ` + postypenameText;
             // var postypetext = `ระดับ` + postypename;
-            await axios .post('   http://127.0.0.1:8000/api/showdatapostypenameAdmin', {
+            await axios .post('http://127.0.0.1:8000/api/showdatapostypenameAdmin', {
                     postypename: postypetext,
                     postypenameid: postypenameid
                 })
@@ -1744,7 +1745,7 @@ export default {
         getjobSpecificCompetencies(dataStaffid) {
             //console.log(this.staffid_Main,this.dataPor);
 
-            axios .post('   http://127.0.0.1:8000/api/showdataposp02', { 
+            axios .post('http://127.0.0.1:8000/api/showdataposp02', { 
                     p_year: this.tracking_date.d_date,
                     evalua: this.tracking_date.evalua,
                     p_staffid: this.dataStaffid
@@ -1833,7 +1834,7 @@ export default {
             // this.showPostype(this.currentstaff[0]?.postypenameth, this.postypenameid); // แก้ไข ตัวป2
             this.showPostype(this.currentstaff[0]?.postypenameth, posnameid);
 
-            axios.post(' http://127.0.0.1:8000/api/showDataPo', {
+            axios.post('http://127.0.0.1:8000/api/showDataPo', {
                 staff_id: staff_id,
                 fac_id: facid_Main,
                 year_id: d_date,
@@ -1862,7 +1863,7 @@ export default {
         //29/10/67
         saveScore() {
             axios
-                .post('   http://127.0.0.1:8000/api/saveDatator', {
+                .post('http://127.0.0.1:8000/api/saveDatator', {
                     score: this.totalScore
                 })
                 .then((response) => {
@@ -1928,7 +1929,7 @@ export default {
                 };
 
                 axios
-                    .post('   http://127.0.0.1:8000/api/saveDatator', formData)
+                    .post('http://127.0.0.1:8000/api/saveDatator', formData)
                     .then((response) => {
                         this.DialogScore = false;
                         // console.log('showDataP03',res.data);
@@ -2054,7 +2055,7 @@ export default {
         /*============= ความรู้/ทักษะ/สมรรถนะ ที่ต้องการพัฒนาสำหรับผู้บริหาร =============*/ 
         chkp03data(){ 
                 this.products_Tab3 = [];
-                axios.post('   http://127.0.0.1:8000/api/showData04Tab3',{
+                axios.post('http://127.0.0.1:8000/api/showData04Tab3',{
                     staff_id: this.staffid_Main,
                     fac_id: this.facid_Main,
                     year_id: this.tracking_date.d_date,
@@ -2081,7 +2082,7 @@ export default {
                 });
             },  
         AddDatap04X(){ 
-            axios.post('   http://127.0.0.1:8000/api/saveEvaTab03xx',{
+            axios.post('http://127.0.0.1:8000/api/saveEvaTab03xx',{
                 staff_id: this.staffid_Main,
                 fac_id: this.facid_Main,
                 year_id: this.tracking_date.d_date,
@@ -2116,7 +2117,7 @@ export default {
         },
         DeleteRegislickPX(item) { 
             // Add logic to remove the selected item  
-            axios.post('   http://127.0.0.1:8000/api/delEvaTab03xx',{
+            axios.post('http://127.0.0.1:8000/api/delEvaTab03xx',{
                 id: item
             }).then(res => {  
                 // console.log(res);
@@ -2136,7 +2137,7 @@ export default {
 
             let self = this.products_Tab3T4[0];  // ✅ ดึง object แรกจาก array
 
-            axios.post(' http://127.0.0.1:8000/api/saveexcucive', {
+            axios.post('http://127.0.0.1:8000/api/saveexcucive', {
                 p02_id: self.p02_id,
                 px04_re1: self.px04_re1, 
                 record: self.record, 
@@ -2159,7 +2160,7 @@ export default {
 
         async saveAssess() {
             try {
-                const response = await axios.post('   http://127.0.0.1:8000/api/savedataAssess', { 
+                const response = await axios.post('http://127.0.0.1:8000/api/savedataAssess', { 
                     p_staffid: this.staffid_Main,
                     fac_id: this.facid_Main,
                     p_year: this.tracking_date.d_date,
@@ -2213,7 +2214,7 @@ export default {
             } 
             const queryParams = new URLSearchParams(form).toString();
             // console.log(queryParams); 
-            const url = `   http://127.0.0.1:8000/report_tracking?${queryParams}`;
+            const url = `http://127.0.0.1:8000/report_tracking?${queryParams}`;
             window.open(url, '_blank');
  
         },     

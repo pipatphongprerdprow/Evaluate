@@ -8,7 +8,7 @@
                     </div>
                     <!-- {{ products }}  -->
 
-                    <!-- {{ user.user }}    -->
+                    <!-- {{ user.user }}     -->
 
                     <!-- <div class="col md:col-3" >  
                          
@@ -73,57 +73,66 @@
                         </template>  
                         <TabView :activeIndex="activeIndex" @tabChange="onTabChange"> 
                             <!-- Tab 1 -->
-                            <TabPanel header="แบบใบปะหน้า"> 
-                                <div class="card">
-                                    <h3 class="mb-4" style="text-align: right;">
-                                        <i class="pi pi-folder-open" style="font-size: x-large;"></i> แบบ ป01-02
-                                </h3>
-                                <div style="display: flex; justify-content: center;">
-                                    <img src="~/assets/layout/images/kongkang.jpg" alt="Description of image" class="contract-image" />
-                                </div>
-                                <h4 style="text-align: center;">
-                                    แบบข้อตกลงภาระงานและพฤติกรรมการปฏิบัติราชการ (Term of Reference : TOR) ข้าราชการและพนักงาน สังกัดมหาวิทยาลัยมหาสารคาม
-                                </h4><br>
-                                <!-- ตาราง ก. สมรรถนะหลัก -->
-                                <div class="employee-info">
-                                    <p><strong>ผู้ปฏิบัติงาน:</strong> {{ currentstaff[0].prefixfullname }} {{ currentstaff[0].staffname }} {{   currentstaff[0].staffsurname }}</p>
-                                    <p v-if="currentstaff[0].facultyid==201092700000"><strong>สังกัด:</strong> {{ currentstaff[0].departmentname }} </p>
-                                    <p v-else><strong>สังกัด:</strong> {{ currentstaff[0].facultyname }} </p>
-                                    <p><strong>ตำแหน่ง:</strong> {{ currentstaff[0].posnameth }} </p>
-                                    <strong>ระดับตำแหน่ง:</strong> {{ currentstaff[0]?.posnameth=='ผู้บริหาร'&& !currentstaff[0]?.postypenameth   ? 'ชำนาญการพิเศษ' : currentstaff[0]?.postypenameth}} 
-                                    <p><strong>ชื่อผู้ประเมิน:</strong> {{ assessorText }}</p> 
-                                     <!-- {{ staff_po }} -->
-                                    <p><strong>ตำแหน่งผู้ประเมิน :</strong>{{ assessor_positionText }}</p> 
-                                    <p><strong>รายละเอียดข้อตกลง ระหว่าง วันที่ :</strong> {{ tracking_date.d_evaluationround }} {{ tracking_date.d_date }}</p>
-                                </div><br> 
-                                <div class="explanation">
-                                    <h4>คำชี้แจง</h4>
-                                    <p>
-                                        1. แบบข้อตกลงภาระงานและพฤติกรรมการปฏิบัติราชการ  (Term of Reference : TOR) ข้าราชการและพนักงาน  สังกัดมหาวิทยาลัยมหาสารคามนี้ เป็นการกำหนด
-                                            แผนการปฏิบัติงานของผู้ปฏิบัติงานในมหาวิทยาลัยมหาสารคาม ซึ่งเป็นข้อตกลงร่วมกับผู้บังคับบัญชาก่อนเริ่มปฏิบัติงาน
-                                    </p>
-                                    <p>
-                                        2. การกำหนดข้อตกลงร่วม ผู้ปฏิบัติงานจะต้องกรอกรายละเอียดภาระงานโดยสังเขปในส่วนของภาระงานตามหน้าที่ความรับผิดชอบของตำแหน่ง และ/หรือภาระงาน
-                                            ด้านอื่นๆ พร้อมกำหนดตัวชี้วัดความสำเร็จของภาระงานแต่ละรายการ  ตลอดจนค่าเป้าหมาย และค่านำหนักร้อยละ สำหรับในส่วนของพฤติกรรมการปฏิบัติราชการ
-                                            (สมรรถนะ) ให้ระบุระดับสมรรถนะค่ามาตรฐาน
-                                    </p>
-                                    <p>
-                                        3. สำหรับการกรอกรายละเอียดภาระเอียดภาระงานตามภารกิจ  ให้อ้างอิงการคำนวณภาระงานขั้นต่ำตามหลักเกณฑ์กรอบมาตรฐานภาระงานที่แนบท้ายประกาศ ก.บ.ม. 
-                                            มหาวิทยาลัยมหาสารคาม ที่บังคับใช้สำหรับการประเมินผลการปฏิบัติราชการ
 
-                                    </p>
-                                    <p>
-                                        4. การกำหนดตัวชี้วัดความสำเร็จของงาน  ทั้งในส่วนของเชิงปริมาณและเชิงคุณภาพ  ให้เป็นการกำหนดข้อตกลงภายในหน่วยงานนั้นๆ 
-                                    </p>
-                                    <p>
-                                        5. การจัดทำข้อตกลงภาระงานดังกล่าวนี้  เพื่อใช้เป็นกรอบในการประเมินผลการปฏิบัติราชการ  เพื่อประกอบการเลื่อนเงินเดือนและค่าจ้างในแต่ละรอบการประเมิน
-                                    </p>
-                                </div> 
-                            </div>
-                        </TabPanel>
+                            <TabPanel header="แบบใบปะหน้า"> 
+                                    <div class="col md:col-12 text-right">
+                                        <Button label="Export_ใบปะหน้า" icon="pi pi-file-word" class="mr-2 mb-2 " @click="printDatacoversheet"></Button>
+                                    </div> 
+                                    <div class="card">
+                                        <h3 class="mb-4" style="text-align: right;">
+                                            <i class="pi pi-folder-open" style="font-size: x-large;"></i> แบบ ป01-02
+                                    </h3>
+                                    <div style="display: flex; justify-content: center;">
+                                        <img src="~/assets/layout/images/kongkang.jpg" alt="Description of image" class="contract-image" />
+                                    </div>
+                                    <h4 style="text-align: center;">
+                                        แบบข้อตกลงภาระงานและพฤติกรรมการปฏิบัติราชการ (Term of Reference : TOR) ข้าราชการและพนักงาน สังกัดมหาวิทยาลัยมหาสารคาม
+                                    </h4><br>
+                                    <!-- ตาราง ก. สมรรถนะหลัก -->
+                                    <div class="employee-info">
+                                        <p><strong>ผู้ปฏิบัติงาน:</strong> {{ currentstaff[0].prefixfullname }} {{ currentstaff[0].staffname }} {{   currentstaff[0].staffsurname }}</p>
+                                        <p v-if="currentstaff[0].facultyid==201092700000"><strong>สังกัด:</strong> {{ currentstaff[0].departmentname }} </p>
+                                        <p v-else><strong>สังกัด:</strong> {{ currentstaff[0].facultyname }} </p>
+                                        <p><strong>ตำแหน่ง:</strong> {{ currentstaff[0].posnameth }} </p>
+                                        <strong>ระดับตำแหน่ง:</strong> {{ currentstaff[0]?.posnameth=='ผู้บริหาร'&& !currentstaff[0]?.postypenameth   ? 'ชำนาญการพิเศษ' : currentstaff[0]?.postypenameth}} 
+                                        <p><strong>ชื่อผู้ประเมิน:</strong> {{ assessorText }}</p> 
+                                        <!-- {{ staff_po }} -->
+                                        <p><strong>ตำแหน่งผู้ประเมิน :</strong>{{ assessor_positionText }}</p> 
+                                        <p><strong>รายละเอียดข้อตกลง ระหว่าง วันที่ :</strong> {{ tracking_date.d_evaluationround }} {{ tracking_date.d_date }}</p>
+                                    </div><br> 
+                                    <div class="explanation">
+                                        <h4>คำชี้แจง</h4>
+                                        <p>
+                                            1. แบบข้อตกลงภาระงานและพฤติกรรมการปฏิบัติราชการ  (Term of Reference : TOR) ข้าราชการและพนักงาน  สังกัดมหาวิทยาลัยมหาสารคามนี้ เป็นการกำหนด
+                                                แผนการปฏิบัติงานของผู้ปฏิบัติงานในมหาวิทยาลัยมหาสารคาม ซึ่งเป็นข้อตกลงร่วมกับผู้บังคับบัญชาก่อนเริ่มปฏิบัติงาน
+                                        </p>
+                                        <p>
+                                            2. การกำหนดข้อตกลงร่วม ผู้ปฏิบัติงานจะต้องกรอกรายละเอียดภาระงานโดยสังเขปในส่วนของภาระงานตามหน้าที่ความรับผิดชอบของตำแหน่ง และ/หรือภาระงาน
+                                                ด้านอื่นๆ พร้อมกำหนดตัวชี้วัดความสำเร็จของภาระงานแต่ละรายการ  ตลอดจนค่าเป้าหมาย และค่านำหนักร้อยละ สำหรับในส่วนของพฤติกรรมการปฏิบัติราชการ
+                                                (สมรรถนะ) ให้ระบุระดับสมรรถนะค่ามาตรฐาน
+                                        </p>
+                                        <p>
+                                            3. สำหรับการกรอกรายละเอียดภาระเอียดภาระงานตามภารกิจ  ให้อ้างอิงการคำนวณภาระงานขั้นต่ำตามหลักเกณฑ์กรอบมาตรฐานภาระงานที่แนบท้ายประกาศ ก.บ.ม. 
+                                                มหาวิทยาลัยมหาสารคาม ที่บังคับใช้สำหรับการประเมินผลการปฏิบัติราชการ
+
+                                        </p>
+                                        <p>
+                                            4. การกำหนดตัวชี้วัดความสำเร็จของงาน  ทั้งในส่วนของเชิงปริมาณและเชิงคุณภาพ  ให้เป็นการกำหนดข้อตกลงภายในหน่วยงานนั้นๆ 
+                                        </p>
+                                        <p>
+                                            5. การจัดทำข้อตกลงภาระงานดังกล่าวนี้  เพื่อใช้เป็นกรอบในการประเมินผลการปฏิบัติราชการ  เพื่อประกอบการเลื่อนเงินเดือนและค่าจ้างในแต่ละรอบการประเมิน
+                                        </p>
+                                    </div> 
+                                </div>
+                            </TabPanel>
 
                             <!-- Tab 2 -->
                             <TabPanel header="รายงาน ป.01 - ป.03" >
+                                 <div class="col-12 text-right">
+                                    <Button label="Export_ป.01" icon="pi pi-file-word" class="mr-2 mb-2" @click="printDataP01" />
+                                    <Button label="Export_ป.02" icon="pi pi-file-word" class="mr-2 mb-2" @click="printDataP02" />
+                                    <Button label="Export_ป.03" icon="pi pi-file-word" class="mr-2 mb-2" @click="printDataP03" />
+                                </div>
                                 <div class="grid">
                                     <div class="col-12 lg:col-12 xl:col-12">
                                         <div class="card mb-0"> 
@@ -464,6 +473,9 @@
                             </TabPanel> 
                             <!-- Tab 4 --> 
                             <TabPanel header="รายงาน ป.04">
+                                <div class="col md:col-12 text-right">
+                                    <Button label="Export_ป.04" icon="pi pi-file-word" class="mr-2 mb-2 " @click="printDataP04"></Button>
+                                </div> 
                                 <div class="card">
                                     <h4 style="text-align: left">แบบสรุปการประเมินผล</h4>
                                     <div class="p-fluid formgrid grid">
@@ -771,26 +783,14 @@ export default {
             ],
             //ตาราง ข. สมรรถนะเฉพาะตามลักษณะงานที่ปฏิบัติ
             jobSpecificCompetencies: [],
-            // jobSpecificCompetencies: [
-            //     { id: 6, activity: 'ข. 1 การคิดวิเคราะห์', indicator: '1', data_table2: '' },
-            //     { id: 7, activity: 'ข. 2 การดำเนินการเชิงรุก', indicator: '1', data_table2: '' },
-            //     { id: 8, activity: 'ข. 3 ความผูกพันที่มีต่อส่วนราชการ', indicator: '1', data_table2: '' },
-            //     { id: 9, activity: 'ข. 4 การมองภาพองค์รวม', indicator: '1', data_table2: '' },
-            //     { id: 10, activity: 'ข. 5 การสืบเสาะหาข้อมูล', indicator: '1', data_table2: '' },
-            //     { id: 11, activity: 'ข. 6 การตรวจสอบความถูกต้องตามกระบวนงาน', indicator: '1', data_table2: '' }
-            // ],
+           
             //ตาราง ค. สมรรถนะอื่นๆ
             otherCompetencies: [
                 { id: 12, activity: 'ค. 1 สภาวะผู้นำ', indicator: '0', data_table3: '' },
                 { id: 13, activity: 'ค. 2 วิสัยทัศน์', indicator: '0', data_table3: '' },
                 { id: 14, activity: 'ค. 3 การวางกลยุทธ์ภาครัฐ', indicator: '0', data_table3: '' },
                 { id: 15, activity: 'ค. 4 ศักยภาพเพื่อนำการปรับเปลี่ยน', indicator: '0', data_table3: '' },
-                { id: 16, activity: 'ค. 5 การสอนงานและการมอบหมายงาน', indicator: '0', data_table3: '' }
-                // { id: 12, activity: 'ค. 1 สภาวะผู้นำ', indicator3: executive, datatable3: '', selfAssessment3: '' },
-                // { id: 13, activity: 'ค. 2 วิสัยทัศน์', indicator3: executive, datatable3: '', selfAssessment3: '' },
-                // { id: 14, activity: 'ค. 3 การวางกลยุทธ์ภาครัฐ', indicator3: executive, datatable3: '', selfAssessment3: '' },
-                // { id: 15, activity: 'ค. 4 ศักยภาพเพื่อนำการปรับเปลี่ยน', indicator3: executive, datatable3: '', selfAssessment3: '' },
-                // { id: 16, activity: 'ค. 5 การสอนงานและการมอบหมายงาน', indicator3: executive, datatable3: '', selfAssessment3: '' }
+                { id: 16, activity: 'ค. 5 การสอนงานและการมอบหมายงาน', indicator: '0', data_table3: '' } 
             ],
             improvements: null,
             suggestions: null,
@@ -831,7 +831,8 @@ export default {
             assessorText: null,
             assessor_positionText: null,
             currentstaff: {},  
-            //datatable3: []
+            //datatable3: [],
+            printStaffData: {},
         };
     },
     components: {
@@ -867,7 +868,7 @@ export default {
                     group_id: this.groupid_Main
                 })
                 .then((res) => {
-                    // console.log(res.data);
+                     console.log(res.data);
                     this.tracking_dates = res.data;
                 })
                 .catch((error) => {
@@ -943,6 +944,7 @@ export default {
         },
         // XX One
         async openDataEvalu(data) {
+            
             // console.log('posnameid: ',data.posnameid);
             // console.log('staffid: ',data.staffid);
             
@@ -950,8 +952,10 @@ export default {
                 Swal.fire('แจ้งเตือนจากระบบ', 'กรุณาเลือกรอบประเมิน', 'error');
             } else {
                 this.dataStaffid = data.staffid;
+                this.printStaffData = data; 
 
                 await this.showDataEvalu();
+                await this.showdatator();
 
                 this.currentstaff = this.products.filter((product) => product.staffid === this.dataStaffid);
                 this.products_Tab1 = [];
@@ -1009,72 +1013,7 @@ export default {
                     console.error('Error:', error);
                 });
             }
-        },    
-        // เพิ่มคะแนนประเมิน biwgin
-        // async openDataEvalu(staff_id) {
-        //     // console.log(staff_id);
-            
-        //     if (this.tracking_date.d_date === undefined) {
-        //         Swal.fire('แจ้งเตือนจากระบบ', 'กรุณาเลือกรอบประเมิน', 'error');
-        //     } else {
-        //         this.dataStaffid = staff_id;
-        //         await this.showDataEvalu();
-        //         this.currentstaff = this.products.filter((product) => product.staffid === this.dataStaffid);
-        //         this.products_Tab1 = [];
-        //         this.p01_scores = [
-        //             { name: '0 คะแนน', code: 0 },
-        //             { name: '1 คะแนน', code: 1 },
-        //             { name: '2 คะแนน', code: 2 },
-        //             { name: '3 คะแนน', code: 3 },
-        //             { name: '4 คะแนน', code: 4 },
-        //             { name: '5 คะแนน', code: 5 }
-        //         ];
-
-        //         // ตั้งค่า coreCompetencies กลับไปเป็นค่าเริ่มต้น
-        //         this.coreCompetencies = [
-        //             { id: 1, activity: 'ก. 1 การมุ่งผลสัมฤทธิ์', indicator: '1', data_table1: '',selfAssessment:'' },
-        //             { id: 2, activity: 'ก. 2 การบริการที่ดี', indicator: '1', data_table1: '',selfAssessment:'' },
-        //             { id: 3, activity: 'ก. 3 การสั่งสมความเชี่ยวชาญในงานอาชีพ', indicator: '1', data_table1: '',selfAssessment:'' },
-        //             { id: 4, activity: 'ก. 4 การยึดมั่นในความถูกต้องชอบธรรมและจริยธรรม', indicator: '1', data_table1: '',selfAssessment:'' },
-        //             { id: 5, activity: 'ก. 5 การทำงานเป็นทีม', indicator: '1', data_table1: '',selfAssessment:'' }
-        //         ];
-
-        //         // ตั้งค่า jobSpecificCompetencies กลับไปเป็นค่าเริ่มต้น
-        //         this.jobSpecificCompetencies = [];
-
-        //         this.improvements = null;
-        //         this.suggestions = null;
-
-        //         this.showdataPo(staff_id, this.facid_Main, this.tracking_date.d_date, this.tracking_date.evalua);
-        //         await axios.post('   http://127.0.0.1:8000/api/showDataP03New', {
-        //             staff_id: staff_id,
-        //             fac_id: this.tracking_date.fac_id,
-        //             year_id: this.tracking_date.d_date,
-        //             evalua: this.tracking_date.evalua
-        //         })
-        //         .then((res) => {
-        //             // console.log('openDataEvalu: ',res.data);
-        //             if (res.data && Array.isArray(res.data)) {
-        //                 this.products_Tab1 = res.data;
-        //                 this.products_Tab1.forEach((h) => {
-        //                     h.subP01sX.forEach((subP01) => {
-        //                         // ตรวจสอบว่าค่า p01_score นั้นถูกต้องหรือไม่
-        //                         const foundScore = this.p01_scores.find((score) => score.code === subP01.p01_score);
-        //                         if (foundScore) {
-        //                             subP01.p01_score = foundScore.code; // ใช้ค่าที่ถูกต้อง
-        //                         } else {
-        //                             subP01.p01_score = this.p01_scores[0].code; // ใช้ค่าเริ่มต้น "- ไม่ระบุ -"
-        //                         }
-        //                     });
-        //                 });
-        //             }
-        //             this.DialogAdd = true; 
-        //         })
-        //         .catch((error) => {
-        //             console.error('Error:', error);
-        //         });
-        //     }
-        // },    
+        },     
         async saveEvaTab1(subP01) {
             if (subP01.p01_score === 0) {
                 Swal.fire('แจ้งเตือน', 'กรุณาเลือกคะแนน !', 'error');
@@ -1174,33 +1113,7 @@ export default {
                 timer: 1500
             });
             await this.showDataEvalu();
-        },
-        // async onTabChange(event) {
-        //     console.log('onTabChange: ',event.index);
-        //     if (event.index == 0) {
-        //         //console.log('ผลสัมฤทธิ์ของงาน -',event.index);
-        //     }
-        //     if (event.index == 1) {
-        //         //console.log('รายงาน ป.01 - ป.03 -',event.index);
-        //         this.tab2Data(this.dataStaffid);
-        //         this.showdataPoText(this.dataStaffid, this.facid_Main, this.tracking_date.d_date, this.tracking_date.evalua); 
-        //     }
-        //     if (event.index == 2) {
-        //         //console.log('แผนพัฒนาการปฏิบัติราชการรายบุคคล -',event.index);
-        //         this.products_Tab3 = []; 
-        //         this.chkp04(this.dataStaffid, this.facid_Main, this.tracking_date.d_date, this.tracking_date.evalua);
-        //         this.chkp04data(this.dataStaffid, this.facid_Main, this.tracking_date.d_date, this.tracking_date.evalua);
-        //         await this.showdatator();
-        //     }
-        //     if (event.index == 3) {
-        //         //console.log('รายงาน ป.04 -',event.index);
-        //         this.tab2Data(this.dataStaffid);
-        //         await this.chkp04dataT4(this.dataStaffid, this.facid_Main, this.tracking_date.d_date, this.tracking_date.evalua);
-        //         await this.chkp03data(this.dataStaffid, this.facid_Main, this.tracking_date.d_date, this.tracking_date.evalua);
-        //         // await this.showdatator();
-                
-        //     }
-        // },
+        },  
         async onTabChange(event) { 
             // console.log(this.coreCompetencies);
             // console.log('onTabChange: ',event.index);
@@ -1449,7 +1362,7 @@ export default {
                     });
         },
         async showPostype(postypename,postypenameid) {
-            //console.log('showPostype: ',postypename, postypenameid);
+            console.log('showPostype: ',postypename, postypenameid);
             //let postypenameText = postypename ? postypename : `ชำนาญการพิเศษ`;
             let postypenameText = this.postypenameth ;
             // var postypetext =postypename;
@@ -1521,9 +1434,13 @@ export default {
 
             this.postypenameth = this.currentstaff[0]?.postypenameth  ?? (this.currentstaff[0]?.posnameth === 'ผู้บริหาร' ? 'ชำนาญการพิเศษ' : 'ปฏิบัติการ');
 
-        // console.log("postypenameth:", this.postypenameth);
+         //console.log("postypenameth:", this.postypenameth);
 
-            let postypetext = `ระดับ${this.postypenameth}`;  
+            let postypetext = `ระดับ${this.postypenameth}`;   
+            // let postypetext = this.positionname === 'ผู้บริหาร' ? `ระดับชำนาญการพิเศษ` : `ระดับ${this.postypename}`;
+            // let postypenameid = this.positionname === 'ผู้บริหาร' ? 90 : this.postypenameid;
+            // let positionname = this.positionname === 'ผู้บริหาร' ? `ระดับชำนาญการพิเศษ` : `ระดับ${this.postypename}`;
+
 
             const levelMapping = {
                 'ระดับปฏิบัติการ': 1,
@@ -1921,33 +1838,213 @@ export default {
                     timer: 1000
                 });
             }
-        },  
-        async printDatatracking() { 
-            const { signIn, getSession, signOut } = await useAuth() 
-            const user = await getSession();   
+        },    
+        async printDatacoversheet() { 
+            // console.log('printStaffData: ',this.printStaffData);
+            
+            const { signIn, getSession, signOut } = await useAuth()
+            const user = await getSession();     
+            // const form = {
+            //     // staff_id: this.staffid_Main, // รหัสพันงาน
+            //     group_id: this.groupid_Main, // กลุ่ม?
+            //     fac_id: this.facid_Main, // คณะ
+            //     year_id: this.tracking_date.d_date, // ปี
+            //     evalua: this.tracking_date.evalua , // รอบ
+            //     PREFIXFULLNAME:user.user.name.PREFIXFULLNAME, // คำนำนาย
+            //     STAFFNAME :user.user.name.STAFFNAME, // ชื่อ
+            //     STAFFSURNAME:user.user.name.STAFFSURNAME, // สกุล
+            //     POSITIONNAME:user.user.name.POSITIONNAME, // ตำแหน่ง
+            //     GROUPTYPENAME:user.user.name.GROUPTYPENAME, // พนักงาน
+            //     POSTYPENAME:user.user.name.POSTYPENAME, // ปฏิบัติการ
+            //     SCOPES:user.user.name.SCOPES.staffdepartmentname // สังกัด
+            // }
             const form = {
-                staff_id: this.staffid_Main,
-                group_id: this.groupid_Main,
-                fac_id: this.tracking_date.fac_id,
-                year_id: this.tracking_date.d_date,
-                evalua: this.tracking_date.evalua,
-                PREFIXFULLNAME:user.user.name.PREFIXFULLNAME,
-                STAFFNAME :user.user.name.STAFFNAME,
-                STAFFSURNAME:user.user.name.STAFFSURNAME,
-                POSITIONNAME:user.user.name.POSITIONNAME,
-                GROUPTYPENAME:user.user.name.GROUPTYPENAME,
-                POSTYPENAME:user.user.name.POSTYPENAME, 
-                SCOPES:user.user.name.SCOPES.staffdepartmentname,
-                postypename: `ระดับ${this.postypename}`,
-                postypenameid: this.postypenameid,
-                stftypename: this.stftypename,
-            } 
+                staff_id: this.printStaffData.staffid, // รหัสพันงาน
+                group_id: this.groupid_Main, // กลุ่ม
+                fac_id: this.facid_Main, // คณะ
+                year_id: this.tracking_date.d_date, // ปี
+                evalua: this.tracking_date.evalua , // รอบ
+                PREFIXFULLNAME: this.printStaffData.prefixfullname, // คำนำนาย
+                STAFFNAME : this.printStaffData.staffname, // ชื่อ
+                STAFFSURNAME: this.printStaffData.staffsurname, // สกุล
+                POSITIONNAME: this.printStaffData.posnameth, // ตำแหน่ง
+                GROUPTYPENAME: this.printStaffData.stftypename, // พนักงาน
+                POSTYPENAME: this.printStaffData.postypenameth, // ปฏิบัติการ
+                SCOPES: this.printStaffData.departmentname // สังกัด
+            }
+            // console.log('form: ',form);
+
             const queryParams = new URLSearchParams(form).toString();
             // console.log(queryParams); 
-            const url = `   http://127.0.0.1:8000/report_tracking?${queryParams}`;
+            const url = `    http://127.0.0.1:8000/printReportCoverpage?${queryParams}`;
+            window.location.href = url;
+ 
+        },   
+        async printDataP01() {  
+            const { signIn, getSession, signOut } = await useAuth()
+            const user = await getSession(); 
+            // console.log(user.user.name);   
+            // const form = {
+            //     staff_id: this.staffid_Main,
+            //     group_id: this.groupid_Main,
+            //     fac_id: this.tracking_date.fac_id,
+            //     year_id: this.tracking_date.d_date,
+            //     evalua: this.tracking_date.evalua,
+            //     PREFIXFULLNAME:user.user.name.PREFIXFULLNAME,
+            //     STAFFNAME :user.user.name.STAFFNAME,
+            //     STAFFSURNAME:user.user.name.STAFFSURNAME,
+            //     POSITIONNAME:user.user.name.POSITIONNAME,
+            //     GROUPTYPENAME:user.user.name.GROUPTYPENAME,
+            //     POSTYPENAME:user.user.name.POSTYPENAME, 
+            //     SCOPES:user.user.name.SCOPES.staffdepartmentname
+            // }
+              const form = {
+                staff_id: this.printStaffData.staffid, // รหัสพันงาน
+                group_id: this.groupid_Main, // กลุ่ม
+                fac_id: this.facid_Main, // คณะ
+                year_id: this.tracking_date.d_date, // ปี
+                evalua: this.tracking_date.evalua , // รอบ
+                PREFIXFULLNAME: this.printStaffData.prefixfullname, // คำนำนาย
+                STAFFNAME : this.printStaffData.staffname, // ชื่อ
+                STAFFSURNAME: this.printStaffData.staffsurname, // สกุล
+                POSITIONNAME: this.printStaffData.posnameth, // ตำแหน่ง
+                GROUPTYPENAME: this.printStaffData.stftypename, // พนักงาน
+                POSTYPENAME: this.printStaffData.postypenameth, // ปฏิบัติการ
+                SCOPES: this.printStaffData.departmentname // สังกัด
+            }
+            
+            const queryParams = new URLSearchParams(form).toString();
+            // console.log(queryParams); 
+            const url = `    http://127.0.0.1:8000/report_p01?${queryParams}`;
             window.open(url, '_blank');
  
+        },
+        async printDataP02() { 
+            const { signIn, getSession, signOut } = await useAuth() 
+            const user = await getSession();   
+            // const form = {
+            //     staff_id: this.staffid_Main,
+            //     group_id: this.groupid_Main,
+            //     fac_id: this.tracking_date.fac_id,
+            //     year_id: this.tracking_date.d_date,
+            //     evalua: this.tracking_date.evalua,
+            //     PREFIXFULLNAME:user.user.name.PREFIXFULLNAME,
+            //     STAFFNAME :user.user.name.STAFFNAME,
+            //     STAFFSURNAME:user.user.name.STAFFSURNAME,
+            //     POSITIONNAME:user.user.name.POSITIONNAME,
+            //     GROUPTYPENAME:user.user.name.GROUPTYPENAME,
+            //     POSTYPENAME:user.user.name.POSTYPENAME, 
+            //     SCOPES:user.user.name.SCOPES.staffdepartmentname,
+            //     postypename: `ระดับ${this.postypename}`,
+            //     postypenameid: this.postypenameid
+            // } 
+              const form = {
+                staff_id: this.printStaffData.staffid, // รหัสพันงาน
+                group_id: this.groupid_Main, // กลุ่ม
+                fac_id: this.facid_Main, // คณะ
+                year_id: this.tracking_date.d_date, // ปี
+                evalua: this.tracking_date.evalua , // รอบ
+                PREFIXFULLNAME: this.printStaffData.prefixfullname, // คำนำหน้า
+                STAFFNAME : this.printStaffData.staffname, // ชื่อ
+                STAFFSURNAME: this.printStaffData.staffsurname, // สกุล
+                POSITIONNAME: this.printStaffData.posnameth, // ตำแหน่ง
+                GROUPTYPENAME: this.printStaffData.stftypename, // พนักงาน
+                POSTYPENAME: this.printStaffData.postypenameth, // ปฏิบัติการ
+                SCOPES: this.printStaffData.departmentname, // สังกัด
+                postypename: `ระดับ${this.printStaffData.postypenameth}`, // ระดับ
+                postypenameid: this.printStaffData.posnameth === 'ผู้บริหาร' ? 90 : this.printStaffData.posnameid
+                // postypename: `ระดับ${this.postypename}`, // ระดับ
+                // postypenameid: this.postypenameid 
+            }
+
+            console.log('printStaffData: ',this.printStaffData);
+            console.log('form: ',form);
+
+            const queryParams = new URLSearchParams(form).toString();
+            // console.log(queryParams); 
+            const url = `   http://127.0.0.1:8000/report_p02?${queryParams}`;
+            window.open(url, '_blank');
+ 
+        },  
+        async printDataP03() { 
+                const { signIn, getSession, signOut } = await useAuth()
+                const user = await getSession();     
+                // const form = {
+                //     staff_id: this.staffid_Main,
+                //     group_id: this.groupid_Main,
+                //     fac_id: this.tracking_date.fac_id,
+                //     year_id: this.tracking_date.d_date,
+                //     evalua: this.tracking_date.evalua,
+                //     PREFIXFULLNAME:user.user.name.PREFIXFULLNAME,
+                //     STAFFNAME :user.user.name.STAFFNAME,
+                //     STAFFSURNAME:user.user.name.STAFFSURNAME,
+                //     POSITIONNAME:user.user.name.POSITIONNAME,
+                //     GROUPTYPENAME:user.user.name.GROUPTYPENAME,
+                //     POSTYPENAME:user.user.name.POSTYPENAME, 
+                //     SCOPES:user.user.name.SCOPES.staffdepartmentname,
+                //     postypename: `ระดับ${this.postypename}`   
+                // } 
+                 const form = {
+                    staff_id: this.printStaffData.staffid, // รหัสพันงาน
+                    group_id: this.groupid_Main, // กลุ่ม
+                    fac_id: this.facid_Main, // คณะ
+                    year_id: this.tracking_date.d_date, // ปี
+                    evalua: this.tracking_date.evalua , // รอบ
+                    PREFIXFULLNAME: this.printStaffData.prefixfullname, // คำนำหน้า
+                    STAFFNAME : this.printStaffData.staffname, // ชื่อ
+                    STAFFSURNAME: this.printStaffData.staffsurname, // สกุล
+                    POSITIONNAME: this.printStaffData.posnameth, // ตำแหน่ง
+                    GROUPTYPENAME: this.printStaffData.stftypename, // พนักงาน
+                    POSTYPENAME: this.printStaffData.postypenameth, // ปฏิบัติการ
+                    SCOPES: this.printStaffData.departmentname, // สังกัด
+                    postypename: `ระดับ${this.printStaffData.postypenameth}`, // ระดับ
+                    postypenameid: this.printStaffData.posnameth === 'ผู้บริหาร' ? 90 : this.printStaffData.posnameid
+                }
+
+                const queryParams = new URLSearchParams(form).toString();
+                // console.log(queryParams); 
+                const url = `   http://127.0.0.1:8000/report_p03?${queryParams}`;
+                window.open(url, '_blank'); 
+        }, 
+        async printDataP04() {  
+            const { signIn, getSession, signOut } = await useAuth()
+            const user = await getSession()   
+            // const form = {
+            //     staff_id: this.staffid_Main,
+            //     group_id: this.groupid_Main,
+            //     fac_id: this.tracking_date.fac_id,
+            //     year_id: this.tracking_date.d_date,
+            //     evalua: this.tracking_date.evalua ,
+            //     PREFIXFULLNAME:user.user.name.PREFIXFULLNAME,
+            //     STAFFNAME :user.user.name.STAFFNAME,
+            //     STAFFSURNAME:user.user.name.STAFFSURNAME,
+            //     POSITIONNAME:user.user.name.POSITIONNAME,
+            //     GROUPTYPENAME:user.user.name.GROUPTYPENAME,
+            //     POSTYPENAME:user.user.name.POSTYPENAME, 
+            //     SCOPES:user.user.name.SCOPES.staffdepartmentname     
+            // } 
+
+            const form = {
+                    staff_id: this.printStaffData.staffid, // รหัสพันงาน
+                    group_id: this.groupid_Main, // กลุ่ม
+                    fac_id: this.facid_Main, // คณะ
+                    year_id: this.tracking_date.d_date, // ปี
+                    evalua: this.tracking_date.evalua , // รอบ
+                    PREFIXFULLNAME: this.printStaffData.prefixfullname, // คำนำหน้า
+                    STAFFNAME : this.printStaffData.staffname, // ชื่อ
+                    STAFFSURNAME: this.printStaffData.staffsurname, // สกุล
+                    POSITIONNAME: this.printStaffData.posnameth, // ตำแหน่ง
+                    GROUPTYPENAME: this.printStaffData.stftypename, // พนักงาน
+                    POSTYPENAME: this.printStaffData.postypenameth, // ปฏิบัติการ
+                    SCOPES: this.printStaffData.departmentname, // สังกัด 
+                }
+
+            const queryParams = new URLSearchParams(form).toString();
+            // console.log(queryParams); 
+            const url = `   http://127.0.0.1:8000/report_p04?${queryParams}`;
+            window.open(url, '_blank'); 
         },     
+
     }, 
     
     filters: {

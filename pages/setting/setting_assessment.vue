@@ -126,8 +126,7 @@
                                                 </InputGroupAddon>
                                                     <Dropdown v-model="text_Evalua" :options="evaluaOptions" optionLabel="label" optionValue="value" placeholder="เลือกรอบประเมิน" class="w-full"/>
                                             </InputGroup>
-                                        </div>
-
+                                        </div> 
                                         <div class="field col-12 md:col-7"> 
                                             <label for="text_search_nowork">เพิ่มประเภทภาระงาน</label> 
                                             <InputGroup>
@@ -473,8 +472,37 @@
 
             // บันทึกประเภทภาระงาน   
             saveDatawork() {
-                axios.post(' http://127.0.0.1:8000/api/saveWork', {
-                    id: this.text_search_nowork, 
+                // ตรวจสอบว่ามีข้อมูลในแต่ละช่องหรือไม่
+                if (!this.text_nowork) {
+                    Swal.fire({
+                        title: "แจ้งเตือน!",
+                        text: "กรุณากรอกลำดับที่",
+                        icon: "warning"
+                    });
+                    return; // หยุดการทำงานถ้าข้อมูลไม่ครบ
+                }
+
+                if (!this.text_Evalua) {
+                    Swal.fire({
+                        title: "แจ้งเตือน!",
+                        text: "กรุณาเลือกรอบประเมิน",
+                        icon: "warning"
+                    });
+                    return; // หยุดการทำงานถ้าข้อมูลไม่ครบ
+                }
+
+                if (!this.text_searchwork) {
+                    Swal.fire({
+                        title: "แจ้งเตือน!",
+                        text: "กรุณากรอกชื่อภาระงาน",
+                        icon: "warning"
+                    });
+                    return; // หยุดการทำงานถ้าข้อมูลไม่ครบ
+                }
+
+                // ถ้าข้อมูลครบถ้วน ก็ทำการบันทึกข้อมูล
+                axios.post('http://127.0.0.1:8000/api/saveWork', {
+                    id: this.text_search_nowork,
                     h_no: this.text_nowork,
                     h_evalua: this.text_Evalua,
                     nameH: this.text_searchwork,
@@ -487,8 +515,8 @@
                         text: "บันทึกข้อมูลภาระงานเรียบร้อย!",
                         icon: "success"
                     });
-                    this.DialogAddwork = false;  
-                    this.showDataPerson(this.dataP01.year,this.dataP01.staffdepartment,this.dataP01.evalua);
+                    this.DialogAddwork = false;
+                    this.showDataPerson(this.dataP01.year, this.dataP01.staffdepartment, this.dataP01.evalua);
                 }).catch(error => {
                     console.error('Error:', error);
                     Swal.fire("เกิดข้อผิดพลาด!", "ไม่สามารถบันทึกข้อมูลได้", "error");

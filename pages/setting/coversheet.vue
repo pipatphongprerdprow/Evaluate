@@ -334,7 +334,7 @@ export default {
                 p_staffid: this.staffid_Main
             })
             .then(response => {
-                // console.log('Response',response.data);  
+                 //console.log('Response',response.data);  
                 const dataSet = response.data[0];
                 this.assessor = dataSet.assessor;
                 this.assessor_position = dataSet.assessor_position; 
