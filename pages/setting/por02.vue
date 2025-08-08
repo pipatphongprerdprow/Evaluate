@@ -145,6 +145,8 @@ export default {
                 { id: 16, activity: 'ค. 5 การสอนงานและการมอบหมายงาน', indicator3: '0', datatable3: '',selfAssessment3:'' }
             ],  
             postypetext: null,
+
+            posadio: 0,
              
         };   
     }, 
@@ -189,6 +191,23 @@ export default {
             this.postypename = postypename    
             this.postypenameid = postypenameid    
             this.positionname = positionname   
+            this.getAadioPosition(staffid_Main);
+        },
+        async getAadioPosition(staffid_Main){
+            // console.log('getAadioPosition: ',staffid_Main); 
+            try {   
+                if(staffid_Main){
+                    const res = await axios.get(' http://127.0.0.1:8000/api/getDataAdio', {  
+                        params: {
+                            staffid: staffid_Main
+                        }
+                    }); 
+                    // console.log('getDataAdio: ',res.data);  
+                    this.posadio = res.data[0].posadid
+                } 
+            } catch (error) {
+                console.error('Error fetching evaluation data:', error);
+            } 
         },
         getjobSpecificCompetencies(){
             //console.log(this.staffid_Main,this.dataPor);
@@ -229,9 +248,16 @@ export default {
         showdataPo(){  
             //console.log('positionname: ',this.positionname);   
             //console.log(this.indicator);
-            let postypetext = this.positionname === 'ผู้บริหาร' ? `ระดับชำนาญการพิเศษ` : `ระดับ${this.postypename}`;
-            let postypenameid = this.positionname === 'ผู้บริหาร' ? 90 : this.postypenameid;
-            let positionname = this.positionname === 'ผู้บริหาร' ? `ระดับชำนาญการพิเศษ` : `ระดับ${this.postypename}`;
+            //console.log('posadio: ',this.posadio); 
+
+            // Biw 7/8/68 อันเก่า ก่อนเปลี่ยน
+            // let postypetext = this.positionname === 'ผู้บริหาร' ? `ระดับชำนาญการพิเศษ` : `ระดับ${this.postypename}`;
+            // let postypenameid = this.positionname === 'ผู้บริหาร' ? 90 : this.postypenameid;
+            // let positionname = this.positionname === 'ผู้บริหาร' ? `ระดับชำนาญการพิเศษ` : `ระดับ${this.postypename}`;
+
+            let postypetext = this.posadio === '128' ? `ระดับชำนาญการพิเศษ` : `ระดับ${this.postypename}`;
+            let postypenameid = this.posadio === '128' ? 90 : this.postypenameid;
+            let positionname = this.posadio === '128' ? `ระดับชำนาญการพิเศษ` : `ระดับ${this.postypename}`;
 
             // console.log('postypetext:', postypetext);
             // console.log('postypenameid:', postypenameid);
@@ -264,10 +290,17 @@ export default {
              
             this.jobSpecificCompetencies = [];  
             // ปรับ Mapping ให้ใช้ this.positionname แทน postypetext
+
+            // Biw 7/8/68 อันเก่า ก่อนเปลี่ยน
+            // const Mapping = {
+            //     'ผู้บริหาร': 1
+            // };  
+            // let executive = Mapping[this.positionname] || 0;
+
             const Mapping = {
-                'ผู้บริหาร': 1
+                '128': 1
             };  
-            let executive = Mapping[this.positionname] || 0;
+            let executive = Mapping[this.posadio] || 0;
             // console.log('executive:', executive); 
             // ตั้งค่า otherCompetencies
             this.otherCompetencies = [

@@ -259,7 +259,8 @@
                                         <b v-if="row3.datatable3 != 0 " style="color: blue" >{{ row3.datatable3 }}</b> 
                                     </td> -->
                                     <td>
-                                        <template v-if="positionname === 'ผู้บริหาร'">
+                                        <!-- <template v-if="positionname === 'ผู้บริหาร'"> -->
+                                        <template v-if="posadio === '128'">
                                             <InputNumber 
                                                 v-model.number="row3.datatable3" 
                                                 type="text" 
@@ -638,6 +639,9 @@ import InputText from 'primevue/inputtext';
                 { id: 15, activity: 'ค. 4 ศักยภาพเพื่อนำการปรับเปลี่ยน', indicator: '0', datatable3: '' },
                 { id: 16, activity: 'ค. 5 การสอนงานและการมอบหมายงาน', indicator: '0', datatable3: '' }
             ],
+                posadio: 0,
+
+
 /*============= รายงานผลการปฏิบัติราชการตามตัวชี้วัด/ เกณฑ์การประเมิน =============*/
                 DialogAdd: false,
                 list_no_p03: { name: '- เลือกระดับ -', value: 0 },
@@ -768,8 +772,25 @@ import InputText from 'primevue/inputtext';
                 this.groupid_Main = groupid_Main  
                 this.postypename = postypename    
                 this.postypenameid = postypenameid
-                this.positionname = positionname    
+                this.positionname = positionname   
+                this.getAadioPosition(staffid_Main); 
                 // console.log('setSession: ',staffid_Main,facid_Main,groupid_Main);  
+            },
+            async getAadioPosition(staffid_Main){
+                // console.log('getAadioPosition: ',staffid_Main); 
+                try {   
+                    if(staffid_Main){
+                        const res = await axios.get(' http://127.0.0.1:8000/api/getDataAdio', {  
+                            params: {
+                                staffid: staffid_Main
+                            }
+                        }); 
+                        // console.log('getDataAdio: ',res.data);  
+                        this.posadio = res.data[0].posadid
+                    } 
+                } catch (error) {
+                    console.error('Error fetching evaluation data:', error);
+                } 
             },
             // กรองเฉพาะตัวเลข
             validateNumericInput(index) { 
@@ -1144,10 +1165,17 @@ import InputText from 'primevue/inputtext';
             }, 
             showdataPo(){  
                  //console.log('positionname: ',this.positionname);
-                
-                let postypetext = this.positionname === 'ผู้บริหาร' ? `ระดับชำนาญการพิเศษ` : `ระดับ${this.postypename}`;
-                let postypenameid = this.positionname === 'ผู้บริหาร' ? 90 : this.postypenameid;
-                let positionname = this.positionname === 'ผู้บริหาร' ? `ระดับชำนาญการพิเศษ` : `ระดับ${this.postypename}`;
+
+                 // Biw 7/8/68 อันเก่า ก่อนเปลี่ยน 
+                // let postypetext = this.positionname === 'ผู้บริหาร' ? `ระดับชำนาญการพิเศษ` : `ระดับ${this.postypename}`;
+                // let postypenameid = this.positionname === 'ผู้บริหาร' ? 90 : this.postypenameid;
+                // let positionname = this.positionname === 'ผู้บริหาร' ? `ระดับชำนาญการพิเศษ` : `ระดับ${this.postypename}`;
+
+
+                let postypetext = this.posadio === '128' ? `ระดับชำนาญการพิเศษ` : `ระดับ${this.postypename}`;
+                let postypenameid = this.posadio === '128' ? 90 : this.postypenameid;
+                let positionname = this.posadio === '128' ? `ระดับชำนาญการพิเศษ` : `ระดับ${this.postypename}`;
+
                 // console.log('postypetext: ',postypetext);
                 // console.log('postypenameid: ',postypenameid);
                 
@@ -1182,10 +1210,19 @@ import InputText from 'primevue/inputtext';
                     //     { id: 11, activity: 'ข. 6 การตรวจสอบความถูกต้องตามกระบวนงาน122222', indicator: '0', data_table2: '' }
                     // ], 
                     // ปรับ Mapping ให้ใช้ this.positionname แทน postypetext
-                    const Mapping = {
-                        'ผู้บริหาร': 1
+
+
+                    // Biw 7/8/68 อันเก่า ก่อนเปลี่ยน
+                    // const Mapping = {
+                    //     'ผู้บริหาร': 1
+                    // };  
+                    // let executive = Mapping[this.positionname] || 0;
+
+                     const Mapping = {
+                        '128': 1
                     };  
-                    let executive = Mapping[this.positionname] || 0;
+                    let executive = Mapping[this.posadio] || 0;
+
                     // console.log('executive:', executive); 
                     // ตั้งค่า otherCompetencies
                     this.otherCompetencies = [

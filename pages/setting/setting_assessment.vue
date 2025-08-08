@@ -66,14 +66,15 @@
                                         <InputGroup>  
                                             <InputText v-model="text_search_no" type="number" placeholder="ลำดับ" autocomplete="off" class="col-12 md:col-2" /> 
                                             <InputText v-model="text_search" type="text" placeholder="ชื่อตัวชี้วัด / เกณฑ์การประเมิน" autocomplete="off"/> 
-                                            <Button icon="pi pi-save" label="บันทึก" severity="warning" @click="AddDatalist" />
+                                            <!-- <Button icon="pi pi-save" label="บันทึก" severity="warning" @click="AddDatalist" /> -->
+                                             <Button icon="pi pi-save" label="บันทึก" severity="warning" @click.prevent="AddDatalist" /> 
                                         </InputGroup>  
                                     </div>   
                                 </div> 
                                 <DataTable :value="products_list" :rows="10" :paginator="true" responsiveLayout="scroll" dataKey="id">    
                                     <Column field="ind_no" header="ลำดับ" style="width: 10%">
                                         <template #body="Item">
-                                            ระดับที่ {{ Item.data.ind_no }}
+                                            ลำดับที่ {{ Item.data.ind_no }}
                                         </template>
                                     </Column> 
                                     <Column field="ind_Items" header="ชื่อตัวชี้วัด / เกณฑ์การประเมิน" style="width: 80%">
@@ -83,6 +84,7 @@
                                     </Column>  
                                     <Column field="options" header="ตัวเลือก" style="width: 10%">
                                         <template #body="Item" >   
+                                            <Button style="text-align: center;" severity="primary" icon="pi pi-pencil" class="p-button-text" outlined rounded @click="Editcriteria(Item.data)"></Button> &nbsp;
                                             <Button severity="danger" icon="pi pi-trash" class="p-button-text" outlined rounded @click="DeleteRegislick(Item.data.ind_no)"></Button>
                                         </template>
                                     </Column> 
@@ -303,6 +305,7 @@
                 text_weight: null,
                 text_search_no: null,
                 text_search: null,
+                editIndex: null,
                 products_list: [],
 
                 //เพิ่มภาระงาน
@@ -391,25 +394,59 @@
             });
         },
         // บันทึกตัวชี้วัด / เกณฑ์การประเมิน
-        async AddDatalist(){  
-            if(this.text_search_no == null || this.text_search == null){
+        // async AddDatalist(){  
+        //     if(this.text_search_no == null || this.text_search == null){
+        //         Swal.fire("กรุณาตรวจสอบข้อมูล ลำดับ - ชื่อตัวชี้วัด / เกณฑ์การประเมิน!");
+        //     }else{   
+        //         if (this.products_list.length < 5) { 
+        //             this.products_list.push({
+        //                 ind_no: this.text_search_no,
+        //                 ind_Items: this.text_search
+        //             });  
+        //             // Sort the products_list by ind_no in asc order
+        //             this.products_list.sort((a, b) => a.ind_no - b.ind_no); 
+        //         } else {
+        //             Swal.fire("ตัวชี้วัด / เกณฑ์การประเมิน ครบ 5 ระดับแล้ว!");
+
+        //         } 
+        //         this.text_search_no = null;
+        //         this.text_search = null;
+        //     }
+        // },
+
+        async AddDatalist() {
+            if (this.text_search_no == null || this.text_search == null) {
                 Swal.fire("กรุณาตรวจสอบข้อมูล ลำดับ - ชื่อตัวชี้วัด / เกณฑ์การประเมิน!");
-            }else{   
-                if (this.products_list.length < 5) { 
+                return;
+            }
+
+            // ถ้ามี editIndex แสดงว่าเป็นโหมด "แก้ไข"
+            if (this.editIndex !== null) {
+                this.products_list[this.editIndex].ind_no = this.text_search_no;
+                this.products_list[this.editIndex].ind_Items = this.text_search;
+                this.editIndex = null; // ออกจากโหมดแก้ไข
+                Swal.fire("แก้ไขข้อมูลสำเร็จ", "", "success");
+            } else {
+                // ตรวจสอบจำนวนไม่เกิน 5 รายการ
+                if (this.products_list.length < 5) {
                     this.products_list.push({
                         ind_no: this.text_search_no,
                         ind_Items: this.text_search
-                    });  
-                    // Sort the products_list by ind_no in asc order
-                    this.products_list.sort((a, b) => a.ind_no - b.ind_no); 
+                    });
+                    Swal.fire("เพิ่มข้อมูลสำเร็จ", "", "success");
                 } else {
                     Swal.fire("ตัวชี้วัด / เกณฑ์การประเมิน ครบ 5 ระดับแล้ว!");
-
-                } 
-                this.text_search_no = null;
-                this.text_search = null;
+                }
             }
+
+            // จัดเรียงตามลำดับ
+            this.products_list.sort((a, b) => a.ind_no - b.ind_no);
+
+            // ล้าง input
+            this.text_search_no = null;
+            this.text_search = null;
         },
+
         //บันทึกภาระงาน
         AddDatalistwork(){
             if(this.text_search_nowork == null || this.text_searchwork == null){
@@ -598,7 +635,16 @@
                         }
                     }); 
                 },   
-                
+            //แก้ไขเกณฑ์/ตัวชี้วัดของ ป.01
+            Editcriteria(item) {
+                const index = this.products_list.findIndex(p => p.ind_no === item.ind_no);
+                if (index !== -1) {
+                    this.text_search_no = item.ind_no;
+                    this.text_search = item.ind_Items;
+                    this.editIndex = index;
+                }
+            },
+
 
             // ดึงข้อมูลภาระงาน
             selectDataHEdt(year,fac,he,evalua){  

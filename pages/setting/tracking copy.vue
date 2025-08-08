@@ -106,7 +106,6 @@
                             </p>
                         </template>  
                         <TabView :activeIndex="activeIndex" @tabChange="onTabChange"> 
-
                             <!-- Tab 1 -->
                             <TabPanel header="ผลสัมฤทธิ์ของงาน">
                                 <div class="grid">
@@ -281,10 +280,15 @@
                                                                     <b v-if="!row3.datatable3" style="color: red;">-</b> 
                                                                     <b v-else style="color: blue">{{ row3.datatable3 }}</b> 
                                                                 </td>
-                                                               
+                                                                <!-- <td>
+                                                                    <InputNumber 
+                                                                        v-model.number="row3.selfAssessment3" 
+                                                                        placeholder="0" 
+                                                                        showButtons
+                                                                    />
+                                                                </td> -->
                                                                 <td>
-                                                                    <!-- <template v-if="postypenameth === 'ผู้บริหาร' || (currentstaff && currentstaff[0] && currentstaff[0].posnameth 	=== 'ผู้บริหาร')">  -->
-                                                                    <template v-if="this.posadio === '128'"> 
+                                                                    <template v-if="postypenameth === 'ผู้บริหาร' || (currentstaff && currentstaff[0] && currentstaff[0].posnameth 	=== 'ผู้บริหาร')"> 
                                                                         <InputNumber 
                                                                             v-model.number="row3.selfAssessment3" 
                                                                             type="text" 
@@ -319,7 +323,8 @@
                                         </div>
                                     </div>
                                 </div>
-                            </TabPanel> 
+                            </TabPanel>
+
                             <!-- Tab 2 -->
                             <TabPanel header="รายงาน ป.01 - ป.03" >
                                 <div class="grid">
@@ -961,8 +966,7 @@
                                         </div>  
                                     </div>
                             </TabPanel> 
-
-                        </TabView>
+                            </TabView>
                         <template #footer>
                             <Button label="ตกลง" severity="secondary" class="mb-2 mr-2" @click="DialogAdd = false " />
                         </template>
@@ -1079,8 +1083,6 @@ export default {
                 // { id: 15, activity: 'ค. 4 ศักยภาพเพื่อนำการปรับเปลี่ยน', indicator3: executive, datatable3: '', selfAssessment3: '' },
                 // { id: 16, activity: 'ค. 5 การสอนงานและการมอบหมายงาน', indicator3: executive, datatable3: '', selfAssessment3: '' }
             ],
-            posadio: 0,
-
             improvements: null,
             suggestions: null,
             //Tab 2
@@ -1121,9 +1123,6 @@ export default {
             assessor_positionText: null,
             currentstaff: {},  
             //datatable3: []
-
-            posadio: 0,
-
         };
     },
     components: {
@@ -1141,7 +1140,6 @@ export default {
         // this.showDataEvalu();
         this.showDataSet();   
         // this.showAssesstack(); 
-
     },   
     methods: { 
         setSession(staffid_Main, facid_Main, groupid_Main, postypename, postypenameid) {
@@ -1237,10 +1235,7 @@ export default {
         // XX One
         async openDataEvalu(data) {
             // console.log('posnameid: ',data.posnameid);
-            // console.log('staffid: ',data.staffid); 
-            //await getAadioPosition(data.staffid);
-            
-            await this.getAadioPosition(data.staffid);
+            // console.log('staffid: ',data.staffid);
             
             if (this.tracking_date.d_date === undefined) {
                 Swal.fire('แจ้งเตือนจากระบบ', 'กรุณาเลือกรอบประเมิน', 'error');
@@ -1307,22 +1302,6 @@ export default {
                 });
             }
         },    
-        async getAadioPosition(staffid_Main){
-            // console.log('getAadioPosition: ',staffid_Main); 
-            try {   
-                if(staffid_Main){
-                    const res = await axios.get('http://127.0.0.1:8000/api/getDataAdio', {  
-                        params: {
-                            staffid: staffid_Main
-                        }
-                    }); 
-                    // console.log('getDataAdio: ',res.data);  
-                    this.posadio = res.data[0].posadid
-                } 
-            } catch (error) {
-                console.error('Error fetching evaluation data:', error);
-            } 
-        },
         // เพิ่มคะแนนประเมิน biwgin
         // async openDataEvalu(staff_id) {
         //     // console.log(staff_id);
@@ -1811,12 +1790,9 @@ export default {
                 console.error("Error: currentstaff is undefined or empty.");
                 return;
             } 
-console.log('this.posadio',this.posadio);
+            this.postypenameth = this.currentstaff[0]?.postypenameth  ?? (this.currentstaff[0]?.posnameth === 'ผู้บริหาร' ? 'ชำนาญการพิเศษ' : 'ปฏิบัติการ');
 
-            // this.postypenameth = this.currentstaff[0]?.postypenameth  ?? (this.currentstaff[0]?.posnameth === 'ผู้บริหาร' ? 'ชำนาญการพิเศษ' : 'ปฏิบัติการ');
-            this.postypenameth = this.posadio === '128' ? 'ชำนาญการพิเศษ' : 'ปฏิบัติการ';
-
-            // console.log("postypenameth:", this.postypenameth);
+         //console.log("postypenameth:", this.postypenameth);
 
             let postypetext = `ระดับ${this.postypenameth}`;  
 
@@ -1842,14 +1818,10 @@ console.log('this.posadio',this.posadio);
             ];  
             this.jobSpecificCompetencies = [];
 
-            // const Mapping = {
-            //     'ผู้บริหาร': 1
-            // };  
             const Mapping = {
-                '128': 1
+                'ผู้บริหาร': 1
             };  
-            // let executive = Mapping[this.postypenameth, this.currentstaff[0]?.posnameth] || 0;
-            let executive = Mapping[this.posadio] || 0;
+            let executive = Mapping[this.postypenameth, this.currentstaff[0]?.posnameth] || 0;
 
             this.otherCompetencies = [
                 { id: 12, activity: 'ค. 1 สภาวะผู้นำ', indicator3: executive, datatable3: '', selfAssessment3: '' },

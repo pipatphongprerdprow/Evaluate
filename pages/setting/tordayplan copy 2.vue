@@ -1,6 +1,6 @@
 <template>
     <div class="col md:col-12 text-right">
-        <Button label="Export" icon="pi pi-file-word" class="mr-2 mb-2 " @click="printDataDaily"></Button>
+        <Button label="Export" icon="pi pi-file-word" class="mr-2 mb-2" @click="printDataDaily"></Button>
     </div>
     <div class="grid">
         <div class="col-12 lg:col-12 xl:col-12">
@@ -11,7 +11,130 @@
                     </div>
                     <br>
                     <div class="col md:col-16 text-right">
+                        <Button icon="pi pi-plus" severity="warning" class="mb-2 mr-2" label="เพิ่มแผนปฎิบัติงาน" @click="OpenDialogAddplan" />
                         <Button icon="pi pi-plus" severity="info" class="mb-2 mr-2" label="เพิ่มภาระงาน" @click="OpenDialogAdd" />
+
+
+
+                        <Dialog v-model:visible="DialogAddplan" :breakpoints="{ '960px': '75vw' }" :style="{ width: '80vw' }" :modal="true" position="top">
+                            <template #header>
+                                <div class="flex justify-between items-start w-full">
+                                    <div class="flex-1">
+                                        <h5 class="m-0"><b>บันทึกแผนปฎิบัติงาน</b></h5>
+                                    </div>
+                                    <div class="text-center">
+                                        <p class="m-0">
+                                            <strong>ผู้ปฏิบัติงาน:</strong> {{ user?.user?.name?.PREFIXFULLNAME }} {{ user?.user?.name?.STAFFNAME }} {{ user?.user?.name?.STAFFSURNAME }}
+                                            <strong>สังกัด:</strong> {{ user?.user?.name?.SCOPES?.staffdepartmentname }}
+                                        </p>
+                                    </div>
+                                </div>
+                            </template>
+                            <form>
+                                <div class="p-fluid formgrid grid">
+                                    <div class="field col-12 md:col-4">
+                                        <label for="evaluation_round"> รอบประเมิน <span style="color:red">*</span></label>
+                                        <Dropdown
+                                            v-model="evaluadaily"
+                                            :options="evaluadailys"
+                                            optionLabel="label"
+                                            optionValue="value"
+                                            placeholder="เลือกรอบประเมิน"
+                                            class="w-full"
+                                            required
+                                        />
+                                    </div>
+                                    <div class="field col-12 md:col-4">
+                                        <label for="end_date"> วันที่เริ่มต้นแผน <span style="color:red">*</span></label>
+                                        <InputGroup>
+                                            <InputGroupAddon>
+                                                <i class="pi pi-calendar"></i>
+                                            </InputGroupAddon>
+                                            <Calendar
+                                                v-model="AcompDateplan"
+                                                dateFormat="dd/mm/yy"
+                                                placeholder="วัน/เดือน/ปี เวลา"
+                                                showIcon
+                                                showTime
+                                                hourFormat="24"
+                                                class="w-full"
+                                                required
+                                            />
+                                        </InputGroup>
+                                    </div>
+                                    <div class="field col-12 md:col-4">
+                                        <label for="acomp_date"> วันที่สิ้นสุดแผน <span style="color:red">*</span></label>
+                                        <InputGroup>
+                                            <InputGroupAddon>
+                                                <i class="pi pi-calendar"></i>
+                                            </InputGroupAddon>
+                                            <Calendar
+                                                v-model="EndDateplan"
+                                                dateFormat="dd/mm/yy"
+                                                placeholder="วัน/เดือน/ปี เวลา"
+                                                showIcon
+                                                showTime
+                                                hourFormat="24"
+                                                class="w-full"
+                                            />
+                                        </InputGroup>
+                                    </div>
+                                    <!-- <div class="field col-12">
+                                        <label for="daily_task"> ชื่อแผนปฎิบัติงาน <span style="color:red">*</span></label>
+                                        <InputGroup>
+                                            <InputGroupAddon>
+                                                <i class="pi pi-pencil"></i>
+                                            </InputGroupAddon>
+                                            <InputText
+                                                v-model="dailyplan"
+                                                rows="3"
+                                                placeholder="ระบุชื่อแผนปฎิบัติงาน"
+                                                autoResize
+                                                class="w-full"
+                                                required
+                                            />
+                                        </InputGroup>
+                                    </div> -->
+
+                                    <div class="field col-12 md:col-12"> 
+                                       <label for="daily_task"> ชื่อแผนปฎิบัติงาน <span style="color:red">*</span></label>
+                                        <InputGroup>
+                                            <InputText v-model="text_search_no" type="number" placeholder="ลำดับ" autocomplete="off" class="col-12 md:col-2" />
+                                            <InputText v-model="dailyplan" type="text" placeholder="ชื่อแผนปฎิบัติงาน" autocomplete="off"/>
+                                            <Button icon="pi pi-plus" label="เพิ่ม" severity="warning" @click="AddDatalist" />
+                                        </InputGroup>
+                                    </div>
+                                    <div class="col-12">
+                                        <DataTable :value="products_list" :rows="10" :paginator="true" responsiveLayout="scroll" dataKey="id">
+                                            <Column field="ind_no" header="ลำดับ" style="width: 10%">
+                                                <template #body="Item">
+                                                    ลำดับที่ {{ Item.data.ind_no }}
+                                                </template>
+                                            </Column>
+                                            <Column field="ind_Items" header="ชื่อแผนปฎิบัติงาน" style="text-align: left;width: 80%">
+                                                <template #body="Item">
+                                                    {{ Item.data.ind_Items }}
+                                                </template>
+                                            </Column>
+                                            <Column field="options" header="ตัวเลือก" style="text-align: center; width: 10%">
+                                                <template #body="Item">
+                                                    <Button style="text-align: center;" severity="primary" icon="pi pi-pencil" class="p-button-text" outlined rounded @click="EditRegislick(Item.data)"></Button> &nbsp;
+                                                    <Button style="text-align: center;" severity="danger" icon="pi ti-trash" class="p-button-text" outlined rounded @click="DeleteRegislick(Item.data.ind_no)"></Button>
+                                                </template>
+                                            </Column>
+                                        </DataTable>
+                                    </div>
+                                    </div>
+                            </form>
+                            <template #footer>
+                                <Button label="บันทึกแผน" icon="pi pi-save" class="mb-2 mr-2" @click="savetorplan" />
+                                <Button label="ยกเลิก" icon="pi pi-times" class="mb-2 mr-2" severity="danger" @click="resetPlanDialog" />
+                            </template>
+                        </Dialog>
+
+
+
+
                         <Dialog v-model:visible="DialogAdd" :breakpoints="{ '960px': '75vw' }" :style="{ width: '80vw' }" :modal="true" position="top">
                             <template #header>
                                 <div class="flex justify-between items-start w-full">
@@ -29,10 +152,22 @@
                             <form>
                                 <div class="p-fluid formgrid grid">
                                     <div class="field col-12 md:col-4">
-                                        <label for="evaluation_round">รอบประเมิน</label>
+                                        <label for="evaluation_round">แผนปฏิบัติงาน<span style="color:red">*</span></label>
+                                        <Dropdown
+                                            v-model="evaluadailyplan"
+                                            :options="evaluadailyplans"
+                                            optionLabel="label"
+                                            optionValue="value"
+                                            placeholder="เลือกแผนปฎิบัติงาน"
+                                            class="w-full"
+                                            required
+                                        /> 
+                                    </div>
+                                    <div class="field col-12 md:col-4">
+                                        <label for="evaluation_round">รอบประเมิน <span style="color:red">*</span></label>
                                         <Dropdown
                                             v-model="evaluadaily"
-                                            :options="evaluadailys"
+                                            :options="evaluadailys" 
                                             optionLabel="label"
                                             optionValue="value"
                                             placeholder="เลือกรอบประเมิน"
@@ -41,7 +176,7 @@
                                         />
                                     </div>
                                     <div class="field col-12 md:col-4">
-                                        <label for="task_date">วันที่ลงบันทึก</label>
+                                        <label for="task_date">วันที่ลงบันทึก <span style="color:red">*</span></label>
                                         <InputGroup>
                                             <InputGroupAddon>
                                                 <i class="pi pi-calendar"></i>
@@ -49,8 +184,9 @@
                                             <InputText :value="formatDate(taskDate)" disabled class="w-full" />
                                         </InputGroup>
                                     </div>
+
                                     <div class="field col-12 md:col-4">
-                                        <label for="end_date">วันที่กำหนดเสร็จ</label>
+                                        <label for="end_date">วันที่กำหนดเสร็จ <span style="color:red">*</span></label>
                                         <InputGroup>
                                             <InputGroupAddon>
                                                 <i class="pi pi-calendar"></i>
@@ -100,7 +236,9 @@
                                                 ref="fileInputRef"
                                             />
                                         </InputGroup>
+                                        <small v-if="dailyFilename && !selectedFile">ไฟล์เดิม: {{ dailyFilename }}</small>
                                     </div>
+
                                     <div class="field col-12 md:col-4">
                                         <label for="document_link">ลิงก์เอกสาร</label>
                                         <span style="color: red;"> &nbsp;&nbsp; <b>(ถ้ามี)</b></span>
@@ -115,10 +253,9 @@
                                                 autocomplete="off"
                                             />
                                         </InputGroup>
-                                    </div>
-
-                                    <div class="field col-12 md:col-12">
-                                        <label for="daily_task">ภาระงานประจำวัน</label>
+                                    </div> 
+                                    <div class="field col-12 md:col-8">
+                                        <label for="daily_task">ภาระงานประจำวัน <span style="color:red">*</span></label>
                                         <InputGroup>
                                             <InputGroupAddon>
                                                 <i class="pi pi-pencil"></i>
@@ -133,15 +270,14 @@
                                             />
                                         </InputGroup>
                                     </div>
-
+                                     
                                 </div>
                             </form>
                             <template #footer>
                                 <Button label="บันทึก" icon="pi pi-check" class="mb-2 mr-2" @click="saveDailyTask" />
-                                <Button label="ยกเลิก" icon="pi pi-times" class="mb-2 mr-2" severity="danger" @click="resetDialogdialy" />
+                                <Button label="ยกเลิก" icon="pi pi-times" class="mb-2 mr-2" severity="danger" @click="resetDailyTaskDialog" />
                             </template>
                         </Dialog>
-
                         <Dialog v-model:visible="DialogDetail" :breakpoints="{ '960px': '75vw' }" :style="{ width: '70vw' }" :modal="true" position="top">
                             <template #header>
                                 <h5 class="m-0"><b>รายละเอียดภาระงาน</b></h5>
@@ -230,7 +366,53 @@
                         </Dialog>
                     </div>
                 </div>
-                <DataTable :value="products_date" :rows="10" :paginator="true" responsiveLayout="scroll" dataKey="id">
+                
+
+                <div class="mb-3 flex align-items-center justify-content-between">
+                <h4 class="mb-2 card-header m-0">{{ selectedPlanLabel() }}</h4>
+                
+                <div class="flex gap-2">
+                    <InputText v-model="newPlanLabel" v-if="editingPlanId !== null" placeholder="ชื่อแผนใหม่" class="p-inputtext-sm" />
+
+                    <Button
+                    icon="pi pi-pencil"
+                    class="p-button-text p-button-sm"
+                    v-if="selectedPlanLabel() && editingPlanId === null"
+                    @click="startEdit"
+                    severity="info"
+                    />
+
+                    <Button
+                    icon="pi pi-trash"
+                    class="p-button-text p-button-sm"
+                    v-if="selectedPlanLabel()"
+                    @click="deletePlan(evaluadailyplan)"
+                    severity="danger"
+                    />
+
+                    <Button
+                    icon="pi pi-save"
+                    class="p-button-text p-button-sm"
+                    v-if="editingPlanId !== null"
+                    @click="savePlan"
+                    severity="success"
+                    />
+
+                    <Button
+                    icon="pi pi-times"
+                    class="p-button-text p-button-sm"
+                    v-if="editingPlanId !== null"
+                    @click="cancelEdit"
+                    severity="secondary"
+                    />
+                </div>
+                </div>
+                <div class="mb-4">
+                    <!-- <h4 class="mb-2 card-header">{{ selectedPlanLabel ()}}</h4>  -->
+                    
+
+                <h4 class="mb-2 card-header">ภาระงานประจำวันของฉัน</h4>
+                <DataTable :value="products_date" :rows="10" :paginator="true" responsiveLayout="scroll" dataKey="daily_id">
                     <Column field="daily_date" header="วันที่" style="width: 10%; text-align: center;">
                         <template #body="slotProps">
                             <b>{{ formatDate(slotProps.data.daily_date) }}</b>
@@ -249,7 +431,7 @@
                     <Column field="daily_filename" header="ไฟล์เอกสาร" style="width: 20%; text-align: center;">
                         <template #body="slotProps">
                             <span v-if="slotProps.data.daily_filename">
-                                <a :href="getFileUrl(slotProps.data.dialy_file)" target="_blank" class="p-button p-component p-button-link">
+                                <a :href="getFileUrl(slotProps.data.daily_file)" target="_blank" class="p-button p-component p-button-link">
                                     <i class="pi pi-download"></i> {{ slotProps.data.daily_filename }}
                                 </a>
                             </span>
@@ -304,9 +486,11 @@
                         </template>
                     </Column>
                 </DataTable>
-                <Menu ref="optionsMenu" :model="items" :popup="true" />
+                <Menu ref="optionsMenu" :model="items" :popup="true" id="overlay_menu" />
+                <ConfirmDialog></ConfirmDialog>
             </div>
         </div>
+    </div>
     </div>
 </template>
 
@@ -319,9 +503,14 @@ const user = await getSession();
 <script>
 import axios from 'axios';
 import Swal from 'sweetalert2';
-import { ref } from 'vue';
+import { useConfirm } from "primevue/useconfirm"; // เพิ่มบรรทัดนี้
+//import { ref } from 'vue';
 
 export default {
+    setup() {
+        const confirm = useConfirm(); // สร้าง instance ของ useConfirm
+        return { confirm };
+    },
     data() {
         return {
             staffid_Main: '',
@@ -329,6 +518,7 @@ export default {
             groupid_Main: '01',
             products_date: [],
             DialogAdd: false,
+            DialogAddplan: false,
             DialogDetail: false,
             currentRecordId: null,
             taskDate: null, // กำหนดค่าเริ่มต้นเป็น null
@@ -343,13 +533,30 @@ export default {
             userFacId: null,
             userStaffNameDaily: null,
             userStaffDepartmentName: null,
-            evaluadaily: null,
+            evaluadaily: '',
             evaluadailys: [
                 { label: 'รอบประเมินที่ 1', value: 1 },
                 { label: 'รอบประเมินที่ 2', value: 2 },
             ],
+            evaluadailyplan: '',
+            evaluadailyplans: [
+                { label: 'รอบประเมินที่ 1', value: 1 },
+                { label: 'รอบประเมินที่ 2', value: 2 },
+            ],
+            evaluadailyplanwork: null,
+            evaluadailyplanworks:[],
+            userStaffId: '', // กำหนดค่าเริ่มต้นเป็น string ว่าง
+            userFacId: '',
+            AcompDateplan: null, // วันที่เริ่มต้นแผน
+            EndDateplan: null, // วันที่สิ้นสุดแผน
+            dailyplan: '', // ชื่อแผนปฏิบัติงาน
+            planIdToEdit: null,
+
             selectedTask: null, // ใช้สำหรับ DialogDetail
             selectedRowData: null, // ใช้สำหรับเก็บข้อมูลแถวที่คลิก Menu เพื่อส่งให้ command
+
+           
+
             items: [
                 {
                     label: 'ดูรายละเอียด',
@@ -394,6 +601,7 @@ export default {
             this.userStaffDepartmentName = String(staffdepartmentname);
 
             await this.showDataSetUserdialy();
+            await this.fetchWorkPlans();
         } else {
             console.warn("User session data not found on mounted.");
         }
@@ -525,15 +733,26 @@ export default {
             this.clearForm();
             this.taskDate = new Date(); // กำหนด taskDate เป็นเวลาปัจจุบันท้องถิ่น
         },
+        OpenDialogAddplan(){
+            this.DialogAddplan = true;
+            this.clearForm();
+            this.taskDate = new Date();
+        },
         OpenDialogDetail(data) {
             this.selectedTask = data;
             this.DialogDetail = true;
         },
         resetDialogdialy() {
-            this.DialogAdd = false;
-            this.DialogDetail = false;
+            this.DialogAdd = false; 
+            this.DialogDetail = false; 
             this.clearForm();
         },
+        resetDailyTaskDialog(){
+            this.DialogAdd = false;
+        },
+        resetPlanDialog(){
+            this.DialogAddplan = false;
+        }, 
         onFileChange(event) {
             const file = event.target.files[0];
             this.selectedFile = file;
@@ -635,6 +854,7 @@ export default {
                     timer: 1500
                 });
                 this.DialogAdd = false;
+                this.DialogAddplan = false;
                 this.showDataSetUserdialy();
                 this.clearForm();
             } catch (error) {
@@ -666,10 +886,11 @@ export default {
                     showConfirmButton: true,
                 });
             }
-        },
+        }, 
         editData(data) {
             this.DialogDetail = false;
             this.DialogAdd = true;
+            //this.DialogAddplan = true;
             this.currentRecordId = data.id;
 
             this.taskDate = new Date(); // กำหนด taskDate เป็นเวลาปัจจุบันท้องถิ่น 
@@ -698,7 +919,7 @@ export default {
             }).then(async (result) => {
                 if (result.isConfirmed) {
                     try {
-                        const response = await axios.post('http://127.0.0.1:8000/api/delWorkdaily', { id: data.id });
+                        const response = await axios.post('http://127.0.0.1:8000/api/deleteWorkdaily', { id: data.id });
                         Swal.fire({
                             position: "top-center",
                             icon: "success",
@@ -733,6 +954,104 @@ export default {
                 this.$refs.fileInputRef.value = '';
             }
         },
+
+        //บันทึกแผน
+      async savetorplan() {
+            try { 
+                if (this.AcompDateplan && this.EndDateplan && this.EndDateplan < this.AcompDateplan) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'ข้อมูลไม่ถูกต้อง!',
+                        text: 'วันที่สิ้นสุดต้องเป็นวันที่หลังจากหรือเท่ากับวันที่เริ่มต้น',
+                        confirmButtonText: 'ตกลง',
+                        position: 'top'
+                    });
+                    return; // หยุดการทำงานถ้าวันที่ไม่ถูกต้อง
+                } 
+                const payload = {
+                    plan_id: this.planIdToEdit,
+                    plan_name: this.dailyplan,
+                    start_date: this.AcompDateplan ? this.AcompDateplan.toISOString() : null,
+                    end_date: this.EndDateplan ? this.EndDateplan.toISOString() : null, 
+                    plan_evalua: parseInt(this.evaluadaily) || 0,
+                    plan_facid: this.userFacId,
+                    plan_staffid: this.userStaffId
+                };
+
+                // กำหนดข้อความสำหรับ SweetAlert และ Toast ล่วงหน้า
+                const successTitle = this.planIdToEdit ? 'อัปเดตแผนสำเร็จ' : 'บันทึกแผนสำเร็จ';
+                const toastDetail = this.planIdToEdit ? 'อัปเดตแผนสำเร็จ' : 'บันทึกแผนสำเร็จ';
+
+                // ส่งคำขอ POST ไม่ว่าจะเป็นการสร้างใหม่หรืออัปเดต
+                const response = await axios.post('http://127.0.0.1:8000/api/saveplan', payload); 
+                Swal.fire({
+                    icon: 'success',
+                    title: successTitle,
+                    timer: 2000,
+                    showConfirmButton: false,
+                    position: 'top'
+                }); 
+                //console.log('API Response:', response.data);
+                this.DialogAddplan = false;
+                this.resetDialogdialyplan(); 
+
+            } catch (error) { 
+                const errorMsg = error.response?.data?.message || 'เกิดข้อผิดพลาดในการบันทึกแผน';
+                console.error("Error saving plan:", error.response ? error.response.data : error.message); 
+                if (error.response && error.response.status === 422 && error.response.data.errors) {
+                    let validationErrors = ''; 
+                    for (const field in error.response.data.errors) {
+                        validationErrors += `${error.response.data.errors[field].join(', ')}\n`;
+                    }
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'ข้อมูลไม่ถูกต้อง!',
+                        text: validationErrors || errorMsg,  
+                        confirmButtonText: 'ตกลง',
+                        position: 'top'
+                    });
+                } else {
+                    // แสดงข้อผิดพลาดทั่วไป
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'ผิดพลาด!',
+                        text: errorMsg,
+                        confirmButtonText: 'ตกลง',
+                        position: 'top'
+                    });
+                }
+            }
+        },
+        async fetchWorkPlans() {
+            try {
+                const response = await axios.post('http://127.0.0.1:8000/api/getWorkPlans'); 
+                this.evaluadailyplans = response.data;
+            } catch (error) {
+                console.error('เกิดข้อผิดพลาดในการโหลดแผนปฏิบัติงาน:', error);
+            }
+        },
+        selectedPlanLabel() {
+            const selected = this.evaluadailyplans.find(
+                plan => plan.value === this.evaluadailyplan
+            );
+            return selected ? selected.label : '';
+        },
+
+        resetDialogdialyplan() {
+            this.evaluadaily = null;
+            this.AcompDateplan = null;
+            this.EndDateplan = null;
+            this.dailyplan = '';
+            this.planIdToEdit = null;  
+        },
+        editPlan(plan) { // ฟังก์ชันนี้จะถูกเรียกเมื่อกดปุ่ม "แก้ไข" สำหรับแต่ละแผน
+            this.planIdToEdit = plan.plan_id; // เก็บ ID ของแผนที่จะแก้ไข
+            this.dailyplan = plan.plan_name;
+            this.AcompDateplan = new Date(plan.start_date); // แปลง string เป็น Date object
+            this.EndDateplan = new Date(plan.end_date); // แปลง string เป็น Date object
+            this.evaluadaily = plan.plan_evalua; // หรือดึงค่าที่เหมาะสม
+            this.DialogAddplan = true; // เปิด Dialog
+        }, 
         toggleOptionsMenu(event, data) {
             this.selectedRowData = data;
             this.$refs.optionsMenu.toggle(event);
@@ -803,10 +1122,7 @@ export default {
 
 .p-menuitem-link.delete-menu-item:hover {
     background-color: rgba(220, 53, 69, 0.1); /* สีแดงอ่อนเมื่อ hover */
-}
-
-/* ----- สไตล์ใหม่สำหรับ DataTable Cell Wrapping ----- */
-/* กำหนดให้ข้อความในเซลล์ตารางขึ้นบรรทัดใหม่ได้ */
+} 
 .p-datatable .p-datatable-tbody > tr > td {
     white-space: normal; /* อนุญาตให้ข้อความขึ้นบรรทัดใหม่ */
     word-break: break-word; /* บังคับให้คำที่ยาวมากตัดคำลงมา */
@@ -814,8 +1130,7 @@ export default {
     vertical-align: top; /* จัดตำแหน่งข้อความชิดด้านบนในเซลล์ที่มีหลายบรรทัด */
 }
 
-/* กำหนดความกว้างสูงสุดสำหรับคอลัมน์เฉพาะ (ตัวอย่าง) */
-/* อาจต้องปรับค่า width ใน <Column> tag ของคุณให้สอดคล้องกันด้วย */
+ 
 .p-datatable .p-datatable-tbody > tr > td:nth-child(3) { /* คอลัมน์ "ภาระงาน" */
     max-width: 300px; /* กำหนดความกว้างสูงสุด */
 }
@@ -824,9 +1139,7 @@ export default {
 }
 .p-datatable .p-datatable-tbody > tr > td:nth-child(5) { /* คอลัมน์ "ลิงก์เอกสาร" */
     max-width: 120px; /* กำหนดความกว้างสูงสุด */
-}
-
-/* สไตล์สำหรับปุ่ม 'เปิดลิงก์' และ 'ดาวน์โหลดไฟล์' ให้มีขนาดเล็กลง */
+} 
 .p-datatable .p-button.p-button-link {
     padding: 0.25rem 0.5rem; /* ลดขนาด padding */
     font-size: 0.8em; /* ลดขนาดตัวอักษร */
