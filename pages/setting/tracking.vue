@@ -8,7 +8,7 @@
                     </div>
                     <!-- {{ products }}  -->
 
-                    <!-- {{ user.user }}    -->
+                     <!-- {{ user.user }}    -->
 
                     <!-- <div class="col md:col-3" >  
                          
@@ -1079,7 +1079,7 @@ export default {
                 // { id: 15, activity: 'ค. 4 ศักยภาพเพื่อนำการปรับเปลี่ยน', indicator3: executive, datatable3: '', selfAssessment3: '' },
                 // { id: 16, activity: 'ค. 5 การสอนงานและการมอบหมายงาน', indicator3: executive, datatable3: '', selfAssessment3: '' }
             ],
-            posadio: 0,
+            
 
             improvements: null,
             suggestions: null,
@@ -1188,10 +1188,10 @@ export default {
                 });
             } else {
                 // เช็คว่า dataList เป็น array หรือไม่
-                if (Array.isArray(this.dataList)) {  
+                if (Array.isArray(this.dataList)) {   
                     // กรองข้อมูลที่ไม่ใช่ "ลูกจ้างชั่วคราว"
                     // this.filteredData = this.dataList.filter(item => item.stftypename !== "ลูกจ้างชั่วคราว");
-                    this.filteredData = this.dataList.filter(item => item.stftypename !== "ลูกจ้างชั่วคราว" && item.stftypename !== "พนักงานราชการ"); 
+                    this.filteredData = this.dataList.filter(item => item.stftypename !== "ลูกจ้างชั่วคราว" && item.stftypename !== "พนักงานราชการ" && item.stftypename !== "ลูกจ้างประจำ"); 
                     // เรียกใช้ฟังก์ชัน showDataEvalu()
                     this.showDataEvalu();
                 } else {
@@ -1239,7 +1239,7 @@ export default {
             // console.log('posnameid: ',data.posnameid);
             // console.log('staffid: ',data.staffid); 
             //await getAadioPosition(data.staffid);
-            
+
             await this.getAadioPosition(data.staffid);
             
             if (this.tracking_date.d_date === undefined) {
@@ -1307,8 +1307,8 @@ export default {
                 });
             }
         },    
-        async getAadioPosition(staffid_Main){
-            // console.log('getAadioPosition: ',staffid_Main); 
+        async getAadioPosition(staffid_Main){ 
+            console.log('getAadioPosition: ',staffid_Main);  
             try {   
                 if(staffid_Main){
                     const res = await axios.get('http://127.0.0.1:8000/api/getDataAdio', {  
@@ -1316,8 +1316,9 @@ export default {
                             staffid: staffid_Main
                         }
                     }); 
-                    // console.log('getDataAdio: ',res.data);  
-                    this.posadio = res.data[0].posadid
+                    console.log('getDataAdio: ',res.data);  
+                    
+                    this.posadio = res.data[0].posadid || 0;
                 } 
             } catch (error) {
                 console.error('Error fetching evaluation data:', error);
@@ -1805,16 +1806,21 @@ export default {
                     console.error('Error fetching data:', error);
                 });
         },
-        showdataPo(staff_id, facid_Main, d_date, evalua, posnameid) {  
+        async showdataPo(staff_id, facid_Main, d_date, evalua, posnameid) {  
             // ตรวจสอบว่า currentstaff มีค่าหรือไม่
             if (!this.currentstaff || this.currentstaff.length === 0) {
                 console.error("Error: currentstaff is undefined or empty.");
                 return;
             } 
-console.log('this.posadio',this.posadio);
+            console.log('this.posadio',this.posadio);
+            console.log('this.currentstaff[0]?.postypenameth: ',this.currentstaff[0]?.postypenameth);
+            // console.log('this.currentstaff[0]?.postypename: ',this.currentstaff[0]?.postypename);
+
+
+            
 
             // this.postypenameth = this.currentstaff[0]?.postypenameth  ?? (this.currentstaff[0]?.posnameth === 'ผู้บริหาร' ? 'ชำนาญการพิเศษ' : 'ปฏิบัติการ');
-            this.postypenameth = this.posadio === '128' ? 'ชำนาญการพิเศษ' : 'ปฏิบัติการ';
+            this.postypenameth = this.currentstaff[0]?.postypenameth  ?? (this.posadio === '128' ? 'ชำนาญการพิเศษ' : 'ปฏิบัติการ');
 
             // console.log("postypenameth:", this.postypenameth);
 
@@ -1848,8 +1854,8 @@ console.log('this.posadio',this.posadio);
             const Mapping = {
                 '128': 1
             };  
-            // let executive = Mapping[this.postypenameth, this.currentstaff[0]?.posnameth] || 0;
-            let executive = Mapping[this.posadio] || 0;
+            let executive = Mapping[this.postypenameth, this.currentstaff[0]?.posnameth] || 0;
+             //let executive = Mapping[this.posadio, this.currentstaff[0]?.posnameth] || 0;
 
             this.otherCompetencies = [
                 { id: 12, activity: 'ค. 1 สภาวะผู้นำ', indicator3: executive, datatable3: '', selfAssessment3: '' },
@@ -1860,9 +1866,9 @@ console.log('this.posadio',this.posadio);
             ]; 
 
             // this.showPostype(this.currentstaff[0]?.postypenameth, this.postypenameid); // แก้ไข ตัวป2
-            this.showPostype(this.currentstaff[0]?.postypenameth, posnameid);
+           await this.showPostype(this.currentstaff[0]?.postypenameth, posnameid);
 
-            axios.post('http://127.0.0.1:8000/api/showDataPo', {
+           await axios.post('http://127.0.0.1:8000/api/showDataPo', {
                 staff_id: staff_id,
                 fac_id: facid_Main,
                 year_id: d_date,

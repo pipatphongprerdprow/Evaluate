@@ -411,7 +411,7 @@ export default {
         },
         saveDataset(){
             // console.log(this.dropdownItemYear.code); 
-            axios.post('   http://127.0.0.1:8000/api/saveDateSet',{
+            axios.post('http://127.0.0.1:8000/api/saveDateSet',{
                 staff_id: this.staffid_Main,
                 fac_id: this.facid_Main,
                 group_id: this.groupid_Main,
@@ -475,12 +475,12 @@ export default {
                 }
 
                 if(this.text_user1.length > 3){
-                    const res = await axios.get(' http://127.0.0.1:8000/api/searchDataStaff', {  
+                    const res = await axios.get('http://127.0.0.1:8000/api/searchDataStaff', {  
                         params: {
                             staffid: this.text_user1
                         }
                     }); 
-                    //console.log('searchUserStaffid1: ',res.data);  
+                    console.log('searchUserStaffid1: ',res.data);  
                     this.seen = true; 
                     this.listshoeusername1=res.data  
                 }
