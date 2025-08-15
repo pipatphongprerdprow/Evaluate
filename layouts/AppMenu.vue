@@ -81,7 +81,7 @@ const model = computed(() => {
     if (group_chkUser.value === null) return []; // ถ้าเป็น null คืนค่าเป็นอาร์เรย์ว่าง
 
     const group = String(group_chkUser.value); // แปลงเป็น string เพื่อป้องกันข้อผิดพลาด
-    //console.log("Computed model for group:", group);
+    // console.log("Computed model for group:", group);
     switch (group) {
         case '99':
             return allMenus.value.filter(menu => ['home', 'tor', 'manual','history','torday'].includes(menu.id));//ผู้ใช้งานทั่วไป
