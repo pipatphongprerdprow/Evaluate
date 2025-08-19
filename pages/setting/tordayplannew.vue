@@ -1203,23 +1203,23 @@
     let descTimer = null;
 
     const onSearchTaskDesc = (e) => {
-    const q = (e.query || '').trim();
-    if (descTimer) clearTimeout(descTimer);
+        const q = (e.query || '').trim();
+        if (descTimer) clearTimeout(descTimer);
 
-    if (!q) { descSuggestions.value = []; return; }
+        if (!q) { descSuggestions.value = []; return; }
 
-    // debounce กันยิง API ถี่เกินไป
-    descTimer = setTimeout(async () => {
-        try {
-        const res = await axios.get(`${API}/task-suggest`, {
-            params: { q, fac_id: session.facId, limit: 10 }
-        });
-        descSuggestions.value = res.data?.data || [];
-        } catch (err) {
-        console.error(err);
-        descSuggestions.value = [];
-        }
-    }, 250);
+        // debounce กันยิง API ถี่เกินไป
+        descTimer = setTimeout(async () => {
+            try {
+            const res = await axios.get(`${API}/task-suggest`, {
+                params: { q, fac_id: session.facId, limit: 10 }
+            });
+            descSuggestions.value = res.data?.data || [];
+            } catch (err) {
+            console.error(err);
+            descSuggestions.value = [];
+            }
+        }, 250);
     };
     const editDescSuggestions = ref([]);
     let editDescTimer = null;
