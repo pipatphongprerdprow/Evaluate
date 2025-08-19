@@ -1018,7 +1018,7 @@
 
             const plan = allPlans.value.find(p => p.steps.some(s => s.id === currentStepToAddTasks.id));
             console.log('plan: ',plan);
-            
+            ///
             const step = plan?.steps.find(s => s.id === currentStepToAddTasks.id);
              console.log('step: ',step);
             if (step) {
