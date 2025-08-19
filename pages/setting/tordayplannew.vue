@@ -131,7 +131,7 @@
                             <Column header="จัดการ" style="width: 12rem" class="text-center">
                                 <template #body="stepProps">
                                     <div class="flex gap-2 justify-center">
-                                        <Button icon="pi pi-plus" label="เพิ่ม" class="p-button-warning p-button-sm px-3 py-1" @click="openAddTaskDialog(stepProps.data, slotProps.data.owner)" v-tooltip.top="'เพิ่มภาระงานประจำวัน'" />
+                                        <Button icon="pi pi-plus" label="เพิ่ม" class="p-button-warning p-button-sm px-3 py-1" @click="openAddTaskDialog(stepProps.data, slotProps.data.owner)" v-tooltip.top="'เพิ่มภาระงานประจำวัน'" /> 
                                         <Button icon="pi pi-pencil" class="p-button-text p-button-warning p-button-sm p-button-rounded" @click="openEditStepDialogInTable(slotProps.data.id, stepProps.data)" v-tooltip.top="'แก้ไขขั้นตอน'" />
                                         <Button  icon="pi pi-trash" class="p-button-text p-button-danger p-button-sm p-button-rounded" @click="confirmRemoveStepById(slotProps.data.id, stepProps.data.id)" v-tooltip.top="'ลบขั้นตอน'" />
                                     </div>
@@ -467,8 +467,7 @@
             </template>
         </Dialog>
     </div>
-</template>
-
+</template> 
 <script setup>
     import { ref, reactive, computed, onMounted } from 'vue';
     import Swal from 'sweetalert2';
@@ -506,7 +505,9 @@
     facId:   null,
     groupId: null,
     });
-
+    const { signIn, getSession, signOut } = await useAuth()
+    const user = await getSession();
+    console.log(user); 
     /**
      * ดึง session จาก Nuxt Auth ถ้ามี (ป้องกันพังด้วย try/catch)
      * โครงสร้างที่คาดหวังจากคำอธิบายของคุณ:
@@ -514,29 +515,29 @@
      */
     async function initSessionFromAuth() {
         try {
-            // ถ้าเป็น Nuxt 3 สามารถ import '#imports' ได้
-            // ถ้าไม่ใช่ ให้ลบทิ้งแล้วเรียก setSession เองจากภายนอก
             const mod = await import('#imports').catch(() => null);
             const getSession = mod?.getSession;
-            if (!getSession) return;
-
+            if (!getSession) {
+                loadSessionFromStorage();
+                return;
+            }
             const user = await getSession();
             const nameObj = user?.user?.name || {};
             const STAFFID = nameObj?.STAFFID ?? nameObj?.staffid ?? nameObj?.staffId ?? null;
             const SCOPES  = nameObj?.SCOPES  ?? {};
             const facid   = SCOPES?.staffdepartment ?? SCOPES?.facid ?? SCOPES?.facId ?? null;
             const groupid = SCOPES?.groupid ?? null;
-            console.log('user: ',user);
-            
-
+            console.log('user: ',user); 
             session.staffId = STAFFID ? Number(STAFFID) : null;
             session.facId   = facid   ? Number(facid)   : null;
             session.groupId = groupid ?? null;
         } catch (e) {
-            // ถ้าไม่ได้ใช้ Nuxt ก็จะตกมาที่นี่ ไม่เป็นไร ปล่อยให้ setSession ภายนอกมาเรียกได้
-            // console.warn('initSessionFromAuth skipped.', e);
+            loadSessionFromStorage();
         }
     }
+   
+       
+  
 
     /** เผื่ออยากเซ็ตค่า session เองจากภายนอก */
     function setSession(staffId, facId, groupId = null) {
@@ -580,10 +581,12 @@
     // ----------------- STATE ------------------
     const allPlans = ref([]);
     const owners = ref([
-    { id: 1, name: 'สมชาย รักดี' },
-    { id: 2, name: 'สมหญิง มีสุข' },
-    { id: 3, name: 'สุทธิชัย มั่นคง' },
-    { id: 4, name: 'จันทรา เพ็ญ' },
+    { id: 1, name: 'พิพัฒน์พงษ์ เพริดพราว' },
+    { id: 2, name: 'อนุรักษ์ สุระขันตี' },
+    { id: 3, name: 'อัครรินทร์ บุปผา' },
+    { id: 4, name: 'สุชาติ กัญญาประสิทธิ์' },
+    { id: 5, name: 'ธนดล สิงขรอาสน์' },
+   
     ]);
     const taskStatuses = ref(['รอดำเนินการ', 'อยู่ระหว่างดำเนินการ', 'เสร็จสิ้น']);
 
@@ -672,41 +675,7 @@
     return `${Math.floor(diffInMinutes / 60)} ชม. ${Math.round(diffInMinutes % 60)} นาที`;
     };
     const getTaskStatusSeverityByValue = (status) =>
-    status === 'เสร็จสิ้น' ? 'success' : status === 'อยู่ระหว่างดำเนินการ' ? 'warning' : 'info';
-
-    // ----------------- MAP RESULT -------------
-    // function mapApiToState(arr) {
-    //     return (arr || []).map(p => ({
-    //         ...p,
-    //         startDate: p.startDate ? new Date(p.startDate) : null,
-    //         endDate:   p.endDate   ? new Date(p.endDate)   : null,
-            
-    //         // map owner ให้ตรงกับ owners
-    //         owner: (p.owner || []).map(o => {
-    //             const match = owners.value.find(x => x.id === o.id);
-    //             return match ? match : o;
-    //         }),
-    //         ownerNames: (p.owner || []).map(o => {
-    //             const match = owners.value.find(x => x.id === o.id);
-    //             return match ? match.name : o.name;
-    //         }).join(', '),
-    //         // map owner ให้ตรงกับ owners
-
-    //         steps: (p.steps||[]).map(s => ({
-    //         ...s,
-    //         startDate: s.startDate ? new Date(s.startDate) : null,
-    //         endDate:   s.endDate   ? new Date(s.endDate)   : null,
-    //             tasks: (s.tasks||[]).map(t => ({
-    //                 ...t,
-    //                 mainTask: t.mainTask ?? t.Main_tasks ?? null,
-    //                 dueDate:     t.dueDate     ? new Date(t.dueDate)     : null,
-    //                 startTime:   t.startTime   ? new Date(t.startTime)   : null,
-    //                 endTime:     t.endTime     ? new Date(t.endTime)     : null,
-    //                 createdDate: t.createdDate ? new Date(t.createdDate) : null,
-    //             }))
-    //         }))
-    //     }));
-    // }
+    status === 'เสร็จสิ้น' ? 'success' : status === 'อยู่ระหว่างดำเนินการ' ? 'warning' : 'info'; 
     function mapApiToState(arr) {
         return (arr || []).map(p => ({
             ...p,
@@ -977,8 +946,22 @@
     };
 
 
-    const openAddTaskDialog = (stepData, ownersList) => {
-        // console.log('stepData: ',stepData, 'ownersList: ',ownersList); 
+    const openAddTaskDialog = async (stepData, ownersList) => {
+        // Log user info from session
+        console.log('session:', session);
+        let positionNameId = null;
+        if (user && user.user && user.user.name && user.user.name.POSITIONNAMEID) {
+            positionNameId = user.user.name.POSITIONNAMEID;
+            try {
+                const res = await axios.get(`${API}/getMainWorks`, {
+                    params: { positionnameid: positionNameId }
+                });
+                console.log('getMainWorks response:', res.data);
+                // คุณสามารถนำ res.data ไปใช้งานต่อ เช่น set mainTasks หรืออื่นๆ ตามต้องการ
+            } catch (err) {
+                console.error('getMainWorks error:', err);
+            }
+        }
         showAddTaskDialog.value = true;
         Object.assign(currentStepToAddTasks, { id: stepData.id, name: stepData.name });
         Object.assign(newTaskInStep, { description: '', responsible: ownersList, dueDate: null, startTime: null, endTime: null, status: 'รอดำเนินการ' });  
