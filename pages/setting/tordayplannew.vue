@@ -371,12 +371,21 @@
             </div>
                 <div class="field">
                     <label class="font-semibold">ภาระงาน</label>
-                    <Textarea v-model="currentEditingTask.description" rows="3" autoResize />
+                    <AutoComplete
+                        v-model="currentEditingTask.description"
+                        :suggestions="editDescSuggestions"
+                        @complete="onSearchEditTaskDesc"
+                        :minLength="1"
+                        :dropdown="true"
+                        :forceSelection="false"
+                        placeholder="ระบุ/ค้นหาภาระงาน..."
+                        class="w-full"
+                    />
                 </div>
-                <div class="field mt-4">
+                <div class="field mt-4"> 
                     <label class="font-semibold">ผู้รับผิดชอบ</label>
                     <MultiSelect v-model="currentEditingTask.responsible" :options="owners" optionLabel="name" placeholder="เลือกผู้รับผิดชอบ" display="chip" />
-                </div>
+                </div> 
                 <div class="field mt-4">
                     <label class="font-semibold">วันที่กำหนดเสร็จ</label>
                     <Calendar v-model="currentEditingTask.dueDate" dateFormat="dd/mm/yy" showIcon />
@@ -416,11 +425,18 @@
                         optionValue="value"
                         placeholder="เลือกภาระงานหลัก"
                     />
-                </div>
-
+                </div> 
                 <div class="field col-12">
                     <label class="font-semibold">ภาระงานประจำวัน <span class="text-red-500">*</span></label>
-                    <Textarea v-model="newTaskInStep.description" rows="3" placeholder="ระบุภาระงาน..." autoResize />
+                    <AutoComplete
+                        v-model="newTaskInStep.description"
+                        :suggestions="descSuggestions"
+                        @complete="onSearchTaskDesc"
+                        :minLength="1"
+                        placeholder="ระบุภาระงาน... (พิมพ์เพื่อค้นหาจากฐานข้อมูล)"
+                        :dropdown="true"
+                        :forceSelection="false"
+                    />
                 </div>
 
                 <div class="field col-12">
@@ -475,6 +491,8 @@
     import ConfirmDialog from 'primevue/confirmdialog';
     import Toast from 'primevue/toast';
     import Tooltip from 'primevue/tooltip';
+    import AutoComplete from 'primevue/autocomplete';
+
 
     // Directives
     const vTooltip = Tooltip;
@@ -657,37 +675,78 @@
     status === 'เสร็จสิ้น' ? 'success' : status === 'อยู่ระหว่างดำเนินการ' ? 'warning' : 'info';
 
     // ----------------- MAP RESULT -------------
+    // function mapApiToState(arr) {
+    //     return (arr || []).map(p => ({
+    //         ...p,
+    //         startDate: p.startDate ? new Date(p.startDate) : null,
+    //         endDate:   p.endDate   ? new Date(p.endDate)   : null,
+            
+    //         // map owner ให้ตรงกับ owners
+    //         owner: (p.owner || []).map(o => {
+    //             const match = owners.value.find(x => x.id === o.id);
+    //             return match ? match : o;
+    //         }),
+    //         ownerNames: (p.owner || []).map(o => {
+    //             const match = owners.value.find(x => x.id === o.id);
+    //             return match ? match.name : o.name;
+    //         }).join(', '),
+    //         // map owner ให้ตรงกับ owners
+
+    //         steps: (p.steps||[]).map(s => ({
+    //         ...s,
+    //         startDate: s.startDate ? new Date(s.startDate) : null,
+    //         endDate:   s.endDate   ? new Date(s.endDate)   : null,
+    //             tasks: (s.tasks||[]).map(t => ({
+    //                 ...t,
+    //                 mainTask: t.mainTask ?? t.Main_tasks ?? null,
+    //                 dueDate:     t.dueDate     ? new Date(t.dueDate)     : null,
+    //                 startTime:   t.startTime   ? new Date(t.startTime)   : null,
+    //                 endTime:     t.endTime     ? new Date(t.endTime)     : null,
+    //                 createdDate: t.createdDate ? new Date(t.createdDate) : null,
+    //             }))
+    //         }))
+    //     }));
+    // }
     function mapApiToState(arr) {
         return (arr || []).map(p => ({
             ...p,
             startDate: p.startDate ? new Date(p.startDate) : null,
             endDate:   p.endDate   ? new Date(p.endDate)   : null,
-            
-            // map owner ให้ตรงกับ owners
-            owner: (p.owner || []).map(o => {
-                const match = owners.value.find(x => x.id === o.id);
-                return match ? match : o;
-            }),
-            ownerNames: (p.owner || []).map(o => {
-                const match = owners.value.find(x => x.id === o.id);
-                return match ? match.name : o.name;
-            }).join(', '),
-            // map owner ให้ตรงกับ owners
 
-            steps: (p.steps||[]).map(s => ({
+            // map owner แผนให้ตรงกับ owners
+            owner: (p.owner || []).map(o => owners.value.find(x => x.id === o.id) || o),
+            ownerNames: (p.owner || [])
+            .map(o => (owners.value.find(x => x.id === o.id) || o).name)
+            .join(', '),
+
+            steps: (p.steps || []).map(s => ({
             ...s,
             startDate: s.startDate ? new Date(s.startDate) : null,
             endDate:   s.endDate   ? new Date(s.endDate)   : null,
-                tasks: (s.tasks||[]).map(t => ({
-                    ...t,
-                    dueDate:     t.dueDate     ? new Date(t.dueDate)     : null,
-                    startTime:   t.startTime   ? new Date(t.startTime)   : null,
-                    endTime:     t.endTime     ? new Date(t.endTime)     : null,
-                    createdDate: t.createdDate ? new Date(t.createdDate) : null,
-                }))
-            }))
+
+            tasks: (s.tasks || []).map(t => {
+                // ⭐ สำคัญ: map responsible เป็นชื่อจริงจาก owners (ถ้าเจอ id)
+                const mappedResponsible = Array.isArray(t.responsible)
+                ? t.responsible.map(r => {
+                    const match = owners.value.find(o => o.id === r.id);
+                    return match ? { ...r, name: match.name } : r; // ถ้าไม่เจอ คง placeholder ไว้
+                    })
+                : [];
+
+                return {
+                ...t,
+                responsible: mappedResponsible,
+                mainTask: t.mainTask ?? t.Main_tasks ?? null,
+                dueDate:     t.dueDate     ? new Date(t.dueDate)     : null,
+                startTime:   t.startTime   ? new Date(t.startTime)   : null,
+                endTime:     t.endTime     ? new Date(t.endTime)     : null,
+                createdDate: t.createdDate ? new Date(t.createdDate) : null,
+                };
+            }),
+            })),
         }));
     }
+
 
     // ----------------- API CALLS --------------
     async function fetchPlans() {
@@ -974,6 +1033,7 @@
                     endTime: newTaskInStep.endTime,
                     status: newTaskInStep.status,
                     createdDate: new Date(),
+                    staffId: session.staffId ?? null,
                 });
             }
 
@@ -987,18 +1047,22 @@
 
 
     const openEditTaskDialogInTable = (step, task, taskIndex) => {
+        // console.log(task);
         showEditTaskDialog.value = true;
         currentEditingTask.stepId = step.id;
         currentEditingTask.taskId = task.id;
         currentEditingTask.taskIndex = taskIndex;
-        currentEditingTask.mainTask = task.mainTask || null; // ✅ เพิ่มตรงนี้
+        
+        currentEditingTask.mainTask = task.mainTask || null;
         currentEditingTask.description = task.description;
-        currentEditingTask.responsible = task.responsible;
+       
+        currentEditingTask.responsible = task.responsible || [];
         currentEditingTask.dueDate = task.dueDate ? new Date(task.dueDate) : null;
         currentEditingTask.startTime = task.startTime ? new Date(task.startTime) : null;
         currentEditingTask.endTime = task.endTime ? new Date(task.endTime) : null;
         currentEditingTask.status = task.status;
         currentEditingTask.createdDate = task.createdDate ? new Date(task.createdDate) : null;
+        currentEditingTask.staffId = task.staffId ?? session.staffId ?? null;
     };
 
     const saveEditedTask = async () => {
@@ -1015,7 +1079,7 @@
             startTime: toDateTimeStr(currentEditingTask.startTime),
             endTime: toDateTimeStr(currentEditingTask.endTime),
             status: currentEditingTask.status,
-            staff_id: currentEditingTask.responsible?.[0]?.id ?? session.staffId ?? null,
+            staff_id: currentEditingTask.staffId ?? null,
             fac_id: session.facId,
         };
 
@@ -1050,13 +1114,54 @@
         }
     };
 
+    // const updateTaskStatus = async (step, task, newStatus) => {
+    //     if (!task?.id) {
+    //         return Swal.fire({
+    //             icon: 'warning',
+    //             title: 'ไม่สามารถบันทึก',
+    //             text: 'ภาระงานยังไม่มี ID (ยังไม่ได้บันทึก)'
+    //         });
+    //     }
+
+    //     const oldStatus = task.status;
+    //     task.status = newStatus;
+    //     task.__saving = true;
+
+    //     try {
+    //         await axios.post(`${API}/UpdateTaskStatus`, {
+    //             id: task.id,
+    //             status: newStatus,
+    //             staff_id: task.responsible?.[0]?.id ?? session.staffId ?? null,
+    //             fac_id: session.facId ?? null,
+    //         });
+
+    //         // แจ้งเตือนบันทึกสำเร็จ
+    //         Swal.fire({
+    //             icon: 'success',
+    //             title: 'บันทึกแล้ว',
+    //             text: 'อัปเดตสถานะเรียบร้อย',
+    //             timer: 1500,
+    //             showConfirmButton: false
+    //         });
+
+    //     } catch (e) {
+    //         console.error(e);
+    //         task.status = oldStatus; // revert กลับไปค่าเดิม
+
+    //         // แจ้งเตือนบันทึกไม่สำเร็จ
+    //         Swal.fire({
+    //             icon: 'error',
+    //             title: 'บันทึกไม่สำเร็จ',
+    //             text: 'อัปเดตสถานะไม่สำเร็จ'
+    //         });
+
+    //     } finally {
+    //         task.__saving = false;
+    //     }
+    // };
     const updateTaskStatus = async (step, task, newStatus) => {
         if (!task?.id) {
-            return Swal.fire({
-                icon: 'warning',
-                title: 'ไม่สามารถบันทึก',
-                text: 'ภาระงานยังไม่มี ID (ยังไม่ได้บันทึก)'
-            });
+            return Swal.fire({ icon: 'warning', title: 'ไม่สามารถบันทึก', text: 'ภาระงานยังไม่มี ID (ยังไม่ได้บันทึก)' });
         }
 
         const oldStatus = task.status;
@@ -1064,38 +1169,17 @@
         task.__saving = true;
 
         try {
-            await axios.post(`${API}/UpdateTaskStatus`, {
-                id: task.id,
-                status: newStatus,
-                staff_id: task.responsible?.[0]?.id ?? session.staffId ?? null,
-                fac_id: session.facId ?? null,
-            });
-
-            // แจ้งเตือนบันทึกสำเร็จ
-            Swal.fire({
-                icon: 'success',
-                title: 'บันทึกแล้ว',
-                text: 'อัปเดตสถานะเรียบร้อย',
-                timer: 1500,
-                showConfirmButton: false
-            });
-
+            await axios.post(`${API}/UpdateTaskStatus`, { id: task.id, status: newStatus });
+            Swal.fire({ icon: 'success', title: 'บันทึกแล้ว', text: 'อัปเดตสถานะเรียบร้อย', timer: 1500, showConfirmButton: false });
         } catch (e) {
             console.error(e);
-            task.status = oldStatus; // revert กลับไปค่าเดิม
-
-            // แจ้งเตือนบันทึกไม่สำเร็จ
-            Swal.fire({
-                icon: 'error',
-                title: 'บันทึกไม่สำเร็จ',
-                text: 'อัปเดตสถานะไม่สำเร็จ'
-            });
-
+            task.status = oldStatus; // rollback
+            Swal.fire({ icon:'error', title:'บันทึกไม่สำเร็จ', text:'อัปเดตสถานะไม่สำเร็จ' });
         } finally {
             task.__saving = false;
         }
     };
-
+ 
  
     const confirmRemoveTaskInTable = async (step, taskIndex) => {
     const ok = await Swal.fire({ title:'ยืนยันการลบ', text:'คุณต้องการลบภาระงานนี้ใช่หรือไม่?', icon:'warning', showCancelButton:true });
@@ -1130,6 +1214,51 @@
             Swal.fire({ icon:'error', title:'ผิดพลาด', text:'ลบขั้นตอนไม่สำเร็จ' });
         }
     };
+    //auto-complete ตารางภาระงานประจำวัน
+
+    const descSuggestions = ref([]);
+    let descTimer = null;
+
+    const onSearchTaskDesc = (e) => {
+    const q = (e.query || '').trim();
+    if (descTimer) clearTimeout(descTimer);
+
+    if (!q) { descSuggestions.value = []; return; }
+
+    // debounce กันยิง API ถี่เกินไป
+    descTimer = setTimeout(async () => {
+        try {
+        const res = await axios.get(`${API}/task-suggest`, {
+            params: { q, fac_id: session.facId, limit: 10 }
+        });
+        descSuggestions.value = res.data?.data || [];
+        } catch (err) {
+        console.error(err);
+        descSuggestions.value = [];
+        }
+    }, 250);
+    };
+    const editDescSuggestions = ref([]);
+    let editDescTimer = null;
+
+    const onSearchEditTaskDesc = (e) => {
+    const q = (e.query || '').trim();
+        if (editDescTimer) clearTimeout(editDescTimer);
+        if (!q) { editDescSuggestions.value = []; return; }
+
+        editDescTimer = setTimeout(async () => {
+            try {
+            const res = await axios.get(`${API}/task-suggest`, {
+                params: { q, fac_id: session.facId, limit: 10 }
+            });
+            editDescSuggestions.value = res.data?.data || [];
+            } catch (err) {
+            console.error(err);
+            editDescSuggestions.value = [];
+            }
+        }, 250);
+    };
+
 
  </script>
 
