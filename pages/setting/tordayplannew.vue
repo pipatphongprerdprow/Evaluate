@@ -417,28 +417,29 @@
             </template>
             <div class="p-fluid grid form-layout">
                 <div class="field col-12">
-                    <label class="font-semibold">ภาระงานหลัก <span class="text-red-500">*</span></label>
-                    <Dropdown
+                    <label class="font-semibold">ภาระงานหลัก</label>
+                   <Dropdown 
                         v-model="newTaskInStep.mainTask"
                         :options="mainTasks"
-                        optionLabel="label"
-                        optionValue="value"
+                        optionLabel="POSNAMETH"
+                        optionValue="POSNAMETH"  
                         placeholder="เลือกภาระงานหลัก"
+                        class="w-full"
+                        @change="onMainTaskChange"
                     />
                 </div> 
                 <div class="field col-12">
-                    <label class="font-semibold">ภาระงานประจำวัน <span class="text-red-500">*</span></label>
-                    <AutoComplete
+                    <label class="font-semibold">ภาระงานประจำวัน</label>
+                    <Dropdown 
                         v-model="newTaskInStep.description"
-                        :suggestions="descSuggestions"
-                        @complete="onSearchTaskDesc"
-                        :minLength="1"
-                        placeholder="ระบุภาระงาน... (พิมพ์เพื่อค้นหาจากฐานข้อมูล)"
-                        :dropdown="true"
-                        :forceSelection="false"
+                        :options="subTasks"
+                        optionLabel="name"
+                        optionValue="name"
+                        placeholder="เลือกภาระงานประจำวัน"
+                        class="w-full"
+                        :disabled="!newTaskInStep.mainTask"
                     />
-                </div>
-
+                </div> 
                 <div class="field col-12">
                     <label class="font-semibold">ผู้รับผิดชอบ <span class="text-red-500">*</span></label>
                     <MultiSelect v-model="newTaskInStep.responsible" :options="owners" optionLabel="name" placeholder="เลือกผู้รับผิดชอบ" display="chip" required />
@@ -565,12 +566,12 @@
 
     //ภาระงานหลัก
 
-   const mainTasks = [
-        { label: 'งานสอน', value: 'งานสอน' },
-        { label: 'งานวิจัย', value: 'งานวิจัย' },
-        { label: 'งานบริการวิชาการ', value: 'งานบริการวิชาการ' },
-        { label: 'งานอื่นๆ', value: 'งานอื่นๆ' }
-    ];
+//    const mainTasks = [
+//         { label: 'งานสอน', value: 'งานสอน' },
+//         { label: 'งานวิจัย', value: 'งานวิจัย' },
+//         { label: 'งานบริการวิชาการ', value: 'งานบริการวิชาการ' },
+//         { label: 'งานอื่นๆ', value: 'งานอื่นๆ' }
+//     ];
 
    const getMainTaskLabel = (mainTask) => {
         return mainTask || 'ยังไม่เลือก';
@@ -578,7 +579,29 @@
 
  
 
-    // ----------------- STATE ------------------
+    const mainTasks = ref([]);
+    const subTasks = ref([]);
+   const onMainTaskChange = async (event) => { 
+    const selectedMainActivity = event.value; 
+
+    if (selectedMainActivity) {
+        try {
+            const res = await axios.get(`${API}/getSubWorks`, {
+                params: {
+                    mainActivity: selectedMainActivity // เปลี่ยนชื่อ parameter ให้ตรงกับ backend
+                }
+            });
+            subTasks.value = Array.isArray(res.data.data) ? res.data.data : [];
+        } catch (error) {
+            console.error('Error fetching sub tasks:', error);
+            subTasks.value = [];
+        }
+    } else {
+        subTasks.value = [];
+    }
+    newTaskInStep.description = null;
+};
+     
     const allPlans = ref([]);
     const owners = ref([
     { id: 1, name: 'พิพัฒน์พงษ์ เพริดพราว' },
@@ -947,25 +970,50 @@
 
 
     const openAddTaskDialog = async (stepData, ownersList) => {
-        // Log user info from session
-        console.log('session:', session);
-        let positionNameId = null;
-        if (user && user.user && user.user.name && user.user.name.POSITIONNAMEID) {
-            positionNameId = user.user.name.POSITIONNAMEID;
-            try {
-                const res = await axios.get(`${API}/getMainWorks`, {
-                    params: { positionnameid: positionNameId }
-                });
-                console.log('getMainWorks response:', res.data);
-                // คุณสามารถนำ res.data ไปใช้งานต่อ เช่น set mainTasks หรืออื่นๆ ตามต้องการ
-            } catch (err) {
-                console.error('getMainWorks error:', err);
+    // Log user info from session
+    console.log('session:', session);
+    let positionNameId = null;
+    if (user && user.user && user.user.name && user.user.name.POSITIONNAMEID) {
+        positionNameId = user.user.name.POSITIONNAMEID;
+        try {
+            console.log(positionNameId);
+            
+            const res = await axios.get(`${API}/getMainWorks`, {
+                params: { positionnameid: positionNameId }
+            });
+            console.log('getMainWorks response:', res.data);
+
+            const uniqueTasks = [];
+            const seen = new Set();
+            
+            // ✅ แก้ไขตรงนี้: ตรวจสอบก่อนว่า res.data.data เป็น Array
+            if (Array.isArray(res.data.data)) {
+                for (const item of res.data.data) {
+                    if (!seen.has(item.POSNAMETH)) {
+                        seen.add(item.POSNAMETH);
+                        uniqueTasks.push(item);
+                    }
+                }
+            } else {
+                // หาก res.data.data ไม่ใช่อาร์เรย์ (อาจเป็น Object เดียว) ให้จัดการแยกต่างหาก
+                const item = res.data.data;
+                if (item && !seen.has(item.POSNAMETH)) {
+                    seen.add(item.POSNAMETH);
+                    uniqueTasks.push(item);
+                }
             }
+
+            mainTasks.value = uniqueTasks;
+
+            // คุณสามารถนำ res.data ไปใช้งานต่อ เช่น set mainTasks หรืออื่นๆ ตามต้องการ
+        } catch (err) {
+            console.error('getMainWorks error:', err);
         }
-        showAddTaskDialog.value = true;
-        Object.assign(currentStepToAddTasks, { id: stepData.id, name: stepData.name });
-        Object.assign(newTaskInStep, { description: '', responsible: ownersList, dueDate: null, startTime: null, endTime: null, status: 'รอดำเนินการ' });  
-    };
+    }
+    showAddTaskDialog.value = true;
+    Object.assign(currentStepToAddTasks, { id: stepData.id, name: stepData.name });
+    Object.assign(newTaskInStep, { description: '', responsible: ownersList, dueDate: null, startTime: null, endTime: null, status: 'รอดำเนินการ' });  
+};
 
     const addTaskToStepFromMain = async () => {
         // const responsibleIds = newTaskInStep.responsible.map(u => u.id);
@@ -1029,24 +1077,41 @@
     };
 
 
-    const openEditTaskDialogInTable = (step, task, taskIndex) => {
-        // console.log(task);
-        showEditTaskDialog.value = true;
-        currentEditingTask.stepId = step.id;
-        currentEditingTask.taskId = task.id;
-        currentEditingTask.taskIndex = taskIndex;
-        
-        currentEditingTask.mainTask = task.mainTask || null;
-        currentEditingTask.description = task.description;
-       
-        currentEditingTask.responsible = task.responsible || [];
-        currentEditingTask.dueDate = task.dueDate ? new Date(task.dueDate) : null;
-        currentEditingTask.startTime = task.startTime ? new Date(task.startTime) : null;
-        currentEditingTask.endTime = task.endTime ? new Date(task.endTime) : null;
-        currentEditingTask.status = task.status;
-        currentEditingTask.createdDate = task.createdDate ? new Date(task.createdDate) : null;
-        currentEditingTask.staffId = task.staffId ?? session.staffId ?? null;
-    };
+    const openEditTaskDialogInTable = async (step, task, taskIndex) => {
+    // 1. เปิด Dialog แก้ไข
+    showEditTaskDialog.value = true;
+
+    // 2. กำหนดค่าภาระงานที่กำลังแก้ไข
+    currentEditingTask.stepId = step.id;
+    currentEditingTask.taskId = task.id;
+    currentEditingTask.taskIndex = taskIndex;
+    
+    // ตั้งค่าค่าเริ่มต้นสำหรับ Dropdown
+    currentEditingTask.mainTask = task.mainTask || null;
+    currentEditingTask.description = task.description;
+    currentEditingTask.responsible = task.responsible || [];
+    currentEditingTask.dueDate = task.dueDate ? new Date(task.dueDate) : null;
+    currentEditingTask.startTime = task.startTime ? new Date(task.startTime) : null;
+    currentEditingTask.endTime = task.endTime ? new Date(task.endTime) : null;
+    currentEditingTask.status = task.status;
+    currentEditingTask.createdDate = task.createdDate ? new Date(task.createdDate) : null;
+    currentEditingTask.staffId = task.staffId ?? session.staffId ?? null;
+
+    // 3. ✅ เพิ่มโค้ดส่วนนี้เพื่อดึงข้อมูลภาระงานหลัก
+    try {
+        const positionnameid = session.staffId; // หรือค่าที่ใช้สำหรับดึงภาระงานหลัก
+        const res = await axios.get(`${API}/getMainWorks`, {
+            params: { positionnameid: positionnameid }
+        });
+
+        // 4. ✅ นำข้อมูลที่ได้จาก API มากำหนดให้ `mainTasks`
+        mainTasks.value = res.data.data;
+
+    } catch (e) {
+        console.error("Error fetching main tasks:", e);
+        mainTasks.value = [];
+    }
+};
 
     const saveEditedTask = async () => {
         if (!currentEditingTask.description || !currentEditingTask.responsible.length || !currentEditingTask.dueDate) {
