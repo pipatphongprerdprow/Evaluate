@@ -421,9 +421,7 @@
                     <label class="font-semibold">ภาระงานหลัก</label>
                     <div class="grid">
                         <div class="col-9">
-                            <!-- ถ้าไม่ใช่ภาระงานอื่นๆ ใช้ Dropdown -->
                             <Dropdown 
-                                v-if="!useCustomMainTask"
                                 v-model="newTaskInStep.mainTask"
                                 :options="mainTasks"
                                 optionLabel="POSNAMETH"
@@ -431,14 +429,7 @@
                                 placeholder="เลือกภาระงานหลัก"
                                 class="w-full"
                                 @change="onMainTaskChange"
-                            />
-                            <!-- ถ้าเป็นภาระงานอื่นๆ ใช้ InputText -->
-                            <InputText 
-                                v-else
-                                v-model="newTaskInStep.mainTask"
-                                placeholder="ภาระงานอื่นๆ"
-                                class="w-full"
-                                readonly
+                                :disabled="useCustomMainTask"
                             />
                         </div>
                         <div class="col-3">
@@ -446,42 +437,48 @@
                                 label="ภาระงานอื่นๆ" 
                                 icon="pi pi-plus" 
                                 class="p-button-outlined w-full"
-                                @click="() => {
-                                    useCustomMainTask = true;
-                                    useCustomSubTask = true;
-                                    newTaskInStep.mainTask = 'ภาระงานอื่นๆ';
-                                    newTaskInStep.description = ''; // เคลียร์ช่องภาระงานประจำวัน
-                                }"
+                                @click="useCustomMainTask = !useCustomMainTask; newTaskInStep.mainTask = ''"
                             />
                         </div>
                     </div>
+                    <InputText 
+                        v-if="useCustomMainTask"
+                        v-model="newTaskInStep.mainTask"
+                        placeholder="กรอกภาระงานหลักอื่นๆ"
+                        class="w-full mt-2"
+                    />
                 </div> 
 
                 <!-- ภาระงานประจำวัน -->
                 <div class="field col-12">
                     <label class="font-semibold">ภาระงานประจำวัน</label>
                     <div class="grid">
-                        <div class="col-12">
-                            <!-- Dropdown ปกติ -->
+                        <div class="col-9">
                             <Dropdown 
-                                v-if="!useCustomSubTask"
                                 v-model="newTaskInStep.description"
                                 :options="subTasks"
                                 optionLabel="name"
                                 optionValue="name"
                                 placeholder="เลือกภาระงานประจำวัน"
                                 class="w-full"
-                                :disabled="!newTaskInStep.mainTask"
+                                :disabled="!newTaskInStep.mainTask || useCustomSubTask"
                             />
-                            <!-- InputText กรณีภาระงานอื่นๆ -->
-                            <InputText 
-                                v-else
-                                v-model="newTaskInStep.description"
-                                placeholder="กรอกภาระงานประจำวัน"
-                                class="w-full"
+                        </div>
+                        <div class="col-3">
+                            <Button 
+                                label="งานอื่นๆ" 
+                                icon="pi pi-plus" 
+                                class="p-button-outlined w-full"
+                                @click="useCustomSubTask = !useCustomSubTask; newTaskInStep.description = ''"
                             />
-                        </div> 
+                        </div>
                     </div>
+                    <InputText 
+                        v-if="useCustomSubTask"
+                        v-model="newTaskInStep.description"
+                        placeholder="กรอกภาระงานประจำวันอื่นๆ"
+                        class="w-full mt-2"
+                    />
                 </div>
 
                 <!-- ผู้รับผิดชอบ -->
@@ -529,8 +526,6 @@
                     />
                 </div>
             </div>
-
-
 
             <template #footer>
                 <div class="flex justify-end gap-2 pt-4">
@@ -1215,39 +1210,40 @@
             return Swal.fire({ icon:'error', title:'ข้อผิดพลาด', text:'กรุณากรอกข้อมูลภาระงานให้ครบถ้วน' });
         }
 
-        const responsibleIds = currentEditingTask.responsible.map(u => u.id);
-
+        // สร้าง object ข้อมูลที่จะส่ง
         const payload = {
-            id:          currentEditingTask.taskId,
-            mainTask:    currentEditingTask.mainTask,
+            id: currentEditingTask.taskId,
+            mainTask: currentEditingTask.mainTask,
             description: currentEditingTask.description,
-            dueDate:     toDateStr(currentEditingTask.dueDate),
-            startTime:   toDateTimeStr(currentEditingTask.startTime),
-            endTime:     toDateTimeStr(currentEditingTask.endTime),
-            status:      currentEditingTask.status,
-            responsible: responsibleIds,     // ⭐ ส่งเป็น array
-            fac_id:      session.facId,
+            dueDate: toDateStr(currentEditingTask.dueDate),
+            startTime: toDateTimeStr(currentEditingTask.startTime),
+            endTime: toDateTimeStr(currentEditingTask.endTime),
+            status: currentEditingTask.status,
+            staff_id: currentEditingTask.staffId ?? null,
+            fac_id: session.facId,
         };
+
+        // log ข้อมูลก่อนส่ง
+        console.log("ข้อมูลที่จะส่งไป server:", payload);
 
         try {
             await axios.post(`${API}/Edtdatatasks`, payload);
 
-            // อัปเดตใน state เดิม “ที่ตำแหน่งเดิม”
             const planIndex = allPlans.value.findIndex(p => p.steps.some(s => s.id === currentEditingTask.stepId));
             if (planIndex === -1) return;
             const stepIndex = allPlans.value[planIndex].steps.findIndex(s => s.id === currentEditingTask.stepId);
             if (stepIndex === -1) return;
 
             allPlans.value[planIndex].steps[stepIndex].tasks[currentEditingTask.taskIndex] = {
-            id: currentEditingTask.taskId,                            // ⭐ ยังคง id เดิม
-            mainTask: currentEditingTask.mainTask,
-            description: currentEditingTask.description,
-            responsible: [...currentEditingTask.responsible],
-            dueDate: currentEditingTask.dueDate,
-            startTime: currentEditingTask.startTime,
-            endTime: currentEditingTask.endTime,
-            status: currentEditingTask.status,
-            createdDate: currentEditingTask.createdDate,
+                id: currentEditingTask.taskId,
+                mainTask: currentEditingTask.mainTask,
+                description: currentEditingTask.description,
+                responsible: currentEditingTask.responsible,
+                dueDate: currentEditingTask.dueDate,
+                startTime: currentEditingTask.startTime,
+                endTime: currentEditingTask.endTime,
+                status: currentEditingTask.status,
+                createdDate: currentEditingTask.createdDate,
             };
 
             showEditTaskDialog.value = false;
@@ -1257,7 +1253,6 @@
             Swal.fire({ icon:'error', title:'ผิดพลาด', text:'แก้ไขภาระงานไม่สำเร็จ' });
         }
     };
-
 
     // const updateTaskStatus = async (step, task, newStatus) => {
     //     if (!task?.id) {
