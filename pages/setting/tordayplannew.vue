@@ -160,32 +160,13 @@
                                         </Column>
 
                                         <!-- ภาระงาน -->
-                                        <Column field="description" header="ภาระงานประจะวัน" style="flex: 1" />
-
-                                        <!-- ผู้รับผิดชอบ -->
-                                        <Column header="ผู้รับผิดชอบ" style="width: 14rem">
-                                            <template #body="taskProps">
-                                                <span v-if="taskProps.data.responsible?.length">
-                                                    {{ taskProps.data.responsible.map(o => o.name).join(', ') }}
-                                                </span>
-                                                <span v-else class="text-gray-400">ยังไม่กำหนด</span>
-                                            </template>
-                                        </Column>
-
+                                        <Column field="description" header="ภาระงานประจะวัน" style="flex: 1" /> 
                                         <!-- วันที่ลงบันทึก -->
                                         <Column header="วันที่ลงบันทึก" style="width: 9rem" class="text-center">
                                             <template #body="taskProps">
                                                 <span>{{ formatDate(taskProps.data.createdDate) }}</span>
                                             </template>
-                                        </Column>
-
-                                        <!-- กำหนดเสร็จ -->
-                                        <Column header="กำหนดเสร็จ" style="width: 9rem" class="text-center">
-                                            <template #body="taskProps">
-                                                <Tag :value="formatDate(taskProps.data.dueDate)" 
-                                                    :severity="getTaskDueDateSeverity(taskProps.data.dueDate)" />
-                                            </template>
-                                        </Column>
+                                        </Column> 
 
                                         <!-- เวลาที่ใช้ไป -->
                                         <Column header="เวลาที่ใช้ไป" style="width: 9rem" class="text-center">
@@ -212,12 +193,8 @@
                                         <Column header="จัดการ" style="width: 7rem" class="text-center">
                                             <template #body="taskProps">
                                                 <div class="flex gap-2 justify-center">
-                                                    <Button icon="pi pi-pencil" class="p-button-text p-button-warning p-button-sm p-button-rounded" 
-                                                            @click="openEditTaskDialogInTable(stepProps.data, taskProps.data, taskProps.index)" 
-                                                            v-tooltip.top="'แก้ไขภาระงาน'" />
-                                                    <Button icon="pi pi-trash" class="p-button-text p-button-danger p-button-sm p-button-rounded" 
-                                                            @click="confirmRemoveTaskInTable(stepProps.data, taskProps.index)" 
-                                                            v-tooltip.top="'ลบภาระงาน'" />
+                                                    <Button icon="pi pi-pencil" class="p-button-text p-button-warning p-button-sm p-button-rounded" @click="openEditTaskDialogInTable(stepProps.data, taskProps.data, taskProps.index)" v-tooltip.top="'แก้ไขภาระงาน'" />
+                                                    <Button icon="pi pi-trash" class="p-button-text p-button-danger p-button-sm p-button-rounded"  @click="confirmRemoveTaskInTable(stepProps.data, taskProps.index)" v-tooltip.top="'ลบภาระงาน'" />
                                                 </div>
                                             </template>
                                         </Column>
@@ -371,24 +348,11 @@
             </div>
                 <div class="field">
                     <label class="font-semibold">ภาระงาน</label>
-                    <AutoComplete
+                    <InputText
                         v-model="currentEditingTask.description"
-                        :suggestions="editDescSuggestions"
-                        @complete="onSearchEditTaskDesc"
-                        :minLength="1"
-                        :dropdown="true"
-                        :forceSelection="false"
-                        placeholder="ระบุ/ค้นหาภาระงาน..."
+                        placeholder="ระบุภาระงาน..."
                         class="w-full"
                     />
-                </div>
-                <div class="field mt-4"> 
-                    <label class="font-semibold">ผู้รับผิดชอบ</label>
-                    <MultiSelect v-model="currentEditingTask.responsible" :options="owners" optionLabel="name" placeholder="เลือกผู้รับผิดชอบ" display="chip" />
-                </div> 
-                <div class="field mt-4">
-                    <label class="font-semibold">วันที่กำหนดเสร็จ</label>
-                    <Calendar v-model="currentEditingTask.dueDate" dateFormat="dd/mm/yy" showIcon />
                 </div>
                 <div class="field mt-4">
                     <label class="font-semibold">เวลาเริ่มต้น</label>
@@ -411,131 +375,110 @@
         <Dialog v-model:visible="showAddTaskDialog" :breakpoints="{ '960px': '90vw' }" :style="{ width: '70vw' }" modal>
             <template #header>
                 <div class="flex items-center w-full">
-                    <i class="pi pi-plus-circle mr-2 text-primary-500 text-2xl"></i>
-                    <h5 class="m-0 text-xl font-bold text-primary-700">เพิ่มภาระงานสำหรับขั้นตอน "{{ currentStepToAddTasks.name }}"</h5>
+                <i class="pi pi-plus-circle mr-2 text-primary-500 text-2xl"></i>
+                <h5 class="m-0 text-xl font-bold text-primary-700">
+                    เพิ่มภาระงานสำหรับขั้นตอน "{{ currentStepToAddTasks.name }}"
+                </h5>
                 </div>
             </template>
-            <div class="p-fluid grid form-layout">
-                <!-- ภาระงานหลัก -->
-                <div class="field col-12">
-                    <label class="font-semibold">ภาระงานหลัก</label>
-                    <div class="grid">
-                        <div class="col-9">
-                            <!-- ถ้าไม่ใช่ภาระงานอื่นๆ ใช้ Dropdown -->
-                            <Dropdown 
-                                v-if="!useCustomMainTask"
-                                v-model="newTaskInStep.mainTask"
-                                :options="mainTasks"
-                                optionLabel="POSNAMETH"
-                                optionValue="POSNAMETH"
-                                placeholder="เลือกภาระงานหลัก"
-                                class="w-full"
-                                @change="onMainTaskChange"
-                            />
-                            <!-- ถ้าเป็นภาระงานอื่นๆ ใช้ InputText -->
-                            <InputText 
-                                v-else
-                                v-model="newTaskInStep.mainTask"
-                                placeholder="ภาระงานอื่นๆ"
-                                class="w-full"
-                                readonly
-                            />
-                        </div>
-                        <div class="col-3">
-                            <Button 
-                                label="ภาระงานอื่นๆ" 
-                                icon="pi pi-plus" 
-                                class="p-button-outlined w-full"
-                                @click="() => {
-                                    useCustomMainTask = true;
-                                    useCustomSubTask = true;
-                                    newTaskInStep.mainTask = 'ภาระงานอื่นๆ';
-                                    newTaskInStep.description = ''; // เคลียร์ช่องภาระงานประจำวัน
-                                }"
-                            />
-                        </div>
-                    </div>
-                </div> 
 
-                <!-- ภาระงานประจำวัน -->
+            <div class="p-fluid grid form-layout">
+
+                <!-- ประเภทภาระงาน -->
                 <div class="field col-12">
-                    <label class="font-semibold">ภาระงานประจำวัน</label>
-                    <div class="grid">
-                        <div class="col-12">
-                            <!-- Dropdown ปกติ -->
-                            <Dropdown 
-                                v-if="!useCustomSubTask"
-                                v-model="newTaskInStep.description"
-                                :options="subTasks"
-                                optionLabel="name"
-                                optionValue="name"
-                                placeholder="เลือกภาระงานประจำวัน"
-                                class="w-full"
-                                :disabled="!newTaskInStep.mainTask"
-                            />
-                            <!-- InputText กรณีภาระงานอื่นๆ -->
-                            <InputText 
-                                v-else
-                                v-model="newTaskInStep.description"
-                                placeholder="กรอกภาระงานประจำวัน"
-                                class="w-full"
-                            />
+                <label class="font-semibold">ประเภทภาระงาน</label>
+                <Dropdown
+                    v-model="newTaskInStep.taskType"
+                    :options="taskTypes"
+                    optionLabel="label"
+                    optionValue="value"
+                    placeholder="เลือกประเภทภาระงาน"
+                    class="w-full"
+                    @change="onTaskTypeChange"
+                />
+                </div>
+
+                <!-- ภาระงานหลัก (แสดงเมื่อไม่ใช่ 'งานอื่นๆ') -->
+                <div class="field col-12" v-if="newTaskInStep.taskType !== 'งานอื่นๆ'">
+                <label class="font-semibold">ภาระงานหลัก</label>
+                <div class="grid">
+                    <div class="col-12">
+                        <Dropdown
+                            v-if="!useCustomMainTask"
+                            v-model="newTaskInStep.mainTask"
+                            :options="mainTasks"
+                            optionLabel="label"
+                            optionValue="value"
+                            placeholder="เลือกภาระงานหลัก"
+                            class="w-full"
+                            @change="onMainTaskChange"
+                        />
+                        <InputText
+                            v-else
+                            v-model="newTaskInStep.mainTask"
+                            placeholder="ภาระงานอื่นๆ"
+                            class="w-full"
+                            readonly
+                        />
                         </div> 
                     </div>
                 </div>
 
-                <!-- ผู้รับผิดชอบ -->
+                <!-- ภาระงานประจำวัน (แสดงเมื่อไม่ใช่ 'งานอื่นๆ') -->
+
                 <div class="field col-12">
-                    <label class="font-semibold">ผู้รับผิดชอบ <span class="text-red-500">*</span></label>
-                    <MultiSelect 
-                        v-model="newTaskInStep.responsible" 
-                        :options="owners" 
-                        optionLabel="name" 
-                        placeholder="เลือกผู้รับผิดชอบ" 
-                        display="chip" 
-                        required 
+                    <label class="font-semibold">ภาระงานประจำวัน</label>
+
+                    <!-- งานหลัก: Dropdown -->
+                    <Dropdown
+                        v-if="newTaskInStep.taskType === 'งานหลัก'"
+                        v-model="newTaskInStep.description"
+                        :options="subTasks"
+                        optionLabel="name"
+                        optionValue="name"
+                        placeholder="เลือกภาระงานประจำวัน"
+                        class="w-full"
+                        :disabled="!newTaskInStep.mainTask"
                     />
+
+                    <!-- งานตำแหน่งอื่น / งานอื่นๆ: กรอกเอง -->
+                    <InputText
+                        v-else
+                        v-model="newTaskInStep.description"
+                        placeholder="กรอกภาระงานประจำวัน"
+                        class="w-full"
+                    />
+                </div>
+
+                <!-- หมายเหตุ (แสดงเฉพาะเมือ 'งานอื่นๆ') -->
+                <div class="field col-12" v-if="newTaskInStep.taskType === 'งานอื่นๆ'">
+                <label class="font-semibold">หมายเหตุ</label>
+                <Textarea
+                    v-model="newTaskInStep.note"
+                    autoResize
+                    rows="3"
+                    placeholder="กรอกรายละเอียดภาระงาน/หมายเหตุ"
+                    class="w-full"
+                />
                 </div>
 
                 <!-- เวลาเริ่มต้น -->
-                <div class="field col-12 md:col-6">
-                    <label class="font-semibold">เวลาเริ่มต้น</label>
-                    <Calendar 
-                        v-model="newTaskInStep.startTime" 
-                        :showTime="true" 
-                        hourFormat="24" 
-                        placeholder="เวลาเริ่มต้น" 
-                    />
+                <div class="field col-6 md:col-6">
+                <label class="font-semibold">เวลาเริ่มต้น</label>
+                <Calendar v-model="newTaskInStep.startTime" :showTime="true" hourFormat="24" placeholder="เวลาเริ่มต้น" />
                 </div>
 
                 <!-- เวลาสิ้นสุด -->
-                <div class="field col-12 md:col-6">
-                    <label class="font-semibold">เวลาสิ้นสุด</label>
-                    <Calendar 
-                        v-model="newTaskInStep.endTime" 
-                        :showTime="true" 
-                        hourFormat="24" 
-                        placeholder="เวลาสิ้นสุด" 
-                    />
-                </div>
-
-                <!-- วันที่กำหนดเสร็จ -->
-                <div class="field col-12">
-                    <label class="font-semibold">วันที่กำหนดเสร็จ <span class="text-red-500">*</span></label>
-                    <Calendar 
-                        v-model="newTaskInStep.dueDate" 
-                        dateFormat="dd/mm/yy" 
-                        showIcon 
-                    />
+                <div class="field col-6 md:col-6">
+                <label class="font-semibold">เวลาสิ้นสุด</label>
+                <Calendar v-model="newTaskInStep.endTime" :showTime="true" hourFormat="24" placeholder="เวลาสิ้นสุด" />
                 </div>
             </div>
 
-
-
             <template #footer>
                 <div class="flex justify-end gap-2 pt-4">
-                    <Button label="ยกเลิก" icon="pi pi-times" class="p-button-text p-button-danger" @click="showAddTaskDialog = false" />
-                    <Button label="บันทึก" icon="pi pi-plus" class="p-button-success" @click="addTaskToStepFromMain" :disabled="!isNewTaskInStepValid" />
+                <Button label="ยกเลิก" icon="pi pi-times" class="p-button-text p-button-danger" @click="showAddTaskDialog = false" />
+                <Button label="บันทึก" icon="pi pi-plus" class="p-button-success" @click="addTaskToStepFromMain" :disabled="!isNewTaskInStepValid" />
                 </div>
             </template>
         </Dialog>
@@ -608,10 +551,7 @@
             loadSessionFromStorage();
         }
     }
-   
-       
-  
-
+    
     /** เผื่ออยากเซ็ตค่า session เองจากภายนอก */
     function setSession(staffId, facId, groupId = null) {
     session.staffId = staffId ?? null;
@@ -649,39 +589,80 @@
         return mainTask || 'ยังไม่เลือก';
     };
 
+    //เพิ่มภาระงาน
+
+   async function fetchPositionMainWorks() {
+    const positionNameId = user?.user?.name?.POSITIONNAMEID ?? null;
+        if (!positionNameId) { positionMains.value = []; return; }
+        const res = await axios.get(`${API}/getMainWorks`, { params: { positionnameid: positionNameId }});
+
+        // ⬇️ map ให้เป็น {label,value}
+        const data = Array.isArray(res.data?.data) ? res.data.data : [];
+        positionMains.value = data
+        .map(x => ({ label: x.POSNAMETH, value: x.POSNAMETH }))
+        .filter(x => !!x.label);
+    } 
+   async function fetchAllMainWorks() {
+        const res = await axios.get(`${API}/getMainWorksAll`);
+        allMainTasks.value = (Array.isArray(res.data?.data) ? res.data.data : []);
+    }
+
+    async function fetchPositionSubWorks(mainName) { // [NEW] โหลด sub "ตามตำแหน่ง"
+    if (!mainName) { positionSubs.value = []; return; }
+    const res = await axios.get(`${API}/getSubWorks`, { params: { mainActivity: mainName } });
+    positionSubs.value = Array.isArray(res.data?.data) ? res.data.data : [];
+    }
+
+    async function fetchAllSubWorks(mainName) { // [NEW] โหลด sub "ทุกตำแหน่ง"
+    // <== เช่น /getSubWorksAll?mainActivity=xxx ที่ไม่กรองตามตำแหน่ง
+    const res = await axios.get(`${API}/getSubWorksAll`, { params: { mainActivity: mainName } });
+    allSubTasks.value = Array.isArray(res.data?.data) ? res.data.data : [];
+    }
+
  
 
     const mainTasks = ref([]);
     const subTasks = ref([]);
-   const onMainTaskChange = async (event) => { 
-    const selectedMainActivity = event.value; 
+    const onMainTaskChange = async (e) => {
+        const mainName = e?.value ?? newTaskInStep.mainTask; // string
+        if (!mainName) { subTasks.value = []; newTaskInStep.description = null; return; }
 
-    if (selectedMainActivity) {
-        try {
-            const res = await axios.get(`${API}/getSubWorks`, {
-                params: {
-                    mainActivity: selectedMainActivity // เปลี่ยนชื่อ parameter ให้ตรงกับ backend
-                }
-            });
-            subTasks.value = Array.isArray(res.data.data) ? res.data.data : [];
-        } catch (error) {
-            console.error('Error fetching sub tasks:', error);
-            subTasks.value = [];
+        if (newTaskInStep.taskType === 'งานตำแหน่งอื่น') {
+            const res = await axios.get(`${API}/getSubWorksAll`, { params: { mainActivity: mainName }});
+            subTasks.value = Array.isArray(res.data?.data) ? res.data.data : [];
+        } else {
+            const res = await axios.get(`${API}/getSubWorks`, { params: { mainActivity: mainName }});
+            subTasks.value = Array.isArray(res.data?.data) ? res.data.data : [];
         }
-    } else {
-        subTasks.value = [];
-    }
-    newTaskInStep.description = null;
-};
+        newTaskInStep.description = null;
+    };
      
     const allPlans = ref([]);
     const owners = ref([
-    { id: 1, name: 'พิพัฒน์พงษ์ เพริดพราว' },
-    { id: 2, name: 'อนุรักษ์ สุระขันตี' },
-    { id: 3, name: 'อัครรินทร์ บุปผา' },
-    { id: 4, name: 'สุชาติ กัญญาประสิทธิ์' },
-    { id: 5, name: 'ธนดล สิงขรอาสน์' },
-   
+    { id: 1, name: 'นาย พิพัฒน์พงษ์ เพริดพราว' },
+    { id: 2, name: 'นาย อนุรักษ์ สุระขันตี' },
+    { id: 3, name: 'นาย อัครรินทร์ บุปผา' },
+    { id: 4, name: 'นาย สุชาติ กัญญาประสิทธิ์' },
+    { id: 5, name: 'นาย ธนดล สิงขรอาสน์' }, 
+    { id: 6, name: 'นาย ณัฐวุฒิ สุทธิพันธ์' },
+    { id: 7, name: 'นาง นันทรัตน์ จำปาแดง' },
+    { id: 8, name: 'นาย ไกรษร อุทัยแสง' },
+    { id: 9, name: 'นาง พิมพ์พร พรรณศรี' },
+    { id: 10, name: 'นาย กัมปนาท อาชา' },
+    { id: 11, name: 'นาง วาสนา อุทัยแสง' },
+    { id: 12, name: 'นางสาว แจ่มจันทร์ จันทร์ศรี' },
+    { id: 13, name: 'นาง อิศราภรณ์ ศรีเวียงธนาธิป' },
+    { id: 14, name: 'นาย คมรัตน์ หลูปรีชาเศรษฐ' },
+    { id: 15, name: 'นางสาว สิริมา ศรีสุภาพ' },
+    { id: 16, name: 'นางสาว รัตติยา สัจจภิรมย์' },
+    { id: 17, name: 'นางสาว กัญญมน แก้วมงคล' },
+    { id: 18, name: 'นาง อัจฉราวดี กำมุขโช' },
+    { id: 19, name: 'นาง วรินธร จีระฉัตร' },
+    { id: 20, name: 'นางสาว ญาณทัสน์ อันทะราศรี' },
+    { id: 21, name: 'นาย นัฐพงษ์ ศรีเตชะ' },
+    { id: 22, name: 'นางสาว สมสมัย บุญทศ' },
+    { id: 23, name: 'นาง สารดา พันธุ์เสนา' }, 
+      
     ]);
     const taskStatuses = ref(['รอดำเนินการ', 'อยู่ระหว่างดำเนินการ', 'เสร็จสิ้น']);
 
@@ -704,8 +685,8 @@
     // State for adding task from main table
     const showAddTaskDialog = ref(false);
     const currentStepToAddTasks = reactive({ id: null, name: '' });
-    const newTaskInStep = reactive({ description: '', responsible: [], dueDate: null, startTime: null, endTime: null, mainTask: null, status: 'รอดำเนินการ',main_tasks: null });
-
+    //const newTaskInStep = reactive({ description: '', responsible: [], dueDate: null, startTime: null, endTime: null, mainTask: null, status: 'รอดำเนินการ',main_tasks: null });
+    const newTaskInStep = reactive({ taskType: 'งานหลัก', mainTask: null, description: '', responsible: [], startTime: null, endTime: null, dueDate: null, status: 'รอดำเนินการ', });
     // ----------------- VALIDATIONS ------------
     const isFirstStepValid = computed(() =>
         currentPlan.planLabel && currentPlan.owner.length > 0 && currentPlan.startDate && currentPlan.endDate
@@ -715,9 +696,17 @@
     const isNewStepValid = computed(() =>
         newStepName.value && newStepDates.value && newStepDates.value.length === 2 && newStepDates.value[0] && newStepDates.value[1]
     );
-    const isNewTaskInStepValid = computed(() =>
-        newTaskInStep.description && newTaskInStep.responsible.length > 0 && newTaskInStep.dueDate
-    );
+    const isNewTaskInStepValid = computed(() => { // [MOD] รองรับกรณี 'งานอื่นๆ'
+        const t = newTaskInStep;
+        const timeOk = !t.startTime || !t.endTime || new Date(t.endTime) >= new Date(t.startTime);
+        if (t.taskType === 'งานอื่นๆ') {
+            // งานอื่นๆ: ต้องกรอกหมายเหตุ
+            return !!t.note && t.note.trim() !== '' && !!t.status && timeOk; // [NEW]
+        } else {
+            // งานหลัก/งานตำแหน่งอื่น: ต้องเลือก description (subtask)
+            return !!t.description && t.description.trim() !== '' && !!t.status && timeOk; // [MOD]
+        }
+    });
 
     // ----------------- HELPERS ----------------
     const pad = (n) => String(n).padStart(2,'0');
@@ -763,11 +752,24 @@
         return due < now ? 'danger' : 'success';
     };
     const getTaskTimeSpent = (task) => {
-    if (!task.startTime || !task.endTime) return 'ยังไม่ระบุ';
+        // รองรับกรณีมีแค่เวลาเริ่ม + กำลังดำเนินการ -> นับจนถึงตอนนี้
+        if (task?.startTime && !task?.endTime && task?.status === 'อยู่ระหว่างดำเนินการ') {
+            const start = new Date(task.startTime);
+            const now = new Date();
+            const diffMin = Math.max(0, Math.round((now - start) / (1000 * 60)));
+            return `${diffMin} นาที`;
+        }
+
+        // กรณีมี start & end ครบ
+        if (!task?.startTime || !task?.endTime) return 'ยังไม่ระบุ';
         const start = new Date(task.startTime);
-        const end = new Date(task.endTime);
-        const diffInMinutes = Math.abs(end - start) / (1000 * 60);
-    return `${Math.floor(diffInMinutes / 60)} ชม. ${Math.round(diffInMinutes % 60)} นาที`;
+        const end   = new Date(task.endTime);
+
+        // ถ้า end เร็วกว่า start ให้ถือว่าเป็น 0 (กันพลาดจากการกรอกเวลา)
+        const diffMs  = Math.max(0, end - start);
+        const diffMin = Math.round(diffMs / (1000 * 60));
+
+        return `${diffMin} นาที`;
     };
     const getTaskStatusSeverityByValue = (status) =>
     status === 'เสร็จสิ้น' ? 'success' : status === 'อยู่ระหว่างดำเนินการ' ? 'warning' : 'info'; 
@@ -1090,12 +1092,30 @@
 
     //เคลลียร์ฟอร์มก่อนเปิด dialog
     const useCustomMainTask = ref(false);
-    const useCustomSubTask  = ref(false);
+    const useCustomSubTask  = ref(false); 
+
+    const allMainTasks   = ref([]);   // main ทั้งระบบ (ทุกตำแหน่ง)
+    const allSubTasks    = ref([]);   // sub ทั้งระบบ (ทุกตำแหน่ง)
+    const positionMains  = ref([]);   // main ตามตำแหน่งผู้ใช้
+    const positionSubs   = ref([]);   // sub ตามตำแหน่งผู้ใช้ (ขึ้นกับ main)
+    const mainTaskOptionLabel = computed(() => {
+    // ถ้าของที่โหลดมาเป็นแบบ { POSNAMETH } ใช้คีย์นั้น, ถ้าเป็น {label,value} ก็ใช้ label
+    // ทำให้ Dropdown ใช้ร่วมกันได้ทั้งสองรูปแบบ
+    const sample = mainTasks.value?.[0] || {};
+    return sample.POSNAMETH ? 'POSNAMETH' : 'label';
+    });
+    const mainTaskOptionValue = computed(() => {
+    const sample = mainTasks.value?.[0] || {};
+    return sample.POSNAMETH ? 'POSNAMETH' : 'value';
+    });
+ 
 
     function resetNewTaskInStep() {
         Object.assign(newTaskInStep, {
+            taskType: 'งานหลัก',
             mainTask: null,
             description: '',
+            note: '',
             responsible: [],
             startTime: null,
             endTime: null,
@@ -1106,63 +1126,79 @@
         useCustomSubTask.value  = false;
         subTasks.value = [];
     }
+    const taskTypes = [
+    { label: 'งานหลัก', value: 'งานหลัก' },
+    { label: 'งานตำแหน่งอื่น', value: 'งานตำแหน่งอื่น' },
+    { label: 'งานอื่นๆ', value: 'งานอื่นๆ' },
+    ];
+ 
+    const onTaskTypeChange = async () => {
+        const t = newTaskInStep.taskType;
+        newTaskInStep.mainTask = null;
+        newTaskInStep.description = '';
+        useCustomMainTask.value = false;
+        useCustomSubTask.value = (t === 'งานอื่นๆ'); // งานอื่นๆ = กรอกเอง
+        subTasks.value = [];
 
-
-    const addTaskToStepFromMain = async () => {
-        // const responsibleIds = newTaskInStep.responsible.map(u => u.id);
-        // console.log(responsibleIds); // [1, 2]
-        // console.log('session.staffId: ',session.staffId);
-        // console.log('session.facId: ',session.facId);
-        
-        if (!isNewTaskInStepValid.value) {
-            return Swal.fire({ icon:'error', title:'ข้อผิดพลาด', text:'กรุณากรอกข้อมูลภาระงานให้ครบถ้วน' });
+        if (t === 'งานอื่นๆ') {
+            newTaskInStep.mainTask = 'ภาระงานอื่นๆ';
+            return;
         }
+        if (t === 'งานหลัก') {
+            await fetchPositionMainWorks();
+            mainTasks.value = positionMains.value;  // ← ทั้งสองกรณีเป็น {label,value}
+        } else if (t === 'งานตำแหน่งอื่น') {
+            await fetchAllMainWorks();
+            mainTasks.value = allMainTasks.value;   // ← {label,value}
+        }
+    };
+
+
+
+    const addTaskToStepFromMain = async () => { // [MOD]
+        if (!isNewTaskInStepValid.value) {
+            return Swal.fire({
+            icon: 'error',
+            title: 'ข้อผิดพลาด',
+            text: 'กรุณากรอกข้อมูลให้ครบถ้วน (ตรวจสอบประเภท/รายละเอียด/หมายเหตุ และเวลา)'
+            });
+        }
+
         try {
             const payload = {
-                step_id: currentStepToAddTasks.id,
-                mainTask: newTaskInStep.mainTask,
-                description: newTaskInStep.description,
-                dueDate: toDateStr(newTaskInStep.dueDate),
-                startTime: toDateTimeStr(newTaskInStep.startTime),
-                endTime: toDateTimeStr(newTaskInStep.endTime),
-                status: newTaskInStep.status,
-                staff_id: session.staffId,
-                fac_id: session.facId,
-                owner: newTaskInStep.responsible.map(u => u.id),
+            step_id: currentStepToAddTasks.id,
+            taskType: newTaskInStep.taskType,                                           // [MOD]
+            mainTask: newTaskInStep.taskType === 'งานอื่นๆ' ? 'ภาระงานอื่นๆ' : newTaskInStep.mainTask, // [NEW]
+            // ถ้าเป็นงานอื่นๆ ใช้ note เป็น description
+            description: newTaskInStep.taskType === 'งานอื่นๆ' ? (newTaskInStep.note || '') : newTaskInStep.description, // [NEW]
+            startTime: toDateTimeStr(newTaskInStep.startTime),
+            endTime:   toDateTimeStr(newTaskInStep.endTime),
+            status:    newTaskInStep.status,
+            staff_id:  session.staffId,
+            fac_id:    session.facId,
             };
-
-            // // log ข้อมูลที่จะส่ง
-            // console.log("Payload ที่จะส่ง:", payload);
-  
 
             const res = await axios.post(`${API}/savedatatasks`, payload);
 
-            // // log response จาก server
-            // console.log("Response จาก server:", res.data);
-
             const plan = allPlans.value.find(p => p.steps.some(s => s.id === currentStepToAddTasks.id));
-            console.log('plan: ',plan);
-            ///
             const step = plan?.steps.find(s => s.id === currentStepToAddTasks.id);
-             console.log('step: ',step);
             if (step) {
-                step.tasks = step.tasks || [];
-                step.tasks.push({
-                    id: res.data.id,
-                    mainTask: newTaskInStep.mainTask,
-                    description: newTaskInStep.description,
-                    responsible: newTaskInStep.responsible,
-                    dueDate: newTaskInStep.dueDate,
-                    startTime: newTaskInStep.startTime,
-                    endTime: newTaskInStep.endTime,
-                    status: newTaskInStep.status,
-                    createdDate: new Date(),
-                    staffId: session.staffId ?? null,
-                });
+            step.tasks = step.tasks || [];
+            step.tasks.push({
+                id: res.data.id,
+                taskType: payload.taskType,
+                mainTask: payload.mainTask,
+                description: payload.description,
+                startTime: newTaskInStep.startTime,
+                endTime: newTaskInStep.endTime,
+                status: newTaskInStep.status,
+                createdDate: new Date(),
+                staffId: session.staffId ?? null,
+            });
             }
 
             showAddTaskDialog.value = false;
-            Swal.fire({ icon:'success', title:'สำเร็จ', text:'เพิ่มภาระงานเรียบร้อยแล้ว', timer: 1200, showConfirmButton: false });
+            Swal.fire({ icon: 'success', title: 'สำเร็จ', text: 'เพิ่มภาระงานเรียบร้อยแล้ว', timer: 1200, showConfirmButton: false });
         } catch (e) {
             console.error("เกิดข้อผิดพลาด:", e);
             Swal.fire({ icon:'error', title:'ผิดพลาด', text:'เพิ่มภาระงานไม่สำเร็จ' });
@@ -1201,8 +1237,7 @@
         value: item.POSNAMETH
         }));
 
-        // ถ้า mainTask เดิมมีอยู่ ให้คงค่าไว้ (v-model จะโชว์ทันที)
-        // ไม่มีโค้ดเพิ่ม เพราะ currentEditingTask.mainTask ถูกตั้งไว้แล้วด้านบน
+       
     } catch (e) {
         console.error("Error fetching main tasks:", e);
         mainTasks.value = [];
@@ -1210,40 +1245,43 @@
     };
 
 
-    const saveEditedTask = async () => {
-        if (!currentEditingTask.description || !currentEditingTask.responsible.length || !currentEditingTask.dueDate) {
-            return Swal.fire({ icon:'error', title:'ข้อผิดพลาด', text:'กรุณากรอกข้อมูลภาระงานให้ครบถ้วน' });
-        }
+    const saveEditedTask = async () => { 
+        const invalidTime =
+            currentEditingTask.startTime &&
+            currentEditingTask.endTime &&
+            new Date(currentEditingTask.endTime) < new Date(currentEditingTask.startTime);
 
-        const responsibleIds = currentEditingTask.responsible.map(u => u.id);
+        if (!currentEditingTask.description || invalidTime) {
+            return Swal.fire({
+            icon: 'error',
+            title: 'ข้อผิดพลาด',
+            text: invalidTime
+                ? 'กรุณาตรวจสอบเวลาเริ่มต้น-สิ้นสุด'
+                : 'กรุณาระบุภาระงาน'
+            });
+        }
 
         const payload = {
             id:          currentEditingTask.taskId,
             mainTask:    currentEditingTask.mainTask,
             description: currentEditingTask.description,
-            dueDate:     toDateStr(currentEditingTask.dueDate),
             startTime:   toDateTimeStr(currentEditingTask.startTime),
             endTime:     toDateTimeStr(currentEditingTask.endTime),
             status:      currentEditingTask.status,
-            responsible: responsibleIds,     // ⭐ ส่งเป็น array
             fac_id:      session.facId,
         };
 
         try {
-            await axios.post(`${API}/Edtdatatasks`, payload);
-
-            // อัปเดตใน state เดิม “ที่ตำแหน่งเดิม”
+            await axios.post(`${API}/Edtdatatasks`, payload); 
             const planIndex = allPlans.value.findIndex(p => p.steps.some(s => s.id === currentEditingTask.stepId));
             if (planIndex === -1) return;
             const stepIndex = allPlans.value[planIndex].steps.findIndex(s => s.id === currentEditingTask.stepId);
             if (stepIndex === -1) return;
 
             allPlans.value[planIndex].steps[stepIndex].tasks[currentEditingTask.taskIndex] = {
-            id: currentEditingTask.taskId,                            // ⭐ ยังคง id เดิม
+            id: currentEditingTask.taskId,
             mainTask: currentEditingTask.mainTask,
-            description: currentEditingTask.description,
-            responsible: [...currentEditingTask.responsible],
-            dueDate: currentEditingTask.dueDate,
+            description: currentEditingTask.description, 
             startTime: currentEditingTask.startTime,
             endTime: currentEditingTask.endTime,
             status: currentEditingTask.status,
@@ -1257,6 +1295,8 @@
             Swal.fire({ icon:'error', title:'ผิดพลาด', text:'แก้ไขภาระงานไม่สำเร็จ' });
         }
     };
+
+
 
 
     // const updateTaskStatus = async (step, task, newStatus) => {
@@ -1403,7 +1443,7 @@
             }
         }, 250);
     };
-
+ 
 
  </script>
 

@@ -103,12 +103,18 @@
                 </template>
               </Column>
 
-              <Column header="ผู้รับผิดชอบหลัก" style="min-width: 10rem">
+              <Column header="ผู้รับผิดชอบ">
                 <template #body="slotProps">
-                  <span v-if="slotProps.data.owner && slotProps.data.owner.length">
+                  <span v-if="slotProps.data.owner?.length">
                     {{ slotProps.data.owner.map(o => o.name).join(', ') }}
                   </span>
                   <span v-else class="text-gray-400">ยังไม่กำหนด</span>
+                </template>
+              </Column>
+
+              <Column header="เวลารวม (นาที)" style="min-width: 10rem; text-align:center;">
+                <template #body="slotProps">
+                  <span class="font-semibold">{{ getPlanTotalMinutes(slotProps.data).toLocaleString() }}</span>
                 </template>
               </Column>
 
@@ -164,14 +170,16 @@
                       <template #body="stepProps">{{ formatDate(stepProps.data.endDate) }}</template>
                     </Column>
 
-                    <Column header="ผู้รับผิดชอบ" style="min-width: 12rem">
-                        <template #body="stepProps">
-                            <span v-if="stepProps.data.owner && stepProps.data.owner.length">
-                            {{ stepProps.data.owner.map(o => o.name).join(', ') }}
-                            </span>
-                            <span v-else class="text-gray-400">ยังไม่กำหนด</span>
-                        </template>
-                    </Column> 
+                    <!-- <Column header="ผู้รับผิดชอบ">
+                      <template #body="stepProps">
+                        <span v-if="stepProps.data.owner?.length">
+                          {{ stepProps.data.owner.map(o => o.name).join(', ') }}
+                        </span>
+                        <span v-else class="text-gray-400">ยังไม่กำหนด</span>
+                      </template>
+                    </Column> -->
+
+
                     <Column header="ความคืบหน้า" style="min-width: 12rem">
                       <template #body="stepProps">
                         <div class="flex items-center">
@@ -212,17 +220,7 @@
                             </template>
                           </Column>
 
-                          <Column field="description" header="ภาระงานประจำวัน" style="flex: 1" />
-
-                          <Column header="ผู้รับผิดชอบ" style="width: 14rem">
-                            <template #body="taskProps">
-                              <span v-if="taskProps.data.responsible?.length">
-                                {{ taskProps.data.responsible.map(o => o.name).join(', ') }}
-                              </span>
-                              <span v-else class="text-gray-400">ยังไม่กำหนด</span>
-                            </template>
-                          </Column>
-
+                          <Column field="description" header="ภาระงานประจำวัน" style="flex: 1" /> 
                           <Column header="วันที่ลงบันทึก" style="width: 9rem" class="text-center">
                             <template #body="taskProps">{{ formatDate(taskProps.data.createdDate) }}</template>
                           </Column>
@@ -288,11 +286,29 @@ const API = 'http://127.0.0.1:8000/api'
 
 /* รายชื่อเจ้าของงาน (ใช้ map owner ให้ตรงกับหน้าแรก) */
 const owners = ref([
-  { id: 1, name: 'พิพัฒน์พงษ์ เพริดพราว' },
-  { id: 2, name: 'อนุรักษ์ สุระขันตี' },
-  { id: 3, name: 'อัครรินทร์ บุปผา' },
-  { id: 4, name: 'สุชาติ กัญญาประสิทธิ์' },
-  { id: 5, name: 'ธนดล สิงขรอาสน์' },
+  { id: 1, name: 'นาย พิพัฒน์พงษ์ เพริดพราว' },
+    { id: 2, name: 'นาย อนุรักษ์ สุระขันตี' },
+    { id: 3, name: 'นาย อัครรินทร์ บุปผา' },
+    { id: 4, name: 'นาย สุชาติ กัญญาประสิทธิ์' },
+    { id: 5, name: 'นาย ธนดล สิงขรอาสน์' }, 
+    { id: 6, name: 'นาย ณัฐวุฒิ สุทธิพันธ์' },
+    { id: 7, name: 'นาง นันทรัตน์ จำปาแดง' },
+    { id: 8, name: 'นาย ไกรษร อุทัยแสง' },
+    { id: 9, name: 'นาง พิมพ์พร พรรณศรี' },
+    { id: 10, name: 'นาย กัมปนาท อาชา' },
+    { id: 11, name: 'นาง วาสนา อุทัยแสง' },
+    { id: 12, name: 'นางสาว แจ่มจันทร์ จันทร์ศรี' },
+    { id: 13, name: 'นาง อิศราภรณ์ ศรีเวียงธนาธิป' },
+    { id: 14, name: 'นาย คมรัตน์ หลูปรีชาเศรษฐ' },
+    { id: 15, name: 'นางสาว สิริมา ศรีสุภาพ' },
+    { id: 16, name: 'นางสาว รัตติยา สัจจภิรมย์' },
+    { id: 17, name: 'นางสาว กัญญมน แก้วมงคล' },
+    { id: 18, name: 'นาง อัจฉราวดี กำมุขโช' },
+    { id: 19, name: 'นาง วรินธร จีระฉัตร' },
+    { id: 20, name: 'นางสาว ญาณทัสน์ อันทะราศรี' },
+    { id: 21, name: 'นาย นัฐพงษ์ ศรีเตชะ' },
+    { id: 22, name: 'นางสาว สมสมัย บุญทศ' },
+    { id: 23, name: 'นาง สารดา พันธุ์เสนา' }, 
 ])
 
 const staffIdMain = ref('')
@@ -460,14 +476,42 @@ function getTaskDueDateSeverity(dueDate) {
   return due < now ? 'danger' : 'success'
 }
 function getTaskTimeSpent(task) {
-  const start = parseDateLoose(task.startTime ?? task.time_start ?? task.start_time ?? task.work_start)
-  const end   = parseDateLoose(task.endTime   ?? task.time_end   ?? task.end_time   ?? task.work_end)
-  if (!start || !end) return 'ยังไม่ระบุ'
-  const diffMin = Math.max(0, (end - start) / (1000*60))
-  const h = Math.floor(diffMin / 60)
-  const m = Math.round(diffMin % 60)
-  return `${h} ชม. ${m} นาที`
+  const mins = getTaskMinutes(task);
+  if (mins === 0) {
+    // ถ้าอยากให้โชว์ “ยังไม่ระบุ” กรณีไม่มีเวลา start/end ให้ใช้แบบนี้:
+    const hasStart = !!parseDateLoose(task?.startTime ?? task?.time_start ?? task?.start_time ?? task?.work_start);
+    const hasEnd   = !!parseDateLoose(task?.endTime   ?? task?.time_end   ?? task?.end_time   ?? task?.work_end);
+    return (hasStart && hasEnd) ? '0 นาที' : 'ยังไม่ระบุ';
+  }
+  return `${mins} นาที`;
 }
+
+function getTaskMinutes(task) {
+  // รองรับคีย์หลายแบบที่อาจมาจาก API
+  const start = parseDateLoose(task?.startTime ?? task?.time_start ?? task?.start_time ?? task?.work_start);
+  const end   = parseDateLoose(task?.endTime   ?? task?.time_end   ?? task?.end_time   ?? task?.work_end);
+
+  // ถ้ายังไม่ครบ ให้ถือว่า 0 นาที (ไม่ทิ้ง error)
+  if (!start || !end) return 0;
+
+  // กันเวลา end < start
+  const diffMs = Math.max(0, end - start);
+  return Math.round(diffMs / 60000); // นาทีล้วน
+}
+
+// รวม “นาทีทั้งหมด” ของขั้นตอนหนึ่ง ๆ
+function getStepTotalMinutes(step) {
+  if (!step?.tasks?.length) return 0;
+  return step.tasks.reduce((sum, t) => sum + getTaskMinutes(t), 0);
+}
+
+// รวม “นาทีทั้งหมด” ของทั้งแผน (รวมทุกขั้นตอน)
+function getPlanTotalMinutes(plan) {
+  if (!plan?.steps?.length) return 0;
+  return plan.steps.reduce((sum, st) => sum + getStepTotalMinutes(st), 0);
+}
+
+
 function getTaskStatusSeverityByValue(status) {
   const s = normalizeStatus(status)
   return s === 'เสร็จสิ้น' ? 'success' : s === 'อยู่ระหว่างดำเนินการ' ? 'warning' : 'info'
@@ -477,43 +521,90 @@ function getMainTaskLabel(mainTask) {
 }
 
 /* ---------- mapping ให้ตรงกับหน้าแรก ---------- */
+const findOwner = (o) =>
+  owners.value.find(x => Number(x.id) === Number(o?.id ?? o)) || null;
+
+// แปลง owner ให้เป็น [{id,name}] รับได้ทั้ง id, object, string, "1,2", "ชื่อ ก,ชื่อ ข"
+function toOwnerArray(v) {
+  if (!v) return [];
+  if (Array.isArray(v)) {
+    return v.map(item => {
+      if (item && typeof item === 'object' && ('id' in item || 'staffid' in item)) {
+        const id = item.id ?? item.staffid;
+        return findOwner({ id }) ?? { id, name: String(item.name ?? item.fullname ?? id) };
+      }
+      if (typeof item === 'number' || /^\d+$/.test(String(item))) {
+        const id = Number(item);
+        return findOwner({ id }) ?? { id, name: String(id) };
+      }
+      return { id: null, name: String(item) };
+    });
+  }
+  if (typeof v === 'string') {
+    return v.split(',').map(s => {
+      const t = s.trim();
+      if (/^\d+$/.test(t)) {
+        const id = Number(t);
+        return findOwner({ id }) ?? { id, name: t };
+      }
+      return { id: null, name: t };
+    });
+  }
+  if (typeof v === 'object') {
+    const id = v.id ?? v.staffid ?? null;
+    return [findOwner({ id }) ?? { id, name: String(v.name ?? v.fullname ?? id ?? '') }];
+  }
+  return [];
+}
+
+// รองรับหลายชื่อฟิลด์ที่ API อาจส่งมา
+function ownersFromAny(p) {
+  return toOwnerArray(
+    p?.owner ?? p?.owners ?? p?.ownerIds ?? p?.owner_ids ?? p?.responsible ?? null
+  );
+}
+
+// === mapping หลัก ===
 function mapApiToState(arr) {
-  return (arr || []).map(p => ({
-    ...p,
-    startDate: p.startDate ? new Date(p.startDate) : null,
-    endDate:   p.endDate   ? new Date(p.endDate)   : null,
+  return (arr || []).map(p => {
+    const planOwners = ownersFromAny(p);
 
-    owner: (p.owner || []).map(o => owners.value.find(x => x.id === o.id) || o),
-    ownerNames: (p.owner || [])
-      .map(o => (owners.value.find(x => x.id === o.id) || o).name)
-      .join(', '),
+    return {
+      ...p,
+      startDate: p.startDate ? new Date(p.startDate) : null,
+      endDate:   p.endDate   ? new Date(p.endDate)   : null,
 
-    steps: (p.steps || []).map(s => ({
-      ...s,
-      startDate: s.startDate ? new Date(s.startDate) : null,
-      endDate:   s.endDate   ? new Date(s.endDate)   : null,
+      owner: planOwners,
+      ownerNames: planOwners.map(o => o.name).join(', '),
 
-      tasks: (s.tasks || []).map(t => {
-        const mappedResponsible = Array.isArray(t.responsible)
-          ? t.responsible.map(r => {
-              const match = owners.value.find(o => o.id === r.id)
-              return match ? { ...r, name: match.name } : r
-            })
-          : []
+      steps: (p.steps || []).map(s => {
+        const stepOwners = ownersFromAny(s);
 
         return {
-          ...t,
-          responsible: mappedResponsible,
-          mainTask: t.mainTask ?? t.Main_tasks ?? null,
-          dueDate:     t.dueDate     ? new Date(t.dueDate)     : null,
-          startTime:   t.startTime   ? new Date(t.startTime)   : null,
-          endTime:     t.endTime     ? new Date(t.endTime)     : null,
-          createdDate: t.createdDate ? new Date(t.createdDate) : null,
-        }
+          ...s,
+          owner: stepOwners,
+          ownerNames: stepOwners.map(o => o.name).join(', '),
+          startDate: s.startDate ? new Date(s.startDate) : null,
+          endDate:   s.endDate   ? new Date(s.endDate)   : null,
+
+          tasks: (s.tasks || []).map(t => {
+            const responsible = ownersFromAny(t);
+            return {
+              ...t,
+              responsible,
+              mainTask: t.mainTask ?? t.Main_tasks ?? null,
+              dueDate:     t.dueDate     ? new Date(t.dueDate)     : null,
+              startTime:   t.startTime   ? new Date(t.startTime)   : null,
+              endTime:     t.endTime     ? new Date(t.endTime)     : null,
+              createdDate: t.createdDate ? new Date(t.createdDate) : null,
+            };
+          }),
+        };
       }),
-    })),
-  }))
+    };
+  });
 }
+
 
 /* ---------- API ---------- */
 async function fetchEvaluationRounds() {
@@ -601,6 +692,10 @@ defineExpose({
   fetchStaffAndDailyTasks,
   openDailyTaskDetail
 })
+
+
+
+
 </script>
 
 
