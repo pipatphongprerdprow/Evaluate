@@ -9,18 +9,6 @@
               ตรวจสอบภาระงานประจำวัน
             </h3>
           </div>
-          <div class="col md:col-5">
-            <Dropdown
-              v-model="selectedEvaluationRound"
-              :options="evaluationRounds"
-              :optionLabel="(item) => `${item.facuties} ${item.d_evaluationround} ${item.d_date}`"
-              placeholder="กรุณาเลือกรอบการประเมิน"
-              style="max-width: 500px; width: 100%"
-            />
-          </div>
-          <div class="col md:col-1">
-            <Button class="mb-2 mr-2" icon="pi pi-search" @click="fetchStaffAndDailyTasks" />
-          </div>
         </div>
 
         <table class="table">
@@ -33,18 +21,18 @@
           </thead>
           <tbody>
             <tr v-for="(item, index) in products" :key="index">
-              <td style="padding-left: 5px;text-align: left;">
+              <td class="staff-name-cell">
                 <b style="color: blue;">{{ item.prefixfullname }} {{ item.namefully }}</b>
               </td>
-              <td class="text-center" style="color: blue;">
+              <td class="text-center staff-position-cell">
                 <b>{{ item.posnameth || '' }}</b>
               </td>
-              <td style="text-align: center;">
+              <td class="button-cell">
                 <Button
                   label="รายละเอียด"
                   severity="info"
                   icon="pi pi-list"
-                  style="width: 130px;"
+                  class="detail-button"
                   @click="openDailyTaskDetail(item)"
                 />
               </td>
@@ -52,7 +40,6 @@
           </tbody>
         </table>
 
-        <!-- Dialog: รายบุคคล -->
         <div class="col md:col-5 text-right">
           <Dialog
             header="รายละเอียดภาระงานประจำวัน"
@@ -73,7 +60,83 @@
               </p>
             </template>
 
-            <!-- ตารางรายบุคคล: แผน → ขั้นตอน → ภาระงาน -->
+            <div class="p-4 dashboard-section">
+              <div class="grid p-fluid">
+                <div class="col-12 lg:col-4">
+                  <Card class="h-full">
+                    <template #title>
+                      <div class="flex align-items-center">
+                        <i class="pi pi-chart-pie mr-2 text-primary"></i>
+                        ภาพรวมภาระงาน
+                      </div>
+                    </template>
+                    <template #content>
+                      <div class="h-full flex flex-column justify-content-center">
+                        <Chart type="pie" :data="taskTypeData" :options="taskTypeOptions" class="w-full" />
+                      </div>
+                    </template>
+                  </Card>
+                </div>
+
+                <div class="col-12 lg:col-4">
+                  <Card class="h-full">
+                    <template #title>
+                      <div class="flex align-items-center">
+                        <i class="pi pi-clock mr-2 text-primary"></i>
+                        เวลารวม (นาที)
+                      </div>
+                    </template>
+                    <template #content>
+                      <div class="h-full flex flex-column justify-content-center">
+                        <Chart type="bar" :data="timeSpentData" :options="timeSpentOptions" class="w-full" />
+                      </div>
+                    </template>
+                  </Card>
+                </div>
+
+                <div class="col-12 lg:col-4">
+                  <Card class="h-full">
+                    <template #title>
+                      <div class="flex align-items-center">
+                        <i class="pi pi-check-circle mr-2 text-primary"></i>
+                        สถานะภาระงาน
+                      </div>
+                    </template>
+                    <template #content>
+                      <div class="h-full flex flex-column align-items-center justify-content-center">
+                        <div class="chart-container">
+                          <Chart type="doughnut" :data="taskStatusData" :options="taskStatusOptions" />
+                          <div class="chart-label">
+                            <span class="text-2xl font-bold">{{ totalTasks }}</span>
+                            <span class="text-sm text-500">ภาระงานทั้งหมด</span>
+                          </div>
+                        </div>
+                        <div class="grid w-full mt-3 text-center">
+                          <div class="col-4">
+                            <div class="status-legend-item pending"></div>
+                            <span class="block text-500 font-medium mt-1">ยังไม่เริ่ม</span>
+                            <div class="text-xl font-bold">{{ taskStatusCounts.pending }}</div>
+                          </div>
+                          <div class="col-4">
+                            <div class="status-legend-item in-progress"></div>
+                            <span class="block text-500 font-medium mt-1">ระหว่างทำ</span>
+                            <div class="text-xl font-bold">{{ taskStatusCounts.inProgress }}</div>
+                          </div>
+                          <div class="col-4">
+                            <div class="status-legend-item completed"></div>
+                            <span class="block text-500 font-medium mt-1">เสร็จสิ้น</span>
+                            <div class="text-xl font-bold">{{ taskStatusCounts.completed }}</div>
+                          </div>
+                        </div>
+                      </div>
+                    </template>
+                  </Card>
+                </div>
+              </div>
+            </div>
+
+            <Divider />
+
             <DataTable
               :value="personPlans"
               v-model:expandedRows="expandedPlansPerson"
@@ -82,7 +145,6 @@
               stripedRows
             >
               <Column expander style="width: 3rem" />
-
               <Column
                 field="planLabel"
                 header="ชื่อแผนงาน/โครงการ"
@@ -102,7 +164,6 @@
                   </div>
                 </template>
               </Column>
-
               <Column header="ผู้รับผิดชอบ">
                 <template #body="slotProps">
                   <span v-if="slotProps.data.owner?.length">
@@ -111,13 +172,11 @@
                   <span v-else class="text-gray-400">ยังไม่กำหนด</span>
                 </template>
               </Column>
-
               <Column header="เวลารวม (นาที)" style="min-width: 10rem; text-align:center;">
                 <template #body="slotProps">
                   <span class="font-semibold">{{ getPlanTotalMinutes(slotProps.data).toLocaleString() }}</span>
                 </template>
               </Column>
-
               <Column header="ความคืบหน้า" style="min-width: 12rem">
                 <template #body="slotProps">
                   <span class="mr-2 text-sm text-primary-600 font-bold">
@@ -126,7 +185,6 @@
                   <ProgressBar :value="getPlanProgress(slotProps.data)" class="flex-1" />
                 </template>
               </Column>
-
               <Column header="สถานะ" style="min-width: 8rem">
                 <template #body="slotProps">
                   <Tag
@@ -137,14 +195,12 @@
                 </template>
               </Column>
 
-              <!-- Expansion: ขั้นตอน -->
               <template #expansion="slotProps">
                 <div class="p-4 bg-gray-50 border-round-xl ml-4">
                   <div class="text-xl font-bold text-700 flex items-center mb-3">
                     <i class="pi pi-list mr-2 text-primary-500"></i>
                     ขั้นตอน/กิจกรรมการทำงาน
                   </div>
-
                   <DataTable
                     :value="slotProps.data.steps"
                     v-model:expandedRows="expandedStepsPerson"
@@ -152,7 +208,6 @@
                     responsiveLayout="scroll"
                   >
                     <Column expander style="width: 3rem" />
-
                     <Column field="name" header="ชื่อขั้นตอน/กิจกรรม" style="min-width: 12rem" class="font-semibold text-700">
                       <template #body="stepProps">
                         <div class="flex items-center">
@@ -161,25 +216,12 @@
                         </div>
                       </template>
                     </Column>
-
                     <Column header="วันเริ่มต้น" style="min-width: 8rem">
                       <template #body="stepProps">{{ formatDate(stepProps.data.startDate) }}</template>
                     </Column>
-
                     <Column header="วันสิ้นสุด" style="min-width: 8rem">
                       <template #body="stepProps">{{ formatDate(stepProps.data.endDate) }}</template>
                     </Column>
-
-                    <!-- <Column header="ผู้รับผิดชอบ">
-                      <template #body="stepProps">
-                        <span v-if="stepProps.data.owner?.length">
-                          {{ stepProps.data.owner.map(o => o.name).join(', ') }}
-                        </span>
-                        <span v-else class="text-gray-400">ยังไม่กำหนด</span>
-                      </template>
-                    </Column> -->
-
-
                     <Column header="ความคืบหน้า" style="min-width: 12rem">
                       <template #body="stepProps">
                         <div class="flex items-center">
@@ -188,21 +230,18 @@
                         </div>
                       </template>
                     </Column>
-
                     <Column header="สถานะ" style="min-width: 8rem">
                       <template #body="stepProps">
                         <Tag :value="getStepStatus(stepProps.data)" :severity="getStepSeverity(stepProps.data)" class="font-bold" />
                       </template>
                     </Column>
 
-                    <!-- Expansion: ภาระงาน -->
                     <template #expansion="stepProps">
                       <div class="p-4 bg-gray-100 border-round-xl ml-4">
                         <div class="text-lg font-bold text-700 flex items-center mb-3">
                           <i class="pi pi-calendar-check mr-2 text-primary-500"></i>
                           ภาระงานประจำวัน
                         </div>
-
                         <DataTable
                           :value="stepProps.data.tasks"
                           responsiveLayout="scroll"
@@ -219,22 +258,18 @@
                               <span v-else class="text-gray-400">ยังไม่เลือก</span>
                             </template>
                           </Column>
-
                           <Column field="description" header="ภาระงานประจำวัน" style="flex: 1" /> 
                           <Column header="วันที่ลงบันทึก" style="width: 9rem" class="text-center">
                             <template #body="taskProps">{{ formatDate(taskProps.data.createdDate) }}</template>
                           </Column>
-
                           <Column header="กำหนดเสร็จ" style="width: 9rem" class="text-center">
                             <template #body="taskProps">
                               <Tag :value="formatDate(taskProps.data.dueDate)" :severity="getTaskDueDateSeverity(taskProps.data.dueDate)" />
                             </template>
                           </Column>
-
                           <Column header="เวลาที่ใช้ไป" style="width: 9rem" class="text-center">
                             <template #body="taskProps">{{ getTaskTimeSpent(taskProps.data) }}</template>
                           </Column>
-
                           <Column header="สถานะ" style="width: 11rem" class="text-center">
                             <template #body="taskProps">
                               <Dropdown
@@ -247,7 +282,6 @@
                             </template>
                           </Column>
                         </DataTable>
-
                         <div v-if="stepProps.data.tasks?.length === 0" class="text-center text-gray-500 text-sm py-4">
                           ยังไม่มีภาระงานสำหรับขั้นตอนนี้
                         </div>
@@ -264,7 +298,7 @@
             </div>
 
             <template #footer>
-              <Button label="ปิด" severity="secondary" @click="dailyTaskDialogVisible = false" />
+              <Button label="ปิด" severity="danger" @click="dailyTaskDialogVisible = false" />
             </template>
           </Dialog>
         </div>
@@ -274,17 +308,19 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import axios from 'axios'
-import Swal from 'sweetalert2'
-import { useAuth } from '#imports'
+import { ref, onMounted, computed } from 'vue';
+import axios from 'axios';
+import Swal from 'sweetalert2';
+import { useAuth } from '#imports';
+import Chart from 'primevue/chart';
+import Card from 'primevue/card';
+import Divider from 'primevue/divider';
 
-const { getSession } = await useAuth()
+const { getSession } = await useAuth();
 
 /* ---------- CONFIG ---------- */
-const API = 'http://127.0.0.1:8000/api'
+const API = 'http://127.0.0.1:8000/api';
 
-/* รายชื่อเจ้าของงาน (ใช้ map owner ให้ตรงกับหน้าแรก) */
 const owners = ref([
   { id: 1, name: 'นาย พิพัฒน์พงษ์ เพริดพราว' },
     { id: 2, name: 'นาย อนุรักษ์ สุระขันตี' },
@@ -309,222 +345,204 @@ const owners = ref([
     { id: 21, name: 'นาย นัฐพงษ์ ศรีเตชะ' },
     { id: 22, name: 'นางสาว สมสมัย บุญทศ' },
     { id: 23, name: 'นาง สารดา พันธุ์เสนา' }, 
-])
+]);
 
-const staffIdMain = ref('')
-const facIdMain = ref('')
-const groupIdMain = ref('')
+const staffIdMain = ref('');
+const facIdMain = ref('');
+const groupIdMain = ref('');
 
-const selectedEvaluationRound = ref(null)
-const evaluationRounds = ref([])
-const products = ref([])
+const selectedEvaluationRound = ref(null);
+const evaluationRounds = ref([]);
+const products = ref([]);
 
-const dailyTaskDialogVisible = ref(false)
-const currentStaffDetail = ref(null)
+const dailyTaskDialogVisible = ref(false);
+const currentStaffDetail = ref(null);
 
-const personPlans = ref([])
-const expandedPlansPerson = ref([])
-const expandedStepsPerson = ref([])
+const personPlans = ref([]);
+const expandedPlansPerson = ref([]);
+const expandedStepsPerson = ref([]);
 
-const taskStatuses = ['รอดำเนินการ', 'อยู่ระหว่างดำเนินการ', 'เสร็จสิ้น']
+const taskStatuses = ['รอดำเนินการ', 'อยู่ระหว่างดำเนินการ', 'เสร็จสิ้น'];
 
 onMounted(async () => {
-  const session = await getSession()
+  const session = await getSession();
   if (session?.user?.name) {
-    const { STAFFID, SCOPES } = session.user.name
-    const { staffdepartment, groupid } = SCOPES || {}
-    staffIdMain.value = String(STAFFID || '')
-    facIdMain.value = String(staffdepartment || '')
-    groupIdMain.value = String(groupid || '')
-    await fetchEvaluationRounds()
+    const { STAFFID, SCOPES } = session.user.name;
+    const { staffdepartment, groupid } = SCOPES || {};
+    staffIdMain.value = String(STAFFID || '');
+    facIdMain.value = String(staffdepartment || '');
+    groupIdMain.value = String(groupid || '');
+    await fetchEvaluationRounds();
+    if (evaluationRounds.value.length > 0) {
+      selectedEvaluationRound.value = evaluationRounds.value[0];
+      await fetchStaffAndDailyTasks();
+    }
   }
-})
+});
 
 /* ---------- utils / format ---------- */
 function formatDate(dateLike) {
-  const d = dateLike instanceof Date ? dateLike : new Date(dateLike)
-  if (!d || isNaN(d)) return ''
-  return d.toLocaleDateString('th-TH', { year: 'numeric', month: '2-digit', day: '2-digit' })
+  const d = dateLike instanceof Date ? dateLike : new Date(dateLike);
+  if (!d || isNaN(d)) return '';
+  return d.toLocaleDateString('th-TH', { year: 'numeric', month: '2-digit', day: '2-digit' });
 }
-function pad(n){return String(n).padStart(2,'0')}
+function pad(n) { return String(n).padStart(2, '0'); }
 
 function parseDateLoose(v) {
-  if (!v) return null
-  if (v instanceof Date) return isNaN(v) ? null : v
-  if (typeof v === 'number') return new Date(v)
-
-  const s = String(v).trim()
-
-  // ISO-like
-  if (/^\d{4}-\d{2}-\d{2}/.test(s)) return new Date(s.replace(' ', 'T'))
-
-  // DD/MM/YYYY (รองรับ พ.ศ.)
-  let m = s.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/)
+  if (!v) return null;
+  if (v instanceof Date) return isNaN(v) ? null : v;
+  if (typeof v === 'number') return new Date(v);
+  const s = String(v).trim();
+  if (/^\d{4}-\d{2}-\d{2}/.test(s)) return new Date(s.replace(' ', 'T'));
+  let m = s.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/);
   if (m) {
-    let [, dd, mm, yyyy] = m
-    let y = parseInt(yyyy, 10); if (y > 2400) y -= 543
-    return new Date(y, parseInt(mm,10)-1, parseInt(dd,10))
+    let [, dd, mm, yyyy] = m;
+    let y = parseInt(yyyy, 10); if (y > 2400) y -= 543;
+    return new Date(y, parseInt(mm, 10) - 1, parseInt(dd, 10));
   }
-
-  // YYYY/MM/DD (รองรับ พ.ศ.)
-  m = s.match(/^(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})$/)
+  m = s.match(/^(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})$/);
   if (m) {
-    let [, yyyy, mm, dd] = m
-    let y = parseInt(yyyy, 10); if (y > 2400) y -= 543
-    return new Date(y, parseInt(mm,10)-1, parseInt(dd,10))
+    let [, yyyy, mm, dd] = m;
+    let y = parseInt(yyyy, 10); if (y > 2400) y -= 543;
+    return new Date(y, parseInt(mm, 10) - 1, parseInt(dd, 10));
   }
-
-  // time-only HH:mm[:ss] → วันนี้
-  const t = s.match(/^(\d{1,2}):(\d{2})(?::(\d{2}))?$/)
+  const t = s.match(/^(\d{1,2}):(\d{2})(?::(\d{2}))?$/);
   if (t) {
-    const now = new Date()
+    const now = new Date();
     return new Date(
       now.getFullYear(),
       now.getMonth(),
       now.getDate(),
-      parseInt(t[1],10),
-      parseInt(t[2],10),
-      t[3] ? parseInt(t[3],10) : 0
-    )
+      parseInt(t[1], 10),
+      parseInt(t[2], 10),
+      t[3] ? parseInt(t[3], 10) : 0
+    );
   }
-
-  const d = new Date(s)
-  return isNaN(d) ? null : d
+  const d = new Date(s);
+  return isNaN(d) ? null : d;
 }
 
 function displayNameOf(o) {
-  if (!o) return ''
-  if (typeof o === 'string') return o
-  if (typeof o === 'number') return `รหัส ${o}`
-  const parts = []
-  const prefix = o.prefixfullname || o.prefix || ''
-  const first  = o.name || o.staffname || o.firstname || o.first_name || o.namefully || ''
-  const last   = o.staffsurname || o.lastname || o.last_name || ''
-  const full   = o.fullname || o.full_name || o.namefully
-  if (full) return full
-  if (prefix) parts.push(prefix)
-  if (first)  parts.push(first)
-  if (last)   parts.push(last)
-  return parts.join(' ').trim()
+  if (!o) return '';
+  if (typeof o === 'string') return o;
+  if (typeof o === 'number') return `รหัส ${o}`;
+  const parts = [];
+  const prefix = o.prefixfullname || o.prefix || '';
+  const first = o.name || o.staffname || o.firstname || o.first_name || o.namefully || '';
+  const last = o.staffsurname || o.lastname || o.last_name || '';
+  const full = o.fullname || o.full_name || o.namefully;
+  if (full) return full;
+  if (prefix) parts.push(prefix);
+  if (first) parts.push(first);
+  if (last) parts.push(last);
+  return parts.join(' ').trim();
 }
 
 function normalizePeople(v) {
-  if (!v) return []
+  if (!v) return [];
   if (Array.isArray(v)) {
     return v.map(x => {
-      if (typeof x === 'string' || typeof x === 'number') return { id: x, name: displayNameOf(x) }
+      if (typeof x === 'string' || typeof x === 'number') return { id: x, name: displayNameOf(x) };
       return {
         id: x.id ?? x.staffid ?? x.STAFFID ?? x.user_id ?? null,
         name: displayNameOf(x) || (x.POSNAMETH ?? '')
-      }
-    })
+      };
+    });
   }
   if (typeof v === 'string') {
-    return v.split(',').map(s => ({ id: s.trim(), name: s.trim() }))
+    return v.split(',').map(s => ({ id: s.trim(), name: s.trim() }));
   }
-  return []
+  return [];
 }
 
 function normalizeStatus(v) {
-  if (v === undefined || v === null) return 'รอดำเนินการ'
+  if (v === undefined || v === null) return 'รอดำเนินการ';
   if (typeof v === 'number') {
-    if (v === 2 || v === 3) return 'เสร็จสิ้น'
-    if (v === 1 || v === 2) return 'อยู่ระหว่างดำเนินการ'
-    return 'รอดำเนินการ'
+    if (v === 2 || v === 3) return 'เสร็จสิ้น';
+    if (v === 1 || v === 2) return 'อยู่ระหว่างดำเนินการ';
+    return 'รอดำเนินการ';
   }
-  const s = String(v).trim().toLowerCase()
-  if (['done','finished','complete','completed','เสร็จ','เสร็จสิ้น'].includes(s)) return 'เสร็จสิ้น'
-  if (['progress','inprogress','processing','อยู่ระหว่างดำเนินการ'].includes(s)) return 'อยู่ระหว่างดำเนินการ'
-  return 'รอดำเนินการ'
+  const s = String(v).trim().toLowerCase();
+  if (['done', 'finished', 'complete', 'completed', 'เสร็จ', 'เสร็จสิ้น'].includes(s)) return 'เสร็จสิ้น';
+  if (['progress', 'inprogress', 'processing', 'อยู่ระหว่างดำเนินการ'].includes(s)) return 'อยู่ระหว่างดำเนินการ';
+  return 'รอดำเนินการ';
 }
 
-/* ---------- progress / tag helpers ---------- */
 function getPlanProgress(plan) {
-  if (!plan?.steps?.length) return 0
-  const total = plan.steps.reduce((s, st) => s + (st.tasks?.length || 0), 0)
-  if (!total) return 0
-  const done = plan.steps.reduce((s, st) => s + (st.tasks?.filter(t => normalizeStatus(t.status) === 'เสร็จสิ้น').length || 0), 0)
-  return Math.round((done / total) * 100)
+  if (!plan?.steps?.length) return 0;
+  const total = plan.steps.reduce((s, st) => s + (st.tasks?.length || 0), 0);
+  if (!total) return 0;
+  const done = plan.steps.reduce((s, st) => s + (st.tasks?.filter(t => normalizeStatus(t.status) === 'เสร็จสิ้น').length || 0), 0);
+  return Math.round((done / total) * 100);
 }
 function getStepProgress(step) {
-  if (!step?.tasks?.length) return 0
-  const total = step.tasks.length
-  const done = step.tasks.filter(t => normalizeStatus(t.status) === 'เสร็จสิ้น').length
-  return Math.round((done / total) * 100)
+  if (!step?.tasks?.length) return 0;
+  const total = step.tasks.length;
+  const done = step.tasks.filter(t => normalizeStatus(t.status) === 'เสร็จสิ้น').length;
+  return Math.round((done / total) * 100);
 }
 function getPlanStatusLabel(plan) {
-  const p = getPlanProgress(plan)
-  return p === 100 ? 'เสร็จสิ้น' : p > 0 ? 'อยู่ระหว่างดำเนินการ' : 'รอดำเนินการ'
+  const p = getPlanProgress(plan);
+  return p === 100 ? 'เสร็จสิ้น' : p > 0 ? 'อยู่ระหว่างดำเนินการ' : 'รอดำเนินการ';
 }
 function getPlanStatusSeverity(plan) {
-  const p = getPlanProgress(plan)
-  return p === 100 ? 'success' : p > 0 ? 'warning' : 'info'
+  const p = getPlanProgress(plan);
+  return p === 100 ? 'success' : p > 0 ? 'warning' : 'info';
 }
 function getStepStatus(step) {
-  const p = getStepProgress(step)
-  return p === 100 ? 'เสร็จสิ้น' : p > 0 ? 'อยู่ระหว่างดำเนินการ' : 'รอดำเนินการ'
+  const p = getStepProgress(step);
+  return p === 100 ? 'เสร็จสิ้น' : p > 0 ? 'อยู่ระหว่างดำเนินการ' : 'รอดำเนินการ';
 }
 function getStepSeverity(step) {
-  const p = getStepProgress(step)
-  return p === 100 ? 'success' : p > 0 ? 'warning' : 'info'
+  const p = getStepProgress(step);
+  return p === 100 ? 'success' : p > 0 ? 'warning' : 'info';
 }
 function getTaskDueDateSeverity(dueDate) {
-  if (!dueDate) return 'info'
-  const now = new Date()
-  const due = dueDate instanceof Date ? dueDate : new Date(dueDate)
-  due.setHours(23,59,59,999)
-  return due < now ? 'danger' : 'success'
+  if (!dueDate) return 'info';
+  const now = new Date();
+  const due = dueDate instanceof Date ? dueDate : new Date(dueDate);
+  due.setHours(23, 59, 59, 999);
+  return due < now ? 'danger' : 'success';
 }
 function getTaskTimeSpent(task) {
   const mins = getTaskMinutes(task);
   if (mins === 0) {
-    // ถ้าอยากให้โชว์ “ยังไม่ระบุ” กรณีไม่มีเวลา start/end ให้ใช้แบบนี้:
     const hasStart = !!parseDateLoose(task?.startTime ?? task?.time_start ?? task?.start_time ?? task?.work_start);
-    const hasEnd   = !!parseDateLoose(task?.endTime   ?? task?.time_end   ?? task?.end_time   ?? task?.work_end);
+    const hasEnd = !!parseDateLoose(task?.endTime ?? task?.time_end ?? task?.end_time ?? task?.work_end);
     return (hasStart && hasEnd) ? '0 นาที' : 'ยังไม่ระบุ';
   }
   return `${mins} นาที`;
 }
 
 function getTaskMinutes(task) {
-  // รองรับคีย์หลายแบบที่อาจมาจาก API
   const start = parseDateLoose(task?.startTime ?? task?.time_start ?? task?.start_time ?? task?.work_start);
-  const end   = parseDateLoose(task?.endTime   ?? task?.time_end   ?? task?.end_time   ?? task?.work_end);
-
-  // ถ้ายังไม่ครบ ให้ถือว่า 0 นาที (ไม่ทิ้ง error)
+  const end = parseDateLoose(task?.endTime ?? task?.time_end ?? task?.end_time ?? task?.work_end);
   if (!start || !end) return 0;
-
-  // กันเวลา end < start
   const diffMs = Math.max(0, end - start);
-  return Math.round(diffMs / 60000); // นาทีล้วน
+  return Math.round(diffMs / 60000);
 }
 
-// รวม “นาทีทั้งหมด” ของขั้นตอนหนึ่ง ๆ
 function getStepTotalMinutes(step) {
   if (!step?.tasks?.length) return 0;
   return step.tasks.reduce((sum, t) => sum + getTaskMinutes(t), 0);
 }
 
-// รวม “นาทีทั้งหมด” ของทั้งแผน (รวมทุกขั้นตอน)
 function getPlanTotalMinutes(plan) {
   if (!plan?.steps?.length) return 0;
   return plan.steps.reduce((sum, st) => sum + getStepTotalMinutes(st), 0);
 }
 
-
 function getTaskStatusSeverityByValue(status) {
-  const s = normalizeStatus(status)
-  return s === 'เสร็จสิ้น' ? 'success' : s === 'อยู่ระหว่างดำเนินการ' ? 'warning' : 'info'
+  const s = normalizeStatus(status);
+  return s === 'เสร็จสิ้น' ? 'success' : s === 'อยู่ระหว่างดำเนินการ' ? 'warning' : 'info';
 }
 function getMainTaskLabel(mainTask) {
-  return mainTask || 'ยังไม่เลือก'
+  return mainTask || 'ยังไม่เลือก';
 }
 
-/* ---------- mapping ให้ตรงกับหน้าแรก ---------- */
 const findOwner = (o) =>
   owners.value.find(x => Number(x.id) === Number(o?.id ?? o)) || null;
 
-// แปลง owner ให้เป็น [{id,name}] รับได้ทั้ง id, object, string, "1,2", "ชื่อ ก,ชื่อ ข"
 function toOwnerArray(v) {
   if (!v) return [];
   if (Array.isArray(v)) {
@@ -557,45 +575,38 @@ function toOwnerArray(v) {
   return [];
 }
 
-// รองรับหลายชื่อฟิลด์ที่ API อาจส่งมา
 function ownersFromAny(p) {
   return toOwnerArray(
     p?.owner ?? p?.owners ?? p?.ownerIds ?? p?.owner_ids ?? p?.responsible ?? null
   );
 }
 
-// === mapping หลัก ===
 function mapApiToState(arr) {
   return (arr || []).map(p => {
     const planOwners = ownersFromAny(p);
-
     return {
       ...p,
       startDate: p.startDate ? new Date(p.startDate) : null,
-      endDate:   p.endDate   ? new Date(p.endDate)   : null,
-
+      endDate: p.endDate ? new Date(p.endDate) : null,
       owner: planOwners,
       ownerNames: planOwners.map(o => o.name).join(', '),
-
       steps: (p.steps || []).map(s => {
         const stepOwners = ownersFromAny(s);
-
         return {
           ...s,
           owner: stepOwners,
           ownerNames: stepOwners.map(o => o.name).join(', '),
           startDate: s.startDate ? new Date(s.startDate) : null,
-          endDate:   s.endDate   ? new Date(s.endDate)   : null,
-
+          endDate: s.endDate ? new Date(s.endDate) : null,
           tasks: (s.tasks || []).map(t => {
             const responsible = ownersFromAny(t);
             return {
               ...t,
               responsible,
               mainTask: t.mainTask ?? t.Main_tasks ?? null,
-              dueDate:     t.dueDate     ? new Date(t.dueDate)     : null,
-              startTime:   t.startTime   ? new Date(t.startTime)   : null,
-              endTime:     t.endTime     ? new Date(t.endTime)     : null,
+              dueDate: t.dueDate ? new Date(t.dueDate) : null,
+              startTime: t.startTime ? new Date(t.startTime) : null,
+              endTime: t.endTime ? new Date(t.endTime) : null,
               createdDate: t.createdDate ? new Date(t.createdDate) : null,
             };
           }),
@@ -605,6 +616,129 @@ function mapApiToState(arr) {
   });
 }
 
+/* ---------- Computed Properties for Dashboards ---------- */
+const allTasks = computed(() => {
+  const tasks = [];
+  if (personPlans.value) {
+    personPlans.value.forEach(plan => {
+      plan.steps.forEach(step => {
+        tasks.push(...step.tasks);
+      });
+    });
+  }
+  return tasks;
+});
+
+const totalTasks = computed(() => allTasks.value.length);
+
+const taskTypeData = computed(() => {
+  const mainTaskCount = allTasks.value.filter(t => t.mainTask === 'งานหลัก').length;
+  const otherPositionCount = allTasks.value.filter(t => t.mainTask === 'งานตำแหน่งอื่น').length;
+  const otherCount = allTasks.value.filter(t => t.mainTask === 'งานอื่นๆ').length;
+  return {
+    labels: ['งานหลัก', 'งานตำแหน่งอื่น', 'งานอื่นๆ'],
+    datasets: [
+      {
+        data: [mainTaskCount, otherPositionCount, otherCount],
+        backgroundColor: ['#42A5F5', '#66BB6A', '#FFA726'],
+        hoverBackgroundColor: ['#64B5F6', '#81C784', '#FFB74D']
+      }
+    ]
+  };
+});
+const taskTypeOptions = {
+  plugins: {
+    legend: { position: 'bottom' },
+    tooltip: {
+      callbacks: {
+        label: (tooltipItem) => {
+          const total = tooltipItem.dataset.data.reduce((sum, val) => sum + val, 0);
+          const value = tooltipItem.raw;
+          const percentage = total > 0 ? ((value / total) * 100).toFixed(2) + '%' : '0.00%';
+          return `${tooltipItem.label}: ${value} (${percentage})`;
+        }
+      }
+    }
+  }
+};
+
+const timeSpentData = computed(() => {
+  const mainTaskMinutes = allTasks.value
+    .filter(t => t.mainTask === 'งานหลัก')
+    .reduce((sum, t) => sum + getTaskMinutes(t), 0);
+  const otherPositionMinutes = allTasks.value
+    .filter(t => t.mainTask === 'งานตำแหน่งอื่น')
+    .reduce((sum, t) => sum + getTaskMinutes(t), 0);
+  const otherMinutes = allTasks.value
+    .filter(t => t.mainTask === 'งานอื่นๆ')
+    .reduce((sum, t) => sum + getTaskMinutes(t), 0);
+  return {
+    labels: ['งานหลัก', 'งานตำแหน่งอื่น', 'งานอื่นๆ'],
+    datasets: [
+      {
+        label: 'เวลารวม (นาที)',
+        backgroundColor: '#42A5F5',
+        data: [mainTaskMinutes, otherPositionMinutes, otherMinutes]
+      }
+    ]
+  };
+});
+const timeSpentOptions = {
+  plugins: {
+    legend: { display: false }
+  },
+  scales: {
+    y: {
+      beginAtZero: true
+    }
+  }
+};
+
+const taskStatusCounts = computed(() => {
+  let pending = 0;
+  let inProgress = 0;
+  let completed = 0;
+  allTasks.value.forEach(t => {
+    const status = normalizeStatus(t.status);
+    if (status === 'รอดำเนินการ') {
+      pending++;
+    } else if (status === 'อยู่ระหว่างดำเนินการ') {
+      inProgress++;
+    } else {
+      completed++;
+    }
+  });
+  return { pending, inProgress, completed };
+});
+const taskStatusData = computed(() => {
+  const counts = taskStatusCounts.value;
+  return {
+    labels: ['ยังไม่ดำเนินการ', 'อยู่ระหว่างดำเนินการ', 'เสร็จสิ้น'],
+    datasets: [
+      {
+        data: [counts.pending, counts.inProgress, counts.completed],
+        backgroundColor: ['#6c757d', '#ffc107', '#28a745'],
+        hoverBackgroundColor: ['#5a6268', '#e0a800', '#218838']
+      }
+    ]
+  };
+});
+const taskStatusOptions = {
+  cutout: '60%',
+  plugins: {
+    legend: { display: false },
+    tooltip: {
+      callbacks: {
+        label: (tooltipItem) => {
+          const total = tooltipItem.dataset.data.reduce((sum, val) => sum + val, 0);
+          const value = tooltipItem.raw;
+          const percentage = total > 0 ? ((value / total) * 100).toFixed(2) + '%' : '0.00%';
+          return `${tooltipItem.label}: ${value} (${percentage})`;
+        }
+      }
+    }
+  }
+};
 
 /* ---------- API ---------- */
 async function fetchEvaluationRounds() {
@@ -613,17 +747,17 @@ async function fetchEvaluationRounds() {
       staff_id: staffIdMain.value,
       fac_id: facIdMain.value,
       group_id: groupIdMain.value
-    })
-    evaluationRounds.value = res.data
+    });
+    evaluationRounds.value = res.data;
   } catch {
-    Swal.fire({ icon: 'error', title: 'ข้อผิดพลาด', text: 'ไม่สามารถโหลดรอบการประเมินได้' })
+    Swal.fire({ icon: 'error', title: 'ข้อผิดพลาด', text: 'ไม่สามารถโหลดรอบการประเมินได้' });
   }
 }
 
 async function fetchStaffAndDailyTasks() {
   if (!selectedEvaluationRound.value) {
-    Swal.fire('แจ้งเตือน', 'กรุณาเลือกรอบการประเมิน', 'error')
-    return
+    Swal.fire('แจ้งเตือน', 'กรุณาเลือกรอบการประเมิน', 'error');
+    return;
   }
   try {
     const res = await axios.get(`${API}/showDataEvalu`, {
@@ -634,47 +768,43 @@ async function fetchStaffAndDailyTasks() {
         evalua: selectedEvaluationRound.value.evalua,
         p_year: selectedEvaluationRound.value.d_date
       }
-    })
+    });
     products.value = (res.data || []).filter(
       item => item.stftypename !== 'ลูกจ้างชั่วคราว' && item.stftypename !== 'พนักงานราชการ'
-    )
+    );
   } catch {
-    Swal.fire({ icon: 'error', title: 'ข้อผิดพลาด', text: 'ไม่สามารถโหลดข้อมูลผู้รับการประเมินได้' })
+    Swal.fire({ icon: 'error', title: 'ข้อผิดพลาด', text: 'ไม่สามารถโหลดข้อมูลผู้รับการประเมินได้' });
   }
 }
 
 async function openDailyTaskDetail(staffData) {
   if (!selectedEvaluationRound.value) {
-    Swal.fire('แจ้งเตือน', 'กรุณาเลือกรอบการประเมินก่อน', 'error')
-    return
+    Swal.fire('แจ้งเตือน', 'กรุณาเลือกรอบการประเมินก่อน', 'error');
+    return;
   }
-  currentStaffDetail.value = staffData
-  dailyTaskDialogVisible.value = true
-  personPlans.value = []
-
+  currentStaffDetail.value = staffData;
+  dailyTaskDialogVisible.value = true;
+  personPlans.value = [];
   try {
-    // ใช้ endpoint เดียวกับหน้าแรก เพื่อให้โครงสร้าง/ค่าตรงกัน
     const { data } = await axios.post(`${API}/showplannew`, {
       staff_id: staffData.staffid,
-      fac_id:   selectedEvaluationRound.value.fac_id
-    })
-    personPlans.value = mapApiToState(data?.data || [])
-
-    // (option) ถ้าไม่มีข้อมูล ลอง fallback ไปของเดิม
+      fac_id: selectedEvaluationRound.value.fac_id
+    });
+    personPlans.value = mapApiToState(data?.data || []);
     if (!personPlans.value.length) {
       const alt = await axios.post(`${API}/getDataplans`, {
         staffid: staffData.staffid,
         facid: selectedEvaluationRound.value.fac_id
-      })
-      personPlans.value = mapApiToState(alt.data?.plans || [])
+      });
+      personPlans.value = mapApiToState(alt.data?.plans || []);
     }
   } catch (e) {
-    console.error(e)
-    personPlans.value = []
-    Swal.fire({ icon: 'error', title: 'ข้อผิดพลาด', text: 'ไม่สามารถโหลดข้อมูลภาระงานประจำวันได้' })
+    console.error(e);
+    personPlans.value = [];
+    Swal.fire({ icon: 'error', title: 'ข้อผิดพลาด', text: 'ไม่สามารถโหลดข้อมูลภาระงานประจำวันได้' });
   }
 }
-// ิ bew
+
 /* ---------- expose ---------- */
 defineExpose({
   formatDate,
@@ -691,35 +821,123 @@ defineExpose({
   fetchEvaluationRounds,
   fetchStaffAndDailyTasks,
   openDailyTaskDetail
-})
-
-
-
-
+});
 </script>
 
-
-
-
 <style>
+/* CSS Variables for theme colors */
+:root {
+  --surface-bg: #f9fafb; /* Light gray */
+  --card-bg: #ffffff;    /* White */
+}
+
+/* Apply background to the dialog content */
+.p-dialog .p-dialog-content {
+  background-color: var(--surface-bg);
+}
+
 .card-header {
   text-align: left;
   margin: 0;
   padding: 0;
 }
-.table th {
-  background-color: #edf2bb;
-  font-weight: bold;
-}
-table {
-  border-collapse: collapse;
+
+.table {
+  border-collapse: separate;
+  border-spacing: 0 5px;
   width: 100%;
 }
-th, td {
-  border: 1px solid rgb(206, 203, 203);
-  text-align: center;
+
+.table th {
+  background-color: blanchedalmond; /* กลับเป็นสีเดิม */
+  font-weight: bold;
+  padding: 10px;
+  border: 1px solid #e0e0e0;
 }
+
+.table td {
+  border: 1px solid #e0e0e0;
+  text-align: center;
+  padding: 10px;
+}
+
+.table tbody tr {
+  transition: background-color 0.3s ease;
+}
+
+.table tbody tr:hover {
+  background-color: #f5f5f5;
+}
+
+.striped-row {
+  background-color: #f9f9f9; /* หรือตามที่คุณต้องการให้เป็นสีขาวสลับเทาอ่อน */
+}
+
 .p-datatable .p-column-header-content {
   justify-content: center;
+}
+
+/* Specific styling for table cells */
+.staff-name-cell {
+  text-align: left;
+  padding-left: 20px;
+}
+.staff-position-cell {
+  text-align: center;
+}
+.button-cell {
+  text-align: center;
+}
+.detail-button {
+  width: 130px;
+}
+
+.chart-container {
+  position: relative;
+  width: 15rem;
+  height: 15rem;
+}
+
+.chart-label {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1.2;
+}
+
+.status-legend-item {
+  width: 1rem;
+  height: 1rem;
+  border-radius: 50%;
+  margin: auto;
+  margin-bottom: 0.25rem;
+}
+
+.status-legend-item.pending {
+  background-color: #6c757d;
+}
+
+.status-legend-item.in-progress {
+  background-color: #ffc107;
+}
+
+.status-legend-item.completed {
+  background-color: #28a745;
+}
+
+/* Card Styling for a professional look */
+.p-card {
+  background-color: var(--card-bg);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+  border: none;
+}
+
+.p-card .p-card-content {
+  height: calc(100% - 3.5rem);
 }
 </style>
