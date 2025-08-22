@@ -13,7 +13,7 @@
 
         <table class="table">
           <thead>
-            <tr style="height: 40px;background-color: blanchedalmond;">
+            <tr style="height: 40px;background-color: #FFFBEA;">
               <th style="width: 40%;">ผู้รับการประเมิน</th>
               <th>ตำแหน่ง</th>
               <th>ดูภาระงาน</th>
@@ -72,7 +72,8 @@
                     </template>
                     <template #content>
                       <div class="h-full flex flex-column justify-content-center">
-                        <Chart type="pie" :data="taskTypeData" :options="taskTypeOptions" class="w-full" />
+                        <!-- <Chart type="pie" :data="taskTypeData" :options="taskTypeOptions" class="w-full" /> -->
+                         <Chart type="pie" :data="taskTypeData" :options="taskTypeOptionsSmall" />
                       </div>
                     </template>
                   </Card>
@@ -137,20 +138,9 @@
 
             <Divider />
 
-            <DataTable
-              :value="personPlans"
-              v-model:expandedRows="expandedPlansPerson"
-              dataKey="id"
-              responsiveLayout="scroll"
-              stripedRows
-            >
+            <DataTable  :value="personPlansSortedByNumber" v-model:expandedRows="expandedPlansPerson" dataKey="id" responsiveLayout="scroll" stripedRows >
               <Column expander style="width: 3rem" />
-              <Column
-                field="planLabel"
-                header="ชื่อแผนงาน/โครงการ"
-                style="min-width: 12rem"
-                class="font-bold text-primary-800"
-              >
+              <Column field="planLabel" header="ชื่อแผนงาน/โครงการ" style="min-width: 12rem" class="font-bold text-primary-800" >
                 <template #body="slotProps">
                   <div class="flex flex-col items-start">
                     <div class="flex items-center">
@@ -201,12 +191,7 @@
                     <i class="pi pi-list mr-2 text-primary-500"></i>
                     ขั้นตอน/กิจกรรมการทำงาน
                   </div>
-                  <DataTable
-                    :value="slotProps.data.steps"
-                    v-model:expandedRows="expandedStepsPerson"
-                    dataKey="id"
-                    responsiveLayout="scroll"
-                  >
+                  <DataTable :value="slotProps.data.steps" v-model:expandedRows="expandedStepsPerson" dataKey="id" responsiveLayout="scroll"  >
                     <Column expander style="width: 3rem" />
                     <Column field="name" header="ชื่อขั้นตอน/กิจกรรม" style="min-width: 12rem" class="font-semibold text-700">
                       <template #body="stepProps">
@@ -234,20 +219,28 @@
                       <template #body="stepProps">
                         <Tag :value="getStepStatus(stepProps.data)" :severity="getStepSeverity(stepProps.data)" class="font-bold" />
                       </template>
-                    </Column>
-
+                    </Column> 
                     <template #expansion="stepProps">
                       <div class="p-4 bg-gray-100 border-round-xl ml-4">
                         <div class="text-lg font-bold text-700 flex items-center mb-3">
                           <i class="pi pi-calendar-check mr-2 text-primary-500"></i>
                           ภาระงานประจำวัน
                         </div>
-                        <DataTable
-                          :value="stepProps.data.tasks"
-                          responsiveLayout="scroll"
-                          stripedRows
-                          :class="{ 'p-datatable-gridlines': true }"
-                        >
+                        <DataTable :value="stepProps.data.tasks" responsiveLayout="scroll" stripedRows :class="{ 'p-datatable-gridlines': true }" >
+
+                          <Column header="ประเภทภาระงาน" style="width: 10rem">
+                            <template #body="taskProps">
+                              <Tag
+                                :value="taskProps.data.taskType || 'ไม่ระบุ'"
+                                :severity="
+                                  taskProps.data.taskType === 'งานหลัก' ? 'success'
+                                  : taskProps.data.taskType === 'งานตำแหน่งอื่น' ? 'warning'
+                                  : taskProps.data.taskType === 'งานอื่นๆ' ? 'info'
+                                  : 'secondary'
+                                "
+                              />
+                            </template>
+                          </Column>
                           <Column header="ภาระงานหลัก" style="width: 12rem">
                             <template #body="taskProps">
                               <Tag
@@ -282,6 +275,8 @@
                             </template>
                           </Column>
                         </DataTable>
+
+
                         <div v-if="stepProps.data.tasks?.length === 0" class="text-center text-gray-500 text-sm py-4">
                           ยังไม่มีภาระงานสำหรับขั้นตอนนี้
                         </div>
@@ -603,6 +598,7 @@ function mapApiToState(arr) {
             return {
               ...t,
               responsible,
+              taskType: t.taskType ?? t.workload_type ?? null,
               mainTask: t.mainTask ?? t.Main_tasks ?? null,
               dueDate: t.dueDate ? new Date(t.dueDate) : null,
               startTime: t.startTime ? new Date(t.startTime) : null,
@@ -632,19 +628,19 @@ const allTasks = computed(() => {
 const totalTasks = computed(() => allTasks.value.length);
 
 const taskTypeData = computed(() => {
-  const mainTaskCount = allTasks.value.filter(t => t.mainTask === 'งานหลัก').length;
-  const otherPositionCount = allTasks.value.filter(t => t.mainTask === 'งานตำแหน่งอื่น').length;
-  const otherCount = allTasks.value.filter(t => t.mainTask === 'งานอื่นๆ').length;
+  const main = allTasks.value.filter(t => t.taskType === 'งานหลัก').length
+  const otherPos = allTasks.value.filter(t => t.taskType === 'งานตำแหน่งอื่น').length
+  const other = allTasks.value.filter(t => t.taskType === 'งานอื่นๆ').length
   return {
     labels: ['งานหลัก', 'งานตำแหน่งอื่น', 'งานอื่นๆ'],
     datasets: [
       {
-        data: [mainTaskCount, otherPositionCount, otherCount],
+        data: [main, otherPos, other],
         backgroundColor: ['#42A5F5', '#66BB6A', '#FFA726'],
         hoverBackgroundColor: ['#64B5F6', '#81C784', '#FFB74D']
       }
     ]
-  };
+  }
 });
 const taskTypeOptions = {
   plugins: {
@@ -661,28 +657,41 @@ const taskTypeOptions = {
     }
   }
 };
+ 
+const BAR_COLORS  = ['#FACC15', '#34D399', '#60A5FA']; // เหลือง, เขียว, ฟ้า
+const BAR_HOVERS  = ['#EAB308', '#10B981', '#3B82F6'];
+const BAR_BORDERS = ['#D4AF0A', '#0EA5A2', '#2563EB'];
 
 const timeSpentData = computed(() => {
-  const mainTaskMinutes = allTasks.value
-    .filter(t => t.mainTask === 'งานหลัก')
+  const typeOf = (t) => t.taskType ?? t.mainTask ?? '';
+
+  const mainMinutes = allTasks.value
+    .filter(t => typeOf(t) === 'งานหลัก')
     .reduce((sum, t) => sum + getTaskMinutes(t), 0);
-  const otherPositionMinutes = allTasks.value
-    .filter(t => t.mainTask === 'งานตำแหน่งอื่น')
+
+  const otherPosMinutes = allTasks.value
+    .filter(t => typeOf(t) === 'งานตำแหน่งอื่น')
     .reduce((sum, t) => sum + getTaskMinutes(t), 0);
+
   const otherMinutes = allTasks.value
-    .filter(t => t.mainTask === 'งานอื่นๆ')
+    .filter(t => typeOf(t) === 'งานอื่นๆ')
     .reduce((sum, t) => sum + getTaskMinutes(t), 0);
+
   return {
     labels: ['งานหลัก', 'งานตำแหน่งอื่น', 'งานอื่นๆ'],
     datasets: [
       {
         label: 'เวลารวม (นาที)',
-        backgroundColor: '#42A5F5',
-        data: [mainTaskMinutes, otherPositionMinutes, otherMinutes]
+        data: [mainMinutes, otherPosMinutes, otherMinutes],
+        backgroundColor: BAR_COLORS,        // 👈 เปลี่ยนเป็นอาร์เรย์
+        hoverBackgroundColor: BAR_HOVERS,
+        borderColor: BAR_BORDERS,
+        borderWidth: 1
       }
     ]
   };
 });
+ 
 const timeSpentOptions = {
   plugins: {
     legend: { display: false }
@@ -805,6 +814,14 @@ async function openDailyTaskDetail(staffData) {
   }
 }
 
+const personPlansSortedByNumber = computed(() => {
+  return [...personPlans.value].sort((a, b) => {
+    const numA = parseInt(a.planLabel.replace(/[^0-9]/g, ''), 10) || 0
+    const numB = parseInt(b.planLabel.replace(/[^0-9]/g, ''), 10) || 0
+    return numA - numB
+  })
+})
+
 /* ---------- expose ---------- */
 defineExpose({
   formatDate,
@@ -821,7 +838,11 @@ defineExpose({
   fetchEvaluationRounds,
   fetchStaffAndDailyTasks,
   openDailyTaskDetail
-});
+});  
+
+
+
+
 </script>
 
 <style>
@@ -849,7 +870,7 @@ defineExpose({
 }
 
 .table th {
-  background-color: blanchedalmond; /* กลับเป็นสีเดิม */
+  background-color: #efefaf;  /* เหลืองอ่อน */
   font-weight: bold;
   padding: 10px;
   border: 1px solid #e0e0e0;

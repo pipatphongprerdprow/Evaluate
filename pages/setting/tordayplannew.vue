@@ -24,7 +24,7 @@
                 <Button icon="pi pi-plus" label="สร้างแผนงาน/โครงการใหม่" class="p-button p-button-info px-4 py-2 rounded-lg font-semibold shadow hover:shadow-lg transition duration-200" @click="openPlanDialog" />
             </div>
 
-            <DataTable :value="allPlans" v-model:expandedRows="expandedPlans" dataKey="id" responsiveLayout="scroll" stripedRows > <!-- :class="{'p-datatable-gridlines': allPlans.length > 0}" -->
+            <DataTable :value="allPlansSorted" v-model:expandedRows="expandedPlans" dataKey="id" responsiveLayout="scroll" stripedRows > <!-- :class="{'p-datatable-gridlines': allPlans.length > 0}" -->
                 <Column expander style="width: 3rem" />
                 <Column field="planLabel" header="ชื่อแผนงาน/โครงการ" style="min-width: 12rem" class="font-bold text-primary-800">
                     <template #body="slotProps">
@@ -144,13 +144,19 @@
                                         ภาระงานประจำวัน
                                     </div>
 
-                                    <DataTable 
-                                        :value="stepProps.data.tasks" 
-                                        responsiveLayout="scroll" 
-                                        stripedRows 
-                                        :class="{'p-datatable-gridlines': true}"
-                                     > 
-                                        <Column header="ภาระงานหลัก" style="width: 12rem">
+                                    <DataTable :value="stepProps.data.tasks" responsiveLayout="scroll" stripedRows :class="{'p-datatable-gridlines': true}"> 
+                                        <!-- ประเภทภาระงาน -->
+                                        <Column header="ประเภทภาระงาน" style="width: 8rem">
+                                            <template #body="taskProps">
+                                                <Tag :value="taskProps.data.taskType || 'ไม่ระบุ'"
+                                                    :severity="taskProps.data.taskType === 'งานหลัก' ? 'success'
+                                                                : taskProps.data.taskType === 'งานตำแหน่งอื่น' ? 'warning'
+                                                                : taskProps.data.taskType === 'งานอื่นๆ' ? 'info' : 'secondary'" />
+                                            </template>
+                                        </Column> 
+
+                                        <!-- ภาระงาน -->
+                                        <Column header="ภาระงาน" style="width: 10rem">
                                             <template #body="taskProps">
                                                 <Tag v-if="taskProps.data.mainTask" 
                                                     :value="getMainTaskLabel(taskProps.data.mainTask)" 
@@ -159,38 +165,39 @@
                                             </template>
                                         </Column>
 
-                                        <!-- ภาระงาน -->
-                                        <Column field="description" header="ภาระงานประจะวัน" style="flex: 1" /> 
+                                        <!-- ภาระงานประจำวัน (หลัก → กินพื้นที่เยอะสุด) -->
+                                        <Column field="description" header="ภาระงานประจำวัน" style="flex: 1; min-width: 18rem" /> 
+
                                         <!-- วันที่ลงบันทึก -->
-                                        <Column header="วันที่ลงบันทึก" style="width: 9rem" class="text-center">
+                                        <Column header="วันที่ลงบันทึก" style="width: 7.5rem" class="text-center">
                                             <template #body="taskProps">
                                                 <span>{{ formatDate(taskProps.data.createdDate) }}</span>
                                             </template>
                                         </Column> 
 
                                         <!-- เวลาที่ใช้ไป -->
-                                        <Column header="เวลาที่ใช้ไป" style="width: 9rem" class="text-center">
+                                        <Column header="เวลาที่ใช้ไป" style="width: 7rem" class="text-center">
                                             <template #body="taskProps">
                                                 <span>{{ getTaskTimeSpent(taskProps.data) }}</span>
                                             </template>
                                         </Column>
 
                                         <!-- สถานะ -->
-                                        <Column header="สถานะ" style="width: 11rem" class="text-center">
+                                        <Column header="สถานะ" style="width: 9rem" class="text-center">
                                             <template #body="taskProps">
-                                               <Dropdown
+                                                <Dropdown
                                                     :modelValue="taskProps.data.status"
                                                     :options="taskStatuses"
                                                     class="w-full"
                                                     :disabled="taskProps.data.__saving === true"
                                                     :class="getTaskStatusSeverityByValue(taskProps.data.status) + '-tag-dropdown'"
                                                     @update:modelValue="(val) => updateTaskStatus(stepProps.data, taskProps.data, val)"
-                                                    />
+                                                />
                                             </template>
                                         </Column>
 
                                         <!-- จัดการ -->
-                                        <Column header="จัดการ" style="width: 7rem" class="text-center">
+                                        <Column header="จัดการ" style="width: 6rem" class="text-center">
                                             <template #body="taskProps">
                                                 <div class="flex gap-2 justify-center">
                                                     <Button icon="pi pi-pencil" class="p-button-text p-button-warning p-button-sm p-button-rounded" @click="openEditTaskDialogInTable(stepProps.data, taskProps.data, taskProps.index)" v-tooltip.top="'แก้ไขภาระงาน'" />
@@ -198,8 +205,7 @@
                                                 </div>
                                             </template>
                                         </Column>
-                                    </DataTable>
-
+                                    </DataTable> 
                                     <div v-if="stepProps.data.tasks?.length === 0" 
                                         class="text-center text-gray-500 text-sm py-4">
                                         ยังไม่มีภาระงานสำหรับขั้นตอนนี้
@@ -328,40 +334,77 @@
         </Dialog>
 
         <!-- Dialog: แก้ไขภาระงาน -->
-        <Dialog v-model:visible="showEditTaskDialog" :breakpoints="{ '960px': '90vw' }" :style="{ width: '60vw' }" modal>
+        <Dialog v-model:visible="showEditTaskDialog" :breakpoints="{ '960px': '90vw' }" :style="{ width: '70vw' }" modal>
             <template #header>
                 <div class="flex items-center w-full">
                     <i class="pi pi-pencil mr-2 text-primary-500 text-2xl"></i>
                     <h5 class="m-0 text-xl font-bold text-primary-700">แก้ไขภาระงาน</h5>
                 </div>
-            </template>
-            <div class="p-fluid">
-                <div class="field mt-4">
-                <label class="font-semibold">ภาระงานหลัก</label>
-                <Dropdown
+            </template> 
+
+            <div class="p-fluid formgrid grid">
+                <!-- ประเภทภาระงาน -->
+                <div class="field col-6">
+                    <label class="font-semibold">ประเภทภาระงาน</label>
+                    <Dropdown
+                    v-model="currentEditingTask.taskType"
+                    :options="taskTypes"
+                    optionLabel="label"
+                    optionValue="value"
+                    placeholder="เลือกประเภทภาระงาน"
+                    class="w-full"
+                    @change="onEditTaskTypeChange"
+                    />
+                </div>
+
+                <!-- ภาระงานหลัก -->
+                <div class="field col-6">
+                    <label class="font-semibold">ภาระงานหลัก</label>
+                    <Dropdown
                     v-model="currentEditingTask.mainTask"
                     :options="mainTasks"
                     optionLabel="label"
                     optionValue="value"
                     placeholder="เลือกภาระงานหลัก"
-                />
-            </div>
-                <div class="field">
-                    <label class="font-semibold">ภาระงาน</label>
-                    <InputText
-                        v-model="currentEditingTask.description"
-                        placeholder="ระบุภาระงาน..."
-                        class="w-full"
+                    class="w-full"
                     />
                 </div>
-                <div class="field mt-4">
+            </div>
+
+            <div class="p-fluid formgrid grid">
+                <!-- ภาระงาน -->
+                <div class="field col-12 md:col-6 lg:col-6">
+                    <label class="font-semibold">ภาระงานประจำวัน</label>
+                    <InputText
+                    v-model="currentEditingTask.description"
+                    placeholder="ระบุภาระงาน..."
+                    class="w-full"
+                    />
+                </div>
+
+                <!-- เวลาเริ่มต้น -->
+                <div class="field col-12 md:col-3 lg:col-3">
                     <label class="font-semibold">เวลาเริ่มต้น</label>
-                    <Calendar v-model="currentEditingTask.startTime" :showTime="true" hourFormat="24" placeholder="เวลาเริ่มต้น" />
+                    <Calendar
+                    v-model="currentEditingTask.startTime"
+                    :showTime="true"
+                    hourFormat="24"
+                    placeholder="เวลาเริ่มต้น"
+                    class="w-full"
+                    />
                 </div>
-                <div class="field mt-4">
+
+                <!-- เวลาสิ้นสุด -->
+                <div class="field col-12 md:col-3 lg:col-3">
                     <label class="font-semibold">เวลาสิ้นสุด</label>
-                    <Calendar v-model="currentEditingTask.endTime" :showTime="true" hourFormat="24" placeholder="เวลาสิ้นสุด" />
-                </div>
+                    <Calendar
+                    v-model="currentEditingTask.endTime"
+                    :showTime="true"
+                    hourFormat="24"
+                    placeholder="เวลาสิ้นสุด"
+                    class="w-full"
+                    />
+                </div>  
             </div>
             <template #footer>
                 <div class="flex justify-end gap-2 pt-4">
@@ -638,6 +681,11 @@
     };
      
     const allPlans = ref([]);
+    // ใช้ computed มาจัดเรียงใหม่
+    const allPlansSorted = computed(() =>
+    [...allPlans.value].sort((a, b) => planNo(a.planLabel) - planNo(b.planLabel))
+    )
+
     const owners = ref([
     { id: 1, name: 'นาย พิพัฒน์พงษ์ เพริดพราว' },
     { id: 2, name: 'นาย อนุรักษ์ สุระขันตี' },
@@ -679,9 +727,25 @@
 
     // Edit State for Steps and Tasks
     const showEditStepDialog = ref(false);
-    const currentEditingStep = reactive({ id: null, name: '', dates: [], index: null });
+    const currentEditingStep = reactive({ 
+        id: null, 
+        name: '', 
+        dates: [], 
+        index: null 
+    });
     const showEditTaskDialog = ref(false);
-    const currentEditingTask = reactive({ mainTask: null,description: '', responsible: [], dueDate: null, startTime: null, endTime: null, status: '', stepId: null, taskId: null, taskIndex: null, createdDate: null });
+    const currentEditingTask = reactive({ 
+        taskType: 'งานหลัก',
+        mainTask: null,
+        description: '', 
+        responsible: [], 
+        dueDate: null, 
+        startTime: null, 
+        endTime: null, status: '',
+        stepId: null, taskId: null,
+        taskIndex: null, 
+        createdDate: null 
+    });
     // State for adding task from main table
     const showAddTaskDialog = ref(false);
     const currentStepToAddTasks = reactive({ id: null, name: '' });
@@ -1207,44 +1271,69 @@
 
 
     const openEditTaskDialogInTable = async (step, task, taskIndex) => {
-    showEditTaskDialog.value = true;
+        showEditTaskDialog.value = true;
 
-    Object.assign(currentEditingTask, {
-        stepId: step.id,
-        taskId: task.id,
-        taskIndex,
-        mainTask: task.mainTask || null,
-        description: task.description,
-        responsible: task.responsible || [],
-        dueDate: task.dueDate ? new Date(task.dueDate) : null,
-        startTime: task.startTime ? new Date(task.startTime) : null,
-        endTime: task.endTime ? new Date(task.endTime) : null,
-        status: task.status,
-        createdDate: task.createdDate ? new Date(task.createdDate) : null,
-        staffId: task.staffId ?? session.staffId ?? null,
-    });
+        Object.assign(currentEditingTask, {
+            stepId: step.id,
+            taskId: task.id,
+            taskIndex,
+            taskType: task.taskType || 'งานหลัก',
+            mainTask: task.mainTask || null,
+            description: task.description || '',
+            responsible: task.responsible || [],
+            dueDate: task.dueDate ? new Date(task.dueDate) : null,
+            startTime: task.startTime ? new Date(task.startTime) : null,
+            endTime: task.endTime ? new Date(task.endTime) : null,
+            status: task.status || '',
+            createdDate: task.createdDate ? new Date(task.createdDate) : null,
+            staffId: task.staffId ?? session.staffId ?? null,
+        });
 
-    try {
-        // ⭐ ใช้ POSITIONNAMEID จาก user session (เหมือน openAddTaskDialog)
-        const posNameId = user?.user?.name?.POSITIONNAMEID ?? null;
-        if (!posNameId) { mainTasks.value = []; return; }
+        // ⬇️ โหลดตัวเลือกภาระงานหลักตามประเภทงาน
+        if (currentEditingTask.taskType === 'งานหลัก') {
+            await fetchPositionMainWorks();          // ได้ {label, value} แล้ว
+            mainTasks.value = positionMains.value;
+        } else if (currentEditingTask.taskType === 'งานตำแหน่งอื่น') {
+            await fetchAllMainWorks();               // ได้ {label, value} แล้ว
+            mainTasks.value = allMainTasks.value;
+        } else {
+            // งานอื่นๆ ไม่ต้องเลือก mainTask
+            mainTasks.value = [{ label: 'ภาระงานอื่นๆ', value: 'ภาระงานอื่นๆ' }];
+        }
 
-        const res = await axios.get(`${API}/getMainWorks`, { params: { positionnameid: posNameId } });
-
-        // ใน dialog แก้ไข คุณใช้ optionLabel="label" optionValue="value"
-        mainTasks.value = (Array.isArray(res.data.data) ? res.data.data : []).map(item => ({
-        label: item.POSNAMETH,
-        value: item.POSNAMETH
-        }));
-
-       
-    } catch (e) {
-        console.error("Error fetching main tasks:", e);
-        mainTasks.value = [];
-    }
+        // ถ้าต้องการโหลด subtask ตาม mainTask เดิม (ถ้ามี)
+        if (currentEditingTask.mainTask) {
+            if (currentEditingTask.taskType === 'งานหลัก') {
+            const r = await axios.get(`${API}/getSubWorks`,     { params: { mainActivity: currentEditingTask.mainTask }});
+            subTasks.value = Array.isArray(r.data?.data) ? r.data.data : [];
+            } else if (currentEditingTask.taskType === 'งานตำแหน่งอื่น') {
+            const r = await axios.get(`${API}/getSubWorksAll`,  { params: { mainActivity: currentEditingTask.mainTask }});
+            subTasks.value = Array.isArray(r.data?.data) ? r.data.data : [];
+            } else {
+            subTasks.value = [];
+            }
+        }
     };
 
+    const onEditTaskTypeChange = async () => {
+        const t = currentEditingTask.taskType;
+        currentEditingTask.mainTask = null;
+        currentEditingTask.description = '';
+        subTasks.value = [];
 
+        if (t === 'งานอื่นๆ') {
+            // พิมพ์เอง ไม่ต้องโหลด main/sub
+            return;
+        }
+        if (t === 'งานหลัก') {
+            await fetchPositionMainWorks();
+            mainTasks.value = positionMains.value;
+        } else if (t === 'งานตำแหน่งอื่น') {
+            await fetchAllMainWorks();
+            mainTasks.value = allMainTasks.value;
+        }
+    };
+ 
     const saveEditedTask = async () => { 
         const invalidTime =
             currentEditingTask.startTime &&
@@ -1263,6 +1352,7 @@
 
         const payload = {
             id:          currentEditingTask.taskId,
+            taskType:    currentEditingTask.taskType,
             mainTask:    currentEditingTask.mainTask,
             description: currentEditingTask.description,
             startTime:   toDateTimeStr(currentEditingTask.startTime),
@@ -1280,6 +1370,7 @@
 
             allPlans.value[planIndex].steps[stepIndex].tasks[currentEditingTask.taskIndex] = {
             id: currentEditingTask.taskId,
+            taskType: currentEditingTask.taskType, 
             mainTask: currentEditingTask.mainTask,
             description: currentEditingTask.description, 
             startTime: currentEditingTask.startTime,
@@ -1294,56 +1385,8 @@
             console.error("เกิดข้อผิดพลาด:", e);
             Swal.fire({ icon:'error', title:'ผิดพลาด', text:'แก้ไขภาระงานไม่สำเร็จ' });
         }
-    };
-
-
-
-
-    // const updateTaskStatus = async (step, task, newStatus) => {
-    //     if (!task?.id) {
-    //         return Swal.fire({
-    //             icon: 'warning',
-    //             title: 'ไม่สามารถบันทึก',
-    //             text: 'ภาระงานยังไม่มี ID (ยังไม่ได้บันทึก)'
-    //         });
-    //     }
-
-    //     const oldStatus = task.status;
-    //     task.status = newStatus;
-    //     task.__saving = true;
-
-    //     try {
-    //         await axios.post(`${API}/UpdateTaskStatus`, {
-    //             id: task.id,
-    //             status: newStatus,
-    //             staff_id: task.responsible?.[0]?.id ?? session.staffId ?? null,
-    //             fac_id: session.facId ?? null,
-    //         });
-
-    //         // แจ้งเตือนบันทึกสำเร็จ
-    //         Swal.fire({
-    //             icon: 'success',
-    //             title: 'บันทึกแล้ว',
-    //             text: 'อัปเดตสถานะเรียบร้อย',
-    //             timer: 1500,
-    //             showConfirmButton: false
-    //         });
-
-    //     } catch (e) {
-    //         console.error(e);
-    //         task.status = oldStatus; // revert กลับไปค่าเดิม
-
-    //         // แจ้งเตือนบันทึกไม่สำเร็จ
-    //         Swal.fire({
-    //             icon: 'error',
-    //             title: 'บันทึกไม่สำเร็จ',
-    //             text: 'อัปเดตสถานะไม่สำเร็จ'
-    //         });
-
-    //     } finally {
-    //         task.__saving = false;
-    //     }
-    // };
+    }; 
+     
     const updateTaskStatus = async (step, task, newStatus) => {
         if (!task?.id) {
             return Swal.fire({ icon: 'warning', title: 'ไม่สามารถบันทึก', text: 'ภาระงานยังไม่มี ID (ยังไม่ได้บันทึก)' });
@@ -1364,8 +1407,7 @@
             task.__saving = false;
         }
     };
- 
- 
+  
     const confirmRemoveTaskInTable = async (step, taskIndex) => {
     const ok = await Swal.fire({ title:'ยืนยันการลบ', text:'คุณต้องการลบภาระงานนี้ใช่หรือไม่?', icon:'warning', showCancelButton:true });
         if (!ok.isConfirmed) return;
@@ -1444,7 +1486,12 @@
         }, 250);
     };
  
+    const planNo = (s) => {
+  const m = String(s || '').match(/\d+/)
+  return m ? parseInt(m[0], 10) : 0
+};
 
+  
  </script>
 
 
