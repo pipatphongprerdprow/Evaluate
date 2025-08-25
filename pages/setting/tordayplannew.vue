@@ -25,7 +25,19 @@
             </div>
 
             <DataTable :value="allPlansSorted" v-model:expandedRows="expandedPlans" dataKey="id" responsiveLayout="scroll" stripedRows > <!-- :class="{'p-datatable-gridlines': allPlans.length > 0}" -->
-                <Column expander style="width: 3rem" />
+                <Column expander style="width: 3rem" /> 
+
+
+                <Column header="ประเภทแผน" style="width: 9rem; min-width: 8rem; text-align:center">
+  <template #body="slotProps">
+    <span class="p-column-title">ประเภทแผน</span>
+    <Tag
+      :value="slotProps.data.planType || 'ไม่ระบุ'"
+      :severity="getPlanTypeSeverity(slotProps.data.planType)"
+      class="font-semibold"
+    />
+  </template>
+</Column>
                 <Column field="planLabel" header="ชื่อแผนงาน/โครงการ" style="min-width: 12rem" class="font-bold text-primary-800">
                     <template #body="slotProps">
                         <span class="p-column-title">ชื่อแผนงาน</span>
@@ -240,7 +252,19 @@
                     <i class="pi pi-file mr-2 text-primary-500"></i>
                     1. ข้อมูลแผนงาน / โครงการ
                 </h3>
-                <div class="p-fluid grid form-layout">
+                <div class="p-fluid grid form-layout"> 
+                      <div class="field col-12 md:col-12">
+                        <label class="font-semibold text-lg">ประเภทแผน <span class="text-red-500">*</span></label>
+                        <Dropdown 
+                            v-model="currentPlan.planType"
+                            :options="planTypes"
+                            optionLabel="label"
+                            optionValue="value"
+                            placeholder="เลือกประเภทแผน"
+                            class="w-full"
+                            required
+                        />
+                    </div>
                     <div class="field col-12">
                         <label class="font-semibold text-lg">ชื่อแผนปฏิบัติงาน <span class="text-red-500">*</span></label>
                         <InputText v-model="currentPlan.planLabel" placeholder="ระบุชื่อแผนปฏิบัติงาน" required />
@@ -718,7 +742,21 @@
     const toast = useToast();
     const showPlanDialog = ref(false);
     const isEditMode = ref(false);
-    const currentPlan = reactive({ id: null, planLabel: '', owner: [], startDate: null, endDate: null, steps: [] });
+    const planTypes = [
+        { label: 'แผนปฏิบัติการ', value: 'แผนปฏิบัติการ' },
+        { label: 'โครงการ', value: 'โครงการ' },
+        { label: 'นโยบาย', value: 'นโยบาย' },
+        { label: 'มติประชุม', value: 'มติประชุม' }
+    ];
+    const currentPlan = reactive({
+         id: null, 
+         planType: null,
+         planLabel: '', 
+         owner: [], 
+         startDate: null, 
+         endDate: null, 
+         steps: [] 
+        });
     const newStepName = ref('');
     const newStepDates = ref([]);
     const expandedPlans = ref([]);
@@ -970,15 +1008,13 @@
 
         const payload = {
             id: currentPlan.id,
+            planType: currentPlan.planType,
             planLabel: currentPlan.planLabel,
             startDate: toDateStr(currentPlan.startDate),
             endDate:   toDateStr(currentPlan.endDate),
-            owner: currentPlan.owner?.map(o => ({ id: o.id })),
-
-            // แนบ session เสมอ
+            owner: currentPlan.owner?.map(o => ({ id: o.id })), 
             staff_id: session.staffId,
-            fac_id:   session.facId,
-
+            fac_id:   session.facId, 
             steps: currentPlan.steps.map(s => ({
             name: s.name,
             startDate: toDateStr(s.startDate),
@@ -1217,6 +1253,17 @@
         }
     };
 
+    // ประเภทแผน
+    const getPlanTypeSeverity = (t) => {
+        switch (t) {
+            case 'แผนปฏิบัติการ': return 'success';   // เขียว
+            case 'โครงการ':       return 'danger';      // ฟ้า
+            case 'นโยบาย':        return 'warning';   // เหลือง
+            case 'มติประชุม':     return 'info';      // ฟ้า
+            case 'ไม่ระบุ':       return 'secondary'; // เทา
+            default:              return 'secondary'; // fallback เป็นเทา
+        }
+    }
 
 
     const addTaskToStepFromMain = async () => { // [MOD]

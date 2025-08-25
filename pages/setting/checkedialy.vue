@@ -140,6 +140,16 @@
 
             <DataTable  :value="personPlansSortedByNumber" v-model:expandedRows="expandedPlansPerson" dataKey="id" responsiveLayout="scroll" stripedRows >
               <Column expander style="width: 3rem" />
+              <Column header="ประเภทแผน" style="width: 9rem; min-width: 8rem; text-align:center;">
+                <template #body="slotProps">
+                  <span class="p-column-title">ประเภทแผน</span>
+                  <Tag
+                    :value="getPlanType(slotProps.data)"
+                    :severity="getPlanTypeSeverity(getPlanType(slotProps.data))"
+                    class="font-semibold"
+                  />
+                </template>
+              </Column>
               <Column field="planLabel" header="ชื่อแผนงาน/โครงการ" style="min-width: 12rem" class="font-bold text-primary-800" >
                 <template #body="slotProps">
                   <div class="flex flex-col items-start">
@@ -821,6 +831,22 @@ const personPlansSortedByNumber = computed(() => {
     return numA - numB
   })
 })
+
+function getPlanType(p) {
+  // รองรับทั้ง planType (camelCase) และ plan_type (snake_case) และ fallback
+  return (p?.planType ?? p?.plan_type ?? 'ไม่ระบุ') || 'ไม่ระบุ';
+}
+
+function getPlanTypeSeverity(t) {
+  switch (t) {
+    case 'แผนปฏิบัติการ': return 'success';   // เขียว
+    case 'โครงการ':        return 'danger';      // แดง
+    case 'นโยบาย':         return 'warning';   // เหลือง
+    case 'มติประชุม':      return 'info'; // ม่วง/เทาอ่อน (แล้วแต่ theme)
+    case 'ไม่ระบุ':        return 'secondary'; // ✅ เทา
+    default:                return 'secondary'; // ✅ fallback เป็นเทา
+  }
+}
 
 /* ---------- expose ---------- */
 defineExpose({
