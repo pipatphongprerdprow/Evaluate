@@ -2,7 +2,7 @@
   <div class="grid">
     <div class="col-12 lg:col-12 xl:col-12">
       <div class="card mb-0">
-        <div class="formgroup-inline mb-1">
+        <div class="formgroup-inline mb-3">
           <div class="col md:col-5">
             <h3 class="mb-4 card-header">
               <i class="pi pi-file" style="font-size: x-large;"></i>
@@ -11,34 +11,67 @@
           </div>
         </div>
 
-        <table class="table">
-          <thead>
-            <tr style="height: 40px;background-color: #FFFBEA;">
-              <th style="width: 40%;">ผู้รับการประเมิน</th>
-              <th>ตำแหน่ง</th>
-              <th>ดูภาระงาน</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="(item, index) in products" :key="index">
-              <td class="staff-name-cell">
-                <b style="color: blue;">{{ item.prefixfullname }} {{ item.namefully }}</b>
-              </td>
-              <td class="text-center staff-position-cell">
-                <b>{{ item.posnameth || '' }}</b>
-              </td>
-              <td class="button-cell">
-                <Button
-                  label="รายละเอียด"
-                  severity="info"
-                  icon="pi pi-list"
-                  class="detail-button"
-                  @click="openDailyTaskDetail(item)"
-                />
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        <!-- ===== Leaderboard / ชาเล้นภาระงาน ===== -->
+        <div class="card p-3 mb-3">
+          <div class="flex align-items-center justify-content-between mb-3">
+            <div class="flex align-items-center gap-2">
+              <i class="pi pi-trophy text-yellow-500 text-2xl"></i>
+              <!-- <h3 class="m-0">ชาเล้นภาระงาน (Leaderboard)</h3> -->
+            </div>
+            <Dropdown
+              v-model="sortKey"
+              :options="sortOptions"
+              optionLabel="label"
+              optionValue="value"
+              class="w-14rem"
+              placeholder="เรียงลำดับตาม"
+            />
+          </div>
+
+          <div class="grid">
+            <div v-for="p in leaderboardSorted" :key="p.staffid" class="col-12 md:col-6 lg:col-4" >
+              <div class="lb-card">
+                <div class="flex align-items-center gap-3">
+                  <!-- รูปพนักงาน -->
+                 <img :src="getAvatarByStaffId(p.staffid)" class="lb-avatar" alt="avatar" @error="(e)=>onImgError(e, p.displayName)" />
+                  <div class="flex-1">
+                    <!-- ชื่อ = ปุ่มรายละเอียด -->
+                    <button
+                      class="lb-name-btn"
+                      @click="openDailyTaskDetail(findProductByStaffId(p.staffid))"
+                      :title="'ดูรายละเอียดของ ' + p.displayName"
+                    >
+                      <span class="lb-name">{{ p.displayName }}</span>
+                      <i class="pi pi-list ml-2 text-primary-600"></i>
+                    </button>
+                    <div class="lb-pos text-500">{{ p.posnameth || '-' }}</div>
+                  </div>
+                  <Tag :value="p.total.toLocaleString()" severity="info" />
+                </div>
+
+                <div class="mt-3 grid text-center">
+                  <div class="col-4">
+                    <div class="text-500 text-sm">งานหลัก</div>
+                    <div class="lb-num success">{{ p.main }}</div>
+                  </div>
+                  <div class="col-4">
+                    <div class="text-500 text-sm">ตำแหน่งอื่น</div>
+                    <div class="lb-num warning">{{ p.otherPos }}</div>
+                  </div>
+                  <div class="col-4">
+                    <div class="text-500 text-sm">อื่นๆ</div>
+                    <div class="lb-num info">{{ p.other }}</div>
+                  </div>
+                </div>
+
+                <ProgressBar :value="p.progressPercent" class="mt-2" />
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- ===== /Leaderboard ===== -->
+
+        <!-- (ซ่อน/ถอดตารางหัวคอลัมน์เดิมออกเพื่อความสะอาดของหน้า) -->
 
         <div class="col md:col-5 text-right">
           <Dialog
@@ -72,8 +105,7 @@
                     </template>
                     <template #content>
                       <div class="h-full flex flex-column justify-content-center">
-                        <!-- <Chart type="pie" :data="taskTypeData" :options="taskTypeOptions" class="w-full" /> -->
-                         <Chart type="pie" :data="taskTypeData" :options="taskTypeOptionsSmall" />
+                        <Chart type="pie" :data="taskTypeData" :options="taskTypeOptionsSmall" />
                       </div>
                     </template>
                   </Card>
@@ -136,13 +168,11 @@
               </div>
             </div>
 
-            <Divider />
-
-            <DataTable  :value="personPlansSortedByNumber" v-model:expandedRows="expandedPlansPerson" dataKey="id" responsiveLayout="scroll" stripedRows >
+            <Divider /> 
+            <DataTable :value="personPlansSortedByNumber" v-model:expandedRows="expandedPlansPerson" dataKey="planLabel" responsiveLayout="scroll" stripedRows>
               <Column expander style="width: 3rem" />
               <Column header="ประเภทแผน" style="width: 9rem; min-width: 8rem; text-align:center;">
                 <template #body="slotProps">
-                  <span class="p-column-title">ประเภทแผน</span>
                   <Tag
                     :value="getPlanType(slotProps.data)"
                     :severity="getPlanTypeSeverity(getPlanType(slotProps.data))"
@@ -150,7 +180,7 @@
                   />
                 </template>
               </Column>
-              <Column field="planLabel" header="ชื่อแผนงาน/โครงการ" style="min-width: 12rem" class="font-bold text-primary-800" >
+              <Column field="planLabel" header="ชื่อแผนงาน/โครงการ" style="min-width: 12rem" class="font-bold text-primary-800">
                 <template #body="slotProps">
                   <div class="flex flex-col items-start">
                     <div class="flex items-center">
@@ -201,7 +231,7 @@
                     <i class="pi pi-list mr-2 text-primary-500"></i>
                     ขั้นตอน/กิจกรรมการทำงาน
                   </div>
-                  <DataTable :value="slotProps.data.steps" v-model:expandedRows="expandedStepsPerson" dataKey="id" responsiveLayout="scroll"  >
+                  <DataTable :value="slotProps.data.steps" v-model:expandedRows="expandedStepsPerson" dataKey="id" responsiveLayout="scroll">
                     <Column expander style="width: 3rem" />
                     <Column field="name" header="ชื่อขั้นตอน/กิจกรรม" style="min-width: 12rem" class="font-semibold text-700">
                       <template #body="stepProps">
@@ -229,15 +259,14 @@
                       <template #body="stepProps">
                         <Tag :value="getStepStatus(stepProps.data)" :severity="getStepSeverity(stepProps.data)" class="font-bold" />
                       </template>
-                    </Column> 
+                    </Column>
                     <template #expansion="stepProps">
                       <div class="p-4 bg-gray-100 border-round-xl ml-4">
                         <div class="text-lg font-bold text-700 flex items-center mb-3">
                           <i class="pi pi-calendar-check mr-2 text-primary-500"></i>
                           ภาระงานประจำวัน
                         </div>
-                        <DataTable :value="stepProps.data.tasks" responsiveLayout="scroll" stripedRows :class="{ 'p-datatable-gridlines': true }" >
-
+                        <DataTable :value="stepProps.data.tasks" responsiveLayout="scroll" stripedRows :class="{ 'p-datatable-gridlines': true }">
                           <Column header="ประเภทภาระงาน" style="width: 10rem">
                             <template #body="taskProps">
                               <Tag
@@ -261,7 +290,7 @@
                               <span v-else class="text-gray-400">ยังไม่เลือก</span>
                             </template>
                           </Column>
-                          <Column field="description" header="ภาระงานประจำวัน" style="flex: 1" /> 
+                          <Column field="description" header="ภาระงานประจำวัน" style="flex: 1" />
                           <Column header="วันที่ลงบันทึก" style="width: 9rem" class="text-center">
                             <template #body="taskProps">{{ formatDate(taskProps.data.createdDate) }}</template>
                           </Column>
@@ -285,7 +314,6 @@
                             </template>
                           </Column>
                         </DataTable>
-
 
                         <div v-if="stepProps.data.tasks?.length === 0" class="text-center text-gray-500 text-sm py-4">
                           ยังไม่มีภาระงานสำหรับขั้นตอนนี้
@@ -321,35 +349,39 @@ import Chart from 'primevue/chart';
 import Card from 'primevue/card';
 import Divider from 'primevue/divider';
 
+
 const { getSession } = await useAuth();
 
 /* ---------- CONFIG ---------- */
 const API = 'http://127.0.0.1:8000/api';
 
+/** URL รูปโปรไฟล์ ตาม format: `${profileImageUrl}${staffid}.jpg` */
+const profileImageUrl = 'https://pd.msu.ac.th/staff/picture/'; // 
+
 const owners = ref([
   { id: 1, name: 'นาย พิพัฒน์พงษ์ เพริดพราว' },
-    { id: 2, name: 'นาย อนุรักษ์ สุระขันตี' },
-    { id: 3, name: 'นาย อัครรินทร์ บุปผา' },
-    { id: 4, name: 'นาย สุชาติ กัญญาประสิทธิ์' },
-    { id: 5, name: 'นาย ธนดล สิงขรอาสน์' }, 
-    { id: 6, name: 'นาย ณัฐวุฒิ สุทธิพันธ์' },
-    { id: 7, name: 'นาง นันทรัตน์ จำปาแดง' },
-    { id: 8, name: 'นาย ไกรษร อุทัยแสง' },
-    { id: 9, name: 'นาง พิมพ์พร พรรณศรี' },
-    { id: 10, name: 'นาย กัมปนาท อาชา' },
-    { id: 11, name: 'นาง วาสนา อุทัยแสง' },
-    { id: 12, name: 'นางสาว แจ่มจันทร์ จันทร์ศรี' },
-    { id: 13, name: 'นาง อิศราภรณ์ ศรีเวียงธนาธิป' },
-    { id: 14, name: 'นาย คมรัตน์ หลูปรีชาเศรษฐ' },
-    { id: 15, name: 'นางสาว สิริมา ศรีสุภาพ' },
-    { id: 16, name: 'นางสาว รัตติยา สัจจภิรมย์' },
-    { id: 17, name: 'นางสาว กัญญมน แก้วมงคล' },
-    { id: 18, name: 'นาง อัจฉราวดี กำมุขโช' },
-    { id: 19, name: 'นาง วรินธร จีระฉัตร' },
-    { id: 20, name: 'นางสาว ญาณทัสน์ อันทะราศรี' },
-    { id: 21, name: 'นาย นัฐพงษ์ ศรีเตชะ' },
-    { id: 22, name: 'นางสาว สมสมัย บุญทศ' },
-    { id: 23, name: 'นาง สารดา พันธุ์เสนา' }, 
+  { id: 2, name: 'นาย อนุรักษ์ สุระขันตี' },
+  { id: 3, name: 'นาย อัครรินทร์ บุปผา' },
+  { id: 4, name: 'นาย สุชาติ กัญญาประสิทธิ์' },
+  { id: 5, name: 'นาย ธนดล สิงขรอาสน์' }, 
+  { id: 6, name: 'นาย ณัฐวุฒิ สุทธิพันธ์' },
+  { id: 7, name: 'นาง นันทรัตน์ จำปาแดง' },
+  { id: 8, name: 'นาย ไกรษร อุทัยแสง' },
+  { id: 9, name: 'นาง พิมพ์พร พรรณศรี' },
+  { id: 10, name: 'นาย กัมปนาท อาชา' },
+  { id: 11, name: 'นาง วาสนา อุทัยแสง' },
+  { id: 12, name: 'นางสาว แจ่มจันทร์ จันทร์ศรี' },
+  { id: 13, name: 'นาง อิศราภรณ์ ศรีเวียงธนาธิป' },
+  { id: 14, name: 'นาย คมรัตน์ หลูปรีชาเศรษฐ' },
+  { id: 15, name: 'นางสาว สิริมา ศรีสุภาพ' },
+  { id: 16, name: 'นางสาว รัตติยา สัจจภิรมย์' },
+  { id: 17, name: 'นางสาว กัญญมน แก้วมงคล' },
+  { id: 18, name: 'นาง อัจฉราวดี กำมุขโช' },
+  { id: 19, name: 'นาง วรินธร จีระฉัตร' },
+  { id: 20, name: 'นางสาว ญาณทัสน์ อันทะราศรี' },
+  { id: 21, name: 'นาย นัฐพงษ์ ศรีเตชะ' },
+  { id: 22, name: 'นางสาว สมสมัย บุญทศ' },
+  { id: 23, name: 'นาง สารดา พันธุ์เสนา' }, 
 ]);
 
 const staffIdMain = ref('');
@@ -368,6 +400,125 @@ const expandedPlansPerson = ref([]);
 const expandedStepsPerson = ref([]);
 
 const taskStatuses = ['รอดำเนินการ', 'อยู่ระหว่างดำเนินการ', 'เสร็จสิ้น'];
+
+/* ===== Leaderboard state & helpers ===== */
+const leaderboard = ref([]);
+const sortKey = ref('total');
+const sortOptions = [
+  { label: 'รวมมาก → น้อย', value: 'total' },
+  { label: 'งานหลักมาก → น้อย', value: 'main' },
+  { label: 'ตำแหน่งอื่นมาก → น้อย', value: 'otherPos' },
+  { label: 'งานอื่นๆมาก → น้อย', value: 'other' },
+  { label: 'ชื่อ (ก-ฮ)', value: 'name' },
+];
+
+const displayNameOfStaff = (s) =>
+  `${s?.prefixfullname || ''} ${s?.namefully || s?.staffname || ''}`.trim();
+
+function findProductByStaffId(staffid) {
+  return products.value.find(x => String(x.staffid) === String(staffid)) || null;
+}
+
+function getAvatarByStaffId(staffid) {
+  return `${profileImageUrl}${staffid}.jpg`;
+}
+function onImgError(e, name = 'User') {
+  e.target.src =
+    'https://ui-avatars.com/api/?background=EEE&color=444&name=' + encodeURIComponent(name);
+}
+
+function accumulateFromPlans(plans) {
+  const tasks = [];
+  let totalTasks = 0, completed = 0;
+
+  (plans || []).forEach(pl => {
+    (pl.steps || []).forEach(st => {
+      (st.tasks || []).forEach(t => {
+        tasks.push(t);
+        totalTasks += 1;
+        if ((String(t.status||'')).includes('เสร็จ')) completed += 1;
+      });
+    });
+  });
+
+  const { main, otherPos, other } = tallyByType(tasks, PIE_MODE);
+  const total = main + otherPos + other;
+
+  return {
+    main, otherPos, other, total,
+    progressPercent: totalTasks ? Math.round((completed/totalTasks)*100) : 0
+  };
+}
+
+/* ---------- unify counter ---------- */
+const PIE_MODE = 'count'; // 'count' = นับจำนวนงาน, 'minutes' = นับเวลานาที
+
+function classifyTaskType(t) {
+  const raw = (t?.taskType ?? t?.workload_type ?? t?.mainTask ?? '').toString().trim();
+  if (raw === 'งานหลัก') return 'งานหลัก';
+  if (raw === 'งานตำแหน่งอื่น') return 'งานตำแหน่งอื่น';
+  if (raw === 'งานอื่นๆ') return 'งานอื่นๆ';
+  return 'งานอื่นๆ'; // fallback
+}
+
+function tallyByType(tasks, mode = 'count') {
+  const acc = { main: 0, otherPos: 0, other: 0 };
+  (tasks || []).forEach(t => {
+    const k = classifyTaskType(t);
+    const plus = mode === 'minutes' ? getTaskMinutes(t) : 1;
+    if (k === 'งานหลัก') acc.main += plus;
+    else if (k === 'งานตำแหน่งอื่น') acc.otherPos += plus;
+    else acc.other += plus;
+  });
+  return acc;
+}
+
+
+
+async function buildLeaderboard() {
+  if (!selectedEvaluationRound.value || !products.value.length) {
+    leaderboard.value = [];
+    return;
+  }
+  const fac = selectedEvaluationRound.value.fac_id;
+  const jobs = products.value.map(async (s) => {
+    try {
+      const { data } = await axios.post(`${API}/showplannew`, {
+        staff_id: s.staffid,
+        fac_id: fac
+      });
+      const plans = mapApiToState(data?.data || []);
+      const acc = accumulateFromPlans(plans);
+      return {
+        staffid: s.staffid,
+        displayName: displayNameOfStaff(s),
+        posnameth: s.posnameth || '',
+        ...acc,
+      };
+    } catch {
+      return {
+        staffid: s.staffid,
+        displayName: displayNameOfStaff(s),
+        posnameth: s.posnameth || '',
+        main: 0, otherPos: 0, other: 0, total: 0, progressPercent: 0,
+      };
+    }
+  });
+  leaderboard.value = await Promise.all(jobs);
+}
+
+const leaderboardSorted = computed(() => {
+  const arr = [...leaderboard.value];
+  switch (sortKey.value) {
+    case 'name': return arr.sort((a,b) => a.displayName.localeCompare(b.displayName, 'th'));
+    case 'main': return arr.sort((a,b) => b.main - a.main);
+    case 'otherPos': return arr.sort((a,b) => b.otherPos - a.otherPos);
+    case 'other': return arr.sort((a,b) => b.other - a.other);
+    case 'total':
+    default: return arr.sort((a,b) => b.total - a.total);
+  }
+});
+/* ===== /Leaderboard ===== */
 
 onMounted(async () => {
   const session = await getSession();
@@ -415,17 +566,13 @@ function parseDateLoose(v) {
   if (t) {
     const now = new Date();
     return new Date(
-      now.getFullYear(),
-      now.getMonth(),
-      now.getDate(),
-      parseInt(t[1], 10),
-      parseInt(t[2], 10),
-      t[3] ? parseInt(t[3], 10) : 0
+      now.getFullYear(), now.getMonth(), now.getDate(),
+      parseInt(t[1], 10), parseInt(t[2], 10), t[3] ? parseInt(t[3], 10) : 0
     );
   }
   const d = new Date(s);
   return isNaN(d) ? null : d;
-}
+} 
 
 function displayNameOf(o) {
   if (!o) return '';
@@ -638,9 +785,7 @@ const allTasks = computed(() => {
 const totalTasks = computed(() => allTasks.value.length);
 
 const taskTypeData = computed(() => {
-  const main = allTasks.value.filter(t => t.taskType === 'งานหลัก').length
-  const otherPos = allTasks.value.filter(t => t.taskType === 'งานตำแหน่งอื่น').length
-  const other = allTasks.value.filter(t => t.taskType === 'งานอื่นๆ').length
+  const { main, otherPos, other } = tallyByType(allTasks.value, PIE_MODE);
   return {
     labels: ['งานหลัก', 'งานตำแหน่งอื่น', 'งานอื่นๆ'],
     datasets: [
@@ -650,8 +795,9 @@ const taskTypeData = computed(() => {
         hoverBackgroundColor: ['#64B5F6', '#81C784', '#FFB74D']
       }
     ]
-  }
+  };
 });
+
 const taskTypeOptions = {
   plugins: {
     legend: { position: 'bottom' },
@@ -667,8 +813,9 @@ const taskTypeOptions = {
     }
   }
 };
+const taskTypeOptionsSmall = taskTypeOptions;
  
-const BAR_COLORS  = ['#FACC15', '#34D399', '#60A5FA']; // เหลือง, เขียว, ฟ้า
+const BAR_COLORS  = ['#FACC15', '#34D399', '#60A5FA'];
 const BAR_HOVERS  = ['#EAB308', '#10B981', '#3B82F6'];
 const BAR_BORDERS = ['#D4AF0A', '#0EA5A2', '#2563EB'];
 
@@ -693,7 +840,7 @@ const timeSpentData = computed(() => {
       {
         label: 'เวลารวม (นาที)',
         data: [mainMinutes, otherPosMinutes, otherMinutes],
-        backgroundColor: BAR_COLORS,        // 👈 เปลี่ยนเป็นอาร์เรย์
+        backgroundColor: BAR_COLORS,
         hoverBackgroundColor: BAR_HOVERS,
         borderColor: BAR_BORDERS,
         borderWidth: 1
@@ -719,13 +866,9 @@ const taskStatusCounts = computed(() => {
   let completed = 0;
   allTasks.value.forEach(t => {
     const status = normalizeStatus(t.status);
-    if (status === 'รอดำเนินการ') {
-      pending++;
-    } else if (status === 'อยู่ระหว่างดำเนินการ') {
-      inProgress++;
-    } else {
-      completed++;
-    }
+    if (status === 'รอดำเนินการ') pending++;
+    else if (status === 'อยู่ระหว่างดำเนินการ') inProgress++;
+    else completed++;
   });
   return { pending, inProgress, completed };
 });
@@ -791,6 +934,7 @@ async function fetchStaffAndDailyTasks() {
     products.value = (res.data || []).filter(
       item => item.stftypename !== 'ลูกจ้างชั่วคราว' && item.stftypename !== 'พนักงานราชการ'
     );
+    await buildLeaderboard(); // หลังได้รายชื่อ
   } catch {
     Swal.fire({ icon: 'error', title: 'ข้อผิดพลาด', text: 'ไม่สามารถโหลดข้อมูลผู้รับการประเมินได้' });
   }
@@ -799,6 +943,10 @@ async function fetchStaffAndDailyTasks() {
 async function openDailyTaskDetail(staffData) {
   if (!selectedEvaluationRound.value) {
     Swal.fire('แจ้งเตือน', 'กรุณาเลือกรอบการประเมินก่อน', 'error');
+    return;
+  }
+  if (!staffData) {
+    Swal.fire('แจ้งเตือน', 'ไม่พบข้อมูลพนักงาน', 'error');
     return;
   }
   currentStaffDetail.value = staffData;
@@ -818,7 +966,6 @@ async function openDailyTaskDetail(staffData) {
       personPlans.value = mapApiToState(alt.data?.plans || []);
     }
   } catch (e) {
-    console.error(e);
     personPlans.value = [];
     Swal.fire({ icon: 'error', title: 'ข้อผิดพลาด', text: 'ไม่สามารถโหลดข้อมูลภาระงานประจำวันได้' });
   }
@@ -826,25 +973,24 @@ async function openDailyTaskDetail(staffData) {
 
 const personPlansSortedByNumber = computed(() => {
   return [...personPlans.value].sort((a, b) => {
-    const numA = parseInt(a.planLabel.replace(/[^0-9]/g, ''), 10) || 0
-    const numB = parseInt(b.planLabel.replace(/[^0-9]/g, ''), 10) || 0
+    const numA = parseInt((a.planLabel || '').replace(/[^0-9]/g, ''), 10) || 0
+    const numB = parseInt((b.planLabel || '').replace(/[^0-9]/g, ''), 10) || 0
     return numA - numB
   })
 })
 
 function getPlanType(p) {
-  // รองรับทั้ง planType (camelCase) และ plan_type (snake_case) และ fallback
   return (p?.planType ?? p?.plan_type ?? 'ไม่ระบุ') || 'ไม่ระบุ';
 }
 
 function getPlanTypeSeverity(t) {
   switch (t) {
-    case 'แผนปฏิบัติการ': return 'success';   // เขียว
-    case 'โครงการ':        return 'danger';      // แดง
-    case 'นโยบาย':         return 'warning';   // เหลือง
-    case 'มติประชุม':      return 'info'; // ม่วง/เทาอ่อน (แล้วแต่ theme)
-    case 'ไม่ระบุ':        return 'secondary'; // ✅ เทา
-    default:                return 'secondary'; // ✅ fallback เป็นเทา
+    case 'แผนปฏิบัติการ': return 'success';
+    case 'โครงการ':        return 'danger';
+    case 'นโยบาย':         return 'warning';
+    case 'มติประชุม':      return 'info';
+    case 'ไม่ระบุ':        return 'secondary';
+    default:                return 'secondary';
   }
 }
 
@@ -864,127 +1010,75 @@ defineExpose({
   fetchEvaluationRounds,
   fetchStaffAndDailyTasks,
   openDailyTaskDetail
-});  
-
-
-
-
+});
 </script>
 
 <style>
-/* CSS Variables for theme colors */
 :root {
-  --surface-bg: #f9fafb; /* Light gray */
-  --card-bg: #ffffff;    /* White */
+  --surface-bg: #f9fafb;
+  --card-bg: #ffffff;
 }
+.p-dialog .p-dialog-content { background-color: var(--surface-bg); }
+.card-header { text-align: left; margin: 0; padding: 0; }
 
-/* Apply background to the dialog content */
-.p-dialog .p-dialog-content {
-  background-color: var(--surface-bg);
+/* ===== Leaderboard styles ===== */
+.lb-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 14px;
+  box-shadow: 0 4px 14px rgba(0,0,0,.06);
+  border: 1px solid #f0f0f0;
 }
-
-.card-header {
-  text-align: left;
-  margin: 0;
+.lb-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 9999px;
+  object-fit: cover;
+  border: 2px solid #e5e7eb;
+}
+.lb-name-btn {
+  background: transparent;
+  border: 0;
   padding: 0;
-}
-
-.table {
-  border-collapse: separate;
-  border-spacing: 0 5px;
-  width: 100%;
-}
-
-.table th {
-  background-color: #efefaf;  /* เหลืองอ่อน */
-  font-weight: bold;
-  padding: 10px;
-  border: 1px solid #e0e0e0;
-}
-
-.table td {
-  border: 1px solid #e0e0e0;
-  text-align: center;
-  padding: 10px;
-}
-
-.table tbody tr {
-  transition: background-color 0.3s ease;
-}
-
-.table tbody tr:hover {
-  background-color: #f5f5f5;
-}
-
-.striped-row {
-  background-color: #f9f9f9; /* หรือตามที่คุณต้องการให้เป็นสีขาวสลับเทาอ่อน */
-}
-
-.p-datatable .p-column-header-content {
-  justify-content: center;
-}
-
-/* Specific styling for table cells */
-.staff-name-cell {
-  text-align: left;
-  padding-left: 20px;
-}
-.staff-position-cell {
-  text-align: center;
-}
-.button-cell {
-  text-align: center;
-}
-.detail-button {
-  width: 130px;
-}
-
-.chart-container {
-  position: relative;
-  width: 15rem;
-  height: 15rem;
-}
-
-.chart-label {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  display: flex;
-  flex-direction: column;
+  cursor: pointer;
+  display: inline-flex;
   align-items: center;
-  line-height: 1.2;
+}
+.lb-name-btn:hover .lb-name { text-decoration: underline; }
+.lb-name { font-weight: 700; }
+.lb-pos { font-size: .9rem; }
+.lb-num { font-size: 1.25rem; font-weight: 800; }
+.lb-num.success { color: #16a34a; }
+.lb-num.warning { color: #d97706; }
+.lb-num.info    { color: #2563eb; }
+
+.chart-container { position: relative; width: 15rem; height: 15rem; }
+.chart-label { position: absolute; top:50%; left:50%; transform:translate(-50%,-50%); display:flex; flex-direction:column; align-items:center; line-height:1.2; }
+.status-legend-item { width:1rem; height:1rem; border-radius:50%; margin:auto; margin-bottom:.25rem; }
+.status-legend-item.pending { background:#6c757d; }
+.status-legend-item.in-progress { background:#ffc107; }
+.status-legend-item.completed { background:#28a745; }
+
+/* Card (PrimeVue) */
+.p-card { background-color: var(--card-bg); box-shadow: 0 4px 6px rgba(0,0,0,0.08); border-radius: 12px; border: none; }
+.p-card .p-card-content { height: calc(100% - 3.5rem); }
+
+
+.lb-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 9999px;
+  object-fit: cover;
+  border: 2px solid #e5e7eb;
+
+  transition: transform 0.3s ease; /* ใส่ transition ให้นิ่ม */
 }
 
-.status-legend-item {
-  width: 1rem;
-  height: 1rem;
-  border-radius: 50%;
-  margin: auto;
-  margin-bottom: 0.25rem;
+.lb-avatar:hover {
+  transform: scale(3); /* ขยาย 2.5 เท่าเวลา hover */
+  z-index: 10;           /* ให้อยู่บนสุดเวลา overlap */
+  position: relative;
 }
 
-.status-legend-item.pending {
-  background-color: #6c757d;
-}
 
-.status-legend-item.in-progress {
-  background-color: #ffc107;
-}
-
-.status-legend-item.completed {
-  background-color: #28a745;
-}
-
-/* Card Styling for a professional look */
-.p-card {
-  background-color: var(--card-bg);
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.08);
-  border-radius: 12px;
-  border: none;
-}
-
-.p-card .p-card-content {
-  height: calc(100% - 3.5rem);
-}
 </style>
