@@ -16,6 +16,7 @@
           <div class="flex align-items-center justify-content-between mb-3">
             <div class="flex align-items-center gap-2">
               <i class="pi pi-trophy text-yellow-500 text-2xl"></i>
+              <!-- <h3 class="m-0">ชาเล้นภาระงาน (Leaderboard)</h3> -->
             </div>
             <Dropdown
               v-model="sortKey"
@@ -32,7 +33,7 @@
               <div class="lb-card">
                 <div class="flex align-items-center gap-3">
                   <!-- รูปพนักงาน -->
-                  <img :src="getAvatarByStaffId(p.staffid)" class="lb-avatar" alt="avatar" @error="(e)=>onImgError(e, p.displayName)" />
+                 <img :src="getAvatarByStaffId(p.staffid)" class="lb-avatar" alt="avatar" @error="(e)=>onImgError(e, p.displayName)" />
                   <div class="flex-1">
                     <!-- ชื่อ = ปุ่มรายละเอียด -->
                     <button
@@ -40,8 +41,6 @@
                       @click="openDailyTaskDetail(findProductByStaffId(p.staffid))"
                       :title="'ดูรายละเอียดของ ' + p.displayName"
                     >
-                    <!-- {{ p.displayName }} -->
-
                       <span class="lb-name">{{ p.displayName }}</span>
                       <i class="pi pi-list ml-2 text-primary-600"></i>
                     </button>
@@ -170,16 +169,8 @@
             </div>
 
             <Divider /> 
-
-            <!-- ตารางแผนของบุคคล -->
-            <DataTable
-              :value="personPlansSortedByNumber"
-              v-model:expandedRows="expandedPlansPerson"
-              dataKey="planLabel"
-              responsiveLayout="scroll"
-              stripedRows
-            >
-              <!-- <Column expander style="width: 3rem" /> -->
+            <DataTable :value="personPlansSortedByNumber" v-model:expandedRows="expandedPlansPerson" dataKey="planLabel" responsiveLayout="scroll" stripedRows>
+              <Column expander style="width: 3rem" />
               <Column header="ประเภทแผน" style="width: 9rem; min-width: 8rem; text-align:center;">
                 <template #body="slotProps">
                   <Tag
@@ -189,7 +180,7 @@
                   />
                 </template>
               </Column>
-              <Column field="planLabel" header="ชื่อแผนงาน/โครงการ" style="min-width: 12rem" >
+              <Column field="planLabel" header="ชื่อแผนงาน/โครงการ" style="min-width: 12rem" class="font-bold text-primary-800">
                 <template #body="slotProps">
                   <div class="flex flex-col items-start">
                     <div class="flex items-center">
@@ -232,19 +223,8 @@
                     class="font-bold"
                   />
                 </template>
-              </Column> 
-              <!-- NEW: ปุ่มรายละเอียด (เปิด OverlayPanel แบบ Drawer) -->
-              <Column header="รายละเอียด" style="width:8rem; text-align:center;">
-                <template #body="slotProps">
-                  <Button
-                    label="รายละเอียด"
-                    icon="pi pi-search"
-                    class="p-button-sm px-3 py-1 rounded-full bg-sky-500 text-white hover:bg-sky-600 transition"
-                    @click="(e) => openPlanDrawer(e, slotProps.data)"
-                  />
-                </template>
-              </Column> 
-              
+              </Column>
+
               <template #expansion="slotProps">
                 <div class="p-4 bg-gray-50 border-round-xl ml-4">
                   <div class="text-xl font-bold text-700 flex items-center mb-3">
@@ -345,113 +325,6 @@
               </template>
             </DataTable>
 
-            <!-- NEW: Drawer รายละเอียดแผนแบบ OverlayPanel + ไทม์ไลน์ -->
-
-            <Sidebar v-model:visible="planSidebarVisible" position="right" :modal="true" :dismissable="true" style="width: 920px; max-width: 100vw;">
-              <template #header>
-                <div class="flex items-center gap-3">
-                  <i class="pi pi-briefcase text-primary text-xl"></i>
-                  <div class="flex flex-column">
-                    <span class="text-lg font-bold line-clamp-1">{{ selectedPlan?.planLabel || '-' }}</span>
-                    <small class="text-600">
-                      <i class="pi pi-user mr-1"></i>{{ (selectedPlan?.owner ?? []).map(o=>o.name).join(', ') || '-' }}
-                    </small>
-                  </div>
-                </div>
-              </template> 
-              <div v-if="selectedPlan" class="detail-wrap">
-                <!-- สรุปหัวเรื่อง -->
-                <div class="summary">
-                  <div class="summary-item">
-                    <i class="pi pi-calendar text-600 mr-2"></i>
-                    {{ formatDate(selectedPlan.startDate) }} - {{ formatDate(selectedPlan.endDate) }}
-                  </div>
-                  <div class="summary-item">
-                    <i class="pi pi-chart-line text-600 mr-2"></i>
-                    ความคืบหน้า: <b>{{ getPlanProgress(selectedPlan) }}%</b>
-                  </div>
-                  <div class="summary-item">
-                    <i class="pi pi-clock text-600 mr-2"></i>
-                    เวลารวม: <b>{{ getPlanTotalMinutes(selectedPlan).toLocaleString() }}</b> นาที
-                  </div>
-                </div>
-
-                <!-- legend -->
-                <div class="legend">
-                  <span class="dot bg-gray-400"></span> ยังไม่เริ่ม
-                  <span class="dot bg-yellow-500 ml-3"></span> ระหว่างทำ
-                  <span class="dot bg-green-500 ml-3"></span> เสร็จสิ้น
-                </div> 
-                <!-- ไทม์ไลน์ขั้นตอน -->  
-
-                <div class="timeline">
-                  <div
-                    v-for="(st, idx) in (selectedPlan.steps || [])"
-                    :key="st.id ?? idx"
-                    class="step-card"
-                  >
-                    <div class="step-marker" :class="statusClass(getStepStatus(st))"></div>
-
-                    <!-- ⬇⬇⬇ เพิ่ม wrapper ที่หายไป -->
-                    <div class="step-body">
-                      <div class="step-head">
-                        <div class="step-title">
-                          <i class="pi pi-list mr-2 text-primary"></i>
-                          {{ st.name || ('ขั้นตอนที่ ' + (idx + 1)) }}
-                        </div> 
-
-                        <!-- ขวาหัวการ์ด: แสดงผู้รับผิดชอบ + สถานะ -->
-                        <div class="step-right">
-                          <i class="pi pi-users mr-2 text-600"></i>
-                          <span class="step-owners">{{ getStepOwnerNames(st) }}</span>
-                          <Tag class="ml-2" :value="getStepStatus(st)" :severity="getStepSeverity(st)" />
-                        </div>  
-                      </div> 
-                      <div class="step-meta">
-                        <span>
-                          <i class="pi pi-calendar mr-1"></i>
-                          {{ formatDate(st.startDate) }} - {{ formatDate(st.endDate) }}
-                        </span>
-                        <span class="ml-3">
-                          <i class="pi pi-percentage mr-1"></i>{{ getStepProgress(st) }}%
-                        </span>
-                        <span class="ml-3">
-                          <i class="pi pi-clock mr-1"></i>{{ getStepTotalMinutes(st).toLocaleString() }} นาที
-                        </span>
-                      </div> 
-                      <!-- ภาระงานของขั้นตอน (อ่านเร็วแบบการ์ดสั้น) -->
-                      <div class="task-list" v-if="(st.tasks||[]).length">
-                        <div v-for="(t,i) in st.tasks" :key="i" class="task-item">
-                          <div class="task-header">
-                            <span class="task-bullet" :class="statusClass(t.status)"></span>
-                            <span class="task-title">{{ t.description || '(ยังไม่ระบุ)' }}</span>
-                              <Tag class="ml-auto"
-                            :value="normalizeStatus(t.status)"
-                            :severity="getTaskStatusSeverityByValue(t.status)" />
-                            </div>
-                          <div class="task-meta">
-                            <span class="chip" :class="typeClass(classifyTaskType(t))">
-                              {{ classifyTaskType(t) }}
-                            </span>
-                            <span class="ml-3">
-                              <i class="pi pi-calendar mr-1"></i>
-                              วันที่ลง: {{ t.createdDate ? formatDate(t.createdDate) : '-' }}
-                            </span>
-                            <span class="ml-3">
-                              <i class="pi pi-clock mr-1"></i>{{ getTaskMinutes(t).toLocaleString() }} นาที
-                            </span>
-                          </div>
-                        </div>
-                      </div> 
-
-                      <div v-else class="empty-task">ยังไม่มีภาระงานสำหรับขั้นตอนนี้</div>
-                    </div> <!-- /step-body -->
-                  </div>
-                </div> 
-
-              </div>
-            </Sidebar> 
-            <!-- /NEW Drawer --> 
             <div v-if="personPlans.length === 0" class="flex flex-col items-center justify-center p-8">
               <i class="pi pi-inbox text-5xl text-gray-400 mb-3"></i>
               <p class="text-gray-500">ไม่พบแผน/ภาระงานของบุคคลนี้</p>
@@ -474,9 +347,7 @@ import Swal from 'sweetalert2';
 import { useAuth } from '#imports';
 import Chart from 'primevue/chart';
 import Card from 'primevue/card';
-import Divider from 'primevue/divider'; 
-import Sidebar from 'primevue/sidebar';
-
+import Divider from 'primevue/divider';
 
 
 const { getSession } = await useAuth();
@@ -529,48 +400,6 @@ const expandedPlansPerson = ref([]);
 const expandedStepsPerson = ref([]);
 
 const taskStatuses = ['รอดำเนินการ', 'อยู่ระหว่างดำเนินการ', 'เสร็จสิ้น'];
-
-/* ===== NEW: Drawer state ===== */
-const planDetailOP = ref();     // ref ของ OverlayPanel
-const selectedPlan = ref(null); // แผนที่ถูกกดดูรายละเอียด
-const planSidebarVisible = ref(false);
- 
-
-
-function openPlanDrawer(event, plan) {
-  selectedPlan.value = plan;
-  planSidebarVisible.value = true;
-}
-
-/* สร้างไอเท็มสำหรับ Timeline ขั้นตอน */
-const planTimelineItems = computed(() => {
-  if (!selectedPlan.value?.steps) return [];
-  return selectedPlan.value.steps
-    .map((st, idx) => ({
-      id: st.id ?? idx,
-      name: st.name || `ขั้นตอนที่ ${idx + 1}`,
-      start: st.startDate ? formatDate(st.startDate) : '-',
-      end: st.endDate ? formatDate(st.endDate) : '-',
-      progress: getStepProgress(st),
-      status: getStepStatus(st),
-      owners: (st.owner ?? []).map(o => o.name),
-      tasks: (st.tasks ?? []).map((t, i) => ({
-        i,
-        desc: t.description || '(ยังไม่ระบุ)',
-        type: classifyTaskType(t),
-        due: t.dueDate ? formatDate(t.dueDate) : '-',
-        mins: getTaskMinutes(t),
-        status: normalizeStatus(t.status),
-        who: (t.responsible ?? []).map(r => r.name).join(', ') || '-'
-      }))
-    }))
-    .sort((a, b) => {
-      const pa = parseDateLoose(selectedPlan.value.steps.find(s => s.name === a.name)?.startDate) ?? 0;
-      const pb = parseDateLoose(selectedPlan.value.steps.find(s => s.name === b.name)?.startDate) ?? 0;
-      return pa - pb;
-    });
-});
-/* ===== /NEW ===== */
 
 /* ===== Leaderboard state & helpers ===== */
 const leaderboard = ref([]);
@@ -643,6 +472,8 @@ function tallyByType(tasks, mode = 'count') {
   });
   return acc;
 }
+
+
 
 async function buildLeaderboard() {
   if (!selectedEvaluationRound.value || !products.value.length) {
@@ -1084,18 +915,6 @@ async function fetchEvaluationRounds() {
     Swal.fire({ icon: 'error', title: 'ข้อผิดพลาด', text: 'ไม่สามารถโหลดรอบการประเมินได้' });
   }
 }
-function statusClass(s) {
-  const st = String(s || '').trim();
-  if (st.includes('เสร็จ')) return 'is-done';
-  if (st.includes('ระหว่าง')) return 'is-progress';
-  return 'is-pending';
-}
-function typeClass(s) {
-  if (s === 'งานหลัก') return 'chip-main';
-  if (s === 'งานตำแหน่งอื่น') return 'chip-otherpos';
-  return 'chip-other';
-}
-
 
 async function fetchStaffAndDailyTasks() {
   if (!selectedEvaluationRound.value) {
@@ -1175,23 +994,6 @@ function getPlanTypeSeverity(t) {
   }
 }
 
-function getStepOwnerNames(st) {
-    // ดึงรายชื่อจากหลายรูปแบบของ key (owner / owners / ownerIds / owner_ids / responsible)
-    const arr = ownersFromAny(st);
-      if (arr.length) return arr.map(o => o.name).join(', ');
-
-      // ถ้ามีข้อความรวมชื่อที่ map ไว้แล้ว
-      if (st.ownerNames) return st.ownerNames;
-
-    // ถ้าไม่มีในขั้นตอน ลอง fallback เป็น owner ของแผน
-    const planOwners = ownersFromAny(selectedPlan.value || {});
-      if (planOwners.length) return planOwners.map(o => o.name).join(', ');
-      if (selectedPlan.value?.ownerNames) return selectedPlan.value.ownerNames;
-
-    return '-';
-}
-
-
 /* ---------- expose ---------- */
 defineExpose({
   formatDate,
@@ -1212,7 +1014,7 @@ defineExpose({
 </script>
 
 <style>
-  :root {
+:root {
   --surface-bg: #f9fafb;
   --card-bg: #ffffff;
 }
@@ -1233,12 +1035,6 @@ defineExpose({
   border-radius: 9999px;
   object-fit: cover;
   border: 2px solid #e5e7eb;
-  transition: transform 0.3s ease;
-}
-.lb-avatar:hover {
-  transform: scale(3);
-  z-index: 10;
-  position: relative;
 }
 .lb-name-btn {
   background: transparent;
@@ -1256,109 +1052,33 @@ defineExpose({
 .lb-num.warning { color: #d97706; }
 .lb-num.info    { color: #2563eb; }
 
+.chart-container { position: relative; width: 15rem; height: 15rem; }
+.chart-label { position: absolute; top:50%; left:50%; transform:translate(-50%,-50%); display:flex; flex-direction:column; align-items:center; line-height:1.2; }
+.status-legend-item { width:1rem; height:1rem; border-radius:50%; margin:auto; margin-bottom:.25rem; }
+.status-legend-item.pending { background:#6c757d; }
+.status-legend-item.in-progress { background:#ffc107; }
+.status-legend-item.completed { background:#28a745; }
+
 /* Card (PrimeVue) */
-.p-card {
-  background-color: var(--card-bg);
-  box-shadow: 0 4px 6px rgba(0,0,0,0.08);
-  border-radius: 12px;
-  border: none;
-}
+.p-card { background-color: var(--card-bg); box-shadow: 0 4px 6px rgba(0,0,0,0.08); border-radius: 12px; border: none; }
 .p-card .p-card-content { height: calc(100% - 3.5rem); }
 
-/* ===== Timeline ===== */
-.detail-wrap { padding: 8px 6px 24px; }
 
-/* summary bar */
-.summary {
-  display:flex; flex-wrap:wrap; gap:12px;
-  background:#f8fafc; border:1px solid #eef2f7; border-radius:12px;
-  padding:10px 12px; margin-bottom:10px;
-}
-.summary-item { display:flex; align-items:center; color:#475569; }
+.lb-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 9999px;
+  object-fit: cover;
+  border: 2px solid #e5e7eb;
 
-/* legend */
-.legend { color:#64748b; margin:6px 2px 14px; display:flex; align-items:center; }
-.legend .dot { width:10px; height:10px; border-radius:9999px; display:inline-block; margin-right:6px; }
-
-/* timeline container */
-.timeline { position:relative; margin-left:18px; }
-.timeline:before {
-  content:""; position:absolute; left:-9px; top:0; bottom:0; width:2px; background:#e5e7eb;
+  transition: transform 0.3s ease; /* ใส่ transition ให้นิ่ม */
 }
 
-/* step card */
-.step-card { position:relative; margin-bottom:14px; }
-.step-marker {
-  position:absolute; left:-14px; top:10px; width:12px; height:12px;
-  border-radius:9999px; border:2px solid #fff;
-  box-shadow:0 0 0 2px rgba(0,0,0,.06);
-}
-.step-marker.is-pending { background:#9ca3af; }
-.step-marker.is-progress { background:#f59e0b; }
-.step-marker.is-done { background:#22c55e; }
-
-.step-body {
-  background:#fff; border:1px solid #eef2f7; border-radius:12px; padding:12px;
-  box-shadow:0 4px 10px rgba(0,0,0,.04);
+.lb-avatar:hover {
+  transform: scale(3); /* ขยาย 2.5 เท่าเวลา hover */
+  z-index: 10;           /* ให้อยู่บนสุดเวลา overlap */
+  position: relative;
 }
 
-.step-head { display:flex; align-items:center; justify-content:space-between; }
-.step-title { font-weight:700; color:#0f172a; display:flex; align-items:center; }
-.step-meta {
-  color:#475569; margin-top:4px; font-size:.9rem;
-  display:flex; flex-wrap:wrap; gap:6px 0;
-}
 
-/* tasks */
-.task-list {
-  margin-top:10px; margin-left:32px;
-  display:flex; flex-direction:column; gap:8px;
-}
-.task-item {
-  border-left:2px solid #e5e7eb;
-  padding-left:12px;
-  border-radius:6px;
-  background:#fafafa;
-}
-.task-header {
-  display:flex; align-items:center;
-}
-.task-title {
-  color:#444; font-weight:500;
-}
-.task-bullet {
-  width:10px; height:10px;
-  border-radius:9999px;
-  display:inline-block;
-  margin-right:6px;
-}
-.task-bullet.is-pending  { background:#2465d6; }
-.task-bullet.is-progress { background:#f59e0b; }
-.task-bullet.is-done     { background:#22c55e; }
-
-.task-meta {
-  margin-top:4px; color:#4b5563; font-size:.9rem;
-  display:flex; flex-wrap:wrap; gap:6px 0;
-}
-.chip {
-  padding:2px 8px; border-radius:9999px; font-size:.75rem; font-weight:600; margin-right:8px;
-  border:1px solid transparent; background:#f1f5f9;
-}
-.chip-main { background:#ecfeff; border-color:#67e8f9; }
-.chip-otherpos { background:#fef9c3; border-color:#fde047; }
-.chip-other { background:#e0e7ff; border-color:#818cf8; }
-
-.empty-task { color:#94a3b8; font-style:italic; margin-top:8px; }
-.line-clamp-1 {
-  display:-webkit-box; -webkit-line-clamp:1; -webkit-box-orient:vertical; overflow:hidden;
-}
-
-.step-right { display:flex; align-items:center; gap:.25rem; }
-.step-owners {
-  max-width:360px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
-}
-@media (max-width:640px){
-  .step-owners { max-width:180px; }
-}
-/* Custom styles for the component */
 </style>
