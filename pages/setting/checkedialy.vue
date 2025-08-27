@@ -348,7 +348,7 @@
             <!-- NEW: Drawer รายละเอียดแผนแบบ OverlayPanel + ไทม์ไลน์ -->
 
             <Sidebar v-model:visible="planSidebarVisible" position="right" :modal="true" :dismissable="true" style="width: 920px; max-width: 100vw;">
-              <template #header>
+              <template #header> 
                 <div class="flex items-center gap-3">
                   <i class="pi pi-briefcase text-primary text-xl"></i>
                   <div class="flex flex-column">
@@ -356,7 +356,7 @@
                     <small class="text-600">
                       <i class="pi pi-user mr-1"></i>{{ (selectedPlan?.owner ?? []).map(o=>o.name).join(', ') || '-' }}
                     </small>
-                  </div>
+                  </div> 
                 </div>
               </template> 
               <div v-if="selectedPlan" class="detail-wrap">
@@ -378,8 +378,8 @@
 
                 <!-- legend -->
                 <div class="legend">
-                  <span class="dot bg-gray-400"></span> ยังไม่เริ่ม
-                  <span class="dot bg-yellow-500 ml-3"></span> ระหว่างทำ
+                  <span class="dot bg-gray-400"></span> รอดำเนินการ
+                  <span class="dot bg-yellow-500 ml-3"></span> อยู่ระหว่างดำเนินการ
                   <span class="dot bg-green-500 ml-3"></span> เสร็จสิ้น
                 </div> 
                 <!-- ไทม์ไลน์ขั้นตอน -->  
@@ -401,11 +401,14 @@
                         </div> 
 
                         <!-- ขวาหัวการ์ด: แสดงผู้รับผิดชอบ + สถานะ -->
+
                         <div class="step-right">
                           <i class="pi pi-users mr-2 text-600"></i>
                           <span class="step-owners">{{ getStepOwnerNames(st) }}</span>
                           <Tag class="ml-2" :value="getStepStatus(st)" :severity="getStepSeverity(st)" />
-                        </div>  
+                        </div> 
+                        
+                        
                       </div> 
                       <div class="step-meta">
                         <span>
@@ -447,8 +450,7 @@
                       <div v-else class="empty-task">ยังไม่มีภาระงานสำหรับขั้นตอนนี้</div>
                     </div> <!-- /step-body -->
                   </div>
-                </div> 
-
+                </div>  
               </div>
             </Sidebar> 
             <!-- /NEW Drawer --> 
@@ -765,34 +767,50 @@ function normalizeStatus(v) {
 }
 
 function getPlanProgress(plan) {
-  if (!plan?.steps?.length) return 0;
-  const total = plan.steps.reduce((s, st) => s + (st.tasks?.length || 0), 0);
-  if (!total) return 0;
-  const done = plan.steps.reduce((s, st) => s + (st.tasks?.filter(t => normalizeStatus(t.status) === 'เสร็จสิ้น').length || 0), 0);
-  return Math.round((done / total) * 100);
+    if (!plan?.steps?.length) return 0;
+    const total = plan.steps.length;
+    const done = plan.steps.filter(st => st.status === 'เสร็จสิ้น').length;
+    const inProgress = plan.steps.filter(st => st.status === 'อยู่ระหว่างดำเนินการ').length;
+
+    if (done === total) return 100;
+    if (inProgress > 0 || done > 0) {
+      return Math.round(((done + inProgress * 0.5) / total) * 100); // ✅ logic เฉลี่ย
+    }
+    return 0;
 }
+
 function getStepProgress(step) {
-  if (!step?.tasks?.length) return 0;
-  const total = step.tasks.length;
-  const done = step.tasks.filter(t => normalizeStatus(t.status) === 'เสร็จสิ้น').length;
-  return Math.round((done / total) * 100);
+  if (!step) return 0;
+  if (step.status === 'เสร็จสิ้น') return 100;
+  if (step.status === 'อยู่ระหว่างดำเนินการ') return 50; // ✅ ปรับตาม logic ที่ต้องการ
+  return 0;
 }
+
 function getPlanStatusLabel(plan) {
-  const p = getPlanProgress(plan);
-  return p === 100 ? 'เสร็จสิ้น' : p > 0 ? 'อยู่ระหว่างดำเนินการ' : 'รอดำเนินการ';
+  if (!plan?.steps?.length) return 'รอดำเนินการ';
+  if (plan.steps.every(st => st.status === 'เสร็จสิ้น')) return 'เสร็จสิ้น';
+  if (plan.steps.some(st => st.status === 'อยู่ระหว่างดำเนินการ' || st.status === 'เสร็จสิ้น'))
+    return 'อยู่ระหว่างดำเนินการ';
+  return 'รอดำเนินการ';
 }
+
 function getPlanStatusSeverity(plan) {
-  const p = getPlanProgress(plan);
-  return p === 100 ? 'success' : p > 0 ? 'warning' : 'info';
+  const s = getPlanStatusLabel(plan);
+  return s === 'เสร็จสิ้น' ? 'success' : s === 'อยู่ระหว่างดำเนินการ' ? 'warning' : 'info';
 }
+
 function getStepStatus(step) {
-  const p = getStepProgress(step);
-  return p === 100 ? 'เสร็จสิ้น' : p > 0 ? 'อยู่ระหว่างดำเนินการ' : 'รอดำเนินการ';
+  return step?.status || 'รอดำเนินการ';
 }
+
 function getStepSeverity(step) {
-  const p = getStepProgress(step);
-  return p === 100 ? 'success' : p > 0 ? 'warning' : 'info';
+  switch (step?.status) {
+    case 'เสร็จสิ้น': return 'success';
+    case 'อยู่ระหว่างดำเนินการ': return 'warning';
+    default: return 'info';
+  }
 }
+
 function getTaskDueDateSeverity(dueDate) {
   if (!dueDate) return 'info';
   const now = new Date();
@@ -800,6 +818,7 @@ function getTaskDueDateSeverity(dueDate) {
   due.setHours(23, 59, 59, 999);
   return due < now ? 'danger' : 'success';
 }
+
 function getTaskTimeSpent(task) {
   const mins = getTaskMinutes(task);
   if (mins === 0) {
@@ -832,6 +851,7 @@ function getTaskStatusSeverityByValue(status) {
   const s = normalizeStatus(status);
   return s === 'เสร็จสิ้น' ? 'success' : s === 'อยู่ระหว่างดำเนินการ' ? 'warning' : 'info';
 }
+
 function getMainTaskLabel(mainTask) {
   return mainTask || 'ยังไม่เลือก';
 }
@@ -886,6 +906,7 @@ function mapApiToState(arr) {
         const stepOwners = ownersFromAny(s);
         return {
           ...s,
+          status: s.status_planstep ?? null, 
           owner: stepOwners,
           ownerNames: stepOwners.map(o => o.name).join(', '),
           startDate: s.startDate ? new Date(s.startDate) : null,
@@ -1161,6 +1182,9 @@ function getStepOwnerNames(st) {
 
     return '-';
 }
+
+
+
 
 
 /* ---------- expose ---------- */

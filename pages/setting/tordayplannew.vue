@@ -62,6 +62,7 @@
                         <span v-else class="text-gray-400">ยังไม่กำหนด</span>
                     </template>
                 </Column>
+                <!-- คืบหน้าแผน -->
                 <Column header="ความคืบหน้า" style="min-width: 12rem">
                     <template #body="slotProps">
                         <span class="p-column-title">ความคืบหน้า</span>
@@ -71,6 +72,8 @@
                         </div>
                     </template>
                 </Column>
+                <!-- สิ้นสุดคืบหน้าแผน -->
+
                 <Column header="สถานะ" style="min-width: 8rem">
                     <template #body="slotProps">
                         <span class="p-column-title">สถานะ</span>
@@ -124,6 +127,8 @@
                                     <span v-else class="text-gray-400">ยังไม่กำหนด</span>
                                 </template>
                             </Column>
+
+                            <!-- ความคืบหน้าขั้นตอน --> 
                             <Column header="ความคืบหน้า" style="min-width: 12rem">
                                 <template #body="stepProps">
                                     <span class="p-column-title">ความคืบหน้า</span>
@@ -133,12 +138,24 @@
                                     </div>
                                 </template>
                             </Column>
-                            <Column header="สถานะ" style="min-width: 8rem">
+                            <!-- สิ้นสุดความคืบหน้าขั้นตอน -->
+
+                            <!-- สถานะขั้นตอน -->
+                            <Column header="สถานะ" style="min-width: 9rem" class="text-center">
                                 <template #body="stepProps">
                                     <span class="p-column-title">สถานะ</span>
-                                    <Tag :value="getStepStatus(stepProps.data)" :severity="getStepSeverity(stepProps.data)" class="font-bold" />
+                                    <Dropdown
+                                    :modelValue="getStepStatus(stepProps.data)"     
+                                    :options="taskStatuses"                        
+                                    class="w-full"
+                                    :disabled="stepProps.data.__saving === true"
+                                    :class="getTaskStatusSeverityByValue(getStepStatus(stepProps.data)) + '-tag-dropdown'"
+                                    @update:modelValue="(val) => updateStepStatus(planSlot.data, stepProps.data, val)"
+                                    />
                                 </template>
                             </Column>
+                            <!-- สิ้นสุดสถานะขั้นตอน -->
+
                             <Column header="จัดการ" style="width: 12rem" class="text-center">
                                 <template #body="stepProps">
                                     <div class="flex gap-2 justify-center">
@@ -212,19 +229,10 @@
                                             </template>
                                         </Column>
 
-                                        <!-- สถานะ -->
-                                        <Column header="สถานะ" style="width: 9rem" class="text-center">
-                                            <template #body="taskProps">
-                                                <Dropdown
-                                                    :modelValue="taskProps.data.status"
-                                                    :options="taskStatuses"
-                                                    class="w-full"
-                                                    :disabled="taskProps.data.__saving === true"
-                                                    :class="getTaskStatusSeverityByValue(taskProps.data.status) + '-tag-dropdown'"
-                                                    @update:modelValue="(val) => updateTaskStatus(stepProps.data, taskProps.data, val)"
-                                                />
-                                            </template>
-                                        </Column>
+                                        <!-- สถานะภาระงานประจำวัน -->
+                                      
+                                        <!-- สิ้นสุดสถานะภาระงานประจำวัน -->
+
 
                                         <!-- จัดการ -->
                                         <Column header="จัดการ" style="width: 6rem" class="text-center">
@@ -290,16 +298,16 @@
                     <div class="field col-12">
                         <label class="font-semibold text-lg">ผู้รับผิดชอบหลัก <span class="text-red-500">*</span></label>
                         <AutoComplete
-  v-model="currentPlan.owner"
-  :multiple="true"
-  :suggestions="ownerSuggestions"
-  optionLabel="name"
-  placeholder="พิมพ์ชื่อหรือรหัสพนักงานเพื่อค้นหา…"
-  forceSelection
-  dropdown
-  @complete="searchOwners"
-/>
-<small class="text-gray-500">พิมพ์อย่างน้อย 3 ตัวอักษร เช่น รหัสพนักงาน หรือชื่อ-สกุล</small>
+                            v-model="currentPlan.owner"
+                            :multiple="true"
+                            :suggestions="ownerSuggestions"
+                            optionLabel="name"
+                            placeholder="พิมพ์ชื่อหรือรหัสพนักงานเพื่อค้นหา…"
+                            forceSelection
+                            dropdown
+                            @complete="searchOwners"
+                            />
+                        <small class="text-gray-500">พิมพ์อย่างน้อย 3 ตัวอักษร เช่น รหัสพนักงาน หรือชื่อ-สกุล</small>
                     </div>
                     <div class="field col-12 md:col-6">
                         <label class="font-semibold text-lg">วันที่เริ่มต้น <span class="text-red-500">*</span></label>
@@ -889,21 +897,32 @@
 
     const getPlanProgress = (plan) => {
         if (!plan.steps || plan.steps.length === 0) return 0;
-        const totalTasks = plan.steps.reduce((sum, step) => sum + (step.tasks?.length || 0), 0);
-        if (totalTasks === 0) return 0;
-        const completedTasks = plan.steps.reduce((sum, step) => sum + (step.tasks?.filter(t => t.status === 'เสร็จสิ้น').length || 0), 0);
-        return Math.round((completedTasks / totalTasks) * 100);
+        const total = plan.steps.reduce((sum, step) => sum + getStepProgress(step), 0);
+        return Math.round(total / plan.steps.length);
     };
     const getStepProgress = (step) => {
-        if (!step.tasks || step.tasks.length === 0) return 0;
-        const totalTasks = step.tasks.length;
-        const completedTasks = step.tasks.filter(t => t.status === 'เสร็จสิ้น').length;
-        return Math.round((completedTasks / totalTasks) * 100);
+        if (!step) return 0;
+        if (step.status === 'เสร็จสิ้น') return 100;
+        if (step.status === 'อยู่ระหว่างดำเนินการ') return 50;  // จะใช้ 50% กลาง ๆ
+        return 0; // รอดำเนินการ
     };
     const getPlanStatusLabel = (plan) => (getPlanProgress(plan) === 100 ? 'เสร็จสิ้น' : getPlanProgress(plan) > 0 ? 'อยู่ระหว่างดำเนินการ' : 'รอดำเนินการ');
     const getPlanStatusSeverity = (plan) => (getPlanProgress(plan) === 100 ? 'success' : getPlanProgress(plan) > 0 ? 'warning' : 'info');
-    const getStepStatus = (step) => (getStepProgress(step) === 100 ? 'เสร็จสิ้น' : getStepProgress(step) > 0 ? 'อยู่ระหว่างดำเนินการ' : 'รอดำเนินการ');
-    const getStepSeverity = (step) => (getStepProgress(step) === 100 ? 'success' : getStepProgress(step) > 0 ? 'warning' : 'info');
+    // const getStepStatus = (step) => (getStepProgress(step) === 100 ? 'เสร็จสิ้น' : getStepProgress(step) > 0 ? 'อยู่ระหว่างดำเนินการ' : 'รอดำเนินการ');
+    // const getStepSeverity = (step) => (getStepProgress(step) === 100 ? 'success' : getStepProgress(step) > 0 ? 'warning' : 'info');
+    const getStepStatus = (step) => step?.status || 'รอดำเนินการ';
+
+    const getStepSeverity = (step) => {
+        switch (step?.status) {
+            case 'เสร็จสิ้น': return 'success';
+            case 'อยู่ระหว่างดำเนินการ': return 'warning';
+            default: return 'info';
+        }
+    };
+
+ 
+
+
     const getTaskDueDateSeverity = (dueDate) => {
     if (!dueDate) return 'info';
         const now = new Date();
@@ -953,6 +972,7 @@
 
         steps: (p.steps || []).map(s => ({
         ...s,
+        status: s.status_planstep ?? null, 
         startDate: s.startDate ? new Date(s.startDate) : null,
         endDate:   s.endDate   ? new Date(s.endDate)   : null,
         tasks: (s.tasks || []).map(t => ({
@@ -1570,26 +1590,34 @@
         }
     }; 
      
-    const updateTaskStatus = async (step, task, newStatus) => {
-        if (!task?.id) {
-            return Swal.fire({ icon: 'warning', title: 'ไม่สามารถบันทึก', text: 'ภาระงานยังไม่มี ID (ยังไม่ได้บันทึก)' });
+    async function updateStepStatus(plan, step, newStatus) {
+        if (!step?.id) {
+            await Swal.fire({ icon:'warning', title:'ยังไม่สามารถบันทึก', text:'ขั้นตอนนี้ยังไม่มี ID' });
+            return;
         }
-
-        const oldStatus = task.status;
-        task.status = newStatus;
-        task.__saving = true;
+        const oldStatus = step.status ?? null;
+        step.status = newStatus;
+        step.__saving = true;
 
         try {
-            await axios.post(`${API}/UpdateTaskStatus`, { id: task.id, status: newStatus });
-            Swal.fire({ icon: 'success', title: 'บันทึกแล้ว', text: 'อัปเดตสถานะเรียบร้อย', timer: 1500, showConfirmButton: false });
+            await axios.post(`${API}/UpdateStepStatus`, {
+            id: step.id,
+            status: newStatus,
+            fac_id: session.facId,
+            });
+
+            // (ตัวเลือก) ถ้าต้องการให้ task ใต้ step ถูกดันสถานะตามด้วย
+            // if (Array.isArray(step.tasks)) step.tasks.forEach(t => { t.status = newStatus; });
+
+            Swal.fire({ icon:'success', title:'บันทึกแล้ว', text:'อัปเดตสถานะขั้นตอนเรียบร้อย', timer: 1200, showConfirmButton: false });
         } catch (e) {
             console.error(e);
-            task.status = oldStatus; // rollback
-            Swal.fire({ icon:'error', title:'บันทึกไม่สำเร็จ', text:'อัปเดตสถานะไม่สำเร็จ' });
+            step.status = oldStatus;
+            Swal.fire({ icon:'error', title:'บันทึกไม่สำเร็จ', text:'อัปเดตสถานะขั้นตอนไม่สำเร็จ' });
         } finally {
-            task.__saving = false;
+            step.__saving = false;
         }
-    };
+    }
   
     const confirmRemoveTaskInTable = async (step, taskIndex) => {
     const ok = await Swal.fire({ title:'ยืนยันการลบ', text:'คุณต้องการลบภาระงานนี้ใช่หรือไม่?', icon:'warning', showCancelButton:true });
