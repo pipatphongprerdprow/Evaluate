@@ -117,13 +117,13 @@
                                 </template>
                             </Column>
                             <Column header="ผู้รับผิดชอบ" style="min-width: 12rem">
-  <template #body="stepProps">
-    <span v-if="Array.isArray(planSlot.data.owner) && planSlot.data.owner.length">
-      {{ planSlot.data.owner.map(o => getOwnerDisplay(o)).join(', ') }}
-    </span>
-    <span v-else class="text-gray-400">ยังไม่กำหนด</span>
-  </template>
-</Column>
+                                <template #body="stepProps">
+                                    <span v-if="Array.isArray(planSlot.data.owner) && planSlot.data.owner.length">
+                                    {{ planSlot.data.owner.map(o => getOwnerDisplay(o)).join(', ') }}
+                                    </span>
+                                    <span v-else class="text-gray-400">ยังไม่กำหนด</span>
+                                </template>
+                            </Column>
                             <Column header="ความคืบหน้า" style="min-width: 12rem">
                                 <template #body="stepProps">
                                     <span class="p-column-title">ความคืบหน้า</span>
@@ -140,33 +140,33 @@
                                 </template>
                             </Column>
                             <Column header="จัดการ" style="width: 12rem" class="text-center">
-  <template #body="stepProps">
-    <div class="flex gap-2 justify-center">
-      <!-- owner ต้องใช้จาก planSlot -->
-      <Button 
-        icon="pi pi-plus" 
-        label="เพิ่ม" 
-        class="p-button-warning p-button-sm px-3 py-1" 
-        @click="openAddTaskDialog(stepProps.data, planSlot.data.owner)" 
-        v-tooltip.top="'เพิ่มภาระงานประจำวัน'" 
-      /> 
+                                <template #body="stepProps">
+                                    <div class="flex gap-2 justify-center">
+                                    <!-- owner ต้องใช้จาก planSlot -->
+                                        <Button 
+                                            icon="pi pi-plus" 
+                                            label="เพิ่ม" 
+                                            class="p-button-warning p-button-sm px-3 py-1" 
+                                            @click="openAddTaskDialog(stepProps.data, planSlot.data.owner)" 
+                                            v-tooltip.top="'เพิ่มภาระงานประจำวัน'" 
+                                        /> 
 
-      <Button 
-        icon="pi pi-pencil" 
-        class="p-button-text p-button-warning p-button-sm p-button-rounded" 
-        @click="openEditStepDialogInTable(planSlot.data.id, stepProps.data)" 
-        v-tooltip.top="'แก้ไขขั้นตอน'" 
-      />
+                                        <Button 
+                                            icon="pi pi-pencil" 
+                                            class="p-button-text p-button-warning p-button-sm p-button-rounded" 
+                                            @click="openEditStepDialogInTable(planSlot.data.id, stepProps.data)" 
+                                            v-tooltip.top="'แก้ไขขั้นตอน'" 
+                                        />
 
-      <Button  
-        icon="pi pi-trash" 
-        class="p-button-text p-button-danger p-button-sm p-button-rounded" 
-        @click="confirmRemoveStepById(planSlot.data.id, stepProps.data.id)" 
-        v-tooltip.top="'ลบขั้นตอน'" 
-      />
-    </div>
-  </template>
-</Column>
+                                        <Button  
+                                            icon="pi pi-trash" 
+                                            class="p-button-text p-button-danger p-button-sm p-button-rounded" 
+                                            @click="confirmRemoveStepById(planSlot.data.id, stepProps.data.id)" 
+                                            v-tooltip.top="'ลบขั้นตอน'" 
+                                        />
+                                    </div>
+                                </template>
+                            </Column>
                             <template #expansion="stepProps">
                                 <div class="p-4 bg-gray-100 border-round-xl ml-4">
                                     <div class="text-lg font-bold text-700 flex items-center mb-3">
@@ -183,7 +183,7 @@
                                                                 : taskProps.data.taskType === 'งานตำแหน่งอื่น' ? 'warning'
                                                                 : taskProps.data.taskType === 'งานอื่นๆ' ? 'info' : 'secondary'" />
                                             </template>
-                                        </Column> 
+                                        </Column>  
 
                                         <!-- ภาระงาน -->
                                         <Column header="ภาระงาน" style="width: 10rem">
@@ -625,26 +625,78 @@
      */
     async function initSessionFromAuth() {
         try {
-            const mod = await import('#imports').catch(() => null);
-            const getSession = mod?.getSession;
-            if (!getSession) {
-                loadSessionFromStorage();
-                return;
-            }
-            const user = await getSession();
-            const nameObj = user?.user?.name || {};
-            const STAFFID = nameObj?.STAFFID ?? nameObj?.staffid ?? nameObj?.staffId ?? null;
-            const SCOPES  = nameObj?.SCOPES  ?? {};
-            const facid   = SCOPES?.staffdepartment ?? SCOPES?.facid ?? SCOPES?.facId ?? null;
-            const groupid = SCOPES?.groupid ?? null;
-            console.log('user: ',user); 
-            session.staffId = STAFFID ? Number(STAFFID) : null;
-            session.facId   = facid   ? Number(facid)   : null;
-            session.groupId = groupid ?? null;
+            // ใช้ useAuth() ตัวเดียว หลีกเลี่ยง import '#imports' ซ้ำซ้อน
+            const { getSession } = await useAuth();
+            const authUser = await getSession();
+
+            // ตรวจดูโครงสร้างที่เป็นไปได้หลายแบบ
+            const nameObj = authUser?.user?.name || {};
+            const STAFFID =
+                authUser?.user?.STAFFID              // บางระบบใส่ไว้ตรง user
+            ?? authUser?.user?.id                   // หรือ id
+            ?? nameObj?.STAFFID
+            ?? nameObj?.staffid
+            ?? nameObj?.staffId
+            ?? null;
+
+            const FACID =
+                authUser?.user?.FACID
+            ?? authUser?.user?.facid
+            ?? nameObj?.SCOPES?.staffdepartment
+            ?? nameObj?.SCOPES?.facid
+            ?? nameObj?.SCOPES?.facId
+            ?? null;
+
+            const GROUPID =
+                authUser?.user?.GROUPID
+            ?? authUser?.user?.groupid
+            ?? nameObj?.SCOPES?.groupid
+            ?? null;
+
+            // ถ้าได้ค่าใหม่มา ให้เขียนทับ session + localStorage ทุกครั้ง
+            if (STAFFID) session.staffId = Number(STAFFID);
+            if (FACID)   session.facId   = Number(FACID);
+            session.groupId = GROUPID ?? session.groupId ?? null;
+
+            try {
+            localStorage.setItem('app_staffId', session.staffId ?? '');
+            localStorage.setItem('app_facId',   session.facId ?? '');
+            localStorage.setItem('app_groupId', session.groupId ?? '');
+            } catch {}
         } catch (e) {
+            // ถ้า auth ล้มเหลว ค่อย fallback ไป localStorage
             loadSessionFromStorage();
         }
     }
+
+    function ensureSessionConsistency(authStaffId) {
+        const cached = Number(localStorage.getItem('app_staffId') || 0);
+            if (authStaffId && cached && Number(authStaffId) !== cached) {
+                try {
+                localStorage.removeItem('app_staffId');
+                localStorage.removeItem('app_facId');
+                localStorage.removeItem('app_groupId');
+                } catch {}
+                try {
+                localStorage.setItem('app_staffId', String(authStaffId));
+                localStorage.setItem('app_facId',   String(session.facId ?? ''));
+                localStorage.setItem('app_groupId', String(session.groupId ?? ''));
+                } catch {}
+            }
+        }
+
+        onMounted(async () => {
+        loadSessionFromStorage();       // อาจเป็นค่าเก่า
+        await initSessionFromAuth();    // ดึงค่าใหม่จาก Auth แล้ว override
+
+        // ✅ ล้าง cache เก่า ถ้ามี mismatch
+        ensureSessionConsistency(session.staffId);
+
+        if (!session.staffId || !session.facId) return;
+        await fetchPlans();
+    });
+
+
     
     /** เผื่ออยากเซ็ตค่า session เองจากภายนอก */
     function setSession(staffId, facId, groupId = null) {
@@ -733,37 +785,15 @@
 
     
     const allPlans = ref([]);
-    // ใช้ computed มาจัดเรียงใหม่
-    const allPlansSorted = computed(() =>
-    [...allPlans.value].sort((a, b) => planNo(a.planLabel) - planNo(b.planLabel))
-    )
-
-    // const owners = ref([
-    //     { id: 1, name: 'นาย พิพัฒน์พงษ์ เพริดพราว' },
-    //     { id: 2, name: 'นาย อนุรักษ์ สุระขันตี' },
-    //     { id: 3, name: 'นาย อัครรินทร์ บุปผา' },
-    //     { id: 4, name: 'นาย สุชาติ กัญญาประสิทธิ์' },
-    //     { id: 5, name: 'นาย ธนดล สิงขรอาสน์' }, 
-    //     { id: 6, name: 'นาย ณัฐวุฒิ สุทธิพันธ์' },
-    //     { id: 7, name: 'นาง นันทรัตน์ จำปาแดง' },
-    //     { id: 8, name: 'นาย ไกรษร อุทัยแสง' },
-    //     { id: 9, name: 'นาง พิมพ์พร พรรณศรี' },
-    //     { id: 10, name: 'นาย กัมปนาท อาชา' },
-    //     { id: 11, name: 'นาง วาสนา อุทัยแสง' },
-    //     { id: 12, name: 'นางสาว แจ่มจันทร์ จันทร์ศรี' },
-    //     { id: 13, name: 'นาง อิศราภรณ์ ศรีเวียงธนาธิป' },
-    //     { id: 14, name: 'นาย คมรัตน์ หลูปรีชาเศรษฐ' },
-    //     { id: 15, name: 'นางสาว สิริมา ศรีสุภาพ' },
-    //     { id: 16, name: 'นางสาว รัตติยา สัจจภิรมย์' },
-    //     { id: 17, name: 'นางสาว กัญญมน แก้วมงคล' },
-    //     { id: 18, name: 'นาง อัจฉราวดี กำมุขโช' },
-    //     { id: 19, name: 'นาง วรินธร จีระฉัตร' },
-    //     { id: 20, name: 'นางสาว ญาณทัสน์ อันทะราศรี' },
-    //     { id: 21, name: 'นาย นัฐพงษ์ ศรีเตชะ' },
-    //     { id: 22, name: 'นางสาว สมสมัย บุญทศ' },
-    //     { id: 23, name: 'นาง สารดา พันธุ์เสนา' }, 
-      
-    // ]);
+    
+    const allPlansSorted = computed(() => {
+        const source = Array.isArray(allPlans.value) ? allPlans.value : [];
+        return [...source].sort((a, b) => {
+            const dateA = a.updatedDate ? new Date(a.updatedDate) : new Date(a.createdDate);
+            const dateB = b.updatedDate ? new Date(b.updatedDate) : new Date(b.createdDate);
+            return dateB - dateA;
+        });
+    });
     const taskStatuses = ref(['รอดำเนินการ', 'อยู่ระหว่างดำเนินการ', 'เสร็จสิ้น']);
 
     const confirm = useConfirm();
@@ -905,26 +935,27 @@
     status === 'เสร็จสิ้น' ? 'success' : status === 'อยู่ระหว่างดำเนินการ' ? 'warning' : 'info'; 
 
     function mapApiToState(arr) {
-        return (arr || []).map(p => ({
-            ...p,
-            startDate: p.startDate ? new Date(p.startDate) : null,
-            endDate:   p.endDate   ? new Date(p.endDate)   : null,
+       return (arr || []).map(p => ({
+        ...p,
+        // ✅ เก็บตัวชี้เจ้าของไว้ใช้กรอง
+        staff_id:  p.staff_id  ?? p.staffId  ?? null,
+        created_by: p.created_by ?? p.createdBy ?? null,
 
-            // owner จาก API -> เก็บ name ถ้ามี ไม่งั้น fallback เป็น ID
-           owner: Array.isArray(p.owner)
-            ? p.owner.map(o => ({
-                id: o.id,
-                name: o.name || o.staff_name || o.owner_name || `ID:${o.id}`
-                }))
-            : [],
+        startDate: p.startDate ? new Date(p.startDate) : null,
+        endDate:   p.endDate   ? new Date(p.endDate)   : null,
 
-            ownerNames: (p.owner || []).map(o => o.name || o.owner_name || `ID:${o.id}`).join(', '),
+        owner: Array.isArray(p.owner)
+        ? p.owner.map(o => ({
+            id: o.id,
+            name: o.name || o.staff_name || o.owner_name || `ID:${o.id}`
+            }))
+        : [],
 
-            steps: (p.steps || []).map(s => ({
-                ...s,
-                startDate: s.startDate ? new Date(s.startDate) : null,
-                endDate:   s.endDate   ? new Date(s.endDate)   : null,
-                tasks: (s.tasks || []).map(t => ({
+        steps: (p.steps || []).map(s => ({
+        ...s,
+        startDate: s.startDate ? new Date(s.startDate) : null,
+        endDate:   s.endDate   ? new Date(s.endDate)   : null,
+        tasks: (s.tasks || []).map(t => ({
                     ...t,
                     responsible: Array.isArray(t.responsible)
                     ? t.responsible.map(r => ({
@@ -945,29 +976,45 @@
 
     // ----------------- API CALLS --------------
     async function fetchPlans() {
+        if (!session.staffId || !session.facId) return;
+
         try {
             const res = await axios.post(`${API}/showplannew`, {
-                staff_id: session.staffId,
-                fac_id:   session.facId,
-            });   
-            if (res.data?.ok) {
-                allPlans.value = mapApiToState(res.data.data);
-            } else {
-                allPlans.value = [];
-            }
+            staff_id: session.staffId,   // ส่งของคนที่ล็อกอิน
+            fac_id:   session.facId,
+            });
 
-            console.log('allPlans.value: ',allPlans.value);
-            
+            const mapped = mapApiToState(res.data?.data || []);
+            // ✅ โชว์ "ของใครของมัน" ตั้งแต่ชั้น fetch
+            allPlans.value = mapped.filter(belongsToMe);
         } catch (e) {
-            console.error(e);
-            toast.add({ severity:'error', summary:'โหลดข้อมูลไม่สำเร็จ', detail:'เชื่อมต่อ API ไม่ได้', life: 3000 });
+            allPlans.value = [];
+            // toast / Swal ตามเดิมถ้าต้องการ
         }
     }
+    function belongsToMe(plan) {
+        const me = Number(session.staffId);
 
-    onMounted(async () => {
-    loadSessionFromStorage();      // เผื่อมีเก็บไว้ก่อนหน้า
-    await initSessionFromAuth();   // พยายามดึงจาก auth ถ้ามี
-    await fetchPlans();            // โหลดข้อมูล โดยส่ง staff_id/fac_id ถ้ามี
+        // 1) จากฟิลด์ staff ของแผน
+        const staffField = Number(
+            plan.staff_id ?? plan.staffId ?? plan.created_by ?? plan.createdBy ?? null
+        );
+
+        // 2) จาก owner array
+        const ownerMatch = Array.isArray(plan.owner)
+            && plan.owner.some(o => Number(o.id) === me);
+
+        return staffField === me;
+    }
+
+
+   onMounted(async () => {
+        loadSessionFromStorage();
+        await initSessionFromAuth();
+
+        // ✅ รอให้ได้ staffId / facId ก่อน ค่อยโหลด
+        if (!session.staffId || !session.facId) return;
+        await fetchPlans();
     });
 
     // ----------------- UI ACTIONS -------------
@@ -1040,7 +1087,8 @@
             startDate: toDateStr(currentPlan.startDate),
             endDate:   toDateStr(currentPlan.endDate), 
             owner: (currentPlan.owner || []).map(o => ({ id: o.id, name: o.name })),
-            staff_id: session.staffId,
+             
+             staff_id: session.staffId,  
             fac_id:   session.facId,
             steps: currentPlan.steps.map(s => ({
                 name: s.name,
@@ -1058,20 +1106,39 @@
             }))
         };
 
-        try {
+        try { 
+            //console.log("Payload ที่จะส่งไป:", payload);
+            console.log('owner0', currentPlan.owner?.[0]);
+            console.log('session', session);
+            console.log('payload.staff_id', (currentPlan.owner?.[0]?.id) ?? session.staffId);
+
             if (isEditMode.value) {
             await axios.post(`${API}/Edtdataplans`, payload);
             const res = await axios.post(`${API}/showplannew`, {
-                staff_id: session.staffId, fac_id: session.facId
+            staff_id: session.staffId, fac_id: session.facId
             });
+            const mapped = mapApiToState(res.data?.data || []);
+            allPlans.value = mapped.filter(belongsToMe);  
+
             allPlans.value = mapApiToState(res.data?.data || []);
             Swal.fire({ icon:'success', title:'สำเร็จ', text:'แก้ไขแผนงานเรียบร้อยแล้ว', timer: 1500, showConfirmButton: false });
             } else {
             const res = await axios.post(`${API}/savedataplans`, payload);
-            // เติม id ใหม่ แล้วรีโหลดจากเซิร์ฟเวอร์จะชัวร์กว่า
-            await fetchPlans();
-            Swal.fire({ icon:'success', title:'สำเร็จ', text:'สร้างแผนงานใหม่เรียบร้อยแล้ว', timer: 1500, showConfirmButton: false });
+
+            // ถ้า backend ส่ง id กลับมา
+            if (res?.data?.id) {
+                currentPlan.id = res.data.id;
             }
+
+            await fetchPlans(); // หรือจะรีโหลดตามเดิมก็ได้
+            Swal.fire({
+                icon:'success',
+                title:'สำเร็จ',
+                text:'สร้างแผนงานใหม่เรียบร้อยแล้ว',
+                timer: 1500,
+                showConfirmButton: false
+            });
+        }
             showPlanDialog.value = false;
         } catch (e) {
             console.error(e);
@@ -1332,8 +1399,7 @@
             default:              return 'secondary'; // fallback เป็นเทา
         }
     }
-
-
+ 
     const addTaskToStepFromMain = async () => { // [MOD]
         if (!isNewTaskInStepValid.value) {
             return Swal.fire({
@@ -1558,8 +1624,8 @@
             Swal.fire({ icon:'error', title:'ผิดพลาด', text:'ลบขั้นตอนไม่สำเร็จ' });
         }
     };
-    //auto-complete ตารางภาระงานประจำวัน
 
+    
     const descSuggestions = ref([]);
     let descTimer = null;
 
@@ -1608,6 +1674,7 @@
         return m ? parseInt(m[0], 10) : 0
     };
 
+  
     
 
   

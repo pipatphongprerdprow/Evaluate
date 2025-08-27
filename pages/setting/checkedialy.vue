@@ -485,33 +485,8 @@ const { getSession } = await useAuth();
 const API = 'http://127.0.0.1:8000/api';
 
 /** URL รูปโปรไฟล์ ตาม format: `${profileImageUrl}${staffid}.jpg` */
-const profileImageUrl = 'https://pd.msu.ac.th/staff/picture/'; // 
+const profileImageUrl = 'https://pd.msu.ac.th/staff/picture/'; //  
 
-const owners = ref([
-  { id: 1, name: 'นาย พิพัฒน์พงษ์ เพริดพราว' },
-  { id: 2, name: 'นาย อนุรักษ์ สุระขันตี' },
-  { id: 3, name: 'นาย อัครรินทร์ บุปผา' },
-  { id: 4, name: 'นาย สุชาติ กัญญาประสิทธิ์' },
-  { id: 5, name: 'นาย ธนดล สิงขรอาสน์' }, 
-  { id: 6, name: 'นาย ณัฐวุฒิ สุทธิพันธ์' },
-  { id: 7, name: 'นาง นันทรัตน์ จำปาแดง' },
-  { id: 8, name: 'นาย ไกรษร อุทัยแสง' },
-  { id: 9, name: 'นาง พิมพ์พร พรรณศรี' },
-  { id: 10, name: 'นาย กัมปนาท อาชา' },
-  { id: 11, name: 'นาง วาสนา อุทัยแสง' },
-  { id: 12, name: 'นางสาว แจ่มจันทร์ จันทร์ศรี' },
-  { id: 13, name: 'นาง อิศราภรณ์ ศรีเวียงธนาธิป' },
-  { id: 14, name: 'นาย คมรัตน์ หลูปรีชาเศรษฐ' },
-  { id: 15, name: 'นางสาว สิริมา ศรีสุภาพ' },
-  { id: 16, name: 'นางสาว รัตติยา สัจจภิรมย์' },
-  { id: 17, name: 'นางสาว กัญญมน แก้วมงคล' },
-  { id: 18, name: 'นาง อัจฉราวดี กำมุขโช' },
-  { id: 19, name: 'นาง วรินธร จีระฉัตร' },
-  { id: 20, name: 'นางสาว ญาณทัสน์ อันทะราศรี' },
-  { id: 21, name: 'นาย นัฐพงษ์ ศรีเตชะ' },
-  { id: 22, name: 'นางสาว สมสมัย บุญทศ' },
-  { id: 23, name: 'นาง สารดา พันธุ์เสนา' }, 
-]);
 
 const staffIdMain = ref('');
 const facIdMain = ref('');
@@ -861,37 +836,34 @@ function getMainTaskLabel(mainTask) {
   return mainTask || 'ยังไม่เลือก';
 }
 
-const findOwner = (o) =>
-  owners.value.find(x => Number(x.id) === Number(o?.id ?? o)) || null;
+function findOwner(o) {
+  // ไม่ lookup ใน directory ภายนอกแล้ว ใช้ข้อมูล object ตรง ๆ
+  if (!o) return null;
+  const id = o.id ?? o.staffid ?? o.STAFFID ?? o.user_id ?? (typeof o === 'number' ? o : null);
+  return {
+    id,
+    name: displayNameOf(o) || (typeof o === 'string' ? o : (id != null ? String(id) : ''))
+  };
+}
 
 function toOwnerArray(v) {
   if (!v) return [];
   if (Array.isArray(v)) {
     return v.map(item => {
-      if (item && typeof item === 'object' && ('id' in item || 'staffid' in item)) {
-        const id = item.id ?? item.staffid;
-        return findOwner({ id }) ?? { id, name: String(item.name ?? item.fullname ?? id) };
-      }
-      if (typeof item === 'number' || /^\d+$/.test(String(item))) {
-        const id = Number(item);
-        return findOwner({ id }) ?? { id, name: String(id) };
-      }
-      return { id: null, name: String(item) };
+      if (item && typeof item === 'object') return findOwner(item);
+      if (typeof item === 'number') return { id: item, name: String(item) };
+      return { id: null, name: String(item ?? '') };
     });
   }
   if (typeof v === 'string') {
+    // รองรับ "ชื่อ1,ชื่อ2" หรือ "123,456"
     return v.split(',').map(s => {
       const t = s.trim();
-      if (/^\d+$/.test(t)) {
-        const id = Number(t);
-        return findOwner({ id }) ?? { id, name: t };
-      }
-      return { id: null, name: t };
+      return { id: /^\d+$/.test(t) ? Number(t) : null, name: t };
     });
   }
   if (typeof v === 'object') {
-    const id = v.id ?? v.staffid ?? null;
-    return [findOwner({ id }) ?? { id, name: String(v.name ?? v.fullname ?? id ?? '') }];
+    return [findOwner(v)];
   }
   return [];
 }
@@ -900,8 +872,7 @@ function ownersFromAny(p) {
   return toOwnerArray(
     p?.owner ?? p?.owners ?? p?.ownerIds ?? p?.owner_ids ?? p?.responsible ?? null
   );
-}
-
+} 
 function mapApiToState(arr) {
   return (arr || []).map(p => {
     const planOwners = ownersFromAny(p);
