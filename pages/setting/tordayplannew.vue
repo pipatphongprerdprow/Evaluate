@@ -230,7 +230,23 @@
                                         </Column>
 
                                         <!-- สถานะภาระงานประจำวัน -->
-                                      
+                                       <Column 
+                                            v-if="false"   
+                                            header="สถานะ" 
+                                            style="width: 9rem" 
+                                            class="text-center"
+                                            >
+                                            <template #body="taskProps">
+                                                <Dropdown
+                                                    :modelValue="taskProps.data.status"
+                                                    :options="taskStatuses"
+                                                    class="w-full"
+                                                    :disabled="true"   
+                                                    :class="getTaskStatusSeverityByValue('เสร็จสิ้น') + '-tag-dropdown'"   
+                                                    @update:modelValue="(val) => {}"   
+                                                />
+                                            </template>
+                                        </Column>
                                         <!-- สิ้นสุดสถานะภาระงานประจำวัน -->
 
 
@@ -1420,7 +1436,7 @@
         }
     }
  
-    const addTaskToStepFromMain = async () => { // [MOD]
+    const addTaskToStepFromMain = async () => { 
         if (!isNewTaskInStepValid.value) {
             return Swal.fire({
             icon: 'error',
@@ -1437,10 +1453,9 @@
                 description: newTaskInStep.taskType === 'งานอื่นๆ' ? (newTaskInStep.note || '') : newTaskInStep.description,
                 startTime: toDateTimeStr(newTaskInStep.startTime),
                 endTime:   toDateTimeStr(newTaskInStep.endTime),
-                status:    newTaskInStep.status,
+                status:    'เสร็จสิ้น',  // ตั้งค่า status เป็น "เสร็จสิ้น"
                 staff_id:  session.staffId,
                 fac_id:    session.facId,
-                // ✅ ส่งผู้รับผิดชอบหลายคนไปให้ Back
                 responsible: (newTaskInStep.responsible || []).map(o => ({ id: o.id })),
             };
 
@@ -1449,20 +1464,19 @@
             const plan = allPlans.value.find(p => p.steps.some(s => s.id === currentStepToAddTasks.id));
             const step = plan?.steps.find(s => s.id === currentStepToAddTasks.id);
             if (step) {
-            step.tasks = step.tasks || [];
-            step.tasks.push({
-                id: res.data.id,
-                taskType: payload.taskType,
-                mainTask: payload.mainTask,
-                description: payload.description,
-                startTime: newTaskInStep.startTime,
-                endTime: newTaskInStep.endTime,
-                status: newTaskInStep.status,
-                createdDate: new Date(),
-                staffId: session.staffId ?? null,
-                // ✅ เก็บไว้บนหน้าด้วย
-                responsible: (newTaskInStep.responsible || []).map(o => ({ id: o.id, name: o.name })),
-            });
+                step.tasks = step.tasks || [];
+                step.tasks.push({
+                    id: res.data.id,
+                    taskType: payload.taskType,
+                    mainTask: payload.mainTask,
+                    description: payload.description,
+                    startTime: newTaskInStep.startTime,
+                    endTime: newTaskInStep.endTime,
+                    status: 'เสร็จสิ้น',  // ตั้งค่า status เป็น "เสร็จสิ้น"
+                    createdDate: new Date(),
+                    staffId: session.staffId ?? null,
+                    responsible: (newTaskInStep.responsible || []).map(o => ({ id: o.id, name: o.name })),
+                });
             }
 
             showAddTaskDialog.value = false;
@@ -1560,7 +1574,7 @@
             description: currentEditingTask.description,
             startTime:   toDateTimeStr(currentEditingTask.startTime),
             endTime:     toDateTimeStr(currentEditingTask.endTime),
-            status:      currentEditingTask.status,
+            status:      'เสร็จสิ้น',  // ตั้งค่า status เป็น "เสร็จสิ้น"
             fac_id:      session.facId,
         };
 
@@ -1578,7 +1592,7 @@
             description: currentEditingTask.description, 
             startTime: currentEditingTask.startTime,
             endTime: currentEditingTask.endTime,
-            status: currentEditingTask.status,
+            status: 'เสร็จสิ้น',  // ตั้งค่า status เป็น "เสร็จสิ้น"
             createdDate: currentEditingTask.createdDate,
             };
 
@@ -1701,9 +1715,6 @@
         const m = String(s || '').match(/\d+/)
         return m ? parseInt(m[0], 10) : 0
     };
-
-  
-    
 
   
  </script>

@@ -148,12 +148,12 @@
                         <div class="grid w-full mt-3 text-center">
                           <div class="col-4">
                             <div class="status-legend-item pending"></div>
-                            <span class="block text-500 font-medium mt-1">ยังไม่เริ่ม</span>
+                            <span class="block text-500 font-medium mt-1">รอดำเนินการ</span>
                             <div class="text-xl font-bold">{{ taskStatusCounts.pending }}</div>
                           </div>
                           <div class="col-4">
                             <div class="status-legend-item in-progress"></div>
-                            <span class="block text-500 font-medium mt-1">ระหว่างทำ</span>
+                            <span class="block text-500 font-medium mt-1">อยู่ระหว่างดำเนินการ</span>
                             <div class="text-xl font-bold">{{ taskStatusCounts.inProgress }}</div>
                           </div>
                           <div class="col-4">
@@ -224,15 +224,13 @@
                   <ProgressBar :value="getPlanProgress(slotProps.data)" class="flex-1" />
                 </template>
               </Column>
+
               <Column header="สถานะ" style="min-width: 8rem">
-                <template #body="slotProps">
-                  <Tag
-                    :value="getPlanStatusLabel(slotProps.data)"
-                    :severity="getPlanStatusSeverity(slotProps.data)"
-                    class="font-bold"
-                  />
+                <template #body="stepProps">
+                  <Tag :value="getStepStatus(stepProps.data)" :severity="getStepSeverity(stepProps.data)" class="font-bold" />
                 </template>
-              </Column> 
+              </Column>
+              
               <!-- NEW: ปุ่มรายละเอียด (เปิด OverlayPanel แบบ Drawer) -->
               <Column header="รายละเอียด" style="width:8rem; text-align:center;">
                 <template #body="slotProps">
@@ -405,10 +403,10 @@
                         <div class="step-right">
                           <i class="pi pi-users mr-2 text-600"></i>
                           <span class="step-owners">{{ getStepOwnerNames(st) }}</span>
-                          <Tag class="ml-2" :value="getStepStatus(st)" :severity="getStepSeverity(st)" />
-                        </div> 
-                        
-                        
+                          //สถานะข้างชื่อ
+                          <Tag class="ml-2" :value="getStepStatus(st)" :severity="getStepSeverity(st)" /> 
+                        </div>  
+
                       </div> 
                       <div class="step-meta">
                         <span>
@@ -634,6 +632,7 @@ async function buildLeaderboard() {
         fac_id: fac
       });
       const plans = mapApiToState(data?.data || []);
+      
       const acc = accumulateFromPlans(plans);
       return {
         staffid: s.staffid,
@@ -787,20 +786,33 @@ function getStepProgress(step) {
 }
 
 function getPlanStatusLabel(plan) {
-  if (!plan?.steps?.length) return 'รอดำเนินการ';
-  if (plan.steps.every(st => st.status === 'เสร็จสิ้น')) return 'เสร็จสิ้น';
-  if (plan.steps.some(st => st.status === 'อยู่ระหว่างดำเนินการ' || st.status === 'เสร็จสิ้น'))
-    return 'อยู่ระหว่างดำเนินการ';
+  if (!plan?.steps?.length) return 'รอดดำเนินการ';
+
+  // ถ้าทุกขั้นตอนเสร็จสิ้น, แผนงานจะเสร็จสิ้น
+  const allCompleted = plan.steps.every(st => st.status === 'เสร็จสิ้น');
+  
+  // ถ้ามีขั้นตอนที่อยู่ระหว่างดำเนินการ, ให้แสดงสถานะ "อยู่ระหว่างดำเนินการ"
+  const hasInProgress = plan.steps.some(st => st.status === 'อยู่ระหว่างดำเนินการ');
+  
+  // ถ้าทุกขั้นตอนเสร็จสิ้น
+  if (allCompleted) return 'เสร็จสิ้น';
+
+  // ถ้ามีขั้นตอนที่อยู่ระหว่างดำเนินการ
+  if (hasInProgress) return 'อยู่ระหว่างดำเนินการ';
+
+  // ถ้าทุกขั้นตอนยังไม่เริ่ม
   return 'รอดำเนินการ';
 }
 
 function getPlanStatusSeverity(plan) {
-  const s = getPlanStatusLabel(plan);
-  return s === 'เสร็จสิ้น' ? 'success' : s === 'อยู่ระหว่างดำเนินการ' ? 'warning' : 'info';
+  const status = getPlanStatusLabel(plan);
+  if (status === 'เสร็จสิ้น') return 'success';
+  if (status === 'อยู่ระหว่างดำเนินการ') return 'warning';
+  return 'info'; // รอดำเนินการ
 }
 
-function getStepStatus(step) {
-  return step?.status || 'รอดำเนินการ';
+function getStepStatus(step) {  
+  return step?.status_planstep || 'รอดดำเนินการ'; 
 }
 
 function getStepSeverity(step) {
@@ -906,7 +918,7 @@ function mapApiToState(arr) {
         const stepOwners = ownersFromAny(s);
         return {
           ...s,
-          status: s.status_planstep ?? null, 
+          status: s.status_planstep ?? 'รอดำเนินการ', 
           owner: stepOwners,
           ownerNames: stepOwners.map(o => o.name).join(', '),
           startDate: s.startDate ? new Date(s.startDate) : null,
@@ -1183,6 +1195,12 @@ function getStepOwnerNames(st) {
     return '-';
 }
 
+const getStepSeverityFromDb = (status) => {
+  const s = String(status || '').trim();
+  if (s.includes('เสร็จ')) return 'success';
+  if (s.includes('ระหว่าง')) return 'warning';
+  return 'info';
+};
 
 
 
