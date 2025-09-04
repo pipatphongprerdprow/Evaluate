@@ -284,7 +284,8 @@
                                                                
                                                                 <td>
                                                                     <!-- <template v-if="postypenameth === 'ผู้บริหาร' || (currentstaff && currentstaff[0] && currentstaff[0].posnameth 	=== 'ผู้บริหาร')">  -->
-                                                                    <template v-if="this.posadio === '128'"> 
+                                                                    <!-- <template v-if="this.posadio === '128'">  -->
+                                                                    <template v-if="Number(posadio) === 128"> 
                                                                         <InputNumber 
                                                                             v-model.number="row3.selfAssessment3" 
                                                                             type="text" 
@@ -1318,12 +1319,14 @@ export default {
                     }); 
                     console.log('getDataAdio: ',res.data);  
                     
-                    this.posadio = res.data[0].posadid || 0;
+                    this.posadio = res.data[0].posadio || 0;
                 } 
             } catch (error) {
                 console.error('Error fetching evaluation data:', error);
             } 
         },
+
+        
         // เพิ่มคะแนนประเมิน biwgin
         // async openDataEvalu(staff_id) {
         //     // console.log(staff_id);
@@ -1390,7 +1393,7 @@ export default {
         //     }
         // },    
         async saveEvaTab1(subP01) {
-            if (subP01.p01_score === 0) {
+            if (subP01.p01_score === null || subP01.p01_score === undefined || subP01.p01_score === '') {
                 Swal.fire('แจ้งเตือน', 'กรุณาเลือกคะแนน !', 'error');
             } else {
                 await axios
@@ -1820,7 +1823,14 @@ export default {
             
 
             // this.postypenameth = this.currentstaff[0]?.postypenameth  ?? (this.currentstaff[0]?.posnameth === 'ผู้บริหาร' ? 'ชำนาญการพิเศษ' : 'ปฏิบัติการ');
-            this.postypenameth = this.currentstaff[0]?.postypenameth  ?? (this.posadio === '128' ? 'ชำนาญการพิเศษ' : 'ปฏิบัติการ');
+            //030968
+            //this.postypenameth = this.currentstaff[0]?.postypenameth  ?? (this.posadio === '128' ? 'ชำนาญการพิเศษ' : 'ปฏิบัติการ');
+
+            if (this.posadio === '128') {
+                    this.postypenameth = 'ชำนาญการพิเศษ';
+            } else {
+                this.postypenameth = this.currentstaff[0]?.postypenameth || 'ปฏิบัติการ';
+            }
 
             // console.log("postypenameth:", this.postypenameth);
 
@@ -1851,10 +1861,18 @@ export default {
             // const Mapping = {
             //     'ผู้บริหาร': 1
             // };  
+
             const Mapping = {
                 '128': 1
             };  
-            let executive = Mapping[this.postypenameth, this.currentstaff[0]?.posnameth] || 0;
+            let executive = Mapping[this.posadio] || 0;
+
+            // const Mapping = {
+            //     '128': 1
+            // };  
+            // let executive = Mapping[this.postypenameth, this.currentstaff[0]?.posnameth] || 0;
+
+
              //let executive = Mapping[this.posadio, this.currentstaff[0]?.posnameth] || 0;
 
             this.otherCompetencies = [
