@@ -327,13 +327,26 @@ export default {
         nameUserclick1(data){
             console.log('User selected:',data); // ตรวจสอบข้อมูลที่ได้จากการเลือก
             this.seen = false;
-            this.text_user1 = data.staffid+' : '+data.namefully;
-            this.text_departmentiduseid = data.departmentid+' : '+data.departmentname; // แสดงรหัสและชื่อคณะ/หน่วยงาน
+            this.text_user1 = data.staffid+' : '+data.namefully; 
             this.text_staffuse1 = data.staffid;
             this.text_positionuse1 = data.posnameth;
             this.text_namefullyuse1 = data.namefully;
-            this.text_departmentnameuse1 =data.departmentname;
-            this.text_departmentiduse1 = data.departmentid;
+            const subSrtDepar = data.departmentid.substring(4, 7); 
+            console.log('subSrtDepar:', subSrtDepar); // ตรวจสอบค่าที่ได้จากการตัดสตริง 
+            if (subSrtDepar === "927") {
+                console.log('Matched departmentid starting with 927');
+                
+                this.text_departmentnameuse1 = data.departmentname;
+                this.text_departmentiduse1 = data.departmentid;
+                this.text_departmentiduseid = data.departmentid+' : '+data.departmentname; 
+            } else {
+                console.log('Other facultyid',data.facultyid);
+                
+                this.text_departmentnameuse1 = data.facultyname;
+                this.text_departmentiduse1 = data.facultyid;
+                this.text_departmentiduseid = data.facultyid+' : '+data.facultyname; 
+            }
+
             this.text_iduse1 = data.id; // *** เก็บ ID ของผู้ใช้ที่เลือกจากผลการค้นหา ***
         },
     }

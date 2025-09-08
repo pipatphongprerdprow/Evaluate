@@ -1317,7 +1317,7 @@ export default {
                             staffid: staffid_Main
                         }
                     }); 
-                    console.log('getDataAdio: ',res.data);  
+                    console.log('getDataAdio: ',res);  
                     
                     this.posadio = res.data[0].posadio || 0;
                 } 

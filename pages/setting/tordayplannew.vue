@@ -19,18 +19,33 @@
         />
 
       <DataTable :value="allPlansSorted" v-model:expandedRows="expandedPlans" dataKey="id" responsiveLayout="scroll" stripedRows>
-        <Column expander style="width:3rem"/>
-        <Column header="ประเภทแผน" style="width:9rem;min-width:8rem;text-align:center">
+        <Column expander style="width:2rem"/>
+         <Column header="ไตรมาส" style="width:8.5rem;min-width:8rem;text-align:center">
           <template #body="{data}">
-            <Tag :value="data.planType || 'ไม่ระบุ'" :severity="getPlanTypeSeverity(data.planType)" class="font-semibold"/>
+            <Tag :value="getQuarter(data.startDate)" class="tag-sm w-full justify-center" severity="info"/>
           </template>
-        </Column>
-        <Column field="planLabel" header="ชื่อแผนงาน/โครงการ" style="min-width:12rem">
+        </Column> 
+        <!-- ปี (พ.ศ.) -->
+        <Column header="ปี" style="width:5.5rem;min-width:5rem;text-align:center">
+          <template #body="{data}">
+            <span class="font-semibold">{{ getYear(data.startDate) }}</span>
+          </template>
+        </Column> 
+        <!-- ประเภทแผน -->
+        <Column header="ประเภทแผน" style="width:7.5rem;min-width:7rem;text-align:center">
+          <template #body="{data}">
+            <Tag :value="data.planType || 'ไม่ระบุ'" :severity="getPlanTypeSeverity(data.planType)" class="tag-sm font-medium"/>
+          </template>
+        </Column> 
+        <!-- ชื่อแผน (ยืดหยุ่น, 2 บรรทัด, ellipsis) -->
+        <Column field="planLabel" header="ชื่อแผนงาน/โครงการ" style="min-width:16rem;max-width:28rem">
           <template #body="{data}">
             <div class="flex flex-col items-start">
-              <div class="flex items-center">
-                <i class="pi pi-briefcase mr-2 text-primary-600 text-lg"></i>
-                {{ data.planLabel }}
+              <div class="flex items-start gap-2">
+                <i class="pi pi-briefcase text-primary-600 text-base mt-1"></i>
+                <div class="truncate-2">
+                  {{ data.planLabel }}
+                </div>
               </div>
               <small class="text-gray-500 mt-1">
                 <i class="pi pi-calendar mr-1 text-xs"></i>
@@ -38,35 +53,49 @@
               </small>
             </div>
           </template>
-        </Column>
-        <Column header="ผู้รับผิดชอบหลัก" style="min-width:10rem">
+        </Column> 
+        <!-- ผู้รับผิดชอบ (แสดง 2 คน + นับส่วนเกิน) -->
+        <Column header="ผู้รับผิดชอบหลัก" style="min-width:12rem;max-width:18rem">
           <template #body="{data}">
-            <span v-if="data.owner?.length">{{ data.owner.map(getOwnerDisplay).join(', ') }}</span>
-            <span v-else class="text-gray-400">ยังไม่กำหนด</span>
-          </template>
-        </Column>
-        <Column header="ความคืบหน้า" style="min-width:12rem">
-          <template #body="{data}">
-            <div class="flex items-center">
-              <span class="mr-2 text-sm text-primary-600 font-bold">{{ getPlanProgress(data) }}%</span>
-              <ProgressBar :value="getPlanProgress(data)" class="flex-1" />
+            <div class="flex flex-wrap gap-1">
+              <span 
+                v-for="o in (data.owner || [])" 
+                :key="o.id" 
+                class="owner-chip"
+              >
+                {{ getOwnerDisplay(o) }}
+              </span>
+              <span v-if="!data.owner?.length" class="text-gray-400">
+                ยังไม่กำหนด
+              </span>
             </div>
           </template>
-        </Column>
-        <Column header="สถานะ" style="min-width:8rem">
+        </Column> 
+        <!-- ความคืบหน้า (แคบลง) -->
+        <Column header="ความคืบหน้า" style="width:11rem;min-width:10rem">
           <template #body="{data}">
-            <Tag :value="getPlanStatusLabel(data)" :severity="getPlanStatusSeverity(data)" class="font-bold" />
-          </template>
-        </Column>
-        <Column header="จัดการ" style="width:8rem" class="text-center">
-          <template #body="{data}">
-            <div class="flex gap-1 justify-center">
-              <Button icon="pi pi-pencil" class="p-button-text p-button-warning p-button-sm p-button-rounded" @click="editPlan(data)" />
-              <Button icon="pi pi-trash" class="p-button-text p-button-danger p-button-sm p-button-rounded" @click="confirmDeletePlan(data.id)" />
+            <div class="flex items-center gap-2">
+              <span class="text-sm text-primary-600 font-bold">{{ getPlanProgress(data) }}%</span>
+              <ProgressBar :value="getPlanProgress(data)" class="flex-1 h-2 rounded-md" />
             </div>
+          </template>
+        </Column> 
+        <!-- สถานะ -->
+        <Column header="สถานะ" style="width:8rem;min-width:7.5rem;text-align:center">
+          <template #body="{data}">
+            <Tag :value="getPlanStatusLabel(data)" :severity="getPlanStatusSeverity(data)" class="tag-sm font-semibold" />
           </template>
         </Column>
 
+        <!-- จัดการ -->
+        <Column header="จัดการ" style="width:6.5rem" class="text-center">
+          <template #body="{data}">
+            <div class="flex gap-1 justify-center">
+              <Button icon="pi pi-pencil" class="p-button-text p-button-warning p-button-sm p-button-rounded" @click="editPlan(data)" />
+              <Button icon="pi pi-trash"  class="p-button-text p-button-danger  p-button-sm p-button-rounded" @click="confirmDeletePlan(data.id)" />
+            </div>
+          </template>
+        </Column> 
         <template #expansion="planSlot">
           <div class="p-4 bg-gray-50 border-round-xl ml-4">
             <div class="text-xl font-bold text-700 flex items-center mb-3">
@@ -147,7 +176,7 @@
                       </template>
                     </Column>
                   </DataTable>
-                  <div v-if="stepProps.data.tasks?.length===0" class="text-center text-gray-500 text-sm py-4">ยังไม่มีภาระงานสำหรับขั้นตอนนี้</div>
+                  <div v-if="stepProps.data.tasks?.length===0" class="text-center text-gray-500 text-sm py-4">ยังไม่มีภาระงานสำหรับขั้นตอนนี้</div> 
                 </div>
               </template>
             </DataTable>
@@ -455,7 +484,7 @@ const isNewTaskInStepValid = computed(()=>{
 const pad = (n)=> String(n).padStart(2,'0')
 const toDateStr = (d)=>{ if(!d) return null; const dt=new Date(d); return `${dt.getFullYear()}-${pad(dt.getMonth()+1)}-${pad(dt.getDate())}` }
 const toDateTimeStr = (d)=>{ if(!d) return null; const dt=new Date(d); return `${dt.getFullYear()}-${pad(dt.getMonth()+1)}-${pad(dt.getDate())} ${pad(dt.getHours())}:${pad(dt.getMinutes())}:00` }
-const formatDate = (x)=>{ if(!x) return ''; const d=new Date(x); return `${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()}` }
+const formatDate = (x) => { if (!x) return ''; const d = new Date(x); const yearBE = d.getFullYear() + 543; return `${pad(d.getDate())}/${pad(d.getMonth()+1)}/${yearBE}`; };
 
 const getPlanProgress = (plan)=> !plan.steps?.length ? 0 : Math.round(plan.steps.reduce((s,st)=> s+getStepProgress(st),0)/plan.steps.length)
 const getStepProgress = (step)=> step?.status==='เสร็จสิ้น'?100: step?.status==='อยู่ระหว่างดำเนินการ'?50:0
@@ -692,7 +721,6 @@ async function addTaskToStepFromMain() {
 }
 
 
-
  
 
 async function openEditTaskDialogInTable(step, task, taskIndex){
@@ -773,6 +801,29 @@ function getPlanTypeSeverity(t){
     default: return 'secondary'
   }
 }
+function toDate(d) {
+  if (!d) return null;
+  const dt = typeof d === 'string' ? new Date(d) : d;
+  return isNaN(dt) ? null : dt;
+}
+
+// ไตรมาสตามปีงบประมาณไทย
+function getQuarter(dateInput) {
+  const d = toDate(dateInput);
+  if (!d) return '-';
+  const month = d.getMonth() + 1; 
+  if (month >= 10 && month <= 12) return 'ไตรมาส 1 : ต.ค. - ธ.ค.';
+  if (month >= 1 && month <= 3)  return 'ไตรมาส 2 : ม.ค. - มี.ค';
+  if (month >= 4 && month <= 6)  return 'ไตรมาส 3 : เม.ย. - มิ.ย.';
+  if (month >= 7 && month <= 9)  return 'ไตรมาส 4 : ก.ค. - ก.ย.';
+  return '-';
+} 
+function getYear(dateInput) {
+  const d = toDate(dateInput);
+  if (!d) return '-';
+  return String(d.getFullYear() + 543);
+} 
+
 </script>
 
 <style scoped>
