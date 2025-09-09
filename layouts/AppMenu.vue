@@ -37,7 +37,7 @@ const allMenus = ref([
         label: 'ผู้บริหาร',
         items: [
             { label: 'ตรวจติดตามแบบประเมิน', icon: 'pi pi-bell', to: '/setting/tracking' },
-             { label: 'ตรวจติดตามภาระงานประจำวัน', icon: 'pi pi-file', to: '/setting/checkedialy' }
+            { label: 'ตรวจติดตามภาระงานประจำวัน', icon: 'pi pi-file', to: '/setting/checkedialy' }
 
         ],
          //items: [{ label: 'ตรวจติดตามภาระงานประจำวัน', icon: 'pi pi-bell', to: '/setting/checkedialy' }]

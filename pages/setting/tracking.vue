@@ -1235,13 +1235,29 @@ export default {
                 console.error('Error fetching data for staff:', error);
             }
         },
+        async getAadioPosition(staffid_Main){ 
+            console.log('getAadioPosition: ',staffid_Main);  
+            try {   
+                if(staffid_Main){
+                    const res = await axios.get('http://127.0.0.1:8000/api/getDataAdio', {  
+                        params: {
+                            staffid: staffid_Main
+                        }
+                    }); 
+                    console.log('getDataAdio: ',res);   
+                    this.posadio = res.data[0].posadid || 0;
+                } 
+            } catch (error) {
+                console.error('Error fetching evaluation data:', error);
+            } 
+        },
         // XX One
         async openDataEvalu(data) {
             // console.log('posnameid: ',data.posnameid);
             // console.log('staffid: ',data.staffid); 
             //await getAadioPosition(data.staffid);
 
-            await this.getAadioPosition(data.staffid);
+            this.getAadioPosition(data.staffid);
             
             if (this.tracking_date.d_date === undefined) {
                 Swal.fire('แจ้งเตือนจากระบบ', 'กรุณาเลือกรอบประเมิน', 'error');
@@ -1276,8 +1292,9 @@ export default {
 
                 this.improvements = null;
                 this.suggestions = null;
-
-                this.showdataPo(data.staffid, this.facid_Main, this.tracking_date.d_date, this.tracking_date.evalua,data.posnameid);
+ 
+                
+                await this.showdataPo(data.staffid, this.facid_Main, this.tracking_date.d_date, this.tracking_date.evalua,data.posnameid);
 
                 await axios.post('http://127.0.0.1:8000/api/showDataP03New', {
                     staff_id: data.staffid,
@@ -1307,24 +1324,7 @@ export default {
                     console.error('Error:', error);
                 });
             }
-        },    
-        async getAadioPosition(staffid_Main){ 
-            console.log('getAadioPosition: ',staffid_Main);  
-            try {   
-                if(staffid_Main){
-                    const res = await axios.get('http://127.0.0.1:8000/api/getDataAdio', {  
-                        params: {
-                            staffid: staffid_Main
-                        }
-                    }); 
-                    console.log('getDataAdio: ',res);  
-                    
-                    this.posadio = res.data[0].posadio || 0;
-                } 
-            } catch (error) {
-                console.error('Error fetching evaluation data:', error);
-            } 
-        },
+        },     
 
         
         // เพิ่มคะแนนประเมิน biwgin
@@ -1815,7 +1815,8 @@ export default {
                 console.error("Error: currentstaff is undefined or empty.");
                 return;
             } 
-            console.log('this.posadio',this.posadio);
+ 
+            console.log('this.posadio',this.posadio); 
             console.log('this.currentstaff[0]?.postypenameth: ',this.currentstaff[0]?.postypenameth);
             // console.log('this.currentstaff[0]?.postypename: ',this.currentstaff[0]?.postypename);
 

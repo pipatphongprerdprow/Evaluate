@@ -125,7 +125,7 @@ export default {
             text_edt: null,
             dropdownItemUsage: null,
             dropdownItemsUsage: [
-                { name: 'เจ้าหน้าที่บุคคล', code: 2 },
+                //{ name: 'เจ้าหน้าที่บุคคล', code: 2 },
                 { name: 'ผู้บริหาร', code: 3 },
                 { name: 'ผู้บังคับบัญชาเหนือขึ้นไป', code: 4 },
             ],

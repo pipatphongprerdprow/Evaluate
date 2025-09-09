@@ -85,15 +85,27 @@
                                     <b v-if="subP01.p01_target==5">&#10003;</b> 
                                     <b v-if="subP01.p01_target!=5"></b> 
                                 </td>
-                                <td style=" vertical-align: middle;" class="text-center">{{ subP01.p01_score }}</td>
+
+                                <td style=" vertical-align: middle;" class="text-center">
+                                    <div v-if="currentDate >= dataPor.d_scoringday">
+                                    {{ subP01.p01_score }}
+                                    </div>
+                                    <div v-else> 0 </div>
+                                </td> 
                                 <td style="vertical-align: middle;" class="text-center">{{ subP01.p01_weight }}%</td> 
-                                <td style=" vertical-align: middle;" class="text-center">{{ (subP01.p01_score * subP01.p01_weight / 100).toFixed(2) }}</td>
+
+                                <td style=" vertical-align: middle;" class="text-center">
+                                    <div v-if="currentDate >= dataPor.d_scoringday">
+                                    {{ (subP01.p01_score * subP01.p01_weight / 100).toFixed(2) }}
+                                    </div>
+                                    <div v-else> 0.00 </div>
+                                </td>
                                 
                                 <td style=" vertical-align: middle;" class="text-center">
                                     <!-- <div v-if="!isCurrentDateAfter"> -->
                                     <div v-if="currentDate < dataPor.d_recordingday">
                                         <SplitButton label="เลือก" :model="itemsBtu(subP01)" severity="warning" class="mb-2 mr-2"></SplitButton>
-                                    </div> 
+                                    </div>  
                                 </td> 
                             </tr>
                         </template>
@@ -105,7 +117,10 @@
                                 <b>{{ totalWeight }}%</b> <!-- แสดงผลรวม p01_weight -->
                             </td>
                             <td class="text-center" style="color: blue;">
-                                <b>{{ totalCalculatedScore }}</b> <!-- แสดงผลรวมคะแนนที่คำนวณ -->
+                                <div v-if="currentDate >= dataPor.d_scoringday">
+                                    <b>{{ totalCalculatedScore }}</b> <!-- แสดงผลรวมคะแนนที่คำนวณ -->
+                                </div>
+                                <div v-else> <b>0</b> </div>
                             </td>
                             <td></td> 
                         </tr>
@@ -113,7 +128,15 @@
                             <td style="text-align: center; vertical-align: middle;" colspan="9">
                                 <b style="color: blue;">(8) สรุปคะแนนส่วนผลสัมฤทธิ์ของงาน =&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </b>
                                 <b style="color: blue;">ผลรวมของค่าคะแนนถ่วงน้ำหนัก</b>
-                                <b style="display: block; text-align: right; color: blue;">{{ totalCalculatedScore}}</b>
+                                <!-- <div v-if="currentDate >= dataPor.d_scoringday">
+                                    <b style="display: block; text-align: right; color: blue;">
+                                        {{ totalCalculatedScore }}
+                                    </b>
+                                </div> -->
+
+                                <b style="display: block; text-align: right; color: blue;">
+                                    {{ currentDate >= dataPor.d_scoringday ? totalCalculatedScore : 0 }}
+                                </b> 
                                 <div style="display: flex; justify-content: flex-end;">
                                     <hr style="border: 1px solid black; width: 80%;">
                                 </div>
@@ -164,8 +187,7 @@
                                 <template v-for="(item, index) in products_person" :key="index">
                                     <tr>
                                         <td style="text-align: left;" colspan="8">
-                                            <b style="color: blue;">{{ item.h_no }}. {{ item.nameH }} </b>
-                                            <!-- {{ item.id }}. -->
+                                            <b style="color: blue;">{{ item.h_no }}. {{ item.nameH }} </b> 
                                         </td>
                                         <td></td>
                                         <!-- <td class="text-center" style="color: blue;"> <b>{{ h.p_weight??0 }}%</b></td>  --> 
