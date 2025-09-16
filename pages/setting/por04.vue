@@ -95,14 +95,24 @@
                     </table>
                     <br>
                     <div class="employee-info">
-                    <h4>ระดับผลการประเมินที่ได้</h4>
-                        <p><strong>[&nbsp;&nbsp; <b v-if="(showscoresum.sum_score) >= 90">&#10003;</b> &nbsp;&nbsp;] ดีเด่น (90-100)</strong></p>
-                        <p><strong>[&nbsp;&nbsp; <b v-if="(showscoresum.sum_score) >= 80 && (showscoresum.sum_score) < 90">&#10003;</b> &nbsp;&nbsp;] ดีมาก (80-89)</strong></p>
-                        <p><strong>[&nbsp;&nbsp; <b v-if="(showscoresum.sum_score) >= 70 && (showscoresum.sum_score) < 80">&#10003;</b> &nbsp;&nbsp;] ดี (70-79)</strong></p>
-                        <p><strong>[&nbsp;&nbsp; <b v-if="(showscoresum.sum_score) >= 60 && (showscoresum.sum_score) < 70">&#10003;</b> &nbsp;&nbsp;] พอใช้ (60-69)</strong></p> 
-                        <p><strong>[&nbsp;&nbsp; <b v-if="(showscoresum.sum_score) < 60">&#10003;</b> &nbsp;&nbsp;] ต้องปรับปรุง (ต่ำกว่า 60)</strong></p>
-                    </div>
-
+                        <h4>ระดับผลการประเมินที่ได้</h4>
+                        <p><strong>[&nbsp;&nbsp; 
+                            <b v-if="new Date(currentDate) >= new Date(dataPor.d_scoringday) && (showscoresum.sum_score) >= 90">&#10003;</b> 
+                            &nbsp;&nbsp;] ดีเด่น (90-100)</strong></p> 
+                        <p><strong>[&nbsp;&nbsp; 
+                            <b v-if="new Date(currentDate) >= new Date(dataPor.d_scoringday) && (showscoresum.sum_score) >= 80 && (showscoresum.sum_score) < 90">&#10003;</b> 
+                            &nbsp;&nbsp;] ดีมาก (80-89)</strong></p> 
+                        <p><strong>[&nbsp;&nbsp; 
+                            <b v-if="new Date(currentDate) >= new Date(dataPor.d_scoringday) && (showscoresum.sum_score) >= 70 && (showscoresum.sum_score) < 80">&#10003;</b> 
+                            &nbsp;&nbsp;] ดี (70-79)</strong></p> 
+                        <p><strong>[&nbsp;&nbsp; 
+                            <b v-if="new Date(currentDate) >= new Date(dataPor.d_scoringday) && (showscoresum.sum_score) >= 60 && (showscoresum.sum_score) < 70">&#10003;</b> 
+                            &nbsp;&nbsp;] พอใช้ (60-69)</strong></p>  
+                        <p><strong>[&nbsp;&nbsp; 
+                            <b v-if="new Date(currentDate) >= new Date(dataPor.d_scoringday) && (showscoresum.sum_score) < 60">&#10003;</b> 
+                            &nbsp;&nbsp;] ต้องปรับปรุง (ต่ำกว่า 60)</strong></p>
+                    </div> 
+                    
                     <h5 class="mb-4"><i class="" style="font-size: x-large;"></i> ส่วนที่ 3 แผนพัฒนาการปฏิบัติราชการรายบุคคล</h5>
                     <table border="1" cellspacing="0" cellpadding="5">
                         <thead>

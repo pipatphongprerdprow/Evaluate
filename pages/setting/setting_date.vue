@@ -235,11 +235,13 @@ export default {
             text_edt: null, 
             dropdownItemYear: null,
             dropdownItemsYear: [
+                { name: 'ปีงบประมาณ 2571', code: 2571 },
+                { name: 'ปีงบประมาณ 2570', code: 2570 }, 
                 { name: 'ปีงบประมาณ 2569', code: 2569 },
                 { name: 'ปีงบประมาณ 2568', code: 2568 },
-                { name: 'ปีงบประมาณ 2567', code: 2567 },
-                { name: 'ปีงบประมาณ 2566', code: 2566 },
-                { name: 'ปีงบประมาณ 2565', code: 2565 },
+                // { name: 'ปีงบประมาณ 2567', code: 2567 },
+                // { name: 'ปีงบประมาณ 2566', code: 2566 },
+                // { name: 'ปีงบประมาณ 2565', code: 2565 },
             ],
             dropdownItemEvalua: null,
             dropdownItemsEvalua: [

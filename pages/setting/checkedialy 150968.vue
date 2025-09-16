@@ -10,108 +10,59 @@
             </h3>
           </div>
         </div> 
-
-        <!-- ===== ช่วงเวลา (ปีงบฯ/ไตรมาส) ===== -->
-        <div class="card p-3 mb-3">
-          <div class="flex flex-wrap gap-2 items-end">
-            <div>
-              <label class="block text-600 mb-1">ปีงบประมาณ (พ.ศ.)</label>
-              <Dropdown
-                v-model="selectedFYBE"
-                :options="fyOptions"
-                optionLabel="label"
-                optionValue="value"
-                class="w-10rem"
-                placeholder="เลือกปีงบฯ"
-              />
-            </div>
-            <div>
-              <label class="block text-600 mb-1">ไตรมาส</label>
-              <Dropdown
-                v-model="selectedQuarter"
-                :options="quarterOptions"
-                optionLabel="label"
-                optionValue="value"
-                class="w-12rem"
-                placeholder="เลือกไตรมาส"
-              />
-            </div>
-            <div class="ml-auto flex gap-2">
-              <Button label="ค้นหา" icon="pi pi-search" :disabled="!isPeriodValid || searching" @click="handleSearch" />
-              <Tag :value="periodLabel" severity="info" class="px-3 py-2" />
-            </div>
-          </div> 
-        </div>
         
         <!-- ===== Leaderboard ===== -->
         <div class="card p-3 mb-3">
-          <div v-if="!hasSearched" class="p-4 text-600 text-center">
-            <i class="pi pi-filter mr-2"></i>
-            โปรดเลือก <b>ปีงบประมาณ</b> และ <b>ไตรมาส</b> แล้วกด “ค้นหา”
-          </div>
-
-          <div v-else-if="searching" class="p-4 text-600 text-center">
-            <i class="pi pi-spin pi-spinner mr-2"></i>กำลังโหลดข้อมูล…
-          </div>
-
-          <template v-else>
-            <!-- เนื้อหา leaderboard เดิมของคุณ ย้ายมาวางตรงนี้ -->
-            <div class="flex align-items-center justify-content-between mb-3">
-              <div class="flex align-items-center gap-2">
-                <i class="pi pi-trophy text-yellow-500 text-2xl"></i>
-              </div>
-              <Dropdown
-                v-model="sortKey"
-                :options="sortOptions"
-                optionLabel="label"
-                optionValue="value"
-                class="w-14rem"
-                placeholder="เรียงลำดับตาม"
-              />
+          <div class="flex align-items-center justify-content-between mb-3">
+            <div class="flex align-items-center gap-2">
+              <i class="pi pi-trophy text-yellow-500 text-2xl"></i>
             </div>
+            <Dropdown
+              v-model="sortKey"
+              :options="sortOptions"
+              optionLabel="label"
+              optionValue="value"
+              class="w-14rem"
+              placeholder="เรียงลำดับตาม"
+            />
+          </div>
 
-            <div class="grid">
-              <div v-for="p in leaderboardSorted" :key="p.staffid" class="col-12 md:col-6 lg:col-4">
-                <div class="lb-card">
-                  <div class="flex align-items-center gap-3">
-                    <img :src="getAvatarByStaffId(p.staffid)" class="lb-avatar" alt="avatar"
-                        @error="(e)=>onImgError(e, p.displayName)" />
-                    <div class="flex-1">
-                      <button class="lb-name-btn"
-                              :disabled="searching"
-                              @click="openDailyTaskDetail(findProductByStaffId(p.staffid))"
-                              :title="'ดูรายละเอียดของ ' + p.displayName">
-                        <span class="lb-name">{{ p.displayName }}</span>
-                        <i class="pi pi-list ml-2 text-primary-600"></i>
-                      </button>
-                      <div class="lb-pos text-500">{{ p.posnameth || '-' }}</div>
-                    </div>
-                    <Tag :value="p.total.toLocaleString()" severity="info" />
+          <div class="grid">
+            <div v-for="p in leaderboardSorted" :key="p.staffid" class="col-12 md:col-6 lg:col-4">
+              <div class="lb-card">
+                <div class="flex align-items-center gap-3">
+                  <img :src="getAvatarByStaffId(p.staffid)" class="lb-avatar" alt="avatar" @error="(e)=>onImgError(e, p.displayName)" />
+                  <div class="flex-1">
+                    <button class="lb-name-btn" @click="openDailyTaskDetail(findProductByStaffId(p.staffid))" :title="'ดูรายละเอียดของ ' + p.displayName">
+                      <span class="lb-name">{{ p.displayName }}</span>
+                      <i class="pi pi-list ml-2 text-primary-600"></i>
+                    </button>
+                    <div class="lb-pos text-500">{{ p.posnameth || '-' }}</div>
                   </div>
-
-                  <div class="mt-3 grid text-center">
-                    <div class="col-4">
-                      <div class="text-500 text-sm">งานหลัก</div>
-                      <div class="lb-num success">{{ p.main }}</div>
-                    </div>
-                    <div class="col-4">
-                      <div class="text-500 text-sm">ตำแหน่งอื่น</div>
-                      <div class="lb-num warning">{{ p.otherPos }}</div>
-                    </div>
-                    <div class="col-4">
-                      <div class="text-500 text-sm">อื่นๆ</div>
-                      <div class="lb-num info">{{ p.other }}</div>
-                    </div>
-                  </div>
-
-                  <ProgressBar :value="p.progressPercent" class="mt-2" />
+                  <Tag :value="p.total.toLocaleString()" severity="info" />
                 </div>
+
+                <div class="mt-3 grid text-center">
+                  <div class="col-4">
+                    <div class="text-500 text-sm">งานหลัก</div>
+                    <div class="lb-num success">{{ p.main }}</div>
+                  </div>
+                  <div class="col-4">
+                    <div class="text-500 text-sm">ตำแหน่งอื่น</div>
+                    <div class="lb-num warning">{{ p.otherPos }}</div>
+                  </div>
+                  <div class="col-4">
+                    <div class="text-500 text-sm">อื่นๆ</div>
+                    <div class="lb-num info">{{ p.other }}</div>
+                  </div>
+                </div>
+
+                <ProgressBar :value="p.progressPercent" class="mt-2" />
               </div>
             </div>
-          </template>
+          </div>
         </div>
         <!-- ===== /Leaderboard ===== -->
-
 
         <div class="col md:col-5 text-right">
           <Dialog
@@ -374,9 +325,8 @@
                   <div class="summary-item"><i class="pi pi-chart-line text-600 mr-2"></i>ความคืบหน้า: <b>{{ getPlanProgress(selectedPlan) }}%</b></div>
                   <div class="summary-item"><i class="pi pi-clock text-600 mr-2"></i>เวลารวม: <b>{{ getPlanTotalMinutes(selectedPlan).toLocaleString() }}</b> นาที</div>
                   <div class="summary-item"> <i class="pi pi-sitemap text-600 mr-2"></i>{{ getQuarter(selectedPlan.startDate) }}</div>
-                  <div class="summary-item"> <i class="pi pi-calendar-times text-600 mr-2"></i> ปีงบฯ: <b>{{ getYearBE(selectedPlan.startDate) }}</b></div>
-                </div>
-
+                  <div class="summary-item"> <i class="pi pi-calendar-times text-600 mr-2"></i> ปีงบฯ: <b>{{ getYearBE(selectedPlan.startDate) }}</b> </div>
+                </div> 
                 <div class="legend">
                   <span class="dot bg-gray-400"></span> รอดำเนินการ
                   <span class="dot bg-yellow-500 ml-3"></span> อยู่ระหว่างดำเนินการ
@@ -419,11 +369,13 @@
                   </div>
                 </div>
               </div>
-            </Sidebar> 
+            </Sidebar>
+
             <div v-if="personPlans.length === 0" class="flex flex-col items-center justify-center p-8">
               <i class="pi pi-inbox text-5xl text-gray-400 mb-3"></i>
               <p class="text-gray-500">ไม่พบแผน/ภาระงานของบุคคลนี้</p>
-            </div> 
+            </div>
+
             <template #footer>
               <Button label="ปิด" severity="danger" @click="dailyTaskDialogVisible = false" />
             </template>
@@ -435,7 +387,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed, watch } from 'vue'; 
+import { ref, onMounted, computed } from 'vue';
 import axios from 'axios';
 import Swal from 'sweetalert2';
 import { useAuth } from '#imports';
@@ -444,7 +396,8 @@ import Card from 'primevue/card';
 import Divider from 'primevue/divider';
 import Sidebar from 'primevue/sidebar';
 
-const { getSession } = await useAuth(); 
+const { getSession } = await useAuth();
+
 /* ---------- CONFIG ---------- */
 const API = 'http://127.0.0.1:8000/api';
 const profileImageUrl = 'https://pd.msu.ac.th/staff/picture/';
@@ -492,7 +445,8 @@ function findProductByStaffId(staffid) { return products.value.find(x => String(
 function getAvatarByStaffId(staffid) { return `${profileImageUrl}${staffid}.jpg`; }
 function onImgError(e, name = 'User') { e.target.src = 'https://ui-avatars.com/api/?background=EEE&color=444&name=' + encodeURIComponent(name); }
 
-function accumulateFromPlans(plans) { 
+function accumulateFromPlans(plans) {
+  // นับจำนวนงานหลัก/ตำแหน่งอื่น/อื่นๆ ยังใช้ tasks เหมือนเดิม
   const tasks = [];
   (plans || []).forEach(pl =>
     (pl.steps || []).forEach(st =>
@@ -501,7 +455,8 @@ function accumulateFromPlans(plans) {
   );
   const { main, otherPos, other } = tallyByType(tasks, PIE_MODE);
   const total = main + otherPos + other;
- 
+
+  // >>> คิด progress ตาม "step"
   let stepTotal = 0, score = 0;
   (plans || []).forEach(pl =>
     (pl.steps || []).forEach(st => {
@@ -544,107 +499,6 @@ async function buildLeaderboard() {
   });
   leaderboard.value = await Promise.all(jobs);
 }
-
-
-// function filterPlansByRange(plans, start, end) {
-//   if (!start || !end) return plans;
-//   const inRange = (d) => d && d >= start && d <= end;
-//   return (plans || []).map(p => {
-//     const steps = (p.steps || []).map(st => {
-//       const tasks = (st.tasks || []).filter(t => {
-//         const d = t.createdDate || t.startTime || t.endTime;
-//         return d ? inRange(d) : true; // ถ้าไม่มีวันที่ ปล่อยผ่าน
-//       });
-//       return { ...st, tasks };
-//     });
-//     return { ...p, steps };
-//   });
-// }
-
- 
-function isInRangeDate(d, start, end) {
-  const x = toDate(d);
-  return !!(x && start && end && x >= start && x <= end);
-}
-
-function planOverlapsRange(plan, start, end) {
-  const s = toDate(plan?.startDate);
-  const e = toDate(plan?.endDate) || s;
-  if (!s && !e) return false;
-  // มีการทับซ้อนช่วงไหม
-  return !(e < start || s > end);
-} 
-function filterPlansByRange(plans, start, end, opts = {}) {
-  const {
-    keepUndatedTasks = false,
-    matchByPlan = 'strictStart'
-  } = opts;
-
-  return (plans || [])
-    .map(p => {
-      const steps = (p.steps || []).map(st => {
-        const tasks = (st.tasks || []).filter(t => {
-          const d = t.createdDate || t.startTime || t.endTime || t.dueDate;
-          return d ? isInRangeDate(d, start, end) : !!keepUndatedTasks;
-        });
-        return { ...st, tasks };
-      });
-      return { ...p, steps };
-    })
-    .filter(p => {
-      const hasTaskInRange = (p.steps || []).some(st => (st.tasks || []).length > 0);
-      const inByPlan =
-        matchByPlan === 'strictStart'
-          ? isInRangeDate(p.startDate, start, end)
-          : planOverlapsRange(p, start, end);
-      return hasTaskInRange || inByPlan;
-    });
-}
-
-
-
-
-async function buildLeaderboardWithPeriod() {
-  if (!products.value.length) { leaderboard.value = []; return; }
-  const fac = selectedEvaluationRound.value.fac_id;
-  const { start, end } = periodRange.value;
-
-  const jobs = products.value.map(async (s) => {
-    try { 
-      const payload = {
-        staff_id: s.staffid,
-        fac_id: fac,
-        date_start: start?.toISOString?.(),
-        date_end: end?.toISOString?.(),
-      };
-      const { data } = await axios.post(`${API}/showplannew`, payload);
-      let plans = mapApiToState(data?.data || []); 
-      plans = filterPlansByRange(plans, start, end, {
-        keepUndatedTasks: false,
-        matchByPlan: 'strictStart'  
-      });
-
-      const acc = accumulateFromPlans(plans);
-      return {
-        staffid: s.staffid,
-        displayName: displayNameOfStaff(s),
-        posnameth: s.posnameth || '',
-        ...acc
-      };
-    } catch {
-      return {
-        staffid: s.staffid,
-        displayName: displayNameOfStaff(s),
-        posnameth: s.posnameth || '',
-        main: 0, otherPos: 0, other: 0, total: 0, progressPercent: 0
-      };
-    }
-  });
-
-  leaderboard.value = await Promise.all(jobs);
-}
-
- 
 
 const leaderboardSorted = computed(() => {
   const arr = [...leaderboard.value];
@@ -748,115 +602,14 @@ function getPlanStatusSeverity(plan){
        : 'info';
 }
 
- 
-
-/* ===== Thai Fiscal Year helpers ===== */
-const today = new Date();
-const thisFY = (d => {
-  const y = d.getFullYear(); const m = d.getMonth() + 1; 
-  return (m >= 10) ? y + 1 : y;
-})(today);
- 
-function fyQuarterToRange(fyAD, q) { 
-  const s = new Date(), e = new Date();
-  if (q === 'ALL') { 
-    return { start: new Date(fyAD - 1, 9, 1), end: new Date(fyAD, 8, 30, 23, 59, 59, 999) };
-  }
-  if (q === 'Q1') return { start: new Date(fyAD - 1, 9, 1),  end: new Date(fyAD - 1, 11, 31, 23,59,59,999) };
-  if (q === 'Q2') return { start: new Date(fyAD, 0, 1),     end: new Date(fyAD, 2, 31, 23,59,59,999) };
-  if (q === 'Q3') return { start: new Date(fyAD, 3, 1),     end: new Date(fyAD, 5, 30, 23,59,59,999) };
-  if (q === 'Q4') return { start: new Date(fyAD, 6, 1),     end: new Date(fyAD, 8, 30, 23,59,59,999) };
-  return { start: null, end: null };
-} 
-function quarterLabel(q){
-  return q==='Q1'?'ไตรมาส 1 : ต.ค. - ธ.ค.'
-      : q==='Q2'?'ไตรมาส 2 : ม.ค. - มี.ค.'
-      : q==='Q3'?'ไตรมาส 3 : เม.ย. - มิ.ย.'
-      : q==='Q4'?'ไตรมาส 4 : ก.ค. - ก.ย.'
-      : 'ทั้งปีงบประมาณ';
-}
-
-/* ===== State: ตัวเลือกช่วงเวลา ===== */
-const selectedFYAD  = ref(thisFY);               
-const selectedFYBE  = ref(thisFY + 543);         
-const selectedQuarter = ref('ALL');              
- 
-const fyOptions = computed(() => {
-  const arr = [];
-  for (let y = thisFY - 2; y <= thisFY + 2; y++){
-    arr.push({ label: String(y + 543), value: y + 543 });
-  }
-  return arr.reverse();  
-});
-const quarterOptions = [
-  { label:'ทั้งหมด', value:'ALL' },
-  { label:'ไตรมาส 1', value:'Q1' },
-  { label:'ไตรมาส 2', value:'Q2' },
-  { label:'ไตรมาส 3', value:'Q3' },
-  { label:'ไตรมาส 4', value:'Q4' },
-];
-
-const hasSearched = ref(false);
-const searching = ref(false);
-let reqSeq = 0;  
- 
-const isPeriodValid = computed(() =>
-  !!selectedFYBE.value && !!selectedQuarter.value
-);
- 
-const periodRange = computed(() =>
-  selectedFYAD.value && selectedQuarter.value
-    ? fyQuarterToRange(selectedFYAD.value, selectedQuarter.value)
-    : { start: null, end: null }
-);
-const periodLabel = computed(() =>
-  !isPeriodValid.value
-    ? 'ยังไม่เลือกช่วงเวลา'
-    : `${quarterLabel(selectedQuarter.value)} / ปีงบฯ ${selectedFYBE.value}`
-);
- 
-watch(selectedFYBE, (be) => {
-  selectedFYAD.value = (parseInt(be, 10) || (thisFY + 543)) - 543;
-});
-
- 
-async function handleSearch() {
-  if (!isPeriodValid.value) {
-    Swal.fire('แจ้งเตือน', 'กรุณาเลือกปีงบประมาณและไตรมาสก่อน', 'warning');
-    return;
-  }
-  searching.value = true;
-  const my = ++reqSeq;
-  try {
-    await reloadAll();
-    if (my === reqSeq) hasSearched.value = true;
-  } finally {
-    if (my === reqSeq) searching.value = false;
-  }
-}
-
-async function reloadAll() {
-  if (!selectedEvaluationRound.value) {
-    Swal.fire('แจ้งเตือน', 'กรุณาเลือกรอบการประเมินก่อน', 'error');
-    return;
-  }
-  await fetchStaffAndDailyTasks();       
-  await buildLeaderboardWithPeriod();   
- 
-  if (dailyTaskDialogVisible.value && currentStaffDetail.value) {
-    await openDailyTaskDetail(currentStaffDetail.value, { keepOpen: true });
-  }
-}
-
-
- 
 // === Quarter & Year (Thai fiscal year) ===
 function toDate(d) {
   if (!d) return null;
   const dt = d instanceof Date ? d : new Date(d);
   return isNaN(dt) ? null : dt;
 }
- 
+
+// ไตรมาสตาม "ปีงบประมาณไทย" (Q1 = ต.ค.-ธ.ค., Q2=ม.ค.-มี.ค., Q3=เม.ย.-มิ.ย., Q4=ก.ค.-ก.ย.)
 function getQuarter(dateInput) {
   const d = toDate(dateInput);
   if (!d) return '-';
@@ -866,13 +619,20 @@ function getQuarter(dateInput) {
   if (m >= 4 && m <= 6)  return 'ไตรมาส 3 : เม.ย. - มิ.ย.';
   if (m >= 7 && m <= 9)  return 'ไตรมาส 4 : ก.ค. - ก.ย.';
   return '-';
-} 
+}
+
+// ปี พ.ศ. (จากวันที่เริ่มต้นแผน)
 function getYearBE(dateInput) {
   const d = toDate(dateInput);
   if (!d) return '-';
   return String(d.getFullYear() + 543);
 }
- 
+
+
+
+
+
+
 
 function getStepProgress(step) { if (!step) return 0; if (step.status === 'เสร็จสิ้น') return 100; if (step.status === 'อยู่ระหว่างดำเนินการ') return 50; return 0; }
 function getStepStatus(step) {
@@ -970,12 +730,14 @@ const planStatusCounts = computed(() => {
   return { pending, inProgress, completed };
 });
 
-const totalPlans = computed(() => personPlans.value.length); 
+const totalPlans = computed(() => personPlans.value.length);
+
+  
 
 const BAR_COLORS  = ['#FACC15', '#34D399', '#60A5FA'];
 const BAR_HOVERS  = ['#EAB308', '#10B981', '#3B82F6'];
 const BAR_BORDERS = ['#D4AF0A', '#0EA5A2', '#2563EB'];
-const TYPE_COLORS = ['#42A5F5', '#66BB6A', '#FFA726'];        
+const TYPE_COLORS = ['#42A5F5', '#66BB6A', '#FFA726'];       // ฟ้า, เขียว, ส้ม
 const TYPE_HOVERS = ['#64B5F6', '#81C784', '#FFB74D']; 
 
 const timeSpentData = computed(() => {
@@ -1031,56 +793,25 @@ async function fetchStaffAndDailyTasks() {
   try {
     const res = await axios.get(`${API}/showDataEvalu`, { params: { staff_id: staffIdMain.value, fac_id: selectedEvaluationRound.value.fac_id, group_id: groupIdMain.value, evalua: selectedEvaluationRound.value.evalua, p_year: selectedEvaluationRound.value.d_date } });
     products.value = (res.data || []).filter(item => item.stftypename !== 'ลูกจ้างชั่วคราว' && item.stftypename !== 'พนักงานราชการ');
-    //await buildLeaderboard();
+    await buildLeaderboard();
   } catch { Swal.fire({ icon: 'error', title: 'ข้อผิดพลาด', text: 'ไม่สามารถโหลดข้อมูลผู้รับการประเมินได้' }); }
 }
- 
-async function openDailyTaskDetail(staffData, opts = {}) {
-  if (!selectedEvaluationRound.value) {
-    Swal.fire('แจ้งเตือน', 'กรุณาเลือกรอบการประเมินก่อน', 'error');
-    return;
-  }
-  if (!staffData) {
-    Swal.fire('แจ้งเตือน', 'ไม่พบข้อมูลพนักงาน', 'error');
-    return;
-  }
 
-  const { start, end } = periodRange.value;
-
-  currentStaffDetail.value = staffData;
-  dailyTaskDialogVisible.value = true;
-  personPlans.value = [];
-
-  try { 
-    const payload = {
-      staff_id: staffData.staffid,
-      fac_id: selectedEvaluationRound.value.fac_id,
-      date_start: start?.toISOString?.(),
-      date_end: end?.toISOString?.(),
-    };
-    const { data } = await axios.post(`${API}/showplannew`, payload);
-    let plans = mapApiToState(data?.data || []);
- 
-    plans = filterPlansByRange(plans, start, end, {
-      keepUndatedTasks: false,
-      matchByPlan: 'strictStart'
-    });
- 
-    if (!plans.length) {
-      const alt = await axios.post(`${API}/getDataplans`, {
-        staffid: staffData.staffid,
-        facid: selectedEvaluationRound.value.fac_id
-      });
-      plans = filterPlansByRange(mapApiToState(alt.data?.plans || []), start, end);
+async function openDailyTaskDetail(staffData) {
+  if (!selectedEvaluationRound.value) { Swal.fire('แจ้งเตือน', 'กรุณาเลือกรอบการประเมินก่อน', 'error'); return; }
+  if (!staffData) { Swal.fire('แจ้งเตือน', 'ไม่พบข้อมูลพนักงาน', 'error'); return; }
+  currentStaffDetail.value = staffData; dailyTaskDialogVisible.value = true; personPlans.value = [];
+  try {
+    const { data } = await axios.post(`${API}/showplannew`, { staff_id: staffData.staffid, fac_id: selectedEvaluationRound.value.fac_id });
+    personPlans.value = mapApiToState(data?.data || []);
+    if (!personPlans.value.length) {
+      const alt = await axios.post(`${API}/getDataplans`, { staffid: staffData.staffid, facid: selectedEvaluationRound.value.fac_id });
+      personPlans.value = mapApiToState(alt.data?.plans || []);
     }
-
-    personPlans.value = plans;
   } catch {
-    personPlans.value = [];
-    Swal.fire({ icon: 'error', title: 'ข้อผิดพลาด', text: 'ไม่สามารถโหลดข้อมูลภาระงานประจำวันได้' });
+    personPlans.value = []; Swal.fire({ icon: 'error', title: 'ข้อผิดพลาด', text: 'ไม่สามารถโหลดข้อมูลภาระงานประจำวันได้' });
   }
 }
-
 
 const personPlansSortedByNumber = computed(() => [...personPlans.value].sort((a, b) => { const numA = parseInt((a.planLabel || '').replace(/[^0-9]/g, ''), 10) || 0; const numB = parseInt((b.planLabel || '').replace(/[^0-9]/g, ''), 10) || 0; return numA - numB; }));
 function getPlanType(p) { return (p?.planType ?? p?.plan_type ?? 'ไม่ระบุ') || 'ไม่ระบุ'; }
@@ -1175,4 +906,3 @@ defineExpose({
 .status-legend-item.completed { background: #22c55e; }     /* เขียว */
  
 </style>
-

@@ -105,7 +105,8 @@
                                     <!-- <div v-if="!isCurrentDateAfter"> -->
                                     <div v-if="currentDate < dataPor.d_recordingday">
                                         <SplitButton label="เลือก" :model="itemsBtu(subP01)" severity="warning" class="mb-2 mr-2"></SplitButton>
-                                    </div>  
+                                    </div> 
+                                    <div v-else style="color: brown; font-weight: bold; text-align: center;"> ครบกำหนดวันบันทึก ป.01 </div> 
                                 </td> 
                             </tr>
                         </template>
@@ -150,8 +151,8 @@
                                 </div>  
                             </td>
                             <td></td>
-                        </tr>  
-                    </tbody>
+                        </tr>   
+                    </tbody>  
                 </table>   
             </div> 
         </div> 
@@ -610,6 +611,7 @@ export default {
                 GROUPTYPENAME:user.user.name.GROUPTYPENAME,
                 POSTYPENAME:user.user.name.POSTYPENAME, 
                 SCOPES:user.user.name.SCOPES.staffdepartmentname
+                
             }
            
             

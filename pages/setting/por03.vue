@@ -138,6 +138,7 @@
                                     <div v-if="currentDate < dataPor.d_enddate"> 
                                         <SplitButton label="เลือก" :model="itemsBtu(subP01)" severity="warning" class="mb-2 mr-2"></SplitButton>
                                     </div>
+                                    <div v-else style="color: brown; font-weight: bold; text-align: center;"> ครบกำหนดวันบันทึก ป.03 </div>
                                 </td>
                             </tr>
                         </template>
@@ -258,9 +259,9 @@
                                         <b v-if="row3.datatable3 == '' ||  row3.datatable3 == null" style="color: red;">-</b> 
                                         <b v-if="row3.datatable3 != 0 " style="color: blue" >{{ row3.datatable3 }}</b> 
                                     </td> -->
-                                    <td>
-                                        <!-- <template v-if="positionname === 'ผู้บริหาร'"> -->
-                                        <template v-if="posadio === '128'">
+                                    <td> 
+                                        <!-- <template v-if="posadio === '128'"> -->
+                                        <template v-if="posadio === '128' && String(staffid_Main) !== '110105'">
                                             <InputNumber 
                                                 v-model.number="row3.datatable3" 
                                                 type="text" 
@@ -274,7 +275,8 @@
                                         </template>
                                     </td>
                                     <td>  
-                                        <b v-if="row3.selfAssessment3 == '' " style="color: red;">-</b> 
+                                        <!-- <b v-if="row3.selfAssessment3 == '' " style="color: red;">-</b>  -->
+                                         <b v-if="row3.selfAssessment3 == '' ||  row3.selfAssessment3 == null" style="color: red;">-</b>
                                         <b v-if="row3.selfAssessment3 != 0 " >{{ row3.selfAssessment3 }}</b> 
                                     </td>
                                 </tr> 
@@ -1176,6 +1178,13 @@ import InputText from 'primevue/inputtext';
                 let postypenameid = this.posadio === '128' ? 90 : this.postypenameid;
                 let positionname = this.posadio === '128' ? `ระดับชำนาญการพิเศษ` : `ระดับ${this.postypename}`;
 
+                 // 👇 ยกเว้น staffid 110105 → กลับไปใช้เงื่อนไขปกติ
+                if (String(this.staffid_Main) === '110105') {
+                    postypetext   = `ระดับ${this.postypename}`;
+                    postypenameid = this.postypenameid;
+                    positionname  = `ระดับ${this.postypename}`;
+                }
+
                 // console.log('postypetext: ',postypetext);
                 // console.log('postypenameid: ',postypenameid);
                 
@@ -1218,10 +1227,19 @@ import InputText from 'primevue/inputtext';
                     // };  
                     // let executive = Mapping[this.positionname] || 0;
 
-                     const Mapping = {
-                        '128': 1
-                    };  
+                    //160968บิว
+                    //  const Mapping = {
+                    //     '128': 1
+                    // };  
+                    // let executive = Mapping[this.posadio] || 0;
+                    const Mapping = { '128': 1 };
                     let executive = Mapping[this.posadio] || 0;
+
+                        // 👇 ยกเว้น staffid 110105 → ไม่ให้เป็น executive
+                        if (String(this.staffid_Main) === '110105') {
+                            executive = 0;
+                    }
+
 
                     // console.log('executive:', executive); 
                     // ตั้งค่า otherCompetencies

@@ -89,15 +89,28 @@
                                 <b v-if="row3.datatable3 != 0 " style="color: blue" >{{ row3.datatable3 }}</b> 
                             </td>
                             <td>  
-                                <b v-if="row3.selfAssessment3 == '' " style="color: red;">-</b> 
+                                <!-- <b v-if="row3.selfAssessment3 == '' " style="color: red;">-</b>  -->
+                                <b v-if="row3.selfAssessment3 == '' ||  row3.selfAssessment3 == null" style="color: red;">-</b>  
                                 <b v-if="row3.selfAssessment3 != 0 " >{{ row3.selfAssessment3 }}</b> 
                             </td>
                         </tr> 
                     </tbody>
-                </table>
+                </table> 
             </div>
-        </div>
+        </div> 
     </div>
+    <br>
+    <div class="p-fluid formgrid grid"> 
+        <B><h4>ความเห็นเพิ่มเติมของผู้ประเมิน (ระบุข้อมูลเมื่อสิ้นรอบการประเมิน)</h4></B>
+            <div class="field col-12 md:col-12">  
+                <label for="improvements">1) จุดเด่น และ/หรือ สิ่งที่ควรปรับปรุงแก้ไข</label>
+                <p style="margin-left: 20px;">{{ improvements??'- ไม่มีข้อมูล -' }}</p>
+            </div>
+            <div class="field col-9 md:col-9">  
+                <label for="suggestions">2) ข้อเสนอแนะเกี่ยวกับวิธีส่งเสริมและพัฒนา</label>
+                <p style="margin-left: 20px;">{{ suggestions??'- ไม่มีข้อมูล -' }}</p> 
+            </div>
+        </div>  
 </template>
 <!-- <script setup> 
     const { signIn, getSession, signOut } = await useAuth()
@@ -297,12 +310,24 @@ export default {
             // };  
             // let executive = Mapping[this.positionname] || 0;
 
+            // const Mapping = {
+            //     '128': 1
+            // };   
+            // let executive = Mapping[this.posadio] || 0;
+            
             const Mapping = {
                 '128': 1
-            };  
-            let executive = Mapping[this.posadio] || 0;
-            // console.log('executive:', executive); 
-            // ตั้งค่า otherCompetencies
+            };   
+            
+            const blacklist = ['110105', '110999', '110999'];  
+                // คำนวณ executive
+                let executive = Mapping[this.posadio] || 0;
+
+                // ถ้า staffid อยู่ใน blacklist → ให้ตัดสิทธิ์ (บังคับเป็น 0)
+                if (blacklist.includes(String(this.staffid_Main))) {
+                executive = 0;
+            }
+
             this.otherCompetencies = [
                 { id: 12, activity: 'ค. 1 สภาวะผู้นำ', indicator3: executive, datatable3: '', selfAssessment3: '' },
                 { id: 13, activity: 'ค. 2 วิสัยทัศน์', indicator3: executive, datatable3: '', selfAssessment3: '' },
@@ -336,6 +361,8 @@ export default {
                         }
                         return item;
                     });  
+                     this.improvements = data.improvements ?? '- ไม่มีข้อมูล -';
+                     this.suggestions = data.suggestions ?? '- ไม่มีข้อมูล -'; 
                 } 
             })
             .catch(error => {

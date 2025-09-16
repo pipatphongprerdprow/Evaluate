@@ -282,10 +282,9 @@
                                                                     <b v-else style="color: blue">{{ row3.datatable3 }}</b> 
                                                                 </td>
                                                                
-                                                                <td>
-                                                                    <!-- <template v-if="postypenameth === 'ผู้บริหาร' || (currentstaff && currentstaff[0] && currentstaff[0].posnameth 	=== 'ผู้บริหาร')">  -->
-                                                                    <!-- <template v-if="this.posadio === '128'">  -->
-                                                                    <template v-if="Number(posadio) === 128"> 
+                                                                <td> 
+                                                                    <!-- <template v-if="Number(posadio) === 128">  -->
+                                                                    <template v-if="Number(posadio) === 128 && !['110105','110200','110999'].includes(String(staffid_Main))"> 
                                                                         <InputNumber 
                                                                             v-model.number="row3.selfAssessment3" 
                                                                             type="text" 
@@ -596,7 +595,8 @@
                                                                     <b v-if="row3.datatable3 != 0 " style="color: blue" >{{ row3.datatable3 }}</b> 
                                                                 </td>
                                                                 <td>  
-                                                                    <b v-if="row3.selfAssessment3 == '' " style="color: red;">0</b> 
+                                                                    <!-- <b v-if="row3.selfAssessment3 == '' " style="color: red;">0</b>  -->
+                                                                    <b v-if="row3.selfAssessment3 == '' ||  row3.selfAssessment3 == null" style="color: red;">0</b>
                                                                     <b v-if="row3.selfAssessment3 != 0 " >{{ row3.selfAssessment3 }}</b> 
                                                                 </td>
                                                             </tr> 
@@ -1293,8 +1293,9 @@ export default {
                 this.improvements = null;
                 this.suggestions = null;
  
-                
-                await this.showdataPo(data.staffid, this.facid_Main, this.tracking_date.d_date, this.tracking_date.evalua,data.posnameid);
+                let facxx = this.tracking_date.fac_id ? this.tracking_date.fac_id : this.facid_Main;
+                await this.showdataPo(data.staffid, facxx, this.tracking_date.d_date, this.tracking_date.evalua,data.posnameid);
+                // await this.showdataPo(data.staffid, this.facid_Main, this.tracking_date.d_date, this.tracking_date.evalua,data.posnameid);
 
                 await axios.post('http://127.0.0.1:8000/api/showDataP03New', {
                     staff_id: data.staffid,
@@ -1423,6 +1424,8 @@ export default {
             }
         },
         async saveEvaTab1_1() {
+           // console.log('this.coreCompetencies: ',this.coreCompetencies);
+            
             this.coreCompetencies.forEach((item, index) => {
                 if (index === 0) {
                     item.data_table1 = item.data_table1 ?? 0; // Update based on the API response
@@ -1472,7 +1475,7 @@ export default {
                 staffid_po: this.staffid_po,
                 staff_id: this.staffid_Main,
                 dataStaffid: this.dataStaffid,
-                fac_id: this.facid_Main,
+                fac_id: this.tracking_date.fac_id ? this.tracking_date.fac_id :  this.facid_Main,
                 year: this.tracking_date.d_date,
                 record: this.tracking_date.evalua,
                 coreCompetencies: this.coreCompetencies,
@@ -1482,7 +1485,7 @@ export default {
                 suggestions: this.suggestions
             };
             const res = await axios.post('http://127.0.0.1:8000/api/saveP03PoTab1', payload);
-            //console.log(res.data);
+            console.log(res.data);
             Swal.fire({
                 position: 'top-end',
                 icon: 'success',
@@ -1550,7 +1553,7 @@ export default {
                     record: record
                 })
                 .then((res) => {
-                    //console.log(res.data);
+                    console.log('showDataPo: ',res.data);
                     if (res.data.length > 0) {
                         const data = res.data[0];
                         this.coreCompetencies.forEach((item) => {
@@ -1815,15 +1818,18 @@ export default {
                 console.error("Error: currentstaff is undefined or empty.");
                 return;
             } 
- 
+             // ---- NEW: blacklist ----
+            const BLACKLIST = ['110105'];                // เพิ่มรหัสอื่นได้ เช่น '110200', '110999'
+            const isBlacklisted = BLACKLIST.includes(String(staff_id));
+
+
             console.log('this.posadio',this.posadio); 
             console.log('this.currentstaff[0]?.postypenameth: ',this.currentstaff[0]?.postypenameth);
             // console.log('this.currentstaff[0]?.postypename: ',this.currentstaff[0]?.postypename);
 
 
             
-
-            // this.postypenameth = this.currentstaff[0]?.postypenameth  ?? (this.currentstaff[0]?.posnameth === 'ผู้บริหาร' ? 'ชำนาญการพิเศษ' : 'ปฏิบัติการ');
+ 
             //030968
             //this.postypenameth = this.currentstaff[0]?.postypenameth  ?? (this.posadio === '128' ? 'ชำนาญการพิเศษ' : 'ปฏิบัติการ');
 
@@ -1857,24 +1863,20 @@ export default {
                 { id: 4, activity: 'ก. 4 การยึดมั่นในความถูกต้องชอบธรรมและจริยธรรม', indicator: xr, data_table1: '', selfAssessment: '' },
                 { id: 5, activity: 'ก. 5 การทำงานเป็นทีม', indicator: xr, data_table1: '', selfAssessment: '' }
             ];  
-            this.jobSpecificCompetencies = [];
+            this.jobSpecificCompetencies = []; 
 
-            // const Mapping = {
-            //     'ผู้บริหาร': 1
-            // };  
-
-            const Mapping = {
-                '128': 1
-            };  
-            let executive = Mapping[this.posadio] || 0;
-
+            //160968
             // const Mapping = {
             //     '128': 1
             // };  
-            // let executive = Mapping[this.postypenameth, this.currentstaff[0]?.posnameth] || 0;
+            // let executive = Mapping[this.posadio] || 0; 
+            const Mapping = { '128': 1 };  
+                let executive = Mapping[this.posadio] || 0; 
 
-
-             //let executive = Mapping[this.posadio, this.currentstaff[0]?.posnameth] || 0;
+                // ---- NEW: ถ้าอยู่ใน blacklist → ไม่เป็น executive
+                if (isBlacklisted) {
+                    executive = 0;
+            }
 
             this.otherCompetencies = [
                 { id: 12, activity: 'ค. 1 สภาวะผู้นำ', indicator3: executive, datatable3: '', selfAssessment3: '' },
@@ -1894,6 +1896,7 @@ export default {
                 record: evalua,
                 postypename: postypetext
             }).then(res => {     
+                console.log('this.showDataPo',res.data); 
                 if (res.data.length > 0) {
                     const data = res.data[0]; 
                     this.coreCompetencies = this.coreCompetencies.map(item => {

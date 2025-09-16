@@ -59,6 +59,7 @@ export default defineNuxtConfig({
         baseURL: 'http://localhost:3000/evaluate/api/auth',
       // เปิดใช้จริง
     //   baseURL: 'https://survey.msu.ac.th/evaluate/api/auth',
+
       provider: {
           type: 'authjs',
           trustHost: false,
