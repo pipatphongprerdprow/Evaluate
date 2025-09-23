@@ -50,6 +50,13 @@ const allMenus = ref([
             { label: 'ตรวจสอบ แบบประเมิน', icon: 'pi pi-fw pi-star', to: '/setting/checkevaluate' },
             { label: 'เพิ่มสิทธิ์การใช้งาน', icon: 'pi pi-fw pi-user-plus', to: '/setting/setting_user' },
         ]
+    }, 
+     {
+        id: 'Ad',
+        label: 'คำนวนค่างาน',
+        items: [ 
+            { label: 'ตรวจสอบค่างาน', icon: 'pi pi-calculator', to: '/setting/workcalculate' }, 
+        ]
     },
     {
         id: 'manual',
@@ -87,12 +94,14 @@ const model = computed(() => {
             return allMenus.value.filter(menu => ['home', 'tor', 'manual','history','torday'].includes(menu.id));//ผู้ใช้งานทั่วไป
         case '2':
            // return allMenus.value.filter(menu => ['home', 'tor', 'executive','manual'].includes(menu.id)); //ฝ่ายบุคคล
-            return allMenus.value.filter(menu => ['home', 'tor', 'executive', 'hr', 'manual','history','torday'].includes(menu.id));//ฝ่ายบุคคล
+            return allMenus.value.filter(menu => ['home', 'tor', 'executive', 'hr', 'manual','Ad','torday'].includes(menu.id));//ฝ่ายบุคคล
         case '3':
             //return allMenus.value.filter(menu => ['home', 'tor', 'executive', 'hr', 'manual'].includes(menu.id));//หน หน่วยงาน
             return allMenus.value.filter(menu => ['home', 'tor', 'executive','manual','history'].includes(menu.id));//หน หน่วยงาน
         case '4':
             return allMenus.value.filter(menu => [ 'home','executive',].includes(menu.id));//ผู้บริหารสูงขึ้นไป
+        case '5':
+            return allMenus.value.filter(menu => [ 'home', 'tor', 'manual','Ad','torday',].includes(menu.id));//admin
         default:
             return allMenus.value.filter(menu => ['home', 'manual'].includes(menu.id));
     }

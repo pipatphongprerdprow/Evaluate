@@ -154,14 +154,24 @@
                 <div class="col-12 lg:col-4">
                   <Card class="h-full">
                     <template #title>
-                      <div class="flex align-items-center">
-                        <i class="pi pi-clock mr-2 text-primary"></i>
-                        เวลารวม (นาที)
+                      <div class="flex align-items-center justify-content-between w-full">
+                        <div class="flex align-items-center">
+                          <i class="pi pi-clock mr-2 text-primary"></i>
+                          เวลารวม (นาที)
+                        </div>
+                        <!-- แสดงผลรวมเวลาทั้งปี -->
+                        <span class="text-primary font-bold">{{ totalTimeYear }} นาที/ปี</span>
                       </div>
                     </template>
+
                     <template #content>
                       <div class="h-full flex flex-column justify-content-center">
-                        <Chart type="bar" :data="timeSpentData" :options="timeSpentOptions" class="w-full" />
+                        <Chart
+                          type="bar"
+                          :data="timeSpentData"
+                          :options="timeSpentOptions"
+                          class="w-full"
+                        />
                       </div>
                     </template>
                   </Card>
@@ -992,6 +1002,9 @@ const timeSpentData = computed(() => {
       hoverBackgroundColor: TYPE_HOVERS
     }]
   };
+});
+const totalTimeYear = computed(() => {
+  return timeSpentData.value.datasets[0].data.reduce((sum, val) => sum + val, 0);
 });
 const timeSpentOptions = { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } };
 
