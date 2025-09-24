@@ -22,11 +22,13 @@
                          
                         <Dropdown v-model="tracking_date" :options="tracking_dates" :optionLabel="(item) => `${item.facuties} ${item.d_evaluationround} ${item.d_date}`" placeholder="กรุณาเลือกรอบการประเมิน" style=" max-width: 500px; width: 100%"></Dropdown> 
                     </div> 
-                    <div class="col md:col-2" >  
-                        <Button class="mb-2 mr-2" icon="pi pi-search" @click="xxr" /> &nbsp; &nbsp; &nbsp; &nbsp;   
-                        <Button label="Export" icon="pi pi-file-word" class="mr-2 mb-2 " @click="printDatatracking"></Button>
-                    </div> 
-                </div>  
+                        <Button class="mb-2 mr-2" icon="pi pi-search" :disabled="loading || !tracking_date" @click="xxr" /> &nbsp;&nbsp;&nbsp;&nbsp;
+                        <Button label="Export" icon="pi pi-file-word" class="mr-2 mb-2" :disabled="loading" @click="printDatatracking" />
+                    </div>  
+                    <div v-if="loading" class="loading-wrap">
+                        <ProgressSpinner style="width:60px;height:60px" strokeWidth="6" />
+                        <div class="mt-2">กำลังโหลดข้อมูล…</div>
+                    </div>
                 <table class="table">
                     <thead> 
                         <tr style="height: 40px;background-color: blanchedalmond;">
@@ -987,6 +989,7 @@ import TabView from 'primevue/tabview';
 import TabPanel from 'primevue/tabpanel';
 import { LogarithmicScale } from 'chart.js';
 import InputNumber from 'primevue/inputnumber'; 
+import ProgressSpinner from 'primevue/progressspinner'
 export default {
     // props: {
     //     dataPor: {
@@ -1029,6 +1032,8 @@ export default {
 
             // ตารางรายชื่อ
             products: [],
+
+             loading: false,   // ⬅️ เพิ่มตัวนี้
 
             // เพิ่มคะแนนประเมิน
             DialogAdd: false,
@@ -1153,6 +1158,16 @@ export default {
             this.postypename = postypename;
             this.postypenameid = postypenameid;
         },
+
+         async withLoading(task) {
+            this.loading = true
+            try {
+            return await task()
+            } finally {
+            this.loading = false
+            }
+        },
+
         showDataSet() {
             axios
                 .post('http://127.0.0.1:8000/api/showDateSetleader', {
@@ -1169,37 +1184,50 @@ export default {
                 });
         },
         // ตารางรายชื่อ
+         
         // xxr() {
-        //     if (this.tracking_date.evalua === undefined) {
+        //     if (this.tracking_date?.evalua === undefined) {
         //         Swal.fire({
         //             title: 'แจ้งเตือนจากระบบ!',
         //             text: 'กรุณาเลือก รอบประเมิน ก่อน!',
         //             icon: 'error'
         //         });
         //     } else {
-        //         this.showDataEvalu();
+        //         // เช็คว่า dataList เป็น array หรือไม่
+        //         if (Array.isArray(this.dataList)) {   
+        //             // กรองข้อมูลที่ไม่ใช่ "ลูกจ้างชั่วคราว"
+        //             // this.filteredData = this.dataList.filter(item => item.stftypename !== "ลูกจ้างชั่วคราว");
+        //             this.filteredData = this.dataList.filter(item => item.stftypename !== "ลูกจ้างชั่วคราว" && item.stftypename !== "พนักงานราชการ" && item.stftypename !== "ลูกจ้างประจำ"); 
+        //             // เรียกใช้ฟังก์ชัน showDataEvalu()
+        //             this.showDataEvalu();
+        //         } else {
+        //             console.error("dataList is not an array:", this.dataList);
+        //         }
         //     }
-        // },
+        // }, 
         xxr() {
             if (this.tracking_date?.evalua === undefined) {
-                Swal.fire({
-                    title: 'แจ้งเตือนจากระบบ!',
-                    text: 'กรุณาเลือก รอบประเมิน ก่อน!',
-                    icon: 'error'
-                });
-            } else {
-                // เช็คว่า dataList เป็น array หรือไม่
-                if (Array.isArray(this.dataList)) {   
-                    // กรองข้อมูลที่ไม่ใช่ "ลูกจ้างชั่วคราว"
-                    // this.filteredData = this.dataList.filter(item => item.stftypename !== "ลูกจ้างชั่วคราว");
-                    this.filteredData = this.dataList.filter(item => item.stftypename !== "ลูกจ้างชั่วคราว" && item.stftypename !== "พนักงานราชการ" && item.stftypename !== "ลูกจ้างประจำ"); 
-                    // เรียกใช้ฟังก์ชัน showDataEvalu()
-                    this.showDataEvalu();
-                } else {
-                    console.error("dataList is not an array:", this.dataList);
-                }
+                Swal.fire({ title:'แจ้งเตือนจากระบบ!', text:'กรุณาเลือก รอบประเมิน ก่อน!', icon:'error' })
+                return
             }
-        }, 
+
+            if (!Array.isArray(this.dataList)) {
+                console.error('dataList is not an array:', this.dataList)
+                return
+            }
+
+            this.filteredData = this.dataList.filter(
+                i => i.stftypename !== "ลูกจ้างชั่วคราว"
+                && i.stftypename !== "พนักงานราชการ"
+                && i.stftypename !== "ลูกจ้างประจำ"
+            )
+
+            // ⬇️ แสดงสปินเนอร์ระหว่างโหลดข้อมูล
+            this.withLoading(async () => {
+                await this.showDataEvalu()
+            })
+        },
+
         async showDataEvalu() {
             try { 
                 const res = await axios.get('http://127.0.0.1:8000/api/showDataEvalu', {  
@@ -1252,80 +1280,134 @@ export default {
             } 
         },
         // XX One
-        async openDataEvalu(data) {
-            // console.log('posnameid: ',data.posnameid);
-            // console.log('staffid: ',data.staffid); 
-            //await getAadioPosition(data.staffid);
+        // async openDataEvalu(data) {
+        //     // console.log('posnameid: ',data.posnameid);
+        //     // console.log('staffid: ',data.staffid); 
+        //     //await getAadioPosition(data.staffid);
 
-            this.getAadioPosition(data.staffid);
+        //     this.getAadioPosition(data.staffid);
             
-            if (this.tracking_date.d_date === undefined) {
-                Swal.fire('แจ้งเตือนจากระบบ', 'กรุณาเลือกรอบประเมิน', 'error');
-            } else {
-                this.dataStaffid = data.staffid;
+        //     if (this.tracking_date.d_date === undefined) {
+        //         Swal.fire('แจ้งเตือนจากระบบ', 'กรุณาเลือกรอบประเมิน', 'error');
+        //     } else {
+        //         this.dataStaffid = data.staffid;
 
-                await this.showDataEvalu();
-                //await this.showdatator();
+        //         await this.showDataEvalu();
+        //         //await this.showdatator();
 
-                this.currentstaff = this.products.filter((product) => product.staffid === this.dataStaffid);
-                this.products_Tab1 = [];
-                this.p01_scores = [
-                    { name: '0 คะแนน', code: 0 },
-                    { name: '1 คะแนน', code: 1 },
-                    { name: '2 คะแนน', code: 2 },
-                    { name: '3 คะแนน', code: 3 },
-                    { name: '4 คะแนน', code: 4 },
-                    { name: '5 คะแนน', code: 5 }
-                ];
+        //         this.currentstaff = this.products.filter((product) => product.staffid === this.dataStaffid);
+        //         this.products_Tab1 = [];
+        //         this.p01_scores = [
+        //             { name: '0 คะแนน', code: 0 },
+        //             { name: '1 คะแนน', code: 1 },
+        //             { name: '2 คะแนน', code: 2 },
+        //             { name: '3 คะแนน', code: 3 },
+        //             { name: '4 คะแนน', code: 4 },
+        //             { name: '5 คะแนน', code: 5 }
+        //         ];
 
-                // ตั้งค่า coreCompetencies กลับไปเป็นค่าเริ่มต้น
-                this.coreCompetencies = [
-                    { id: 1, activity: 'ก. 1 การมุ่งผลสัมฤทธิ์', indicator: '1', data_table1: '',selfAssessment:'' },
-                    { id: 2, activity: 'ก. 2 การบริการที่ดี', indicator: '1', data_table1: '',selfAssessment:'' },
-                    { id: 3, activity: 'ก. 3 การสั่งสมความเชี่ยวชาญในงานอาชีพ', indicator: '1', data_table1: '',selfAssessment:'' },
-                    { id: 4, activity: 'ก. 4 การยึดมั่นในความถูกต้องชอบธรรมและจริยธรรม', indicator: '1', data_table1: '',selfAssessment:'' },
-                    { id: 5, activity: 'ก. 5 การทำงานเป็นทีม', indicator: '1', data_table1: '',selfAssessment:'' }
-                ];
+        //         // ตั้งค่า coreCompetencies กลับไปเป็นค่าเริ่มต้น
+        //         this.coreCompetencies = [
+        //             { id: 1, activity: 'ก. 1 การมุ่งผลสัมฤทธิ์', indicator: '1', data_table1: '',selfAssessment:'' },
+        //             { id: 2, activity: 'ก. 2 การบริการที่ดี', indicator: '1', data_table1: '',selfAssessment:'' },
+        //             { id: 3, activity: 'ก. 3 การสั่งสมความเชี่ยวชาญในงานอาชีพ', indicator: '1', data_table1: '',selfAssessment:'' },
+        //             { id: 4, activity: 'ก. 4 การยึดมั่นในความถูกต้องชอบธรรมและจริยธรรม', indicator: '1', data_table1: '',selfAssessment:'' },
+        //             { id: 5, activity: 'ก. 5 การทำงานเป็นทีม', indicator: '1', data_table1: '',selfAssessment:'' }
+        //         ];
 
-                // ตั้งค่า jobSpecificCompetencies กลับไปเป็นค่าเริ่มต้น
-                this.jobSpecificCompetencies = [];
+        //         // ตั้งค่า jobSpecificCompetencies กลับไปเป็นค่าเริ่มต้น
+        //         this.jobSpecificCompetencies = [];
 
-                this.improvements = null;
-                this.suggestions = null;
+        //         this.improvements = null;
+        //         this.suggestions = null;
  
-                let facxx = this.tracking_date.fac_id ? this.tracking_date.fac_id : this.facid_Main;
-                await this.showdataPo(data.staffid, facxx, this.tracking_date.d_date, this.tracking_date.evalua,data.posnameid);
-                // await this.showdataPo(data.staffid, this.facid_Main, this.tracking_date.d_date, this.tracking_date.evalua,data.posnameid);
+        //         let facxx = this.tracking_date.fac_id ? this.tracking_date.fac_id : this.facid_Main;
+        //         await this.showdataPo(data.staffid, facxx, this.tracking_date.d_date, this.tracking_date.evalua,data.posnameid);
+        //         // await this.showdataPo(data.staffid, this.facid_Main, this.tracking_date.d_date, this.tracking_date.evalua,data.posnameid);
 
-                await axios.post('http://127.0.0.1:8000/api/showDataP03New', {
-                    staff_id: data.staffid,
-                    fac_id: this.tracking_date.fac_id,
-                    year_id: this.tracking_date.d_date,
-                    evalua: this.tracking_date.evalua
-                })
-                .then((res) => {
-                    // console.log('openDataEvalu: ',res.data);
-                    if (res.data && Array.isArray(res.data)) {
-                        this.products_Tab1 = res.data;
-                        this.products_Tab1.forEach((h) => {
-                            h.subP01sX.forEach((subP01) => {
-                                // ตรวจสอบว่าค่า p01_score นั้นถูกต้องหรือไม่
-                                const foundScore = this.p01_scores.find((score) => score.code === subP01.p01_score);
-                                if (foundScore) {
-                                    subP01.p01_score = foundScore.code; // ใช้ค่าที่ถูกต้อง
-                                } else {
-                                    subP01.p01_score = this.p01_scores[0].code; // ใช้ค่าเริ่มต้น "- ไม่ระบุ -"
-                                }
-                            });
-                        });
-                    }
-                    this.DialogAdd = true; 
-                })
-                .catch((error) => {
-                    console.error('Error:', error);
-                });
+        //         await axios.post('http://127.0.0.1:8000/api/showDataP03New', {
+        //             staff_id: data.staffid,
+        //             fac_id: this.tracking_date.fac_id,
+        //             year_id: this.tracking_date.d_date,
+        //             evalua: this.tracking_date.evalua
+        //         })
+        //         .then((res) => {
+        //             // console.log('openDataEvalu: ',res.data);
+        //             if (res.data && Array.isArray(res.data)) {
+        //                 this.products_Tab1 = res.data;
+        //                 this.products_Tab1.forEach((h) => {
+        //                     h.subP01sX.forEach((subP01) => {
+        //                         // ตรวจสอบว่าค่า p01_score นั้นถูกต้องหรือไม่
+        //                         const foundScore = this.p01_scores.find((score) => score.code === subP01.p01_score);
+        //                         if (foundScore) {
+        //                             subP01.p01_score = foundScore.code; // ใช้ค่าที่ถูกต้อง
+        //                         } else {
+        //                             subP01.p01_score = this.p01_scores[0].code; // ใช้ค่าเริ่มต้น "- ไม่ระบุ -"
+        //                         }
+        //                     });
+        //                 });
+        //             }
+        //             this.DialogAdd = true; 
+        //         })
+        //         .catch((error) => {
+        //             console.error('Error:', error);
+        //         });
+        //     }
+        // },   
+        async openDataEvalu(data) {
+            if (this.tracking_date.d_date === undefined) {
+                Swal.fire('แจ้งเตือนจากระบบ', 'กรุณาเลือกรอบประเมิน', 'error')
+                return
             }
-        },     
+
+            // ⬇️ ทุกงานที่ทำตอนเปิด Dialog ค่อนข้างเยอะ กดครั้งเดียวให้โชว์โหลดตลอดจนเสร็จ
+            await this.withLoading(async () => {
+                this.getAadioPosition(data.staffid)
+                this.dataStaffid = data.staffid
+
+                await this.showDataEvalu()
+                this.currentstaff = this.products.filter(p => p.staffid === this.dataStaffid)
+
+                // reset ค่าต่าง ๆ …
+                this.products_Tab1 = []
+                this.p01_scores = [
+                { name: '0 คะแนน', code: 0 }, { name: '1 คะแนน', code: 1 },
+                { name: '2 คะแนน', code: 2 }, { name: '3 คะแนน', code: 3 },
+                { name: '4 คะแนน', code: 4 }, { name: '5 คะแนน', code: 5 }
+                ]
+                this.coreCompetencies = [
+                { id:1, activity:'ก. 1 การมุ่งผลสัมฤทธิ์', indicator:'1', data_table1:'', selfAssessment:'' },
+                { id:2, activity:'ก. 2 การบริการที่ดี', indicator:'1', data_table1:'', selfAssessment:'' },
+                { id:3, activity:'ก. 3 การสั่งสมความเชี่ยวชาญในงานอาชีพ', indicator:'1', data_table1:'', selfAssessment:'' },
+                { id:4, activity:'ก. 4 การยึดมั่นในความถูกต้องชอบธรรมและจริยธรรม', indicator:'1', data_table1:'', selfAssessment:'' },
+                { id:5, activity:'ก. 5 การทำงานเป็นทีม', indicator:'1', data_table1:'', selfAssessment:'' }
+                ]
+                this.jobSpecificCompetencies = []
+                this.improvements = null
+                this.suggestions = null
+
+                const facxx = this.tracking_date.fac_id ? this.tracking_date.fac_id : this.facid_Main
+                await this.showdataPo(data.staffid, facxx, this.tracking_date.d_date, this.tracking_date.evalua, data.posnameid)
+
+                const res = await axios.post('http://127.0.0.1:8000/api/showDataP03New', {
+                staff_id: data.staffid,
+                fac_id: this.tracking_date.fac_id,
+                year_id: this.tracking_date.d_date,
+                evalua: this.tracking_date.evalua
+                })
+                if (Array.isArray(res.data)) {
+                this.products_Tab1 = res.data
+                this.products_Tab1.forEach(h => {
+                    h.subP01sX.forEach(sub => {
+                    const found = this.p01_scores.find(s => s.code === sub.p01_score)
+                    sub.p01_score = found ? found.code : this.p01_scores[0].code
+                    })
+                })
+                }
+                this.DialogAdd = true
+            })
+         },
+        
 
         
         // เพิ่มคะแนนประเมิน biwgin
@@ -2514,4 +2596,16 @@ td:nth-child(3) {
 .left-align {
     text-align: left;
 }
+.loading-wrap{
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  padding:32px; color:#555;
+}
+
+.loading-overlay{
+  position: fixed; inset: 0;
+  background: rgba(255,255,255,.7);
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  z-index: 9999;
+}
+
 </style>

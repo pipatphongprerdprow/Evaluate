@@ -45,7 +45,7 @@
             <col style="width: 14%" />
             <col style="width: 14%" />
             <col style="width: 8%" />
-            <col style="width: 10%" /> <!-- ค่างานปัจจุบัน (ผลรวมใหม่) -->
+            <col style="width: 10%" />
           </colgroup>
 
           <thead>
@@ -64,24 +64,36 @@
           </thead>
 
           <tbody>
-            <tr v-for="(Item, index) in viewRows" :key="Item.staffid ?? index">
+            <tr v-for="(Item, index) in viewRows" :key="Item.staffid ?? Item.staff_id ?? index">
               <td class="text-center">{{ index + 1 }}</td>
-              <td class="left"><b class="blue">{{ Item.prefixfullname }} {{ Item.namefully }}</b></td>
+              <td class="left">
+                <b class="blue">{{ [Item.prefixfullname, Item.namefully].filter(Boolean).join(' ') }}</b>
+              </td>
               <td class="text-center"><b class="blue">{{ Item.posnameth || '—' }}</b></td>
 
               <!-- ส่วนงาน -->
-              <td class="text-center">{{ toFix(Item.work_main) }}</td>
-              <td class="text-center">{{ toFix(Item.work_other_position) }}</td>
-              <td class="text-center">{{ toFix(Item.work_misc) }}</td>
+              <td class="text-center">{{ formatDays(Item.work_main) }}</td>
+              <td class="text-center">{{ formatDays(Item.work_other_position) }}</td>
+              <td class="text-center">{{ formatDays(Item.work_misc) }}</td>
 
               <!-- ค่างานปัจจุบัน = ผลรวมของ 3 ช่องข้างต้น -->
-              <td class="text-center">{{ toFix(Item.current_value) }}</td>
+              <td class="text-center">{{ formatDays(Item.current_value) }}</td>
             </tr>
 
             <tr v-if="!viewRows.length">
               <td colspan="7" class="text-center">— ไม่พบข้อมูล —</td>
             </tr>
           </tbody>
+
+          <tfoot v-if="viewRows.length">
+            <tr>
+              <td colspan="3" class="left"><b>รวม</b></td>
+              <td class="text-center"><b>{{ formatDays(totals.main) }}</b></td>
+              <td class="text-center"><b>{{ formatDays(totals.other) }}</b></td>
+              <td class="text-center"><b>{{ formatDays(totals.misc) }}</b></td>
+              <td class="text-center"><b>{{ formatDays(totals.total) }}</b></td>
+            </tr>
+          </tfoot>
         </table>
 
       </div>
@@ -94,6 +106,14 @@ import axios from 'axios'
 import { ref, onMounted, computed } from 'vue'
 import ProgressSpinner from 'primevue/progressspinner'
 import Dropdown from 'primevue/dropdown'
+
+// ถ้ามี composable useAuth อยู่แล้ว ให้ import ให้ถูก path ของโปรเจกต์
+// import { useAuth } from '@/composables/useAuth'
+
+const API = axios.create({
+  baseURL: 'http://127.0.0.1:8000/api',
+  timeout: 20000,
+})
 
 const products = ref([])
 const tracking_date = ref(null)
@@ -110,56 +130,92 @@ const facultyOptions = computed(() => {
   const map = new Map()
   for (const p of products.value) {
     const id = p.facultyid ?? p.fac_id
-    const name = p.facultyname ?? p.facuties
-    if (id != null && name) map.set(id, name)
+    const name = p.facultyname ?? p.facuties ?? p.fac_name
+    if (id != null && name) map.set(String(id), String(name))
   }
-  return [{ label: 'ทั้งหมด', value: null }, ...Array.from(map, ([value, label]) => ({ label, value }))]
+  const opts = Array.from(map, ([value, label]) => ({ label, value }))
+  return [{ label: 'ทั้งหมด', value: null }, ...opts]
 })
 const filteredProducts = computed(() => {
   if (!selectedFaculty.value) return products.value
-  return products.value.filter(p => (p.facultyid ?? p.fac_id) === selectedFaculty.value)
+  return products.value.filter(p => String(p.facultyid ?? p.fac_id) === String(selectedFaculty.value))
 })
- 
+
+// viewRows ใช้ current_value ที่ “คำนวณใหม่แล้ว”
 const viewRows = computed(() => filteredProducts.value)
 
+const totals = computed(() => {
+  const acc = { main: 0, other: 0, misc: 0, total: 0 }
+  for (const r of viewRows.value) {
+    const m = Number(r.work_main || 0)
+    const o = Number(r.work_other_position || 0)
+    const s = Number(r.work_misc || 0)
+    acc.main  += m
+    acc.other += o
+    acc.misc  += s
+    acc.total += (Number(r.current_value || (m + o + s)) || 0)
+  }
+  return acc
+})
+
+// ---- Session ----
 const { getSession } = await useAuth()
 const user = await getSession()
-const { STAFFID, SCOPES } = user.user.name
-const { staffdepartment, groupid } = SCOPES
+const STAFFID = user?.user?.name?.STAFFID ?? user?.user?.STAFFID ?? ''
+const SCOPES  = user?.user?.name?.SCOPES  ?? user?.user?.SCOPES  ?? {}
+const staffdepartment = SCOPES?.staffdepartment ?? ''
+const groupid         = SCOPES?.groupid ?? ''
 
 function setSession(staffid, facid, groupidX) {
-  staffid_Main.value = staffid
-  facid_Main.value   = facid
-  groupid_Main.value = groupidX
+  staffid_Main.value = staffid ?? ''
+  facid_Main.value   = facid ?? ''
+  groupid_Main.value = groupidX ?? ''
 }
 
 function toFix(val) {
   const n = Number(val)
-  return isNaN(n) ? '—' : n.toFixed(2)
+  if (!isFinite(n) || isNaN(n)) return '—'
+  // ถ้าติดลบจากข้อมูลไม่ครบ ให้แสดง 0.00
+  return (n < 0 ? 0 : n).toFixed(2)
+}
+function formatDays(val) {
+  return toFix(val)
 }
 
+// ---- Loaders ----
 async function showDataSetAndAutoLoad() {
+  loading.value = true
   try {
-    loading.value = true
-    const res = await axios.post('http://127.0.0.1:8000/api/showDateSetleader', {
+    const res = await API.post('/showDateSetleader', {
       staff_id: staffid_Main.value,
       fac_id:   facid_Main.value,
       group_id: groupid_Main.value
     })
-    tracking_dates.value = Array.isArray(res.data) ? res.data : []
+    const arr = Array.isArray(res.data) ? res.data : []
+    // กันวันที่ซ้ำ + sort desc โดย fallback เป็น 0
+    const seen = new Set()
+    tracking_dates.value = arr.filter(x => {
+      const key = [x?.fac_id, x?.evalua, x?.d_date].join('|')
+      if (seen.has(key)) return false
+      seen.add(key)
+      return true
+    }).sort((a, b) => {
+      const da = Date.parse(a?.d_date ?? '') || 0
+      const db = Date.parse(b?.d_date ?? '') || 0
+      return db - da
+    })
 
     if (tracking_dates.value.length) {
-      const sorted = [...tracking_dates.value].sort((a, b) => {
-        const da = Date.parse(a?.d_date ?? '')
-        const db = Date.parse(b?.d_date ?? '')
-        if (isNaN(da) || isNaN(db)) return 0
-        return db - da
-      })
-      tracking_date.value = sorted[0] || tracking_dates.value[0]
-
+      tracking_date.value = tracking_dates.value[0]
       await showDataEvalu()
-      await fetchWorkloadSummary()    
+      await fetchWorkloadSummary()
+    } else {
+      // ไม่มีวันที่ให้โหลด ตั้งค่าว่าง
+      products.value = []
     }
+  } catch (e) {
+    console.error('showDataSetAndAutoLoad error', e)
+    products.value = []
   } finally {
     loading.value = false
   }
@@ -167,67 +223,76 @@ async function showDataSetAndAutoLoad() {
 
 async function showDataEvalu() {
   if (!tracking_date.value) return
-  const res = await axios.get('http://127.0.0.1:8000/api/showDataEvalu', {
-    params: {
-      staff_id: staffid_Main.value,
-      fac_id:   tracking_date.value?.fac_id,
-      group_id: groupid_Main.value,
-      evalua:   tracking_date.value?.evalua,
-      p_year:   tracking_date.value?.d_date
-    }
-  })
-
-  products.value = (Array.isArray(res.data) ? res.data : []).map(r => ({
-    ...r, 
-    original_current_value: r.current_value, 
-    work_main: 0,
-    work_other_position: 0,
-    work_misc: 0, 
-    current_value: 0,
-  }))
+  try {
+    const res = await API.get('/showDataEvalu', {
+      params: {
+        staff_id: staffid_Main.value,
+        fac_id:   tracking_date.value?.fac_id ?? null,
+        group_id: groupid_Main.value,
+        evalua:   tracking_date.value?.evalua ?? null,
+        p_year:   tracking_date.value?.d_date ?? null
+      }
+    })
+    products.value = (Array.isArray(res.data) ? res.data : []).map(r => ({
+      ...r,
+      original_current_value: r.current_value,
+      work_main: 0,
+      work_other_position: 0,
+      work_misc: 0,
+      current_value: 0,
+    }))
+  } catch (e) {
+    console.error('showDataEvalu error', e)
+    products.value = []
+  }
 }
 
 async function fetchWorkloadSummary() {
-  const resp = await axios.post('http://127.0.0.1:8000/api/showplannew', {
-    fac_id:   tracking_date.value?.fac_id ?? null,
-    staff_id: null,
-    keyword:  null,
-  })
+  if (!tracking_date.value) return
+  try {
+    const resp = await API.post('/showplannew', {
+      fac_id:   tracking_date.value?.fac_id ?? null,
+      staff_id: null,
+      keyword:  null,
+    })
+    const workloadSummary = resp?.data?.workloadSummary || {}
+    const sumByStaff = new Map()
 
-  const workloadSummary = resp?.data?.workloadSummary || {}
-  const sumByStaff = new Map()
- 
-  for (const planId of Object.keys(workloadSummary)) {
-    const bucket = workloadSummary[planId] || {}
-    for (const rawStaffId of Object.keys(bucket)) {
-      const byType = bucket[rawStaffId]?.byType || {}
-      const cur = sumByStaff.get(String(rawStaffId)) || { main: 0, other_position: 0, misc: 0 }
-      sumByStaff.set(String(rawStaffId), {
-        main:           cur.main + Number(byType?.main?.days || 0),
-        other_position: cur.other_position + Number(byType?.other_position?.days || 0),
-        misc:           cur.misc + Number(byType?.misc?.days || 0),
-      })
+    for (const planId of Object.keys(workloadSummary)) {
+      const bucket = workloadSummary[planId] || {}
+      for (const rawStaffId of Object.keys(bucket)) {
+        const byType = bucket[rawStaffId]?.byType || {}
+        const cur = sumByStaff.get(String(rawStaffId)) || { main: 0, other_position: 0, misc: 0 }
+        sumByStaff.set(String(rawStaffId), {
+          main:           cur.main + Number(byType?.main?.days || 0),
+          other_position: cur.other_position + Number(byType?.other_position?.days || 0),
+          misc:           cur.misc + Number(byType?.misc?.days || 0),
+        })
+      }
     }
+
+    products.value = products.value.map(row => {
+      const key = String(row?.staffid ?? row?.staff_id ?? '')
+      const found = sumByStaff.get(key)
+      if (!found) return row
+
+      const main  = Number(found.main || 0)
+      const other = Number(found.other_position || 0)
+      const misc  = Number(found.misc || 0)
+      const total = main + other + misc
+
+      return {
+        ...row,
+        work_main:           main,
+        work_other_position: other,
+        work_misc:           misc,
+        current_value:       total,
+      }
+    })
+  } catch (e) {
+    console.error('fetchWorkloadSummary error', e)
+    // ถ้าดึง summary ไม่ได้ ให้คงค่าเดิมไว้
   }
- 
-  products.value = products.value.map(row => {
-    const key = String(row?.staffid ?? row?.staff_id ?? '')
-    const found = sumByStaff.get(key)
-    if (!found) return row
-
-    const main  = Number(found.main || 0)
-    const other = Number(found.other_position || 0)
-    const misc  = Number(found.misc || 0)
-    const total = main + other + misc    
-
-    return {
-      ...row,
-      work_main:           main,
-      work_other_position: other,
-      work_misc:           misc,
-      current_value:       total,   
-    }
-  })
 }
 
 const emit = defineEmits(['open'])

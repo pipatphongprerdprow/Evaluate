@@ -50,9 +50,10 @@
             โปรดเลือก <b>ปีงบประมาณ</b> และ <b>ไตรมาส</b> แล้วกด “ค้นหา”
           </div>
 
-          <div v-else-if="searching" class="p-4 text-600 text-center">
-            <i class="pi pi-spin pi-spinner mr-2"></i>กำลังโหลดข้อมูล…
-          </div>
+         <div v-else-if="searching" class="p-4 text-600 text-center flex align-items-center justify-content-center">
+            <ProgressSpinner style="width:32px;height:32px" strokeWidth="6" />
+            <span class="ml-2">กำลังโหลดข้อมูล…</span>
+        </div>
 
           <template v-else>
             <!-- เนื้อหา leaderboard เดิมของคุณ ย้ายมาวางตรงนี้ -->
@@ -131,8 +132,7 @@
                 {{ currentStaffDetail?.staffname || currentStaffDetail?.namefully || '-' }}
                 {{ currentStaffDetail?.staffsurname || '' }}
               </p>
-            </template>
-
+            </template> 
             <div class="p-4 dashboard-section">
               <div class="grid p-fluid">
                 <div class="col-12 lg:col-4">
@@ -438,6 +438,12 @@
               <Button label="ปิด" severity="danger" @click="dailyTaskDialogVisible = false" />
             </template>
           </Dialog>
+          <Transition name="fade">
+            <div v-if="searching" class="loading-fab" aria-live="polite" aria-busy="true">
+              <ProgressSpinner style="width:28px;height:28px" strokeWidth="6" />
+              <span class="ml-2">กำลังโหลดข้อมูล…</span>
+            </div>
+          </Transition>
         </div>
       </div>
     </div>
@@ -453,6 +459,7 @@ import Chart from 'primevue/chart';
 import Card from 'primevue/card';
 import Divider from 'primevue/divider';
 import Sidebar from 'primevue/sidebar';
+import ProgressSpinner from 'primevue/progressspinner'
 
 const { getSession } = await useAuth(); 
 /* ---------- CONFIG ---------- */
@@ -1186,6 +1193,29 @@ defineExpose({
 .status-legend-item.pending { background: #9ca3af; }       /* เทา */
 .status-legend-item.in-progress { background: #f59e0b; }   /* เหลือง */
 .status-legend-item.completed { background: #22c55e; }     /* เขียว */
+
+/* แถบโหลดลอยด้านล่าง */
+.loading-fab {
+  position: fixed;
+  left: 50%;
+  bottom: 20px;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  padding: 10px 14px;
+  background: rgba(17, 24, 39, 0.92);
+  color: #fff;
+  border-radius: 9999px;
+  box-shadow: 0 8px 24px rgba(0,0,0,.18);
+  z-index: 9999;
+  backdrop-filter: blur(4px);
+}
+
+/* ทรานซิชันจางเข้าออก */
+.fade-enter-active, .fade-leave-active { transition: opacity .18s ease; }
+.fade-enter-from, .fade-leave-to { opacity: 0; }
+
+
  
 </style>
 
