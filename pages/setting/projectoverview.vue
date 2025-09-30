@@ -1,6 +1,5 @@
 <template>
-  <div class="page-wrap"> 
-    <!-- ===== HERO / KPI ===== -->
+  <div class="page-wrap">  
     <div class="hero">
       <div class="hero-left">
         <div class="hero-title">
@@ -26,9 +25,7 @@
           <div class="kpi-value">{{ averageProgress }}%</div>
         </div>
       </div>
-    </div>  
-    
-    <!-- ===== FILTER BAR ===== -->
+    </div>   
     <div class="filterbar card">
       <div class="grid align-items-end">
         <div class="col-12 md:col-3">
@@ -43,9 +40,13 @@
           <label class="block text-600 mb-1">ประเภทแผน</label>
           <Dropdown v-model="selectedPlanType" :options="planOptions" optionLabel="label" optionValue="value" class="w-full" placeholder="ทั้งหมด"/>
         </div>
-        <div class="col-12 md:col-3">
+        <!-- <div class="col-12 md:col-3">
           <label class="block text-600 mb-1">คณะ/หน่วยงาน/กอง</label>
           <Dropdown v-model="selectedDepartment" :options="departmentOptions" optionLabel="label" optionValue="value" class="w-full" placeholder="ทั้งหมด"/>
+        </div> -->
+        <div class="col-12 md:col-3">
+          <label class="block text-600 mb-1">คณะ/หน่วยงาน/กอง</label>
+          <Dropdown v-model="selectedDepartment" :options="departmentOptions" optionLabel="label" optionValue="value" class="w-full" placeholder="ทั้งหมด" :disabled="!isAdmin"/>
         </div>
 
         <div class="col-12 md:col-6 mt-3">
@@ -65,9 +66,7 @@
           <small class="text-600">กำลังโหลดข้อมูล…</small>
         </div>
       </div>
-    </div>
-
-    <!-- ===== DASHBOARD ===== -->
+    </div> 
     <div class="card p-3 mb-3"> 
       <div class="grid p-fluid"> 
         <!-- ประเภทแผน -->
@@ -89,8 +88,7 @@
               <div class="text-600 text-sm mt-2">รวม: <b>{{ dashTotals.total }}</b> โครงการ</div>
             </template>
           </Card>
-        </div>
-
+        </div> 
         <!-- สถานะโครงการ -->
         <div class="col-12 lg:col-4">
           <Card class="h-full dash-card">
@@ -168,18 +166,12 @@
               <div class="relative">
                 <div v-if="searching" class="overlay-loading">
                   <ProgressSpinner style="width:28px;height:28px" strokeWidth="6" />
-                </div>
-
+                </div> 
                 <!-- กราฟแท่งแสดงเวลารวม (นาที) ต่อประเภทแผน -->
-                <Chart type="bar" :data="planTypeMinutesChartData" :options="planTypeMinutesChartOptions" />
-
+                <Chart type="bar" :data="planTypeMinutesChartData" :options="planTypeMinutesChartOptions" /> 
                 <!-- รายการสรุปด้านล่าง (เรียงจากมาก -> น้อย) -->
                 <div class="mt-3">
-                  <div
-                    v-for="row in planTypeMinutesList"
-                    :key="row.type"
-                    class="flex justify-content-between align-items-center py-1 border-bottom-1 surface-border"
-                  >
+                  <div v-for="row in planTypeMinutesList" :key="row.type" class="flex justify-content-between align-items-center py-1 border-bottom-1 surface-border">
                     <div class="text-700">
                       <i class="pi pi-sitemap mr-2"></i>{{ row.type }}
                     </div>
@@ -191,27 +183,14 @@
           </Card>
         </div> 
       </div>
-    </div>
-
-    <!-- ===== TABLE ===== -->
+    </div> 
     <div class="card p-3"> 
       <div v-if="searching" class="p-6 text-600 text-center flex align-items-center justify-content-center">
         <ProgressSpinner style="width:36px;height:36px" strokeWidth="6" />
         <span class="ml-2">กำลังโหลดข้อมูล…</span>
-      </div>
-
+      </div> 
       <template v-else>
-        <DataTable
-          ref="dt"
-          :value="filteredProjects"
-          :paginator="true"
-          :rows="10"
-          :rowsPerPageOptions="[10,20,50]"
-          dataKey="__key"
-          responsiveLayout="scroll"
-          stripedRows
-          class="elevated-table"
-        >
+        <DataTable  ref="dt" :value="filteredProjects" :paginator="true" :rows="10" :rowsPerPageOptions="[10,20,50]" dataKey="__key" responsiveLayout="scroll" stripedRows class="elevated-table">
           <Column header="ไตรมาส" style="width: 10rem; text-align:center">
             <template #body="slotProps">
               <Tag :value="getQuarter(slotProps.data.startDate)" severity="info" />
@@ -228,7 +207,7 @@
             <template #body="slotProps">
               <Tag :value="getPlanType(slotProps.data)" :severity="getPlanTypeSeverity(getPlanType(slotProps.data))" class="font-semibold"/>
             </template>
-          </Column>
+          </Column> 
 
           <!-- ===== WOW: ชื่อโครงการ + Owners Avatar + Accent ===== -->
           <Column field="planLabel" header="ชื่อแผนงาน/โครงการ" style="min-width: 22rem">
@@ -246,51 +225,27 @@
                 </div>
                 <div class="cell-owners" v-if="(slotProps.data.owner||[]).length">
                   <AvatarGroup>
-                    <Avatar
-                      v-for="(o, i) in (slotProps.data.owner||[]).slice(0,4)"
-                      :key="i"
-                      :label="initials(o.name)"
-                      shape="circle"
-                      class="owner-avatar"
-                      :class="colorSeed(o.name)"
-                    />
-                    <Avatar
-                      v-if="(slotProps.data.owner||[]).length > 4"
-                      :label="`+${(slotProps.data.owner||[]).length-4}`"
-                      shape="circle"
-                      class="owner-avatar more"
-                    />
+                    <Avatar v-for="(o, i) in (slotProps.data.owner||[]).slice(0,4)" :key="i" :label="initials(o.name)" shape="circle" class="owner-avatar" :class="colorSeed(o.name)"/>
+                    <Avatar v-if="(slotProps.data.owner||[]).length > 4" :label="`+${(slotProps.data.owner||[]).length-4}`" shape="circle" class="owner-avatar more"/>
                   </AvatarGroup>
                 </div>
               </div>
             </template>
-          </Column>
-
+          </Column> 
           <Column header="เวลารวม (นาที)" style="width: 10rem; text-align:center">
             <template #body="slotProps">
               <span class="font-semibold">{{ getPlanTotalMinutes(slotProps.data).toLocaleString() }}</span>
             </template>
-          </Column>
-
-          <!-- ===== WOW: Radial progress ===== -->
+          </Column> 
           <Column header="ความคืบหน้า" style="width: 10.5rem; text-align:center">
             <template #body="slotProps">
-              <div
-                class="radial-wrap"
-                :style="radialStyle(getPlanProgress(slotProps.data))"
-                :class="{
-                  'rc-success': getPlanStatusLabel(slotProps.data)==='เสร็จสิ้น',
-                  'rc-warn': getPlanStatusLabel(slotProps.data)==='อยู่ระหว่างดำเนินการ'
-                }"
-              >
+              <div  class="radial-wrap" :style="radialStyle(getPlanProgress(slotProps.data))" :class="{ 'rc-success': getPlanStatusLabel(slotProps.data)==='เสร็จสิ้น', 'rc-warn': getPlanStatusLabel(slotProps.data)==='อยู่ระหว่างดำเนินการ' }">
                 <div class="radial-core">
                   <div class="radial-num">{{ getPlanProgress(slotProps.data) }}%</div>
                 </div>
               </div>
             </template>
-          </Column>
-
-          <!-- ===== WOW: Status pill ===== -->
+          </Column> 
           <Column header="สถานะ" style="width: 10rem; text-align:center">
             <template #body="slotProps">
               <span class="status-pill" :class="getPlanStatusSeverity(slotProps.data)">
@@ -300,21 +255,13 @@
                 {{ getPlanStatusLabel(slotProps.data) }}
               </span>
             </template>
-          </Column>
-
+          </Column> 
           <Column header="รายละเอียด" style="width: 8rem; text-align:center">
             <template #body="slotProps">
-              <Button
-                label="รายละเอียด"
-                icon="pi pi-search"
-                class="p-button-sm"
-                :disabled="searching"
-                @click="openPlanDrawer(null, slotProps.data)"
-              />
+              <Button label="รายละเอียด" icon="pi pi-search" class="p-button-sm" :disabled="searching" @click="openPlanDrawer(null, slotProps.data)"/>
             </template>
           </Column>
-        </DataTable>
-
+        </DataTable> 
         <div v-if="filteredProjects.length === 0" class="text-center text-500 py-5">
           ไม่พบโครงการตามเงื่อนไขที่เลือก
         </div>
@@ -340,14 +287,12 @@
           <div class="summary-item"><i class="pi pi-clock text-600 mr-2"></i>เวลารวม: <b>{{ getPlanTotalMinutes(selectedPlan).toLocaleString() }}</b> นาที</div>
           <div class="summary-item"><i class="pi pi-sitemap text-600 mr-2"></i>{{ getQuarter(selectedPlan.startDate) }}</div>
           <div class="summary-item"><i class="pi pi-calendar-times text-600 mr-2"></i>ปีงบฯ: <b>{{ getYearBE(selectedPlan.startDate) }}</b></div>
-        </div>
-
+        </div> 
         <div class="legend">
           <span class="dot dot-gray"></span> รอดำเนินการ
           <span class="dot dot-amber ml-3"></span> อยู่ระหว่างดำเนินการ
           <span class="dot dot-green ml-3"></span> เสร็จสิ้น
-        </div>
-
+        </div> 
         <div class="timeline">
           <div v-for="(st, idx) in (selectedPlan.steps || [])" :key="st.id ?? idx" class="step-card">
             <div class="step-marker" :class="statusClass(getStepStatus(st))"></div>
@@ -400,9 +345,8 @@ import Chart from 'primevue/chart'
 import Avatar from 'primevue/avatar'
 import AvatarGroup from 'primevue/avatargroup'
 
-const { getSession } = await useAuth()
+const { getSession } = await useAuth() 
 
-/* ---------- CONFIG ---------- */
 const API = 'http://127.0.0.1:8000/api'
 
 /* ===== state หลัก ===== */
@@ -411,15 +355,12 @@ const facIdMain = ref('')
 const groupIdMain = ref('')
 const selectedEvaluationRound = ref(null)
 const evaluationRounds = ref([])
-const products = ref([])
-
-// const hasSearched = ref(false)
+const products = ref([]) 
 const hasSearched = ref(true)
 const searching = ref(false)
 let reqSeq = 0
 let debounceTimer = null
-
-/* ===== เวลารวมตามประเภทแผน (อิง filteredProjects ปัจจุบัน) ===== */
+ 
 const planTypeMinutesMap = computed(() => {
   const map = new Map()
   ;(filteredProjects.value || []).forEach(p => {
@@ -429,8 +370,7 @@ const planTypeMinutesMap = computed(() => {
   })
   return map
 })
-
-/* list สำหรับแสดงใต้กราฟ (เรียงมาก -> น้อย) */
+ 
 const planTypeMinutesList = computed(() => {
   return Array.from(planTypeMinutesMap.value.entries())
     .map(([type, minutes]) => ({ type, minutes }))
@@ -467,8 +407,7 @@ const planTypeMinutesChartOptions = {
     tooltip: {
       callbacks: {
         label: (ctx) => {
-          const val = Number(ctx.raw || 0)
-          // แสดงนาที + คิดเป็นชั่วโมงโดยคร่าว ๆ
+          const val = Number(ctx.raw || 0) 
           const hrs = (val / 60).toFixed(1)
           return ` ${val.toLocaleString()} นาที (~${hrs} ชม.)`
         }
@@ -497,6 +436,16 @@ const planOptions = [
 ]
 
 const selectedDepartment = ref('ALL')
+// const departmentOptions = computed(() => {
+//   const set = new Map()
+//   ;(products.value || []).forEach(p => {
+//     const id = String(p.departmentid || p.fac_id || '')
+//     const name = p.departmentname || p.fac_name || 'ไม่ระบุหน่วยงาน'
+//     if (!set.has(id)) set.set(id, name)
+//   })
+//   return [{ label: 'ทั้งหมด', value: 'ALL' }, ...Array.from(set, ([value, label]) => ({ value, label }))]
+// })
+
 const departmentOptions = computed(() => {
   const set = new Map()
   ;(products.value || []).forEach(p => {
@@ -504,7 +453,14 @@ const departmentOptions = computed(() => {
     const name = p.departmentname || p.fac_name || 'ไม่ระบุหน่วยงาน'
     if (!set.has(id)) set.set(id, name)
   })
-  return [{ label: 'ทั้งหมด', value: 'ALL' }, ...Array.from(set, ([value, label]) => ({ value, label }))]
+
+  const arr = [{ label: 'ทั้งหมด', value: 'ALL' }, ...Array.from(set, ([value, label]) => ({ value, label }))]
+
+  if (isAdmin.value) return arr
+  // non-admin: แสดงเฉพาะคณะของตน (ถ้าไม่มี id จะ fallback เป็นทั้งหมด 1 รายการไม่รวม ALL)
+  const myId = String(facIdMain.value || '')
+  const onlyMine = arr.filter(o => String(o.value) === myId)
+  return onlyMine.length ? onlyMine : arr.filter(o => o.value !== 'ALL')
 })
 
 /* ปีงบ + ไตรมาส */
@@ -641,9 +597,12 @@ async function buildProjectBoard() {
   projects.value = [];
   const { start, end } = periodRange.value;
 
-  // facIds เป้าหมาย
   let facIds = []
-  if (selectedDepartment.value !== 'ALL') {
+  const myFac = String(facIdMain.value || '')
+
+  if (!isAdmin.value) {
+    facIds = myFac ? [myFac] : []
+  } else if (selectedDepartment.value !== 'ALL') {
     facIds = [String(selectedDepartment.value)]
   } else {
     const set = new Set()
@@ -876,8 +835,7 @@ function getStepProgress(step){
     score += ts === 'เสร็จสิ้น' ? 1 : ts === 'อยู่ระหว่างดำเนินการ' ? 0.5 : 0
   })
   return Math.round((score / tasks.length) * 100)
-}
-/* WOW helpers */
+} 
 function initials(name='') {
   const parts = String(name).trim().split(/\s+/).slice(0,2)
   return parts.map(p=>p[0]?.toUpperCase?.() || '').join('')
@@ -1015,8 +973,7 @@ async function exportCSV() {
     confirmButtonText: '📊 สรุปรายโครงการ',
     denyButtonText: '📝 รายละเอียดงานย่อย',
     cancelButtonText: 'ยกเลิก'
-  });
-
+  }); 
   if (action) {
     // ถ้ากดปุ่ม Confirm (สรุปรายโครงการ)
     downloadCSV('สรุปรายโครงการ.csv', exportProjectRows.value);
@@ -1028,11 +985,19 @@ async function exportCSV() {
   }
 }
 /* ---------- Reset Filters (ใช้แทนของเดิมได้เลย) ---------- */
+// function resetFilters(){
+//   selectedFYBE.value = thisFY + 543
+//   selectedQuarter.value = 'ALL'
+//   selectedPlanType.value = 'ALL'
+//   selectedDepartment.value = 'ALL'
+//   tableSearch.value = ''
+//   handleSearch()
+// }
 function resetFilters(){
   selectedFYBE.value = thisFY + 543
   selectedQuarter.value = 'ALL'
   selectedPlanType.value = 'ALL'
-  selectedDepartment.value = 'ALL'
+  selectedDepartment.value = isAdmin.value ? 'ALL' : String(facIdMain.value || '')
   tableSearch.value = ''
   handleSearch()
 }
@@ -1069,8 +1034,26 @@ watch(selectedFYBE, (be) => {
 })
 watch(selectedQuarter, () => { if (selectedFYBE.value) handleSearchDebounced() })
 watch([selectedPlanType, selectedDepartment], () => { handleSearchDebounced() })
+ 
 
 /* ===== เริ่มต้น ===== */
+// onMounted(async ()=>{
+//   const session = await getSession()
+//   if(session?.user?.name){
+//     const { STAFFID, SCOPES } = session.user.name
+//     const { staffdepartment, groupid } = SCOPES || {}
+//     staffIdMain.value = String(STAFFID || '')
+//     facIdMain.value = String(staffdepartment || '')
+//     groupIdMain.value = String(groupid || '')
+//     await fetchEvaluationRounds()
+//     if(evaluationRounds.value.length>0){
+//       selectedEvaluationRound.value = evaluationRounds.value[0]
+//       await handleSearch()
+//     }
+//   }
+// }) 
+const isAdmin = ref(false)
+
 onMounted(async ()=>{
   const session = await getSession()
   if(session?.user?.name){
@@ -1079,6 +1062,18 @@ onMounted(async ()=>{
     staffIdMain.value = String(STAFFID || '')
     facIdMain.value = String(staffdepartment || '')
     groupIdMain.value = String(groupid || '')
+ 
+    const roles = []
+        .concat(SCOPES?.roles || [])
+        .concat(SCOPES?.role ? [SCOPES.role] : [])
+        .map(r=>String(r).toLowerCase())
+      isAdmin.value = SCOPES?.is_admin === true || roles.includes('admin') || roles.includes('superadmin')
+
+      // ถ้าไม่ใช่แอดมิน → ล็อคคณะทันที
+      if(!isAdmin.value && facIdMain.value){
+        selectedDepartment.value = String(facIdMain.value)
+    }
+
     await fetchEvaluationRounds()
     if(evaluationRounds.value.length>0){
       selectedEvaluationRound.value = evaluationRounds.value[0]
@@ -1086,174 +1081,159 @@ onMounted(async ()=>{
     }
   }
 })
+
 </script>
 
-<style>
-/* ===== Layout base ===== */
-.page-wrap{ display:flex; flex-direction:column; gap:1rem; }
+<style> 
+  .page-wrap{ display:flex; flex-direction:column; gap:1rem; }
+  
+  .hero{
+    background: linear-gradient(135deg, #eef2ff 0%, #ecfeff 100%);
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    padding: 18px 20px;
+    display:flex; align-items:center; justify-content:space-between; gap:16px;
+  }
+  .hero-title{
+    font-size: 1.25rem; font-weight: 800; color:#0f172a;
+    display:flex; align-items:center;
+  }
+  .hero-sub{ color:#475569; font-size:.9rem; }
+  
+  .kpi-row{ display:grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap:10px; width: 52%; }
+  .kpi-card{
+    background: linear-gradient(180deg, rgba(255,255,255,.9), rgba(255,255,255,.75));
+    backdrop-filter: blur(6px);
+    border:1px solid rgba(226,232,240,.9); border-radius:14px; padding:10px 12px;
+    box-shadow:0 8px 24px rgba(15,23,42,.08), inset 0 1px 0 rgba(255,255,255,.8);
+    transition: transform .18s ease, box-shadow .18s ease;
+  }
+  .kpi-card:hover{ transform: translateY(-2px); box-shadow: 0 14px 32px rgba(15,23,42,.12); }
+  .kpi-label{ color:#64748b; font-size:.8rem; }
+  .kpi-value{ font-weight:800; font-size:1.3rem; color:#0f172a; }
+  
+  .filterbar{
+    position: sticky; top: 8px; z-index: 20;
+    padding: 14px 16px !important; border-radius: 14px;
+    border:1px solid #eef2f7;
+    box-shadow:0 6px 24px rgba(2,6,23,.06);
+  }
+  
+  .dash-center{
+    position:absolute; inset:0;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    pointer-events:none;
+  }
+  .dot{ width:10px; height:10px; border-radius:9999px; margin:0 auto; }
+  .dot-gray{ background:#9CA3AF; }
+  .dot-amber{ background:#F59E0B; }
+  .dot-green{ background:#22C55E; }
+  .card-head{ font-weight:700; color:#0f172a; display:flex; align-items:center; }
+  .card-head.between{ display:flex; align-items:center; justify-content:space-between; }
+  .dash-card{ border-radius:14px; border:1px solid #eef2f7; }
+  
+  .overlay-loading{
+    position:absolute; inset:0;
+    background: rgba(255,255,255,.7);
+    display:flex; align-items:center; justify-content:center;
+    z-index: 5;
+    border-radius: .75rem;
+    text-align: center;
+    padding: 12px;
+  }
+  
+  .elevated-table{ box-shadow: 0 8px 18px rgba(2,6,23,.05); border-radius: 12px; }
+  .p-datatable .p-datatable-tbody > tr{
+    transition: background .15s ease, box-shadow .15s ease, transform .15s ease;
+  }
+  .p-datatable .p-datatable-tbody > tr:hover{
+    background: #fbfdff;
+    box-shadow: 0 8px 18px rgba(2,6,23,.06);
+    transform: translateZ(0);
+  }
 
-/* ===== HERO ===== */
-.hero{
-  background: linear-gradient(135deg, #eef2ff 0%, #ecfeff 100%);
-  border: 1px solid #e5e7eb;
-  border-radius: 16px;
-  padding: 18px 20px;
-  display:flex; align-items:center; justify-content:space-between; gap:16px;
-}
-.hero-title{
-  font-size: 1.25rem; font-weight: 800; color:#0f172a;
-  display:flex; align-items:center;
-}
-.hero-sub{ color:#475569; font-size:.9rem; }
-
-/* ===== KPI: glass + hover ===== */
-.kpi-row{ display:grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap:10px; width: 52%; }
-.kpi-card{
-  background: linear-gradient(180deg, rgba(255,255,255,.9), rgba(255,255,255,.75));
-  backdrop-filter: blur(6px);
-  border:1px solid rgba(226,232,240,.9); border-radius:14px; padding:10px 12px;
-  box-shadow:0 8px 24px rgba(15,23,42,.08), inset 0 1px 0 rgba(255,255,255,.8);
-  transition: transform .18s ease, box-shadow .18s ease;
-}
-.kpi-card:hover{ transform: translateY(-2px); box-shadow: 0 14px 32px rgba(15,23,42,.12); }
-.kpi-label{ color:#64748b; font-size:.8rem; }
-.kpi-value{ font-weight:800; font-size:1.3rem; color:#0f172a; }
-
-/* ===== Filter bar ===== */
-.filterbar{
-  position: sticky; top: 8px; z-index: 20;
-  padding: 14px 16px !important; border-radius: 14px;
-  border:1px solid #eef2f7;
-  box-shadow:0 6px 24px rgba(2,6,23,.06);
-}
-
-/* DASH */
-.dash-center{
-  position:absolute; inset:0;
-  display:flex; flex-direction:column; align-items:center; justify-content:center;
-  pointer-events:none;
-}
-.dot{ width:10px; height:10px; border-radius:9999px; margin:0 auto; }
-.dot-gray{ background:#9CA3AF; }
-.dot-amber{ background:#F59E0B; }
-.dot-green{ background:#22C55E; }
-.card-head{ font-weight:700; color:#0f172a; display:flex; align-items:center; }
-.card-head.between{ display:flex; align-items:center; justify-content:space-between; }
-.dash-card{ border-radius:14px; border:1px solid #eef2f7; }
-
-/* overlay ใน card ตอน loading */
-.overlay-loading{
-  position:absolute; inset:0;
-  background: rgba(255,255,255,.7);
-  display:flex; align-items:center; justify-content:center;
-  z-index: 5;
-  border-radius: .75rem;
-  text-align: center;
-  padding: 12px;
-}
-
-/* ===== DataTable: row hover ===== */
-.elevated-table{ box-shadow: 0 8px 18px rgba(2,6,23,.05); border-radius: 12px; }
-.p-datatable .p-datatable-tbody > tr{
-  transition: background .15s ease, box-shadow .15s ease, transform .15s ease;
-}
-.p-datatable .p-datatable-tbody > tr:hover{
-  background: #fbfdff;
-  box-shadow: 0 8px 18px rgba(2,6,23,.06);
-  transform: translateZ(0);
-}
-
-/* ===== Cell card (ชื่อโครงการ + owners) ===== */
-.cell-card{
-  display:flex; align-items:center; justify-content:space-between; gap:12px;
-  border: 1px solid #eef2f7; background:#fff; border-radius:12px; padding:10px 12px;
-  position:relative; overflow:hidden;
-  box-shadow: 0 6px 16px rgba(2,6,23,.04);
-}
-.cell-card:before{
-  content:""; position:absolute; left:0; top:0; bottom:0; width:4px; border-radius:12px 0 0 12px;
-  background: var(--type-accent, #c7d2fe);
-}
-.cell-card .title-row{ display:flex; align-items:center; gap:8px; font-weight:700; color:#0f172a; }
-.cell-card .title{ max-width: 34ch; }
-.cell-card .sub-row{ color:#64748b; font-size:.8rem; margin-top:2px; display:flex; align-items:center; }
-.cell-owners{ display:flex; align-items:center; }
-
-/* ประเภท → สี accent */
-.type-แผนปฏิบัติการ { --type-accent:#34d399; }
-.type-โครงการ       { --type-accent:#60a5fa; }
-.type-นโยบาย         { --type-accent:#fbbf24; }
-.type-มติประชุม      { --type-accent:#a78bfa; }
-.type-ไม่ระบุ         { --type-accent:#cbd5e1; }
-
-/* Owners avatar */
-.owner-avatar{ width:28px!important; height:28px!important; font-size:.75rem!important; border:2px solid #fff; box-shadow:0 2px 6px rgba(2,6,23,.12); }
-.owner-avatar.more{ background:#f1f5f9!important; color:#334155!important; }
-.av1{ background:#1d4ed8!important; }
-.av2{ background:#059669!important; }
-.av3{ background:#b45309!important; }
-.av4{ background:#7c3aed!important; }
-.av5{ background:#0ea5e9!important; }
-.av6{ background:#f43f5e!important; }
-
-/* ===== Radial progress ===== */
-.radial-wrap{
-  --radial-color: #3B82F6;
-  width:64px; height:64px; border-radius:9999px; display:inline-flex; align-items:center; justify-content:center;
-  background: conic-gradient(var(--radial-color) 0deg, #eef2f7 0deg);
-  box-shadow: 0 6px 14px rgba(2,6,23,.08);
-  position: relative;
-  animation: pop .18s ease-out;
-}
-.radial-wrap::after{
-  content:""; position:absolute; inset:6px; border-radius:9999px; background:#fff;
-}
-.radial-core{ position:relative; z-index:1; width:100%; height:100%; display:flex; align-items:center; justify-content:center; }
-.radial-num{ font-weight:800; font-size:.9rem; color:#0f172a; }
-.radial-wrap.rc-success{ --radial-color:#16a34a; }
-.radial-wrap.rc-warn{ --radial-color:#f59e0b; }
-@keyframes pop{ from{ transform:scale(.92); opacity:.6 } to{ transform:scale(1); opacity:1 } }
-
-/* ===== Status pill ===== */
-.status-pill{
-  display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border-radius:9999px;
-  font-weight:700; font-size:.8rem; letter-spacing:.2px; background:#eef2f7; color:#334155;
-}
-.status-pill.success{ background:#ecfdf5; color:#065f46; }
-.status-pill.warning{ background:#fff7ed; color:#9a3412; }
-.status-pill.info{ background:#eff6ff; color:#1e40af; }
-
-/* Drawer timeline */
-.detail-wrap { padding: 8px 6px 24px; }
-.summary { display:flex; flex-wrap:wrap; gap:12px; background:#f8fafc; border:1px solid #eef2f7; border-radius:12px; padding:10px 12px; margin-bottom:10px; }
-.summary-item { display:flex; align-items:center; color:#475569; }
-.legend { color:#64748b; margin:6px 2px 14px; display:flex; align-items:center; gap:16px; }
-.timeline { position:relative; margin-left:18px; }
-.timeline:before { content:""; position:absolute; left:-9px; top:0; bottom:0; width:2px; background:#e5e7eb; }
-.step-card { position:relative; margin-bottom:14px; }
-.step-marker { position:absolute; left:-14px; top:10px; width:12px; height:12px; border-radius:9999px; border:2px solid #fff; box-shadow:0 0 0 2px rgba(0,0,0,.06); }
-.step-marker.is-pending { background:#9ca3af; }
-.step-marker.is-progress { background:#f59e0b; }
-.step-marker.is-done { background:#22c55e; }
-.step-body { background:#fff; border:1px solid #eef2f7; border-radius:12px; padding:12px; box-shadow:0 4px 10px rgba(0,0,0,.04); }
-.step-head { display:flex; align-items:center; justify-content:space-between; }
-.step-title { font-weight:700; color:#0f172a; display:flex; align-items:center; }
-.step-meta { color:#475569; margin-top:4px; font-size:.9rem; display:flex; flex-wrap:wrap; gap:6px 0; }
-.task-list { margin-top:10px; margin-left:32px; display:flex; flex-direction:column; gap:8px; }
-.task-item { border-left:2px solid #e5e7eb; padding-left:12px; border-radius:6px; background:#fafafa; }
-.task-header { display:flex; align-items:center; }
-.task-title { color:#444; font-weight:500; }
-.task-bullet { width:10px; height:10px; border-radius:9999px; display:inline-block; margin-right:6px; }
-.task-bullet.is-pending { background:#2465d6; }
-.task-bullet.is-progress { background:#f59e0b; }
-.task-bullet.is-done { background:#22c55e; }
-.task-meta { margin-top:4px; color:#4b5563; font-size:.9rem; display:flex; flex-wrap:wrap; gap:6px 0; }
-.chip { padding:2px 8px; border-radius:9999px; font-size:.75rem; font-weight:600; margin-right:8px; border:1px solid transparent; background:#f1f5f9; }
-.chip-main { background:#ecfeff; border-color:#67e8f9; }
-.chip-otherpos { background:#fef9c3; border-color:#fde047; }
-.chip-other { background:#e0e7ff; border-color:#818cf8; }
-.empty-task { color:#94a3b8; font-style:italic; margin-top:8px; }
-
-/* paginator spacing */
-.p-paginator { border-top: 1px solid #f1f5f9; margin-top: .75rem; padding-top: .5rem; }
+  .cell-card{
+    display:flex; align-items:center; justify-content:space-between; gap:12px;
+    border: 1px solid #eef2f7; background:#fff; border-radius:12px; padding:10px 12px;
+    position:relative; overflow:hidden;
+    box-shadow: 0 6px 16px rgba(2,6,23,.04);
+  }
+  .cell-card:before{
+    content:""; position:absolute; left:0; top:0; bottom:0; width:4px; border-radius:12px 0 0 12px;
+    background: var(--type-accent, #c7d2fe);
+  }
+  .cell-card .title-row{ display:flex; align-items:center; gap:8px; font-weight:700; color:#0f172a; }
+  .cell-card .title{ max-width: 34ch; }
+  .cell-card .sub-row{ color:#64748b; font-size:.8rem; margin-top:2px; display:flex; align-items:center; }
+  .cell-owners{ display:flex; align-items:center; }
+  
+  .type-แผนปฏิบัติการ { --type-accent:#34d399; }
+  .type-โครงการ       { --type-accent:#60a5fa; }
+  .type-นโยบาย         { --type-accent:#fbbf24; }
+  .type-มติประชุม      { --type-accent:#a78bfa; }
+  .type-ไม่ระบุ         { --type-accent:#cbd5e1; }
+  
+  .owner-avatar{ width:28px!important; height:28px!important; font-size:.75rem!important; border:2px solid #fff; box-shadow:0 2px 6px rgba(2,6,23,.12); }
+  .owner-avatar.more{ background:#f1f5f9!important; color:#334155!important; }
+  .av1{ background:#1d4ed8!important; }
+  .av2{ background:#059669!important; }
+  .av3{ background:#b45309!important; }
+  .av4{ background:#7c3aed!important; }
+  .av5{ background:#0ea5e9!important; }
+  .av6{ background:#f43f5e!important; }
+  
+  .radial-wrap{
+    --radial-color: #3B82F6;
+    width:64px; height:64px; border-radius:9999px; display:inline-flex; align-items:center; justify-content:center;
+    background: conic-gradient(var(--radial-color) 0deg, #eef2f7 0deg);
+    box-shadow: 0 6px 14px rgba(2,6,23,.08);
+    position: relative;
+    animation: pop .18s ease-out;
+  }
+  .radial-wrap::after{
+    content:""; position:absolute; inset:6px; border-radius:9999px; background:#fff;
+  }
+  .radial-core{ position:relative; z-index:1; width:100%; height:100%; display:flex; align-items:center; justify-content:center; }
+  .radial-num{ font-weight:800; font-size:.9rem; color:#0f172a; }
+  .radial-wrap.rc-success{ --radial-color:#16a34a; }
+  .radial-wrap.rc-warn{ --radial-color:#f59e0b; }
+  @keyframes pop{ from{ transform:scale(.92); opacity:.6 } to{ transform:scale(1); opacity:1 } }
+  
+  .status-pill{
+    display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border-radius:9999px;
+    font-weight:700; font-size:.8rem; letter-spacing:.2px; background:#eef2f7; color:#334155;
+  }
+  .status-pill.success{ background:#ecfdf5; color:#065f46; }
+  .status-pill.warning{ background:#fff7ed; color:#9a3412; }
+  .status-pill.info{ background:#eff6ff; color:#1e40af; } 
+  .detail-wrap { padding: 8px 6px 24px; }
+  .summary { display:flex; flex-wrap:wrap; gap:12px; background:#f8fafc; border:1px solid #eef2f7; border-radius:12px; padding:10px 12px; margin-bottom:10px; }
+  .summary-item { display:flex; align-items:center; color:#475569; }
+  .legend { color:#64748b; margin:6px 2px 14px; display:flex; align-items:center; gap:16px; }
+  .timeline { position:relative; margin-left:18px; }
+  .timeline:before { content:""; position:absolute; left:-9px; top:0; bottom:0; width:2px; background:#e5e7eb; }
+  .step-card { position:relative; margin-bottom:14px; }
+  .step-marker { position:absolute; left:-14px; top:10px; width:12px; height:12px; border-radius:9999px; border:2px solid #fff; box-shadow:0 0 0 2px rgba(0,0,0,.06); }
+  .step-marker.is-pending { background:#9ca3af; }
+  .step-marker.is-progress { background:#f59e0b; }
+  .step-marker.is-done { background:#22c55e; }
+  .step-body { background:#fff; border:1px solid #eef2f7; border-radius:12px; padding:12px; box-shadow:0 4px 10px rgba(0,0,0,.04); }
+  .step-head { display:flex; align-items:center; justify-content:space-between; }
+  .step-title { font-weight:700; color:#0f172a; display:flex; align-items:center; }
+  .step-meta { color:#475569; margin-top:4px; font-size:.9rem; display:flex; flex-wrap:wrap; gap:6px 0; }
+  .task-list { margin-top:10px; margin-left:32px; display:flex; flex-direction:column; gap:8px; }
+  .task-item { border-left:2px solid #e5e7eb; padding-left:12px; border-radius:6px; background:#fafafa; }
+  .task-header { display:flex; align-items:center; }
+  .task-title { color:#444; font-weight:500; }
+  .task-bullet { width:10px; height:10px; border-radius:9999px; display:inline-block; margin-right:6px; }
+  .task-bullet.is-pending { background:#2465d6; }
+  .task-bullet.is-progress { background:#f59e0b; }
+  .task-bullet.is-done { background:#22c55e; }
+  .task-meta { margin-top:4px; color:#4b5563; font-size:.9rem; display:flex; flex-wrap:wrap; gap:6px 0; }
+  .chip { padding:2px 8px; border-radius:9999px; font-size:.75rem; font-weight:600; margin-right:8px; border:1px solid transparent; background:#f1f5f9; }
+  .chip-main { background:#ecfeff; border-color:#67e8f9; }
+  .chip-otherpos { background:#fef9c3; border-color:#fde047; }
+  .chip-other { background:#e0e7ff; border-color:#818cf8; }
+  .empty-task { color:#94a3b8; font-style:italic; margin-top:8px; } 
+  .p-paginator { border-top: 1px solid #f1f5f9; margin-top: .75rem; padding-top: .5rem; }
 </style>
