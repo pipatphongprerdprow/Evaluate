@@ -26,11 +26,11 @@
           </template>
         </Column> 
         <!-- ปี (พ.ศ.) -->
-        <Column header="ปี" style="width:5.5rem;min-width:5rem;text-align:center">
+        <!-- <Column header="ปี" style="width:5.5rem;min-width:5rem;text-align:center">
           <template #body="{data}">
             <span class="font-semibold">{{ getYear(data.startDate) }}</span>
           </template>
-        </Column> 
+        </Column>  -->
         <!-- ประเภทแผน -->
         <Column header="ประเภทแผน" style="width:7.5rem;min-width:7rem;text-align:center">
           <template #body="{data}">
