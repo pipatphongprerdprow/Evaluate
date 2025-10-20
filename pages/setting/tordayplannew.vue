@@ -415,7 +415,7 @@
   import Toast from 'primevue/toast'
   import AutoComplete from 'primevue/autocomplete' 
   import ProgressSpinner from 'primevue/progressspinner'
-  import Skeleton from 'primevue/skeleton' // ใช้เฉพาะถ้าจะทำ skeleton
+  import Skeleton from 'primevue/skeleton'  
 
 
   const isLoading = ref(true)
@@ -482,7 +482,7 @@
     const res = await axios.get(`${API}/getMainWorksAll`)
     const data = Array.isArray(res.data?.data) ? res.data.data : [] 
     mainTasks.value = data
-      .filter(x => !!x.label) // กัน null/ว่าง
+      .filter(x => !!x.label)  
   }
 
   const onMainTaskChange = async(e)=>{
@@ -515,19 +515,16 @@
   const expandedPlans = ref([])
   const expandedSteps = ref([])
   const activeTabIndex = ref(0)
-
-  // Edit states
+ 
   const showEditStepDialog = ref(false)
   const currentEditingStep = reactive({ id:null, name:'', dates:[], index:null })
   const showEditTaskDialog = ref(false)
   const currentEditingTask = reactive({ taskType:null, mainTask:null, description:'', responsible:[], dueDate:null, startTime:null, endTime:null, status:'', stepId:null, taskId:null, taskIndex:null, createdDate:null })
-
-  // Add-task dialog state
+ 
   const showAddTaskDialog = ref(false)
   const currentStepToAddTasks = reactive({ id:null, name:'' })
   const newTaskInStep = reactive({ taskType:null, mainTask:null, description:'', note:'', responsible:[], startTime:null, endTime:null, dueDate:null, status:'รอดำเนินการ' })
-
-  // ----- Validations -----
+  
   const isFirstStepValid = computed(()=> currentPlan.planLabel && currentPlan.owner.length>0 && currentPlan.startDate && currentPlan.endDate)
   const isSecondStepValid = computed(()=> currentPlan.steps.length>0)
   const isFinalStepValid = computed(()=> isFirstStepValid.value && isSecondStepValid.value)
@@ -535,13 +532,11 @@
   const isNewTaskInStepValid = computed(()=>{
     const t = newTaskInStep
     const timeOk = !t.startTime || !t.endTime || new Date(t.endTime) >= new Date(t.startTime)
-
-    // หากเลือก 'งานอื่นๆ' ไม่ต้องบังคับให้กรอก description
+ 
     if(t.taskType === 'งานอื่นๆ') return !!t.status && timeOk
     return !!t.description?.trim() && !!t.status && timeOk
   })
-
-  // ----- Helpers -----
+ 
   const pad = (n)=> String(n).padStart(2,'0')
   const toDateStr = (d)=>{ if(!d) return null; const dt=new Date(d); return `${dt.getFullYear()}-${pad(dt.getMonth()+1)}-${pad(dt.getDate())}` }
   const toDateTimeStr = (d)=>{ if(!d) return null; const dt=new Date(d); return `${dt.getFullYear()}-${pad(dt.getMonth()+1)}-${pad(dt.getDate())} ${pad(dt.getHours())}:${pad(dt.getMinutes())}:00` }
@@ -588,8 +583,7 @@
       }))
     }))
   }
-
-  // ----- API -----
+ 
   async function fetchPlans(){
     if(!session.staffId || !session.facId) return
     try{
@@ -604,8 +598,7 @@
     const ownerMatch = Array.isArray(plan.owner) && plan.owner.some(o=> Number(o.id)===me)
     return staffField===me || ownerMatch
   }
-
-  // ----- UI Actions -----
+ 
   function openPlanDialog(){
     isEditMode.value=false; showPlanDialog.value=true; activeTabIndex.value=0
     Object.assign(currentPlan,{ id:null, planType:null, planLabel:'', owner:[], startDate:null, endDate:null, steps:[] })
@@ -632,7 +625,7 @@
     const r = await Swal.fire({ title:'ยืนยันการลบ', text:'ลบแผนงานนี้?', icon:'warning', showCancelButton:true, confirmButtonColor:'#d33', cancelButtonColor:'#3085d6', confirmButtonText:'ลบ', cancelButtonText:'ยกเลิก' })
     if(!r.isConfirmed) return
     try{
-      await axios.delete(`${API}/Deldataplan`, { data:{ id:planId } })
+      await axios.post(`${API}/Deldataplan`, { data:{ id:planId } })
       allPlans.value = allPlans.value.filter(p=>p.id!==planId)
       Swal.fire({ icon:'success', title:'สำเร็จ', text:'ลบแผนงานเรียบร้อยแล้ว', timer:1500, showConfirmButton:false })
     }catch(e){ console.error(e); Swal.fire({ icon:'error', title:'ผิดพลาด', text:'ลบไม่สำเร็จ' }) }
@@ -642,7 +635,7 @@
       planId: null,
       planLabel: '',
       name: '',
-      dates: [] // [start, end]
+      dates: [] 
     })
     const planDateHint = computed(()=>{
       const p = allPlans.value.find(x=> x.id===addStepForm.planId)
@@ -663,8 +656,7 @@
       if(!isAddStepFormValid.value){
         return Swal.fire({ icon:'error', title:'ข้อผิดพลาด', text:'กรุณาระบุชื่อขั้นตอนและช่วงเวลาให้ครบถ้วน' })
       }
-
-      // เช็กช่วงวันไม่ให้ end ก่อน start (ป้องกันข้อมูลเพี้ยน)
+ 
       const s = new Date(addStepForm.dates[0])
       const e = new Date(addStepForm.dates[1])
       if(e < s){
@@ -683,8 +675,7 @@
       try {
         const res = await axios.post(`${API}/savedatastep`, payload)
         const realId = res?.data?.id
-
-        // อัปเดต state ด้วย id จริงจาก DB
+ 
         const addToPlanState = (planObj)=>{
           planObj.steps = planObj.steps || []
           planObj.steps.push({
@@ -806,8 +797,7 @@
       await fetchPositionMainWorks()
     }else if(t==='งานตำแหน่งอื่น'){
       await fetchAllMainWorks()        
-    }else if(t==='งานอื่นๆ'){
-      // ไม่ต้อง set mainTask อะไร ปล่อยว่าง
+    }else if(t==='งานอื่นๆ'){ 
     }
   }
   async function onEditTaskTypeChange(){
@@ -816,8 +806,7 @@
     if(t==='งานหลัก') await fetchPositionMainWorks(); else if(t==='งานตำแหน่งอื่น') await fetchAllMainWorks()
   }
 
-  async function addTaskToStepFromMain() {
-    // ตรวจสอบว่าข้อมูลครบถ้วนหรือไม่
+  async function addTaskToStepFromMain() { 
     if (!isNewTaskInStepValid.value) {
       return Swal.fire({
         icon: 'error', 
@@ -831,7 +820,7 @@
         step_id: currentStepToAddTasks.id,
         taskType: newTaskInStep.taskType,
         mainTask: newTaskInStep.taskType === 'งานอื่นๆ' ? 'ภาระงานอื่นๆ' : newTaskInStep.mainTask,
-        description: newTaskInStep.description,  // ส่งค่าตรงๆ ไม่ต้องแปลงเป็น null ถ้าเป็น "งานอื่นๆ"
+        description: newTaskInStep.description,   
         startTime: toDateTimeStr(newTaskInStep.startTime),
         endTime: toDateTimeStr(newTaskInStep.endTime),
         status: 'เสร็จสิ้น',
@@ -917,18 +906,17 @@
     const ok = await Swal.fire({ title:'ยืนยันการลบ', text:'คุณต้องการลบภาระงานนี้ใช่หรือไม่?', icon:'warning', showCancelButton:true })
     if(!ok.isConfirmed) return
     const task = step.tasks[taskIndex]
-    try{ await axios.delete(`${API}/Deldatatask`, { data:{ id:task.id } }); step.tasks.splice(taskIndex,1); Swal.fire({ icon:'success', title:'สำเร็จ', text:'ลบภาระงานเรียบร้อยแล้ว', timer:1200, showConfirmButton:false }) }
+    try{ await axios.post(`${API}/Deldatatask`, { data:{ id:task.id } }); step.tasks.splice(taskIndex,1); Swal.fire({ icon:'success', title:'สำเร็จ', text:'ลบภาระงานเรียบร้อยแล้ว', timer:1200, showConfirmButton:false }) }
     catch(e){ console.error(e); Swal.fire({ icon:'error', title:'ผิดพลาด', text:'ลบภาระงานไม่สำเร็จ' }) }
   }
 
   async function confirmRemoveStepById(planId, stepId){
     const r = await Swal.fire({ title:'ยืนยันการลบ', text:'ลบขั้นตอนนี้?', icon:'warning', showCancelButton:true, confirmButtonText:'ลบ', cancelButtonText:'ยกเลิก', confirmButtonColor:'#d33', cancelButtonColor:'#3085d6' })
     if(!r.isConfirmed) return
-    try{ await axios.delete(`${API}/Deldatastep`, { data:{ id:stepId } }); const plan = allPlans.value.find(p=>p.id===planId); if(plan) plan.steps = plan.steps.filter(s=> s.id!==stepId); Swal.fire({ icon:'success', title:'สำเร็จ', text:'ลบขั้นตอนเรียบร้อยแล้ว', timer:1200, showConfirmButton:false }) }
+    try{ await axios.post(`${API}/Deldatastep`, { data:{ id:stepId } }); const plan = allPlans.value.find(p=>p.id===planId); if(plan) plan.steps = plan.steps.filter(s=> s.id!==stepId); Swal.fire({ icon:'success', title:'สำเร็จ', text:'ลบขั้นตอนเรียบร้อยแล้ว', timer:1200, showConfirmButton:false }) }
     catch(e){ console.error(e); Swal.fire({ icon:'error', title:'ผิดพลาด', text:'ลบขั้นตอนไม่สำเร็จ' }) }
   }
-
-  // ----- Owner search (AutoComplete) -----
+  
   const ownerSuggestions = ref([])
   function mapStaffToOption(x){ return { id:Number(x.staffid)||x.id||null, name:x.namefully||x.name||'', staffid:x.staffid||null, posnameth:x.posnameth||null } }
   let ownerSearchTimer=null
@@ -945,8 +933,7 @@
     },250)
   }
   function getOwnerDisplay(o){ return o?.name || o?.staff_name || o?.owner_name || o?.fullname || o?.staff_fullname || `ID:${o?.id}` }
-
-  // ----- Badge color helper -----
+ 
   function getPlanTypeSeverity(t){
     switch(t){
       case 'แผนปฏิบัติการ': return 'success'
@@ -961,8 +948,7 @@
     const dt = typeof d === 'string' ? new Date(d) : d;
     return isNaN(dt) ? null : dt;
   }
-
-  // ไตรมาสตามปีงบประมาณไทย
+ 
   function getQuarter(dateInput) {
     const d = toDate(dateInput);
       if (!d) return '-';
@@ -986,7 +972,7 @@
     .custom-scroll::-webkit-scrollbar-thumb{ background-color:#d1d5db; border-radius:3px }
     .loader-overlay{
       position: fixed; inset: 0; z-index: 9999;
-      display: grid; place-items: center;            /* ⬅️ กึ่งกลางทั้งแนวตั้ง-แนวนอน */
+      display: grid; place-items: center;              
       background: rgba(255,255,255,0.75);
       backdrop-filter: blur(2px);
     }

@@ -1021,7 +1021,8 @@ function handleSearchDebounced(delay=250){
 }
 async function reloadAll(){
   if(!selectedEvaluationRound.value){
-    Swal.fire('แจ้งเตือน', 'กรุณาเลือกรอบการประเมินก่อน', 'error'); return
+    // Swal.fire('แจ้งเตือน', 'กรุณาเลือกรอบการประเมินก่อน', 'error'); return
+    return;
   }
   await fetchAllStaff()
   await buildProjectBoard()
