@@ -7,7 +7,7 @@
   </div>
   <div v-show="!isLoading" class="p-4 bg-gray-100 min-h-screen font-sans">
     <Toast /> 
-    <div class="flex flex-col sm:flex-row justify-between items-center mb-8 gap-4">
+    <div class="flex flex-col sm:flex-row justify-between items-center mb-5 gap-4">
       <h4 class="text-4xl font-extrabold text-primary-800 flex items-center mb-1">
         <i class="pi pi-chart-line mr-3 text-primary-500"></i>
         บันทึกแผนงาน/โครงการ/ภาระงาน
@@ -16,11 +16,23 @@
     <div class="card p-6 shadow-2xl rounded-xl surface-card">
       <div class="flex items-center mb-6">
         <i class="pi pi-sitemap mr-3 text-primary-500 text-2xl"></i>
-        <h4 class="text-2xl font-bold text-700 m-0">โครงสร้างแผนงานและภาระงาน</h4> 
+        <h4 class="text-2xl font-bold text-700 m-0">แบบบันทึกแผนงานและภาระงาน</h4> 
       </div>
-       <Button  icon="pi pi-plus" label="สร้างแผนงาน/โครงการใหม่" class="p-button-info px-4 py-2 rounded-lg font-semibold shadow mb-4" @click="openPlanDialog" />
-
-      <DataTable :value="allPlansSorted" v-model:expandedRows="expandedPlans" dataKey="id" responsiveLayout="scroll" stripedRows paginator :rows="10" :rowsPerPageOptions="[10,20,50]" paginatorPosition="both" :showCurrentPageReport="true" currentPageReportTemplate="แสดง {first}-{last} จาก {totalRecords}" >
+       <!-- <Button  icon="pi pi-plus" label="สร้างแผนงาน/โครงการใหม่" class="p-button-info px-4 py-2 rounded-lg font-semibold shadow mb-4" @click="openPlanDialog" />  -->
+        
+      <div class="grid grid-cols-1 sm:grid-cols-12 gap-3 mb-4 items-center"> 
+        <div class="sm:col-6 flex justify-start">
+          <Button icon="pi pi-plus" label="สร้างแผนงาน/โครงการใหม่" class="p-button-info px-4 py-2 rounded-lg font-semibold shadow h-[42px]" @click="openPlanDialog" />
+        </div> 
+        <div class="sm:col-12 flex justify-end">
+          <IconField iconPosition="left" class="w-full sm:w-[100%]">
+            <InputIcon class="pi pi-search" />
+            <InputText v-model="globalSearch"  placeholder="ค้นหาชื่อแผน/ขั้นตอน/ภาระงาน/ประเภทแผน..." class="w-full h-[42px]" />
+          </IconField>
+        </div>
+      </div>
+ 
+      <DataTable :value="filteredPlansSorted" v-model:expandedRows="expandedPlans" dataKey="id" responsiveLayout="scroll" stripedRows paginator :rows="10" :rowsPerPageOptions="[10,20,50]" paginatorPosition="bottom" :showCurrentPageReport="true" currentPageReportTemplate="แสดง {first}-{last} จาก {totalRecords}" >
         <Column expander style="width:2rem"/>
          <Column header="ไตรมาส" style="width:8.5rem;min-width:8rem;text-align:center">
           <template #body="{data}">
@@ -108,6 +120,17 @@
               </div>
             </template>
           </Column>
+        </template>
+        <template #empty>
+          <div class="py-8 text-center text-gray-500">
+            <i class="pi pi-search text-2xl block mb-2"></i>
+            <div v-if="debouncedSearch">
+              ไม่พบผลลัพธ์สำหรับ “{{ globalSearch }}”
+            </div>
+            <div v-else>
+              ไม่มีข้อมูล
+            </div>
+          </div>
         </template>
  
         <template #expansion="planSlot">
@@ -337,8 +360,8 @@
         <div class="flex items-center w-full"><i class="pi pi-pencil mr-2 text-primary-500 text-2xl"></i><h5 class="m-0 text-xl font-bold text-primary-700">แก้ไขภาระงาน</h5></div>
       </template>
       <div class="p-fluid formgrid grid">
-        <div class="field col-6"><label class="font-semibold">ประเภทภาระงาน</label><Dropdown v-model="currentEditingTask.taskType" :options="taskTypes" optionLabel="label" optionValue="value" class="w-full" @change="onEditTaskTypeChange"/></div>
-        <div class="field col-6"><label class="font-semibold">ภาระงานหลัก</label><Dropdown v-model="currentEditingTask.mainTask" :options="mainTasks" optionLabel="label" optionValue="value" class="w-full"/></div>
+        <div class="field col-6"><label class="font-semibold">ประเภทภาระงาน</label><Dropdown v-model="currentEditingTask.taskType" :options="taskTypes" optionLabel="label" optionValue="value" class="w-full" @change="onEditTaskTypeChange"/></div> 
+        <div class="field col-6"> <label class="font-semibold">ภาระงานหลัก</label> <AutoComplete v-model="currentEditingTask.mainTask" :suggestions="mainTaskSuggestions" @complete="completeMainTask" placeholder="พิมพ์เพื่อค้นหา/เลือกภาระงานหลัก" dropdown @blur="normalizeEditingMainTask()" class="w-full" /> </div>
       </div>
       <div class="p-fluid formgrid grid">
         <div class="field col-12 md:col-6"><label class="font-semibold">ภาระงานประจำวัน</label><InputText v-model="currentEditingTask.description" placeholder="ระบุภาระงาน..." class="w-full"/></div>
@@ -362,10 +385,19 @@
                 <Dropdown v-model="newTaskInStep.taskType" :options="taskTypes" optionLabel="label" optionValue="value" placeholder="เลือกประเภทภาระงาน" class="w-full" @change="onTaskTypeChange"/>
             </div>
 
-            <!-- เลือกภาระงานหลัก (แสดงเมื่อประเภทงานไม่ใช่ 'งานอื่นๆ') -->
+            <!-- เลือกภาระงานหลัก (แสดงเมื่อประเภทงานไม่ใช่ 'งานอื่นๆ') --> 
             <div class="field col-12" v-if="newTaskInStep.taskType !== 'งานอื่นๆ'">
-                <label class="font-semibold">ภาระงานหลัก</label>
-                <Dropdown v-model="newTaskInStep.mainTask" :options="mainTasks" optionLabel="label" optionValue="value" class="w-full" @change="onMainTaskChange"/>
+              <label class="font-semibold">ภาระงานหลัก</label>
+                <AutoComplete
+                  v-model="newTaskInStep.mainTask"
+                  :suggestions="mainTaskSuggestions"
+                  @complete="completeMainTask"
+                  placeholder="พิมพ์เพื่อค้นหา/เลือกภาระงานหลัก"
+                  dropdown
+                  @item-select="({ value }) => onMainTaskChange(value)"   
+                  @blur="onMainTaskChange(newTaskInStep.mainTask)"       
+                  class="w-full"
+                />
             </div>
 
             <!-- ภาระงานประจำวัน (แสดงแบบต่างกันขึ้นอยู่กับประเภทงาน) -->
@@ -399,7 +431,7 @@
 </template>
 
 <script setup>
-  import { ref, reactive, computed, onMounted } from 'vue'
+  import { ref, reactive, computed, onMounted, watch } from 'vue'
   import Swal from 'sweetalert2'
   import axios from 'axios'
   import Dialog from 'primevue/dialog'
@@ -415,9 +447,70 @@
   import Toast from 'primevue/toast'
   import AutoComplete from 'primevue/autocomplete' 
   import ProgressSpinner from 'primevue/progressspinner'
-  import Skeleton from 'primevue/skeleton'  
+  import IconField from 'primevue/iconfield'
+  import InputIcon from 'primevue/inputicon'
+
+ 
+  const globalSearch = ref('')
+  const debouncedSearch = ref('')
+  let searchTimer = null
+  watch(globalSearch, (val) => {
+    if (searchTimer) clearTimeout(searchTimer)
+    searchTimer = setTimeout(() => {
+      debouncedSearch.value = (val || '').toLowerCase().trim()
+    }, 200)
+  })
+ 
+  function planMatchesQuery(plan, q) {
+    if (!q) return true
+    const bucket = []
+ 
+    bucket.push(
+      plan.planType ?? '',
+      plan.planLabel ?? '',
+      getQuarter(plan.startDate),
+      getYear(plan.startDate),
+      formatDate(plan.startDate),
+      formatDate(plan.endDate),
+      (plan.owner || []).map(getOwnerDisplay).join(' ')
+    )
+ 
+    for (const s of (plan.steps || [])) {
+      bucket.push(
+        s.name ?? '',
+        s.status ?? '',
+        formatDate(s.startDate),
+        formatDate(s.endDate)
+      ) 
+
+      for (const t of (s.tasks || [])) {
+        bucket.push(
+          t.taskType ?? '',
+          t.mainTask ?? '',
+          t.description ?? '',
+          t.status ?? '',
+          formatDate(t?.createdDate),
+          t?.responsible ? t.responsible.map(r => r?.name || '').join(' ') : ''
+        )
+      }
+    }
+ 
+    const haystack = bucket.join(' | ').toLowerCase()
+    return haystack.includes(q)
+  }
+ 
+  const filteredPlansSorted = computed(() => {
+    const base = allPlansSorted.value || []
+    const q = debouncedSearch.value
+    if (!q) return base
+    return base.filter(p => planMatchesQuery(p, q))
+  })
 
 
+
+
+
+ 
   const isLoading = ref(true)
   const API = 'http://127.0.0.1:8000/api'
  
@@ -485,13 +578,49 @@
       .filter(x => !!x.label)  
   }
 
-  const onMainTaskChange = async(e)=>{
-    const mainName = e?.value ?? newTaskInStep.mainTask
-    if(!mainName){ subTasks.value=[]; newTaskInStep.description=null; return }
-    const url = newTaskInStep.taskType==='งานตำแหน่งอื่น' ? `${API}/getSubWorksAll` : `${API}/getSubWorks`
-    const res = await axios.get(url, { params:{ mainActivity: mainName }})
-    subTasks.value = Array.isArray(res.data?.data) ? res.data.data : []
-    newTaskInStep.description=null
+  // const onMainTaskChange = async(e)=>{
+  //   const mainName = e?.value ?? newTaskInStep.mainTask
+  //   if(!mainName){ subTasks.value=[]; newTaskInStep.description=null; return }
+  //   const url = newTaskInStep.taskType==='งานตำแหน่งอื่น' ? `${API}/getSubWorksAll` : `${API}/getSubWorks`
+  //   const res = await axios.get(url, { params:{ mainActivity: mainName }})
+  //   subTasks.value = Array.isArray(res.data?.data) ? res.data.data : []
+  //   newTaskInStep.description=null
+  // }
+
+  const onMainTaskChange = async (valOrEvent) => {
+  // รองรับทั้งกรณี e.value (Dropdown) และ string (AutoComplete)
+  const mainName = typeof valOrEvent === 'string'
+    ? valOrEvent
+    : (valOrEvent?.value ?? newTaskInStep.mainTask)
+
+  if (!mainName) {
+    subTasks.value = []
+    newTaskInStep.description = null
+    return
+  }
+
+  const url = newTaskInStep.taskType === 'งานตำแหน่งอื่น'
+    ? `${API}/getSubWorksAll`
+    : `${API}/getSubWorks`
+
+  const res = await axios.get(url, { params: { mainActivity: mainName } })
+  subTasks.value = Array.isArray(res.data?.data) ? res.data.data : []
+  newTaskInStep.description = null
+}
+
+  const mainTaskSuggestions = ref([])
+
+  // === ฟังก์ชันกรองคำแนะนำจาก mainTasks เดิม ===
+  function completeMainTask(e) {
+    const q = (e.query || '').toLowerCase()
+    // ดึง label จาก mainTasks (ซึ่งเป็น [{label, value}])
+    const labels = [...new Set((mainTasks.value || [])
+      .map(o => o?.label)
+      .filter(Boolean))]
+    // กรองตามข้อความที่พิมพ์
+    mainTaskSuggestions.value = labels
+      .filter(l => l.toLowerCase().includes(q))
+      .slice(0, 30)
   }
  
   const allPlans = ref([])
@@ -867,11 +996,21 @@
     }
   }
   
+  function normalizeEditingMainTask () {
+    const v = currentEditingTask.mainTask 
+    currentEditingTask.mainTask =
+      typeof v === 'object' && v !== null
+        ? (v.label ?? v.value ?? '')
+        : (v ?? '')
+  }
+
   async function openEditTaskDialogInTable(step, task, taskIndex){
     showEditTaskDialog.value=true
     Object.assign(currentEditingTask,{ stepId:step.id, taskId:task.id, taskIndex, taskType:task.taskType||'งานหลัก', mainTask:task.mainTask||null, description:task.description||'', responsible:task.responsible||[], dueDate:task.dueDate?new Date(task.dueDate):null, startTime:task.startTime?new Date(task.startTime):null, endTime:task.endTime?new Date(task.endTime):null, status:task.status||'', createdDate:task.createdDate?new Date(task.createdDate):null, staffId:task.staffId??session.staffId??null })
     if(currentEditingTask.taskType==='งานหลัก'){ await fetchPositionMainWorks() }
     else if(currentEditingTask.taskType==='งานตำแหน่งอื่น'){ await fetchAllMainWorks() }
+
+    normalizeEditingMainTask()
   }
 
   async function saveEditedTask(){

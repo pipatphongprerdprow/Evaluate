@@ -32,7 +32,7 @@ export default NuxtAuthHandler({
           // redirect_uri: 'https://survey.msu.ac.th/evaluate/api/auth/callback/erpauth',
 
           //localhost
-          redirect_uri: 'http://localhost:3000/evaluate/api/auth/callback/erpauth', 
+          redirect_uri: 'http://localhost:3000/evaluate/api/auth/callback/erpauth',
 
           scope: '',
         }
