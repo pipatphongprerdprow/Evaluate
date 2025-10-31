@@ -40,11 +40,20 @@
           </template>
         </Column> 
         <!-- ปี (พ.ศ.) -->
-        <!-- <Column header="ปี" style="width:5.5rem;min-width:5rem;text-align:center">
-          <template #body="{data}">
-            <span class="font-semibold">{{ getYear(data.startDate) }}</span>
+        <Column header="ปีงบประมาณ" style="width:7rem;min-width:6rem;text-align:center">
+          <template #body="{ data }">
+            <Tag
+              :value="(data.planYear ?? '') !== '' && data.planYear != null ? String(data.planYear) : 'ไม่ระบุ'"
+              class="tag-sm w-full justify-center"
+              severity="info"
+            />
           </template>
-        </Column>  -->
+        </Column>
+         <!-- <Column header="ปีงบประมาณ" style="width:7.5rem;min-width:7rem;text-align:center">
+          <template #body="{data}">
+            <Tag :value="data.planYear || 'ไม่ระบุ'" :severity="getPlanTypeSeverity(data.planplanYear)" class="tag-sm font-medium"/>
+          </template>
+        </Column>   -->
         <!-- ประเภทแผน -->
         <Column header="ประเภทแผน" style="width:7.5rem;min-width:7rem;text-align:center">
           <template #body="{data}">
@@ -245,10 +254,16 @@
       <div v-if="isEditMode || activeTabIndex===0">
         <h3 class="text-xl font-bold text-700 flex items-center mb-4"><i class="pi pi-file mr-2 text-primary-500"></i>1. ข้อมูลแผนงาน / โครงการ</h3>
         <div class="p-fluid grid">
-          <div class="field col-12">
+           <div class="field col-3">
+            <label class="font-semibold text-lg">ปีงบประมาณ <span class="text-red-500">*</span></label>
+            <Dropdown v-model="currentPlan.planYear" :options="planYears" optionLabel="label" optionValue="value" placeholder="เลือกปีงบประมาณ" class="w-full" required/>
+          </div>
+          <div class="field col-9">
             <label class="font-semibold text-lg">ประเภทแผน <span class="text-red-500">*</span></label>
             <Dropdown v-model="currentPlan.planType" :options="planTypes" optionLabel="label" optionValue="value" placeholder="เลือกประเภทแผน" class="w-full" required/>
           </div>
+
+
           <div class="field col-12">
             <label class="font-semibold text-lg">ชื่อแผนปฏิบัติงาน <span class="text-red-500">*</span></label>
             <InputText v-model="currentPlan.planLabel" placeholder="ระบุชื่อแผนปฏิบัติงาน" required/>
@@ -400,6 +415,29 @@
                 />
             </div>
 
+
+
+            <div class="field col-6">
+                <label class="font-semibold">รอบประเมิน</label>
+                <Dropdown v-model="newTaskInStep.taskType" :options="taskTypes" optionLabel="label" optionValue="value" placeholder="เลือกปีงบประมาณ" class="w-full" @change="onTaskTypeChange"/>
+            </div> 
+            <!-- ลือกแบบ ป. ที่สอดคล้องกับภาระงาน (แสดงเมื่อประเภทงานไม่ใช่ 'งานอื่นๆ') --> 
+            <div class="field col-6"  >
+              <label class="font-semibold">แบบ ป.ที่สอดคล้อง</label>
+                <AutoComplete
+                  v-model="newTaskInStep.mainTask"
+                  :suggestions="mainTaskSuggestions"
+                  @complete="completeMainTask"
+                  placeholder="พิมพ์เพื่อค้นหา/เลือกแบบ ป. ที่สอดคล้องกับภาระงาน"
+                  dropdown
+                  @item-select="({ value }) => onMainTaskChange(value)"   
+                  @blur="onMainTaskChange(newTaskInStep.mainTask)"       
+                  class="w-full"
+                />
+            </div>
+             
+
+
             <!-- ภาระงานประจำวัน (แสดงแบบต่างกันขึ้นอยู่กับประเภทงาน) -->
             <div class="field col-12">
                 <label class="font-semibold">ภาระงานประจำวัน</label>
@@ -466,7 +504,8 @@
     const bucket = []
  
     bucket.push(
-      plan.planType ?? '',
+      plan.planType ?? '', 
+      plan.planYear ?? '',
       plan.planLabel ?? '',
       getQuarter(plan.startDate),
       getYear(plan.startDate),
@@ -638,7 +677,14 @@
     {label:'นโยบาย', value:'นโยบาย'},
     {label:'มติประชุม', value:'มติประชุม'},
   ]
-  const currentPlan = reactive({ id:null, planType:null, planLabel:'', owner:[], startDate:null, endDate:null, steps:[] })
+  const planYears = [
+    {label:'2567', value:'2567'},
+    {label:'2568', value:'2568'},
+    {label:'2569', value:'2569'},
+    {label:'2570', value:'2570'},
+  ]
+  
+  const currentPlan = reactive({ id:null, planYear:null, planType:null, planLabel:'', owner:[], startDate:null, endDate:null, steps:[] })
   const newStepName = ref('')
   const newStepDates = ref([])
   const expandedPlans = ref([])
@@ -687,31 +733,74 @@
   }
   const getTaskStatusSeverityByValue = (s)=> s==='เสร็จสิ้น'?'success': s==='อยู่ระหว่างดำเนินการ'?'warning':'info'
 
+  // function mapApiToState(arr){
+  //   return (arr||[]).map(p=>({
+  //     ...p,
+  //     staff_id: p.staff_id ?? p.staffId ?? null,
+  //     created_by: p.created_by ?? p.createdBy ?? null,
+  //     startDate: p.startDate? new Date(p.startDate):null,
+  //     endDate:   p.endDate?   new Date(p.endDate):  null,
+  //     owner: Array.isArray(p.owner)? p.owner.map(o=>({ id:o.id, name:o.name||o.staff_name||o.owner_name||`ID:${o.id}` })) : [],
+  //     steps: (p.steps||[]).map(s=>({
+  //       ...s,
+  //       status: s.status_planstep ?? s.status ?? null,
+  //       startDate: s.startDate? new Date(s.startDate):null,
+  //       endDate:   s.endDate?   new Date(s.endDate):  null,
+  //       tasks: (s.tasks||[]).map(t=>({
+  //         ...t,
+  //         responsible: Array.isArray(t.responsible)? t.responsible.map(r=>({ id:r.id, name:r.name||r.owner_name||`ID:${r.id}` })) : [],
+  //         mainTask: t.mainTask ?? t.Main_tasks ?? null,
+  //         dueDate: t.dueDate? new Date(t.dueDate):null,
+  //         startTime: t.startTime? new Date(t.startTime):null,
+  //         endTime: t.endTime? new Date(t.endTime):null,
+  //         createdDate: t.createdDate? new Date(t.createdDate):null,
+  //       }))
+  //     }))
+  //   }))
+  // }
   function mapApiToState(arr){
-    return (arr||[]).map(p=>({
-      ...p,
-      staff_id: p.staff_id ?? p.staffId ?? null,
-      created_by: p.created_by ?? p.createdBy ?? null,
-      startDate: p.startDate? new Date(p.startDate):null,
-      endDate:   p.endDate?   new Date(p.endDate):  null,
-      owner: Array.isArray(p.owner)? p.owner.map(o=>({ id:o.id, name:o.name||o.staff_name||o.owner_name||`ID:${o.id}` })) : [],
-      steps: (p.steps||[]).map(s=>({
-        ...s,
-        status: s.status_planstep ?? s.status ?? null,
-        startDate: s.startDate? new Date(s.startDate):null,
-        endDate:   s.endDate?   new Date(s.endDate):  null,
-        tasks: (s.tasks||[]).map(t=>({
-          ...t,
-          responsible: Array.isArray(t.responsible)? t.responsible.map(r=>({ id:r.id, name:r.name||r.owner_name||`ID:${r.id}` })) : [],
-          mainTask: t.mainTask ?? t.Main_tasks ?? null,
-          dueDate: t.dueDate? new Date(t.dueDate):null,
-          startTime: t.startTime? new Date(t.startTime):null,
-          endTime: t.endTime? new Date(t.endTime):null,
-          createdDate: t.createdDate? new Date(t.createdDate):null,
+    return (arr||[]).map(p=>{
+      const rawStart = p.startDate ?? p.start_date ?? null
+      // const planYearNorm =
+      //   (p.planYear ?? p.plan_year ?? getBudgetYear(rawStart) ?? null)
+      const planYearNorm = (p.planYear ?? p.plan_year ?? null)
+      return {
+        ...p,
+        // ให้มี planYear แน่ ๆ และเก็บเป็น string ให้ตรงกับ options ของ Dropdown
+        planYear: planYearNorm ? String(planYearNorm) : null,
+
+        staff_id: p.staff_id ?? p.staffId ?? null,
+        created_by: p.created_by ?? p.createdBy ?? null,
+
+        startDate: rawStart ? new Date(rawStart) : null,
+        endDate:   (p.endDate ?? p.end_date) ? new Date(p.endDate ?? p.end_date) : null,
+
+        owner: Array.isArray(p.owner)
+          ? p.owner.map(o=>({ id:o.id, name:o.name||o.staff_name||o.owner_name||`ID:${o.id}` }))
+          : [],
+
+        steps: (p.steps||[]).map(s=>({
+          ...s,
+          status: s.status_planstep ?? s.status ?? null,
+          startDate: s.startDate ? new Date(s.startDate) : null,
+          endDate:   s.endDate   ? new Date(s.endDate)   : null,
+          tasks: (s.tasks||[]).map(t=>({
+            ...t,
+            responsible: Array.isArray(t.responsible)
+              ? t.responsible.map(r=>({ id:r.id, name:r.name||r.owner_name||`ID:${r.id}` }))
+              : [],
+            mainTask: t.mainTask ?? t.Main_tasks ?? null,
+            dueDate:     t.dueDate     ? new Date(t.dueDate)     : null,
+            startTime:   t.startTime   ? new Date(t.startTime)   : null,
+            endTime:     t.endTime     ? new Date(t.endTime)     : null,
+            createdDate: t.createdDate ? new Date(t.createdDate) : null,
+          }))
         }))
-      }))
-    }))
+      }
+    })
   }
+
+
  
   async function fetchPlans(){
     if(!session.staffId || !session.facId) return
@@ -730,7 +819,7 @@
  
   function openPlanDialog(){
     isEditMode.value=false; showPlanDialog.value=true; activeTabIndex.value=0
-    Object.assign(currentPlan,{ id:null, planType:null, planLabel:'', owner:[], startDate:null, endDate:null, steps:[] })
+    Object.assign(currentPlan,{ id:null, planYear:null, planType:null, planLabel:'', owner:[], startDate:null, endDate:null, steps:[] })
     newStepName.value=''; newStepDates.value=[]
   }
   function editPlan(plan){
@@ -849,7 +938,7 @@
     const valid = isEditMode.value ? isFirstStepValid.value : isFinalStepValid.value
       if(!valid){ return Swal.fire({ icon:'error', title:'ข้อผิดพลาด', text: isEditMode.value ? 'กรุณากรอกข้อมูลแผนงานให้ครบถ้วน' : 'กรุณาตรวจสอบข้อมูลแผนงานและขั้นตอน' })
     } 
-    const basePayload = { id: currentPlan.id, planType: currentPlan.planType, planLabel: currentPlan.planLabel, startDate: toDateStr(currentPlan.startDate), endDate: toDateStr(currentPlan.endDate), owner: (currentPlan.owner||[]).map(o=>({id:o.id, name:o.name})), staff_id: session.staffId, fac_id: session.facId, } 
+    const basePayload = { id: currentPlan.id, planType: currentPlan.planType, planYear: currentPlan.planYear, planLabel: currentPlan.planLabel, startDate: toDateStr(currentPlan.startDate), endDate: toDateStr(currentPlan.endDate), owner: (currentPlan.owner||[]).map(o=>({id:o.id, name:o.name})), staff_id: session.staffId, fac_id: session.facId, } 
     try{
       if(isEditMode.value){  await axios.post(`${API}/Edtdataplans`, basePayload)
         await fetchPlans() 
@@ -1103,6 +1192,18 @@
     if (!d) return '-';
     return String(d.getFullYear() + 543);
   } 
+  function getBudgetYear(dateInput){
+    const d = toDate(dateInput)
+    if(!d) return null
+    const be = d.getFullYear() + 543
+    const m  = d.getMonth() + 1 
+    return m >= 10 ? String(be + 1) : String(be)
+  }
+  function getPlanYearDisplay(p) {
+    
+    const y = p?.planYear
+    return (y === null || y === undefined || y === '') ? 'ไม่ระบุ' : String(y)
+  }
 
   </script>
 
