@@ -215,8 +215,6 @@
                       </template>
                     </Column>
                     <Column field="description" header="ภาระงานประจำวัน" style="flex:1;min-width:18rem"/>
-                    <Column header="รอบประเมิน" style="min-width:12rem">  <template #body="{data}"> <Tag v-if="data.evalu_steptasks" :value="data.evalu_steptasks" severity="info"/> <span v-else class="text-gray-400">-</span> </template> </Column>
-                    <Column header="แบบ ป. ที่สอดคล้อง" style="min-width:12rem"> <template #body="{data}"> <Tag v-if="data.por_detel" :value="data.por_detel" severity="success"/> <span v-else class="text-gray-400">-</span> </template> </Column>
                     <Column header="วันที่ลงบันทึก" style="width:7.5rem" class="text-center"><template #body="{data}">{{ formatDate(data.createdDate) }}</template></Column>
                     <Column header="เวลาที่ใช้ไป" style="width:7rem" class="text-center"><template #body="{data}">{{ getTaskTimeSpent(data) }}</template></Column>
                     <Column header="จัดการ" style="width:6rem" class="text-center">
@@ -381,14 +379,6 @@
         <div class="field col-6"> <label class="font-semibold">ภาระงานหลัก</label> <AutoComplete v-model="currentEditingTask.mainTask" :suggestions="mainTaskSuggestions" @complete="completeMainTask" placeholder="พิมพ์เพื่อค้นหา/เลือกภาระงานหลัก" dropdown @blur="normalizeEditingMainTask()" class="w-full" /> </div>
       </div>
       <div class="p-fluid formgrid grid">
-        <div class="field col-12 md:col-6">
-          <label class="font-semibold">รอบประเมิน</label> <Dropdown v-model="currentEditingTask.evalRound" :options="evalRounds" optionLabel="label" optionValue="value" placeholder="เลือกรอบประเมิน" class="w-full" @change="onEditEvaluChange" />
-        </div>
-        <div class="field col-12 md:col-6">
-          <label class="font-semibold">แบบ ป.ที่สอดคล้อง</label> <AutoComplete v-model="currentEditingTask.porForm" :suggestions="porFormSuggestions" field="label" placeholder="พิมพ์เพื่อค้นหา/เลือกแบบ ป." dropdown class="w-full" @complete="searchPorFormRemoteForEdit" />
-        </div>
-      </div> 
-      <div class="p-fluid formgrid grid">
         <div class="field col-12 md:col-6"><label class="font-semibold">ภาระงานประจำวัน</label><InputText v-model="currentEditingTask.description" placeholder="ระบุภาระงาน..." class="w-full"/></div>
         <div class="field col-12 md:col-3"><label class="font-semibold">เวลาเริ่มต้น</label><Calendar v-model="currentEditingTask.startTime" :showTime="true" hourFormat="24" placeholder="เวลาเริ่มต้น" class="w-full"/></div>
         <div class="field col-12 md:col-3"><label class="font-semibold">เวลาสิ้นสุด</label><Calendar v-model="currentEditingTask.endTime" :showTime="true" hourFormat="24" placeholder="เวลาสิ้นสุด" class="w-full"/></div>
@@ -424,17 +414,30 @@
                   class="w-full"
                 />
             </div>
- 
+
+
+
             <div class="field col-6">
                 <label class="font-semibold">รอบประเมิน</label>
-                <Dropdown v-model="newTaskInStep.evalRound" :options="evalRounds" optionLabel="label" optionValue="value" placeholder="กรุณาเลือกรอบการประเมิน" class="w-full" @change="onEvaluChange" />
-            </div>
-            <div class="field col-6">
+                <Dropdown v-model="newTaskInStep.taskType" :options="taskTypes" optionLabel="label" optionValue="value" placeholder="เลือกปีงบประมาณ" class="w-full" @change="onTaskTypeChange"/>
+            </div> 
+            <!-- ลือกแบบ ป. ที่สอดคล้องกับภาระงาน (แสดงเมื่อประเภทงานไม่ใช่ 'งานอื่นๆ') --> 
+            <div class="field col-6"  >
               <label class="font-semibold">แบบ ป.ที่สอดคล้อง</label>
-                <AutoComplete v-model="newTaskInStep.porForm" :suggestions="porFormSuggestions" field="label" placeholder="พิมพ์เพื่อค้นหา/เลือกแบบ ป." dropdown class="w-full" @complete="searchPorFormRemote" />
+                <AutoComplete
+                  v-model="newTaskInStep.mainTask"
+                  :suggestions="mainTaskSuggestions"
+                  @complete="completeMainTask"
+                  placeholder="พิมพ์เพื่อค้นหา/เลือกแบบ ป. ที่สอดคล้องกับภาระงาน"
+                  dropdown
+                  @item-select="({ value }) => onMainTaskChange(value)"   
+                  @blur="onMainTaskChange(newTaskInStep.mainTask)"       
+                  class="w-full"
+                />
             </div>
+             
 
- 
+
             <!-- ภาระงานประจำวัน (แสดงแบบต่างกันขึ้นอยู่กับประเภทงาน) -->
             <div class="field col-12">
                 <label class="font-semibold">ภาระงานประจำวัน</label>
@@ -598,13 +601,6 @@
  
   const mainTasks = ref([])
   const subTasks  = ref([])
- 
-  const evalRounds = ref([])             
-  const porFormsAll = ref([])          
-  const porFormSuggestions = ref([])    
-   
-   
-
   const getMainTaskLabel = (x)=> x || 'ยังไม่เลือก'
 
   async function fetchPositionMainWorks(){
@@ -614,22 +610,11 @@
     const data = Array.isArray(res.data?.data) ? res.data.data : []
     mainTasks.value = data.map(x=>({ label:x.POSNAMETH, value:x.POSNAMETH })).filter(x=>!!x.label)
   }
-  // async function fetchAllMainWorks(){
-  //   const res = await axios.get(`${API}/getMainWorksAll`)
-  //   const data = Array.isArray(res.data?.data) ? res.data.data : [] 
-  //   mainTasks.value = data
-  //     .filter(x => !!x.label)  
-  // }
-
   async function fetchAllMainWorks(){
     const res = await axios.get(`${API}/getMainWorksAll`)
-    const data = Array.isArray(res.data?.data) ? res.data.data : []
+    const data = Array.isArray(res.data?.data) ? res.data.data : [] 
     mainTasks.value = data
-      .map(x => ({
-        label: x.POSNAMETH || x.label || '',
-        value: x.POSNAMETH || x.value || ''
-      }))
-      .filter(x => !!x.label)
+      .filter(x => !!x.label)  
   }
 
   // const onMainTaskChange = async(e)=>{
@@ -705,17 +690,15 @@
   const expandedPlans = ref([])
   const expandedSteps = ref([])
   const activeTabIndex = ref(0)
-
-  
  
   const showEditStepDialog = ref(false)
   const currentEditingStep = reactive({ id:null, name:'', dates:[], index:null })
   const showEditTaskDialog = ref(false)
-  const currentEditingTask = reactive({ taskType:null, mainTask:null, description:'', responsible:[], dueDate:null, startTime:null, endTime:null, status:'', stepId:null, taskId:null, taskIndex:null, createdDate:null,evalRound: null, porForm: null,})
+  const currentEditingTask = reactive({ taskType:null, mainTask:null, description:'', responsible:[], dueDate:null, startTime:null, endTime:null, status:'', stepId:null, taskId:null, taskIndex:null, createdDate:null })
  
   const showAddTaskDialog = ref(false)
   const currentStepToAddTasks = reactive({ id:null, name:'' })
-  const newTaskInStep = reactive({ taskType:null, mainTask:null, description:'', note:'', responsible:[], startTime:null, endTime:null, dueDate:null, status:'รอดำเนินการ',evalRound: null,porForm: null })
+  const newTaskInStep = reactive({ taskType:null, mainTask:null, description:'', note:'', responsible:[], startTime:null, endTime:null, dueDate:null, status:'รอดำเนินการ' })
   
   const isFirstStepValid = computed(()=> currentPlan.planLabel && currentPlan.owner.length>0 && currentPlan.startDate && currentPlan.endDate)
   const isSecondStepValid = computed(()=> currentPlan.steps.length>0)
@@ -811,15 +794,6 @@
             startTime:   t.startTime   ? new Date(t.startTime)   : null,
             endTime:     t.endTime     ? new Date(t.endTime)     : null,
             createdDate: t.createdDate ? new Date(t.createdDate) : null,
-
-
-
-            eval_round_year: t.eval_round_year ?? t.d_date ?? null,
-            eval_round_code: t.eval_round_code ?? t.evalua ?? null,
-            porFormCode:     t.por_form       ?? t.por_form_code ?? t.por_code ?? null,
-
-            evalu_steptasks: t.evalu_steptasks ?? t.eval_round_label ?? ((t.d_evaluationround && t.d_date) ? `${t.d_evaluationround} (${t.d_date})` : null),
-            por_detel:       t.por_detel ?? t.por_form_label ?? t.por_form ?? null, 
           }))
         }))
       }
@@ -1012,22 +986,6 @@
     }catch(e){ console.error(e); Swal.fire({ icon:'error', title:'ผิดพลาด', text:'แก้ไขขั้นตอนไม่สำเร็จ' }) }
   }
 
-  // async function openAddTaskDialog(stepData, owners){
-  //   try{
-  //     const posId = user?.user?.name?.POSITIONNAMEID ?? null
-  //     if(posId){
-  //       const res = await axios.get(`${API}/getMainWorks`, { params:{ positionnameid: posId } })
-  //       const arr = Array.isArray(res.data?.data) ? res.data.data : (res.data?.data ? [res.data.data] : [])
-  //       const uniq = []; const seen=new Set()
-  //       for(const it of arr){ if(!seen.has(it.POSNAMETH)){ seen.add(it.POSNAMETH); uniq.push(it) } }
-  //       mainTasks.value = uniq.map(x=>({ label:x.POSNAMETH, value:x.POSNAMETH }))
-  //     }
-  //   }catch(e){ console.error('getMainWorks error:', e) }
-  //   showAddTaskDialog.value=true
-  //   Object.assign(currentStepToAddTasks,{ id:stepData.id, name:stepData.name })
-  //   Object.assign(newTaskInStep,{taskType: null, mainTask: null,description:'', responsible:owners, dueDate:null, startTime:null, endTime:null, status:'รอดำเนินการ' })
-  // }
-
   async function openAddTaskDialog(stepData, owners){
     try{
       const posId = user?.user?.name?.POSITIONNAMEID ?? null
@@ -1039,30 +997,10 @@
         mainTasks.value = uniq.map(x=>({ label:x.POSNAMETH, value:x.POSNAMETH }))
       }
     }catch(e){ console.error('getMainWorks error:', e) }
-
-    showAddTaskDialog.value = true
-    Object.assign(currentStepToAddTasks, { id:stepData.id, name:stepData.name })
-    Object.assign(newTaskInStep, {
-      taskType: null, mainTask: null, description: '',
-      responsible: owners, dueDate: null, startTime: null, endTime: null,
-      status: 'รอดำเนินการ', 
-      evalRound: null,
-      porForm: null
-    })
- 
-    try{
-      await fetchEvalRounds() 
-      if (evalRounds.value.length){ 
-        newTaskInStep.evalRound = evalRounds.value[0].value
-        await onEvaluChange()
-      }
-    }catch(e){
-      console.error('fetchEvalRounds error:', e)
-    }
+    showAddTaskDialog.value=true
+    Object.assign(currentStepToAddTasks,{ id:stepData.id, name:stepData.name })
+    Object.assign(newTaskInStep,{taskType: null, mainTask: null,description:'', responsible:owners, dueDate:null, startTime:null, endTime:null, status:'รอดำเนินการ' })
   }
-
-
-  
 
   const taskTypes = [ {label:'งานหลัก', value:'งานหลัก'}, {label:'งานตำแหน่งอื่น', value:'งานตำแหน่งอื่น'}, {label:'งานอื่นๆ', value:'งานอื่นๆ'} ]
 
@@ -1096,33 +1034,18 @@
     }
 
     try {
-
-      const er = newTaskInStep.evalRound;
-      const evalLabel = er
-        ? `${er.d_evaluationround ?? ''}${er?.d_date ? ` (${er.d_date})` : ''}`.trim() || null
-        : null;
-       
       const payload = {
         step_id: currentStepToAddTasks.id,
         taskType: newTaskInStep.taskType,
         mainTask: newTaskInStep.taskType === 'งานอื่นๆ' ? 'ภาระงานอื่นๆ' : newTaskInStep.mainTask,
-        description: newTaskInStep.description,
+        description: newTaskInStep.description,   
         startTime: toDateTimeStr(newTaskInStep.startTime),
         endTime: toDateTimeStr(newTaskInStep.endTime),
         status: 'เสร็จสิ้น',
         staff_id: session.staffId,
         fac_id: session.facId,
-        responsible: (newTaskInStep.responsible || []).map(o => ({ id: o.id })),
- 
-        eval_round_year: newTaskInStep.evalRound?.d_date ?? null,
-        eval_round_code: newTaskInStep.evalRound?.evalua ?? null,
-        por_form: newTaskInStep.porForm?.value ?? null,
-
-         // ★★ ใหม่: ส่งไปเก็บลงคอลัมน์ table_steptasks
-        evalu_steptasks: evalLabel,                    // = รอบประเมิน  
-        por_detel: newTaskInStep.porForm?.label ?? null // = แบบ ป. ที่สอดคล้อง  
+        responsible: (newTaskInStep.responsible || []).map(o => ({ id: o.id }))
       }
-
 
       const res = await axios.post(`${API}/savedatatasks`, payload)
       const plan = allPlans.value.find(p => p.steps.some(s => s.id === currentStepToAddTasks.id))
@@ -1140,9 +1063,7 @@
           status: 'เสร็จสิ้น',
           createdDate: new Date(),
           staffId: session.staffId ?? null,
-          responsible: (newTaskInStep.responsible || []).map(o => ({ id: o.id, name: o.name })),
-          evalu_steptasks: payload.evalu_steptasks,
-          por_detel: payload.por_detel
+          responsible: (newTaskInStep.responsible || []).map(o => ({ id: o.id, name: o.name }))
         })
       }
 
@@ -1172,151 +1093,32 @@
         : (v ?? '')
   }
 
-  // async function openEditTaskDialogInTable(step, task, taskIndex){
-  //   showEditTaskDialog.value=true
-  //   Object.assign(currentEditingTask,{ stepId:step.id, taskId:task.id, taskIndex, taskType:task.taskType||'งานหลัก', mainTask:task.mainTask||null, description:task.description||'', responsible:task.responsible||[], dueDate:task.dueDate?new Date(task.dueDate):null, startTime:task.startTime?new Date(task.startTime):null, endTime:task.endTime?new Date(task.endTime):null, status:task.status||'', createdDate:task.createdDate?new Date(task.createdDate):null, staffId:task.staffId??session.staffId??null, evalRound: null,porForm: null,porFormCode: task.porFormCode ?? null, })
-  //   if(currentEditingTask.taskType==='งานหลัก'){ await fetchPositionMainWorks() }
-  //   else if(currentEditingTask.taskType==='งานตำแหน่งอื่น'){ await fetchAllMainWorks() }
-
-  //   normalizeEditingMainTask()
-  // }
   async function openEditTaskDialogInTable(step, task, taskIndex){
-    showEditTaskDialog.value = true
+    showEditTaskDialog.value=true
+    Object.assign(currentEditingTask,{ stepId:step.id, taskId:task.id, taskIndex, taskType:task.taskType||'งานหลัก', mainTask:task.mainTask||null, description:task.description||'', responsible:task.responsible||[], dueDate:task.dueDate?new Date(task.dueDate):null, startTime:task.startTime?new Date(task.startTime):null, endTime:task.endTime?new Date(task.endTime):null, status:task.status||'', createdDate:task.createdDate?new Date(task.createdDate):null, staffId:task.staffId??session.staffId??null })
+    if(currentEditingTask.taskType==='งานหลัก'){ await fetchPositionMainWorks() }
+    else if(currentEditingTask.taskType==='งานตำแหน่งอื่น'){ await fetchAllMainWorks() }
 
-    
-    if (!evalRounds.value?.length) {
-      await fetchEvalRounds()
-    }
-
-    Object.assign(currentEditingTask, {
-      stepId: step.id,
-      taskId: task.id,
-      taskIndex,
-      taskType: task.taskType || 'งานหลัก',
-      mainTask: task.mainTask || null,
-      description: task.description || '',
-      responsible: task.responsible || [],
-      dueDate: task.dueDate ? new Date(task.dueDate) : null,
-      startTime: task.startTime ? new Date(task.startTime) : null,
-      endTime: task.endTime ? new Date(task.endTime) : null,
-      status: task.status || '',
-      createdDate: task.createdDate ? new Date(task.createdDate) : null,
-      staffId: task.staffId ?? session.staffId ?? null,
-  
-      porFormCode: task.porFormCode ?? null,
-      evalRound: null,    
-      porForm: null,
-    })
- 
-    if (currentEditingTask.taskType === 'งานหลัก') {
-      await fetchPositionMainWorks()
-    } else if (currentEditingTask.taskType === 'งานตำแหน่งอื่น') {
-      await fetchAllMainWorks()
-    }
     normalizeEditingMainTask()
- 
-    if (task.eval_round_year || task.eval_round_code) {
-      const found = (evalRounds.value || []).find(opt =>
-        String(opt.value.d_date)  === String(task.eval_round_year) &&
-        String(opt.value.evalua)  === String(task.eval_round_code)
-      )
-      currentEditingTask.evalRound = found ? found.value : null
-    }
- 
-    if (currentEditingTask.evalRound) {
-      await onEditEvaluChange()  
-      if (currentEditingTask.porFormCode) {
-        currentEditingTask.porForm =
-          (porFormsAll.value || []).find(it => String(it.value) === String(currentEditingTask.porFormCode)) || null
-      }
-    }
   }
 
-
-
-  // async function saveEditedTask(){
-  //   const invalid = currentEditingTask.startTime && currentEditingTask.endTime && new Date(currentEditingTask.endTime) < new Date(currentEditingTask.startTime)
-  //   if(!currentEditingTask.description || invalid){
-  //     return Swal.fire({ icon:'error', title:'ข้อผิดพลาด', text: invalid? 'กรุณาตรวจสอบเวลาเริ่มต้น-สิ้นสุด':'กรุณาระบุภาระงาน' })
-  //   }
-  //   const payload={ id:currentEditingTask.taskId, taskType:currentEditingTask.taskType, mainTask:currentEditingTask.mainTask, description:currentEditingTask.description, startTime:toDateTimeStr(currentEditingTask.startTime), endTime:toDateTimeStr(currentEditingTask.endTime), status:'เสร็จสิ้น', fac_id:session.facId,por_form: currentEditingTask.porForm?.value ?? null,por_detel: currentEditingTask.porForm?.label ?? null }
-  //     try{
-  //       await axios.post(`${API}/Edtdatatasks`, payload)
-  //       const pIdx = allPlans.value.findIndex(p=> p.steps.some(s=> s.id===currentEditingTask.stepId))
-  //       if(pIdx===-1) return
-  //       const sIdx = allPlans.value[pIdx].steps.findIndex(s=> s.id===currentEditingTask.stepId)
-  //       if(sIdx===-1) return
-  //       allPlans.value[pIdx].steps[sIdx].tasks[currentEditingTask.taskIndex] = { id:currentEditingTask.taskId, taskType:currentEditingTask.taskType, mainTask:currentEditingTask.mainTask, description:currentEditingTask.description, startTime:currentEditingTask.startTime, endTime:currentEditingTask.endTime, status:'เสร็จสิ้น', createdDate:currentEditingTask.createdDate,evalu_steptasks: payload.evalu_steptasks,por_detel: payload.por_detel, }
-  //       showEditTaskDialog.value=false
-  //       Swal.fire({ icon:'success', title:'สำเร็จ', text:'แก้ไขภาระงานเรียบร้อยแล้ว', timer:1200, showConfirmButton:false })
-  //     }catch(e){ console.error(e); Swal.fire({ icon:'error', title:'ผิดพลาด', text:'แก้ไขภาระงานไม่สำเร็จ' }) }
-  //   }
   async function saveEditedTask(){
-    const invalid = currentEditingTask.startTime && currentEditingTask.endTime &&
-                    new Date(currentEditingTask.endTime) < new Date(currentEditingTask.startTime)
+    const invalid = currentEditingTask.startTime && currentEditingTask.endTime && new Date(currentEditingTask.endTime) < new Date(currentEditingTask.startTime)
     if(!currentEditingTask.description || invalid){
-      return Swal.fire({ icon:'error', title:'ข้อผิดพลาด',
-        text: invalid ? 'กรุณาตรวจสอบเวลาเริ่มต้น-สิ้นสุด' : 'กรุณาระบุภาระงาน' })
+      return Swal.fire({ icon:'error', title:'ข้อผิดพลาด', text: invalid? 'กรุณาตรวจสอบเวลาเริ่มต้น-สิ้นสุด':'กรุณาระบุภาระงาน' })
     }
- 
-    const er = currentEditingTask.evalRound
-    const evalLabel = er
-      ? `${er.d_evaluationround ?? ''}${er?.d_date ? ` (${er.d_date})` : ''}`.trim() || null
-      : null
-
-    const payload = {
-      id: currentEditingTask.taskId,
-      taskType: currentEditingTask.taskType,
-      mainTask: currentEditingTask.mainTask,
-      description: currentEditingTask.description,
-      startTime: toDateTimeStr(currentEditingTask.startTime),
-      endTime: toDateTimeStr(currentEditingTask.endTime),
-      status: 'เสร็จสิ้น',
-      fac_id: session.facId,
- 
-      eval_round_year: er?.d_date ?? null,
-      eval_round_code: er?.evalua ?? null,
-      evalu_steptasks: evalLabel,
-      por_form:  currentEditingTask.porForm?.value ?? null,
-      por_detel: currentEditingTask.porForm?.label ?? null,
-    }
-
-    try{
-      await axios.post(`${API}/Edtdatatasks`, payload)
- 
-      const pIdx = allPlans.value.findIndex(p=> p.steps.some(s=> s.id===currentEditingTask.stepId))
-      if (pIdx !== -1) {
+    const payload={ id:currentEditingTask.taskId, taskType:currentEditingTask.taskType, mainTask:currentEditingTask.mainTask, description:currentEditingTask.description, startTime:toDateTimeStr(currentEditingTask.startTime), endTime:toDateTimeStr(currentEditingTask.endTime), status:'เสร็จสิ้น', fac_id:session.facId }
+      try{
+        await axios.post(`${API}/Edtdatatasks`, payload)
+        const pIdx = allPlans.value.findIndex(p=> p.steps.some(s=> s.id===currentEditingTask.stepId))
+        if(pIdx===-1) return
         const sIdx = allPlans.value[pIdx].steps.findIndex(s=> s.id===currentEditingTask.stepId)
-        if (sIdx !== -1) {
-          allPlans.value[pIdx].steps[sIdx].tasks[currentEditingTask.taskIndex] = {
-            id: currentEditingTask.taskId,
-            taskType: currentEditingTask.taskType,
-            mainTask: currentEditingTask.mainTask,
-            description: currentEditingTask.description,
-            startTime: currentEditingTask.startTime,
-            endTime: currentEditingTask.endTime,
-            status: 'เสร็จสิ้น',
-            createdDate: currentEditingTask.createdDate,
-
-            // เก็บทั้ง label และ code
-            evalu_steptasks: payload.evalu_steptasks,
-            por_detel: payload.por_detel,
-            eval_round_year: payload.eval_round_year,
-            eval_round_code: payload.eval_round_code,
-            porFormCode: payload.por_form,
-          }
-        }
-      }
-
-      showEditTaskDialog.value = false
-      Swal.fire({ icon:'success', title:'สำเร็จ', text:'แก้ไขภาระงานเรียบร้อยแล้ว', timer:1200, showConfirmButton:false })
-    }catch(e){
-      console.error(e)
-      Swal.fire({ icon:'error', title:'ผิดพลาด', text:'แก้ไขภาระงานไม่สำเร็จ' })
+        if(sIdx===-1) return
+        allPlans.value[pIdx].steps[sIdx].tasks[currentEditingTask.taskIndex] = { id:currentEditingTask.taskId, taskType:currentEditingTask.taskType, mainTask:currentEditingTask.mainTask, description:currentEditingTask.description, startTime:currentEditingTask.startTime, endTime:currentEditingTask.endTime, status:'เสร็จสิ้น', createdDate:currentEditingTask.createdDate }
+        showEditTaskDialog.value=false
+        Swal.fire({ icon:'success', title:'สำเร็จ', text:'แก้ไขภาระงานเรียบร้อยแล้ว', timer:1200, showConfirmButton:false })
+      }catch(e){ console.error(e); Swal.fire({ icon:'error', title:'ผิดพลาด', text:'แก้ไขภาระงานไม่สำเร็จ' }) }
     }
-  }
-
-
 
   async function updateStepStatus(plan, step, newStatus){
     if(!step?.id){ await Swal.fire({ icon:'warning', title:'ยังไม่สามารถบันทึก', text:'ขั้นตอนนี้ยังไม่มี ID' }); return }
@@ -1402,147 +1204,6 @@
     const y = p?.planYear
     return (y === null || y === undefined || y === '') ? 'ไม่ระบุ' : String(y)
   }
-
-  // โหลดรายการ "รอบประเมิน"
-  async function fetchEvalRounds(){
-    if(!session.staffId || !session.facId){
-      console.warn('skip fetchEvalRounds: missing session ids')
-      evalRounds.value = []
-      return
-    }
-    const res = await axios.post(`${API}/showDateSet`, {
-      staff_id: session.staffId,
-      fac_id:   session.facId,
-      group_id: session.groupId ?? null
-    })
-    const raw = res?.data?.data ?? res?.data ?? []
-    const arr = Array.isArray(raw) ? raw : []
-    evalRounds.value = arr.map(x => ({
-      label: `${x.d_evaluationround} (${x.d_date})`,
-      value: { d_date: x.d_date, evalua: x.evalua, d_evaluationround: x.d_evaluationround }
-    }))
-  }
-
-  // เมื่อเลือกรอบประเมิน → โหลด "แบบ ป." ที่สอดคล้อง
-  async function onEvaluChange(){
-    const sel = newTaskInStep.evalRound
-    if(!sel){
-      porFormsAll.value = []
-      porFormSuggestions.value = []
-      newTaskInStep.porForm = null
-      return
-    }
-    try{
-      const res = await axios.post(`${API}/showdatatorplan`, {
-        p_year:    String(sel.d_date ?? ''),   
-        evalua:    sel.evalua ?? null,
-        p_staffid: session.staffId
-      })
-      const raw = res?.data?.data ?? res?.data ?? []
-      const list = Array.isArray(raw) ? raw : []
-      porFormsAll.value = list.map(it => ({
-        label: it.form_label || it.form_name || `แบบ ${it.form_no || it.id}`,
-        value: it.form_code  || it.form_no   || it.id
-      }))
-      porFormSuggestions.value = porFormsAll.value
-      newTaskInStep.porForm = null
-    }catch(e){
-      console.error('showdatatorplan error:', e?.response?.data || e)
-      porFormsAll.value = []
-      porFormSuggestions.value = []
-      newTaskInStep.porForm = null
-    }
-  }
- 
-  // AutoComplete filter สำหรับ "แบบ ป."
-  function completePorForm(e){
-    const q = (e.query || '').toLowerCase()
-    porFormSuggestions.value = (porFormsAll.value || []).filter(
-      it => (it.label || '').toLowerCase().includes(q)
-    ).slice(0, 30)
-  }
-  async function searchPorFormRemote(e){
-    try {
-      const q = (e.query || '').trim()
-      const sel = newTaskInStep.evalRound
-      if (!sel) { porFormSuggestions.value = []; return }
-
-      if (q.length < 2) {           
-        porFormSuggestions.value = []
-        return
-      }
-
-      const res = await axios.post(`${API}/searchdataplan`, {
-        q,
-        evalua: sel.evalua,
-        year:   String(sel.d_date),
-        staff_id: session.staffId,
-        fac_id:   session.facId,
-        limit: 30
-      })
-      porFormSuggestions.value = Array.isArray(res?.data?.data) ? res.data.data : []
-    } catch (err) {
-      console.error('searchdataplan error:', err?.response?.data || err)
-      porFormSuggestions.value = []
-    }
-  }
-  async function onEditEvaluChange(){
-    const sel = currentEditingTask.evalRound
-    if(!sel){
-      porFormsAll.value = []
-      porFormSuggestions.value = []
-      currentEditingTask.porForm = null
-      return
-    }
-    try{
-      const res = await axios.post(`${API}/showdatatorplan`, {
-        p_year:  String(sel.d_date),
-        evalua:  sel.evalua,
-        p_staffid: session.staffId
-      })
-      const raw  = res?.data?.data ?? []
-      porFormsAll.value = (Array.isArray(raw) ? raw : []).map(it => ({
-        label: it.form_label || it.form_name || `แบบ ${it.form_no || it.id}`,
-        value: it.form_code  || it.form_no   || it.id
-      }))
-      porFormSuggestions.value = porFormsAll.value
-      // ถ้ามี code เดิม ให้จับคู่ตั้งค่าอัตโนมัติ
-      if (currentEditingTask.porFormCode) {
-        const pf = porFormsAll.value.find(
-          it => String(it.value) === String(currentEditingTask.porFormCode)
-        )
-        currentEditingTask.porForm = pf || null
-      }
-    }catch(e){
-      console.error('showdatatorplan(edit) error:', e?.response?.data || e)
-      porFormsAll.value = []
-      porFormSuggestions.value = []
-      currentEditingTask.porForm = null
-    }
-  }
-  async function searchPorFormRemoteForEdit(e){
-    try {
-      const q = (e.query || '').trim()
-      const sel = currentEditingTask.evalRound
-      if (!sel || q.length < 2) { porFormSuggestions.value = []; return }
-
-      const res = await axios.post(`${API}/searchdataplan`, {
-        q,
-        evalua: sel.evalua,
-        year:   String(sel.d_date),
-        staff_id: session.staffId,
-        fac_id:   session.facId,
-        limit: 30
-      })
-      porFormSuggestions.value = Array.isArray(res?.data?.data) ? res.data.data : []
-    } catch (err) {
-      console.error('searchdataplan(edit) error:', err?.response?.data || err)
-      porFormSuggestions.value = []
-    }
-  }
-
-
-
 
   </script>
 
