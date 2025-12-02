@@ -77,7 +77,7 @@
           </template>
         </Column> 
         <!-- ผู้รับผิดชอบ (แสดง 2 คน + นับส่วนเกิน) -->
-        <Column header="ผู้รับผิดชอบหลัก" style="min-width:12rem;max-width:18rem">
+        <Column header="ผู้รับผิดชอบ" style="min-width:12rem;max-width:18rem">
           <template #body="{data}">
             <div class="flex flex-wrap gap-1">
               <span 
@@ -275,6 +275,7 @@
             <AutoComplete v-model="currentPlan.owner" :multiple="true" :suggestions="ownerSuggestions" optionLabel="name" placeholder="พิมพ์ชื่อหรือรหัสพนักงานเพื่อค้นหา…" forceSelection dropdown @complete="searchOwners"/>
             <small class="text-gray-500">พิมพ์อย่างน้อย 3 ตัวอักษร เช่น รหัสพนักงาน หรือชื่อ-สกุล</small>
           </div>
+ 
           <div class="field col-12 md:col-6">
             <label class="font-semibold text-lg">วันที่เริ่มต้น <span class="text-red-500">*</span></label>
             <Calendar v-model="currentPlan.startDate" dateFormat="dd/mm/yy" showIcon required/>
@@ -423,8 +424,7 @@
                   @blur="onMainTaskChange(newTaskInStep.mainTask)"       
                   class="w-full"
                 />
-            </div>
- 
+            </div> 
             <div class="field col-6">
                 <label class="font-semibold">รอบประเมิน</label>
                 <Dropdown v-model="newTaskInStep.evalRound" :options="evalRounds" optionLabel="label" optionValue="value" placeholder="กรุณาเลือกรอบการประเมิน" class="w-full" @change="onEvaluChange" />
