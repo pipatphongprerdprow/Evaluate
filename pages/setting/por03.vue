@@ -169,7 +169,7 @@
                                     </td> 
                                     <td>{{ row1.indicator }}</td>
 
-                                    <td>
+                                    <!-- <td>
                                         <InputNumber 
                                             v-model.number="row1.selfAssessment" 
                                             type="text" 
@@ -178,6 +178,18 @@
                                             :min="0" 
                                             :max="5"
                                             showButtons
+                                        />
+                                    </td> -->
+                                    <td>
+                                        <InputNumber 
+                                            v-model.number="row1.selfAssessment"
+                                            type="text"
+                                            placeholder="0"
+                                            autocomplete="off"
+                                            :min="0"
+                                            :max="5"
+                                            showButtons
+                                            :disabled="currentDate > dataPor.d_enddate" 
                                         />
                                     </td>
                                     <td>  
@@ -222,6 +234,7 @@
                                             placeholder="0" 
                                             autocomplete="off" 
                                             showButtons
+                                            :disabled="currentDate > dataPor.d_enddate" 
                                         />
                                     </td>
                                     <td>
@@ -265,6 +278,7 @@
                                                 placeholder="0" 
                                                 autocomplete="off" 
                                                 showButtons
+                                                :disabled="currentDate > dataPor.d_enddate"
                                             />
                                         </template>
                                         <template v-else>
