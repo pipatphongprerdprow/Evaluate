@@ -7,18 +7,18 @@
             <div class="card mb-0">
                 <!-- {{ dataPor }} --> 
                 <div class="formgroup-inline mb-1"> 
-                    <div class="col md:col-6">
+                    <div class="col md:col-4">
                         <h3 class="mb-4 card-header">
                             <i class="pi pi-fw pi-folder-open" style="font-size: x-large;"></i> แบบ ป01
                         </h3>
                     </div>
-                    <div class="col md:col-6"> 
+                    <div class="col md:col-8"> 
                         <!-- {{ currentDate }} -- {{ dataPor.d_recordingday }} -->
                         <!-- <div v-if="!isCurrentDateAfter"> -->
                         <div v-if="currentDate < dataPor.d_recordingday">
                             <Button icon="pi pi-search" severity="help" class="mb-2 mr-6" label="เลือกข้อมูลแบบประเมิน ป.01" @click="OpenDialogP01" /> 
                             <Button icon="pi pi-plus" severity="info" class="mb-2 mr-6" label="เพิ่มข้อมูลแบบประเมิน" @click="OpenDialogAdd" />
-                            <!-- <Button  icon="pi pi-copy"  severity="success" class="mb-2" label="คัดลอกข้อมูลรอบประเมิน" @click="copyEvaluationData" /> -->
+                            <Button  icon="pi pi-copy"  severity="success" class="mb-2" label="คัดลอกข้อมูลรอบประเมิน" @click="copyEvaluationData" />
                         </div> 
                     </div>  
                 </div>  

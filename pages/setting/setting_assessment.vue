@@ -4,7 +4,7 @@
             <div class="card mb-0"> 
                 <div class="formgroup-inline mb-1">
                    
-                    <div class="col md:col-8"> 
+                    <div class="col md:col-6"> 
                         <h4 v-if="dataP01" class="mb-4 card-header"><i class="pi pi-fw pi-sliders-h" style="font-size: x-large;"></i>  
                             จัดการ แบบประเมิน {{ dataP01.d_evaluationround }} ปีงบประมาณ : {{ dataP01.year }}  
                             <!-- {{ dataP01 }} -->
@@ -15,10 +15,12 @@
                     </div>
                     <div class="col md:col-3 text-left"> 
                         <label for="dropdownItemYear">ปีงบประมาณ : {{ dataP01.year }}  {{ user.user.name.SCOPES?.staffdepartment }}</label> 
-                    </div>     -->
-                    <div class="col md:col-4 text-right"> 
+                    </div>     --> 
+                    <div class="col md:col-6 text-right"> 
                         <Button icon="pi pi-plus" severity="warning" class="mb-2 mr-2" label="เพิ่มประเภทภาระงาน" @click="OpenDialogAddwork" /> 
                         <Button icon="pi pi-plus" severity="help" class="mb-2 mr-2" label="เพิ่มข้อมูลแบบประเมิน" @click="OpenDialogAdd" /> 
+                        <Button  icon="pi pi-copy"  severity="success" class="mb-2" label="คัดลอกข้อมูลรอบประเมิน" @click="copyEvaluationData" />
+ 
                         <Dialog header="จัดการแบบ ป01" maximizable v-model:visible="DialogAdd" :breakpoints="{ '960px': '75vw' }" :style="{ width: '100vw' }" :modal="true" position="top">
                             <form>
                                 <InputText v-model="text_edt" type="hidden" style="display: none;" />
@@ -146,6 +148,58 @@
                             </template>
                         </Dialog> 
 
+                        <!-- คัดลอกข้อมูลรอบประเมิน -->
+                         <Dialog header="คัดลอกข้อมูลแบบประเมิน ป01" maximizable v-model:visible="DialogCopy" :breakpoints="{ '960px': '75vw' }" :style="{ width: '60vw' }" :modal="true" position="top" >
+                            <form>
+                                <div class="p-fluid formgrid grid">
+                                    <div class="field col-12 md:col-12">
+                                        <label>
+                                            <b>เลือกปีงบประมาณและรอบประเมินที่ต้องการคัดลอก</b>
+                                        </label>
+
+                                        <!-- แสดงรายการปี + รอบ ที่ backend ส่งมา -->
+                                        <div
+                                            v-for="round in evalRounds"
+                                            :key="round.year + '-' + round.evalua"
+                                            class="flex align-items-center mb-2"
+                                        >
+                                            <RadioButton
+                                                :inputId="'round-' + round.year + '-' + round.evalua"
+                                                name="evalRound"
+                                                :value="round"                    
+                                                v-model="selectedEvalRound"
+                                            />
+                                            <label class="ml-2"  :for="'round-' + round.year + '-' + round.evalua" >
+                                                <!-- ปี {{ round.year }} รอบที่ {{ round.evalua }} {{ getRoundDesc(round.evalua) }} -->
+                                                 รอบที่ {{ round.evalua }}  {{ getRoundDesc(round.evalua) }}  ปี {{ round.year }}
+                                            </label>
+                                        </div>
+
+                                        <small class="text-gray-600">
+                                            * เลือกปี/รอบที่เคยบันทึกแบบ ป01 ไว้ แล้วคัดลอกมาใช้ใน
+                                            ปี {{ dataP01.year }} รอบที่ {{ dataP01.evalua }}
+                                        </small>
+                                    </div>
+                                </div>
+                            </form>
+
+                            <template #footer>
+                                <Button
+                                    label="บันทึก"
+                                    icon="pi pi-check"
+                                    class="mb-2 mr-2"
+                                    @click="confirmCopyEvaluation"
+                                />
+                                <Button
+                                    label="ยกเลิก"
+                                    icon="pi pi-times"
+                                    class="mb-2 mr-2"
+                                    severity="danger"
+                                    @click="cancelDialogcopy"
+                                />
+                            </template>
+                        </Dialog>
+
                     </div> 
                 </div>  
                 <!-- <table class="table table-bordered"> -->
@@ -239,11 +293,14 @@
   
   <script> 
   import { ref } from 'vue';
-  import axios from 'axios';  
+  import axios from 'axios';
+  import RadioButton from 'primevue/radiobutton';  
   import Swal from 'sweetalert2'
     export default {
-        props: {
-            // กำหนด props ที่จะรับข้อมูลจาก parent
+            components: {
+            RadioButton,
+        },  
+        props: { 
             dataP01: {
             type: Object,
             required: true
@@ -258,6 +315,9 @@
                 groupid_Main: '01',
                 dropdownItemYear: null ,
                 dropdownItemsYear: [
+                    { name: 'ปีงบประมาณ 2572', value: 2572 },
+                    { name: 'ปีงบประมาณ 2571', value: 2571 },
+                    { name: 'ปีงบประมาณ 2570', value: 2570 }, 
                     { name: 'ปีงบประมาณ 2569', value: 2569 },
                     { name: 'ปีงบประมาณ 2568', value: 2568 },
                     { name: 'ปีงบประมาณ 2567', value: 2567 },
@@ -315,6 +375,13 @@
                 text_Evalua:null,
                 products_listwork: [],
 
+                //คัดลอกรอบประเมิน
+                DialogCopy: false,
+                evalRounds: [],          // รายการรอบที่ใช้เป็นต้นทาง
+                selectedEvalRound: null, // รอบที่เลือกคัดลอกจาก
+
+
+
                 
                 
   
@@ -362,7 +429,8 @@
             this.text_search_no = null;
             this.text_search = null;
             this.products_list = [];
-            this.selectDataH(this.year_Main,this.facid_Main );
+            // this.selectDataH(this.year_Main,this.facid_Main );
+            this.selectDataH(this.dataP01.year, this.dataP01.staffdepartment);
         },
 
          // เปิดหน้าต่างสำหรับบันทึก 
@@ -393,27 +461,7 @@
                 console.error('Error:', error);
             });
         },
-        // บันทึกตัวชี้วัด / เกณฑ์การประเมิน
-        // async AddDatalist(){  
-        //     if(this.text_search_no == null || this.text_search == null){
-        //         Swal.fire("กรุณาตรวจสอบข้อมูล ลำดับ - ชื่อตัวชี้วัด / เกณฑ์การประเมิน!");
-        //     }else{   
-        //         if (this.products_list.length < 5) { 
-        //             this.products_list.push({
-        //                 ind_no: this.text_search_no,
-        //                 ind_Items: this.text_search
-        //             });  
-        //             // Sort the products_list by ind_no in asc order
-        //             this.products_list.sort((a, b) => a.ind_no - b.ind_no); 
-        //         } else {
-        //             Swal.fire("ตัวชี้วัด / เกณฑ์การประเมิน ครบ 5 ระดับแล้ว!");
-
-        //         } 
-        //         this.text_search_no = null;
-        //         this.text_search = null;
-        //     }
-        // },
-
+        // บันทึกตัวชี้วัด / เกณฑ์การประเมิน 
         async AddDatalist() {
             if (this.text_search_no == null || this.text_search == null) {
                 Swal.fire("กรุณาตรวจสอบข้อมูล ลำดับ - ชื่อตัวชี้วัด / เกณฑ์การประเมิน!");
@@ -507,169 +555,109 @@
                 });
             },
 
-            // บันทึกประเภทภาระงาน   
-            saveDatawork() {
-                // ตรวจสอบว่ามีข้อมูลในแต่ละช่องหรือไม่
-                if (!this.text_nowork) {
-                    Swal.fire({
-                        title: "แจ้งเตือน!",
-                        text: "กรุณากรอกลำดับที่",
-                        icon: "warning"
-                    });
-                    return; // หยุดการทำงานถ้าข้อมูลไม่ครบ
-                }
-
-                if (!this.text_Evalua) {
-                    Swal.fire({
-                        title: "แจ้งเตือน!",
-                        text: "กรุณาเลือกรอบประเมิน",
-                        icon: "warning"
-                    });
-                    return; // หยุดการทำงานถ้าข้อมูลไม่ครบ
-                }
-
-                if (!this.text_searchwork) {
-                    Swal.fire({
-                        title: "แจ้งเตือน!",
-                        text: "กรุณากรอกชื่อภาระงาน",
-                        icon: "warning"
-                    });
-                    return; // หยุดการทำงานถ้าข้อมูลไม่ครบ
-                }
-
-                // ถ้าข้อมูลครบถ้วน ก็ทำการบันทึกข้อมูล
-                axios.post('http://127.0.0.1:8000/api/saveWork', {
-                    id: this.text_search_nowork,
-                    h_no: this.text_nowork,
-                    h_evalua: this.text_Evalua,
-                    nameH: this.text_searchwork,
-                    fac_id: this.facid_Main,
-                    year_id: this.year_Main
-                }).then(res => {
-                    //console.log(res.data);
-                    Swal.fire({
-                        title: "เรียบร้อย!",
-                        text: "บันทึกข้อมูลภาระงานเรียบร้อย!",
-                        icon: "success"
-                    });
-                    this.DialogAddwork = false;
-                    this.showDataPerson(this.dataP01.year, this.dataP01.staffdepartment, this.dataP01.evalua);
-                }).catch(error => {
-                    console.error('Error:', error);
-                    Swal.fire("เกิดข้อผิดพลาด!", "ไม่สามารถบันทึกข้อมูลได้", "error");
+        // บันทึกประเภทภาระงาน   
+        saveDatawork() {
+            // ตรวจสอบว่ามีข้อมูลในแต่ละช่องหรือไม่
+            if (!this.text_nowork) {
+                Swal.fire({
+                    title: "แจ้งเตือน!",
+                    text: "กรุณากรอกลำดับที่",
+                    icon: "warning"
                 });
-            },
- 
-            // ปิดหน้าต่างบันทึก
-            resetDialog(){
-                this.DialogAdd = false; 
-            },
-            resetDialogwork(){
-                this.DialogAddwork = false; 
-            },
-            // แก้ไขข้อมูล
-            async editData(data){    
-            await axios.post('   http://127.0.0.1:8000/api/edtDataPerson',{
-                p_id: data.p_id
-            }).then(res => { 
-                    // console.log(res.data);   
-                    this.DialogAdd = true; 
-                    this.text_edt = res.data[0].p_id;   
-                    this.text_no = res.data[0].p_no; 
-                    this.text_name = res.data[0].p_subject;  
-                    const target_f = this.dropdownItemsTarget.filter(f=>f.value==res.data[0].p_target)
-                    this.dropdownItemTarget = target_f.length > 0 ? target_f[0] : null;    
-                    this.text_weight = res.data[0].p_weight;  
-                    this.products_list = res.data[0].sub_ITem; 
-                    this.selectDataHEdt(res.data[0].p_year,res.data[0].p_facid,res.data[0].h_id,res.data[0].evalua);   
-                })
-                .catch(error => {
-                    console.error('Error:', error);
+                return; // หยุดการทำงานถ้าข้อมูลไม่ครบ
+            }
+
+            if (!this.text_Evalua) {
+                Swal.fire({
+                    title: "แจ้งเตือน!",
+                    text: "กรุณาเลือกรอบประเมิน",
+                    icon: "warning"
                 });
-            },
-            //แก้ไขประเภทภาระงาน 
-            async Edtwork(data) {
-                    try {
-                        const res = await axios.post(' http://127.0.0.1:8000/api/Edtwork', {
-                        id: data.id,
-                        h_no:data.h_no,
-                        nameH:data.nameH,
-                        h_evalua:data.h_evalua 
-                        }); 
-                        //console.log("ข้อมูลที่ได้:", res.data); 
-                        this.DialogAddwork = true;
-                        this.text_search_nowork = res.data.id;
-                        this.text_searchwork = res.data.nameH;
-                        this.facid_Main = res.data.fac_id; 
-                        this.text_nowork = res.data.h_no;
-                        this.text_Evalua = res.data.h_evalua;
-                    } catch (error) {
-                        console.error('Error:', error);
-                    }
-                }, 
-                async Delework(id){  
-                    Swal.fire({
-                        title: "คุณต้องการลบแบบ ป01 ใช่หรือไม่ ?",
-                        text: "เมื่อคลิกปุ่ม Yes, delete it! ข้อมูลจะถูกลบทันที!",
-                        icon: "warning",
-                        showCancelButton: true,
-                        confirmButtonColor: "#3085d6",
-                        cancelButtonColor: "#d33",
-                        confirmButtonText: "Yes, delete it!"
-                        }).then((result) => {
-                        if (result.isConfirmed) {
-                            axios.post(' http://127.0.0.1:8000/api/Delework',{
-                                id:id
-                            }).then(res => { 
-                                 //console.log(res.data);   
-                                this.showDataPerson(this.dataP01.year,this.dataP01.staffdepartment,this.dataP01.evalua);
-                                Swal.fire({
-                                title: "ลบข้อมูลเสร็จสิ้น!",
-                                text: "ข้อมูลของคุณถูกลบแล้ว",
-                                icon: "success"
-                                });
-                            })
-                            .catch(error => {
-                                console.error('Error:', error);
-                            }); 
-                        }
+                return; // หยุดการทำงานถ้าข้อมูลไม่ครบ
+            }
+
+            if (!this.text_searchwork) {
+                Swal.fire({
+                    title: "แจ้งเตือน!",
+                    text: "กรุณากรอกชื่อภาระงาน",
+                    icon: "warning"
+                });
+                return; // หยุดการทำงานถ้าข้อมูลไม่ครบ
+            }
+
+            // ถ้าข้อมูลครบถ้วน ก็ทำการบันทึกข้อมูล
+            axios.post('http://127.0.0.1:8000/api/saveWork', {
+                id: this.text_search_nowork,
+                h_no: this.text_nowork,
+                h_evalua: this.text_Evalua,
+                nameH: this.text_searchwork,
+                // fac_id: this.facid_Main,
+                // year_id: this.year_Main
+                fac_id: this.dataP01.staffdepartment, // ใช้จาก props
+                year_id: this.dataP01.year             // 👈 ใช้ปีจาก props โ
+            }).then(res => {
+                //console.log(res.data);
+                Swal.fire({
+                    title: "เรียบร้อย!",
+                    text: "บันทึกข้อมูลภาระงานเรียบร้อย!",
+                    icon: "success"
+                });
+                this.DialogAddwork = false;
+                this.showDataPerson(this.dataP01.year, this.dataP01.staffdepartment, this.dataP01.evalua);
+            }).catch(error => {
+                console.error('Error:', error);
+                Swal.fire("เกิดข้อผิดพลาด!", "ไม่สามารถบันทึกข้อมูลได้", "error");
+            });
+        },
+
+        // ปิดหน้าต่างบันทึก
+        resetDialog(){
+            this.DialogAdd = false; 
+        },
+        resetDialogwork(){
+            this.DialogAddwork = false; 
+        },
+        // แก้ไขข้อมูล
+        async editData(data){    
+        await axios.post('   http://127.0.0.1:8000/api/edtDataPerson',{
+            p_id: data.p_id
+        }).then(res => { 
+                // console.log(res.data);   
+                this.DialogAdd = true; 
+                this.text_edt = res.data[0].p_id;   
+                this.text_no = res.data[0].p_no; 
+                this.text_name = res.data[0].p_subject;  
+                const target_f = this.dropdownItemsTarget.filter(f=>f.value==res.data[0].p_target)
+                this.dropdownItemTarget = target_f.length > 0 ? target_f[0] : null;    
+                this.text_weight = res.data[0].p_weight;  
+                this.products_list = res.data[0].sub_ITem; 
+                this.selectDataHEdt(res.data[0].p_year,res.data[0].p_facid,res.data[0].h_id,res.data[0].evalua);   
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        },
+        //แก้ไขประเภทภาระงาน 
+        async Edtwork(data) {
+                try {
+                    const res = await axios.post(' http://127.0.0.1:8000/api/Edtwork', {
+                    id: data.id,
+                    h_no:data.h_no,
+                    nameH:data.nameH,
+                    h_evalua:data.h_evalua 
                     }); 
-                },   
-            //แก้ไขเกณฑ์/ตัวชี้วัดของ ป.01
-            Editcriteria(item) {
-                const index = this.products_list.findIndex(p => p.ind_no === item.ind_no);
-                if (index !== -1) {
-                    this.text_search_no = item.ind_no;
-                    this.text_search = item.ind_Items;
-                    this.editIndex = index;
-                }
-            },
-
-
-            // ดึงข้อมูลภาระงาน
-            selectDataHEdt(year,fac,he,evalua){  
-                //console.log(year,fac,he,evalua);
-                
-                axios.post('   http://127.0.0.1:8000/api/selectDataPersonH',{
-                    // year: year,
-                    // fac: fac,
-                    // evalua:evalua
-                    fac_id : this.dataP01.staffdepartment,
-                    year_id :this.dataP01.year ,
-                    evalua : this.dataP01.evalua 
-                }).then(res => {     
-                     //console.log(res.data); 
-                    this.dropdownItemsH=res.data;  
-                    const h_f = res.data.filter(f=>f.id==he); 
-                    this.dropdownItemH = h_f.length > 0 ? h_f[0] : null;    
-
-                })
-                .catch(error => {
+                    //console.log("ข้อมูลที่ได้:", res.data); 
+                    this.DialogAddwork = true;
+                    this.text_search_nowork = res.data.id;
+                    this.text_searchwork = res.data.nameH;
+                    this.facid_Main = res.data.fac_id; 
+                    this.text_nowork = res.data.h_no;
+                    this.text_Evalua = res.data.h_evalua;
+                } catch (error) {
                     console.error('Error:', error);
-                });
-            },
-            // ลบข้อมูล
-            async delData(data){  
+                }
+            }, 
+            async Delework(id){  
                 Swal.fire({
                     title: "คุณต้องการลบแบบ ป01 ใช่หรือไม่ ?",
                     text: "เมื่อคลิกปุ่ม Yes, delete it! ข้อมูลจะถูกลบทันที!",
@@ -680,10 +668,10 @@
                     confirmButtonText: "Yes, delete it!"
                     }).then((result) => {
                     if (result.isConfirmed) {
-                        axios.post('   http://127.0.0.1:8000/api/delDataPerson',{
-                            p_id: data.p_id
+                        axios.post(' http://127.0.0.1:8000/api/Delework',{
+                            id:id
                         }).then(res => { 
-                            // console.log(res);   
+                                //console.log(res.data);   
                             this.showDataPerson(this.dataP01.year,this.dataP01.staffdepartment,this.dataP01.evalua);
                             Swal.fire({
                             title: "ลบข้อมูลเสร็จสิ้น!",
@@ -697,8 +685,139 @@
                     }
                 }); 
             },   
-        } 
-    }
+        //แก้ไขเกณฑ์/ตัวชี้วัดของ ป.01
+        Editcriteria(item) {
+            const index = this.products_list.findIndex(p => p.ind_no === item.ind_no);
+            if (index !== -1) {
+                this.text_search_no = item.ind_no;
+                this.text_search = item.ind_Items;
+                this.editIndex = index;
+            }
+        }, 
+        // ดึงข้อมูลภาระงาน
+        selectDataHEdt(year,fac,he,evalua){  
+            //console.log(year,fac,he,evalua);
+            
+            axios.post('   http://127.0.0.1:8000/api/selectDataPersonH',{
+                // year: year,
+                // fac: fac,
+                // evalua:evalua
+                fac_id : this.dataP01.staffdepartment,
+                year_id :this.dataP01.year ,
+                evalua : this.dataP01.evalua 
+            }).then(res => {     
+                    //console.log(res.data); 
+                this.dropdownItemsH=res.data;  
+                const h_f = res.data.filter(f=>f.id==he); 
+                this.dropdownItemH = h_f.length > 0 ? h_f[0] : null;    
+
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        },
+        // ลบข้อมูล
+        async delData(data){  
+            Swal.fire({
+                title: "คุณต้องการลบแบบ ป01 ใช่หรือไม่ ?",
+                text: "เมื่อคลิกปุ่ม Yes, delete it! ข้อมูลจะถูกลบทันที!",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Yes, delete it!"
+                }).then((result) => {
+                if (result.isConfirmed) {
+                    axios.post('   http://127.0.0.1:8000/api/delDataPerson',{
+                        p_id: data.p_id
+                    }).then(res => { 
+                        // console.log(res);   
+                        this.showDataPerson(this.dataP01.year,this.dataP01.staffdepartment,this.dataP01.evalua);
+                        Swal.fire({
+                        title: "ลบข้อมูลเสร็จสิ้น!",
+                        text: "ข้อมูลของคุณถูกลบแล้ว",
+                        icon: "success"
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    }); 
+                }
+            }); 
+        },   
+
+        // เปิด Dialog คัดลอกรอบประเมิน
+        copyEvaluationData() {
+            this.DialogCopy = true;
+            this.selectedEvalRound = null; 
+            axios.post('http://127.0.0.1:8000/api/getEvalRoundsForCopy', {
+                fac_id: this.dataP01.staffdepartment,
+                year_id: this.dataP01.year,
+                evalua: this.dataP01.evalua,
+            })
+            .then(res => { 
+                this.evalRounds = res.data;
+            })
+            .catch(error => {
+                console.error('getEvalRoundsForCopy error:', error);
+                Swal.fire('ผิดพลาด', 'ไม่สามารถโหลดข้อมูลปี/รอบประเมินได้', 'error');
+            });
+        },
+
+        // ยืนยันคัดลอกข้อมูล
+        async confirmCopyEvaluation() {
+            if (!this.selectedEvalRound) {
+                Swal.fire('ยังไม่ได้เลือกปี/รอบ', 'กรุณาเลือกรอบประเมินที่ต้องการคัดลอก', 'warning');
+                return;
+            }
+
+            const fromYear   = this.selectedEvalRound.year;
+            const fromEvalua = this.selectedEvalRound.evalua;
+            const toYear     = this.dataP01.year;
+            const toEvalua   = this.dataP01.evalua;
+
+            try {
+                await axios.post('http://127.0.0.1:8000/api/copyDataP01FromRound', {
+                    fac_id: this.dataP01.staffdepartment,
+                    from_year: fromYear,
+                    to_year: toYear,
+                    from_evalua: fromEvalua,
+                    to_evalua: toEvalua,
+                    staff_id: this.staffid_Main,    
+                });
+
+                this.DialogCopy = false;
+
+                // โหลดข้อมูลปี/รอบปัจจุบันใหม่
+                this.showDataPerson(this.dataP01.year, this.dataP01.staffdepartment, this.dataP01.evalua);
+
+                Swal.fire({
+                    title: 'คัดลอกสำเร็จ!',
+                    text: `คัดลอกข้อมูลจาก ปี ${fromYear} รอบที่ ${fromEvalua} → ปี ${toYear} รอบที่ ${toEvalua} เรียบร้อย`,
+                    icon: 'success'
+                });
+            } catch (error) {
+                console.error('Error copyDataP01FromRound:', error);
+                Swal.fire('ผิดพลาด', 'ไม่สามารถคัดลอกข้อมูลได้', 'error');
+            }
+        },
+        cancelDialogcopy() {
+            this.DialogCopy = false;
+            this.selectedEvalRound = null;
+        },
+
+        getRoundDesc(evalua) { 
+            const round = parseInt(evalua, 10);
+            if (round === 1) {
+                return 'วันที่ 1 กันยายน ถึง วันที่ 28/29 กุมภาพันธ์';
+            } else if (round === 2) {
+                return 'วันที่ 1 มีนาคม ถึง วันที่ 31 สิงหาคม';
+            }
+            return '';
+        },
+ 
+    } 
+}
   
   </script>
   
@@ -708,9 +827,9 @@
       font-weight: 500;
   }
   .card-header {
-      text-align: left; /* Aligns text to the left */
-      margin: 0; /* Removes default margins */
-      padding: 0; /* Removes default padding */
+      text-align: left;  
+      margin: 0;  
+      padding: 0;  
   }
   .table th {
       background-color: #edf2bb;

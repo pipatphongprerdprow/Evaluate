@@ -7,29 +7,30 @@
             <div class="card mb-0">
                 <!-- {{ dataPor }} --> 
                 <div class="formgroup-inline mb-1"> 
-                    <div class="col md:col-6">
+                    <div class="col md:col-4">
                         <h3 class="mb-4 card-header">
                             <i class="pi pi-fw pi-folder-open" style="font-size: x-large;"></i> แบบ ป01
                         </h3>
                     </div>
-                    <div class="col md:col-6"> 
+                    <div class="col md:col-8"> 
                         <!-- {{ currentDate }} -- {{ dataPor.d_recordingday }} -->
-                        <!-- <div v-if="!isCurrentDateAfter"> -->
                         <div v-if="currentDate < dataPor.d_recordingday">
                             <Button icon="pi pi-search" severity="help" class="mb-2 mr-6" label="เลือกข้อมูลแบบประเมิน ป.01" @click="OpenDialogP01" /> 
                             <Button icon="pi pi-plus" severity="info" class="mb-2 mr-6" label="เพิ่มข้อมูลแบบประเมิน" @click="OpenDialogAdd" />
-                            <!-- <Button  icon="pi pi-copy"  severity="success" class="mb-2" label="คัดลอกข้อมูลรอบประเมิน" @click="copyEvaluationData" /> -->
+                            <!-- <Button icon="pi pi-copy" severity="success" class="mb-2" label="คัดลอกข้อมูลรอบประเมิน" @click="copyEvaluationData" :style="products_personX[0].subP01sX.length > 0 ? 'display:none' : ''" />   -->
+                            <Button icon="pi pi-copy" severity="success" class="mb-2" label="คัดลอกข้อมูลรอบประเมิน" @click="copyEvaluationData" />  
                         </div> 
                     </div>  
                 </div>  
+
                 <!-- แสดงข้อมูลบันทึก -->
-                <table class="table" >
+                <table class="table">
                     <thead>
                         <tr>
                             <th rowspan="2" style="width: 20%;">(1) <br> กิจกรรม / โครงการ / งาน</th>
                             <th rowspan="2" style="width: 24%;">
-                            (2) <br> ตัวชี้วัด / เกณฑ์การประเมิน <br>
-                            (1.ถูกต้อง 2.ครบถ้วน <br> 3.ตรงเวลา)
+                                (2) <br> ตัวชี้วัด / เกณฑ์การประเมิน <br>
+                                (1.ถูกต้อง 2.ครบถ้วน <br> 3.ตรงเวลา)
                             </th>
                             <th colspan="5" style="width: 15%;">(3) <br> ระดับค่าเป้าหมาย</th>
                             <th rowspan="2" style="width: 7%;">(4) <br> ค่าคะแนน ที่ได้</th>
@@ -50,64 +51,63 @@
                             <tr>
                                 <td style="text-align: left;" colspan="8">
                                     <b style="color: blue;">{{ h.h_no }}. {{ h.nameH }}</b>
-                                    <!-- {{ h.id }} -->
                                 </td>
-                                <td class="text-center" style="color: blue;"><b>{{ h.p01_weight??0}}%</b></td> 
-                                <!-- <td class="text-center" style="color: blue;"><b>{{ h.h_weight }}%</b></td>  -->
+                                <td class="text-center" style="color: blue;"><b>{{ h.p01_weight ?? 0 }}%</b></td> 
                                 <td></td>
                                 <td></td> 
                             </tr> 
                             <tr v-for="(subP01, idx) in h.subP01sX" :key="idx" style="vertical-align: baseline;"> 
                                 <td style="text-align: left;">{{ subP01.p01_no }} {{ subP01.p01_subject }}</td>
                                 <td style="text-align: left;">
-                                    <b>ตัวชี้วัดที่ {{ idx+1 }} {{ subP01.p01_subject }}</b>
+                                    <b>ตัวชี้วัดที่ {{ idx + 1 }} {{ subP01.p01_subject }}</b>
                                     <p v-for="(subIitem, idI) in subP01.subITems" :key="idI" style="padding-left: 8px;margin-bottom: 5px;">
-                                        <div v-if="subIitem.ind_no!=0"><b>ระดับ {{ subIitem.ind_no }}</b> {{ subIitem.ind_Items }}</div>
-                                        <div v-if="subIitem.ind_no==0"><b>{{ subIitem.ind_Items }}</b></div>
+                                        <div v-if="subIitem.ind_no != 0"><b>ระดับ {{ subIitem.ind_no }}</b> {{ subIitem.ind_Items }}</div>
+                                        <div v-else><b>{{ subIitem.ind_Items }}</b></div>
                                     </p>
                                 </td>
-                                <td style=" vertical-align: middle;" class="text-center">
-                                    <b v-if="subP01.p01_target==1">&#10003;</b> 
-                                    <b v-if="subP01.p01_target!=1"></b> 
+                                <td class="text-center" style="vertical-align: middle;">
+                                    <b v-if="subP01.p01_target == 1">&#10003;</b>
                                 </td>
-                                <td style=" vertical-align: middle;" class="text-center"> 
-                                    <b v-if="subP01.p01_target==2">&#10003;</b> 
-                                    <b v-if="subP01.p01_target!=2"></b> 
+                                <td class="text-center" style="vertical-align: middle;">
+                                    <b v-if="subP01.p01_target == 2">&#10003;</b>
                                 </td>
-                                <td style=" vertical-align: middle;" class="text-center">
-                                    <b v-if="subP01.p01_target==3">&#10003;</b> 
-                                    <b v-if="subP01.p01_target!=3"></b> 
+                                <td class="text-center" style="vertical-align: middle;">
+                                    <b v-if="subP01.p01_target == 3">&#10003;</b>
                                 </td>
-                                <td style=" vertical-align: middle;" class="text-center"> 
-                                    <b v-if="subP01.p01_target==4">&#10003;</b> 
-                                    <b v-if="subP01.p01_target!=4"></b> 
+                                <td class="text-center" style="vertical-align: middle;">
+                                    <b v-if="subP01.p01_target == 4">&#10003;</b>
                                 </td>  
-                                <td style=" vertical-align: middle;" class="text-center"> 
-                                    <b v-if="subP01.p01_target==5">&#10003;</b> 
-                                    <b v-if="subP01.p01_target!=5"></b> 
+                                <td class="text-center" style="vertical-align: middle;">
+                                    <b v-if="subP01.p01_target == 5">&#10003;</b>
                                 </td>
 
-                                <td style=" vertical-align: middle;" class="text-center">
+                                <td class="text-center" style="vertical-align: middle;">
                                     <div v-if="currentDate >= dataPor.d_scoringday">
-                                    {{ subP01.p01_score }}
+                                        {{ subP01.p01_score }}
                                     </div>
-                                    <div v-else> 0 </div>
+                                    <div v-else>0</div>
                                 </td> 
-                                <td style="vertical-align: middle;" class="text-center">{{ subP01.p01_weight }}%</td> 
+                                <td class="text-center" style="vertical-align: middle;">{{ subP01.p01_weight }}%</td> 
 
-                                <td style=" vertical-align: middle;" class="text-center">
+                                <td class="text-center" style="vertical-align: middle;">
                                     <div v-if="currentDate >= dataPor.d_scoringday">
-                                    {{ (subP01.p01_score * subP01.p01_weight / 100).toFixed(2) }}
+                                        {{ (subP01.p01_score * subP01.p01_weight / 100).toFixed(2) }}
                                     </div>
-                                    <div v-else> 0.00 </div>
+                                    <div v-else>0.00</div>
                                 </td>
                                 
-                                <td style=" vertical-align: middle;" class="text-center">
-                                    <!-- <div v-if="!isCurrentDateAfter"> -->
+                                <td class="text-center" style="vertical-align: middle;">
                                     <div v-if="currentDate < dataPor.d_recordingday">
-                                        <SplitButton label="เลือก" :model="itemsBtu(subP01)" severity="warning" class="mb-2 mr-2"></SplitButton>
+                                        <SplitButton
+                                            label="เลือก"
+                                            :model="itemsBtu(subP01)"
+                                            severity="warning"
+                                            class="mb-2 mr-2"
+                                        />
                                     </div> 
-                                    <div v-else style="color: brown; font-weight: bold; text-align: center;"> ครบกำหนดวันบันทึก ป.01 </div> 
+                                    <div v-else style="color: brown; font-weight: bold; text-align: center;">
+                                        ครบกำหนดวันบันทึก ป.01
+                                    </div> 
                                 </td> 
                             </tr>
                         </template>
@@ -116,13 +116,13 @@
                                 <b style="color: blue;">(7) ผลรวม</b>
                             </td> 
                             <td class="text-center" style="color: blue;">
-                                <b>{{ totalWeight }}%</b> <!-- แสดงผลรวม p01_weight -->
+                                <b>{{ totalWeight }}%</b>
                             </td>
                             <td class="text-center" style="color: blue;">
                                 <div v-if="currentDate >= dataPor.d_scoringday">
-                                    <b>{{ totalCalculatedScore }}</b> <!-- แสดงผลรวมคะแนนที่คำนวณ -->
+                                    <b>{{ totalCalculatedScore }}</b>
                                 </div>
-                                <div v-else> <b>0</b> </div>
+                                <div v-else><b>0</b></div>
                             </td>
                             <td></td> 
                         </tr>
@@ -130,11 +130,6 @@
                             <td style="text-align: center; vertical-align: middle;" colspan="9">
                                 <b style="color: blue;">(8) สรุปคะแนนส่วนผลสัมฤทธิ์ของงาน =&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </b>
                                 <b style="color: blue;">ผลรวมของค่าคะแนนถ่วงน้ำหนัก</b>
-                                <!-- <div v-if="currentDate >= dataPor.d_scoringday">
-                                    <b style="display: block; text-align: right; color: blue;">
-                                        {{ totalCalculatedScore }}
-                                    </b>
-                                </div> -->
 
                                 <b style="display: block; text-align: right; color: blue;">
                                     {{ currentDate >= dataPor.d_scoringday ? totalCalculatedScore : 0 }}
@@ -146,9 +141,8 @@
                                 <b style="color: blue;">จำนวนระดับค่าเป้าหมาย = 5 </b>
                             </td>
                             <td class="text-center" style="color: blue;  vertical-align: middle;">
-                                <!-- <b>{{ totalCalculatedScore }}</b> = --> 
                                 <div v-if="currentDate >= dataPor.d_scoringday">
-                                    <b> = {{ WeightedScoreSum }}</b> 
+                                    <b>= {{ WeightedScoreSum }}</b> 
                                 </div>  
                             </td>
                             <td></td>
@@ -192,50 +186,40 @@
                                             <b style="color: blue;">{{ item.h_no }}. {{ item.nameH }} </b> 
                                         </td>
                                         <td></td>
-                                        <!-- <td class="text-center" style="color: blue;"> <b>{{ h.p_weight??0 }}%</b></td>  --> 
                                         <td></td> 
                                         <td></td>
                                     </tr>
                                     <tr v-for="(subP01, idx) in item.subP01s" :key="idx" style="vertical-align: baseline;">
-                                        <!-- <tr v-for="(subP01, idx) in [...item.subP01s].sort((a, b) => {
-                                            const aParts = a.p_no.split('.').map(Number);
-                                            const bParts = b.p_no.split('.').map(Number);
-
-                                            if (aParts[0] !== bParts[0]) {
-                                                return aParts[0] - bParts[0]; // เรียงตามหลักแรก (ก่อนจุด)
-                                            }
-                                            return (aParts[1] || 0) - (bParts[1] || 0); // เรียงตามหลักหลังจุด ถ้ามี
-                                        })" :key="idx" style="vertical-align: baseline;"></tr> -->
                                         <td class="text-center">
-                                            <Checkbox :id="'checkOption-' + subP01.p_id" :name="'option-' + subP01.p_id" :value="subP01.p_id" v-model="checkboxValue" />
+                                            <Checkbox
+                                                :id="'checkOption-' + subP01.p_id"
+                                                :name="'option-' + subP01.p_id"
+                                                :value="subP01.p_id"
+                                                v-model="checkboxValue"
+                                            />
                                         </td>
                                         <td style="text-align: left;">{{ subP01.p_no }} {{ subP01.p_subject }}</td>
                                         <td style="text-align: left;">
-                                            <b>ตัวชี้วัดที่ {{ idx+1 }} {{ subP01.p_subject }}</b>
+                                            <b>ตัวชี้วัดที่ {{ idx + 1 }} {{ subP01.p_subject }}</b>
                                             <p v-for="(subIitem, idI) in subP01.subITems" :key="idI" style="padding-left: 8px;margin-bottom: 5px;">
-                                                <div v-if="subIitem.ind_no!=0"><b>ระดับ {{ subIitem.ind_no }}</b> {{ subIitem.ind_Items }}</div>
-                                                <div v-if="subIitem.ind_no==0"><b>{{ subIitem.ind_Items }}</b></div>
+                                                <div v-if="subIitem.ind_no != 0"><b>ระดับ {{ subIitem.ind_no }}</b> {{ subIitem.ind_Items }}</div>
+                                                <div v-else><b>{{ subIitem.ind_Items }}</b></div>
                                             </p>
                                         </td>
                                         <td class="text-center">
-                                            <b v-if="subP01.p_target==1">&#10003;</b>
-                                            <b v-if="subP01.p_target!=1"></b>
+                                            <b v-if="subP01.p_target == 1">&#10003;</b>
                                         </td>
                                         <td class="text-center">
-                                            <b v-if="subP01.p_target==2">&#10003;</b>
-                                            <b v-if="subP01.p_target!=2"></b>
+                                            <b v-if="subP01.p_target == 2">&#10003;</b>
                                         </td>
                                         <td class="text-center">
-                                            <b v-if="subP01.p_target==3">&#10003;</b>
-                                            <b v-if="subP01.p_target!=3"></b>
+                                            <b v-if="subP01.p_target == 3">&#10003;</b>
                                         </td>
                                         <td class="text-center">
-                                            <b v-if="subP01.p_target==4">&#10003;</b>
-                                            <b v-if="subP01.p_target!=4"></b>
+                                            <b v-if="subP01.p_target == 4">&#10003;</b>
                                         </td>
                                         <td class="text-center">
-                                            <b v-if="subP01.p_target==5">&#10003;</b>
-                                            <b v-if="subP01.p_target!=5"></b>
+                                            <b v-if="subP01.p_target == 5">&#10003;</b>
                                         </td>
                                         <td class="text-center">{{ subP01.p_score }}</td>
                                         <td class="text-center">{{ subP01.p_weight }}%</td>
@@ -262,7 +246,13 @@
                         <div class="p-fluid formgrid grid"> 
                             <div class="field col-12 md:col-4">
                                 <label for="dropdownItemH">ประเภทภาระงาน</label>
-                                <Dropdown id="dropdownItemH" v-model="dropdownItemH" :options="dropdownItemsH" optionLabel="nameH" placeholder="เลือกประเภทภาระงาน"></Dropdown>
+                                <Dropdown
+                                    id="dropdownItemH"
+                                    v-model="dropdownItemH"
+                                    :options="dropdownItemsH"
+                                    optionLabel="nameH"
+                                    placeholder="เลือกประเภทภาระงาน"
+                                />
                             </div>
                             <div class="field col-12 md:col-2">
                                 <label for="text_no">ข้อที่</label>
@@ -284,7 +274,13 @@
                             </div> 
                             <div class="field col-12 md:col-3">
                                 <label for="text_target">ระดับค่าเป้าหมาย</label>
-                                <Dropdown id="dropdownItemTarget" v-model="dropdownItemTarget" :options="dropdownItemsTarget" optionLabel="name" placeholder="เลือกระดับค่าเป้าหมาย"></Dropdown>
+                                <Dropdown
+                                    id="dropdownItemTarget"
+                                    v-model="dropdownItemTarget"
+                                    :options="dropdownItemsTarget"
+                                    optionLabel="name"
+                                    placeholder="เลือกระดับค่าเป้าหมาย"
+                                />
                             </div> 
                             <div class="field col-12 md:col-4">
                                 <label for="text_weight">น้ำหนัก(ความสำคัญ / ความยากง่ายของงาน)</label> 
@@ -292,7 +288,13 @@
                                     <InputGroupAddon>
                                         <i class="pi pi-tags"></i>
                                     </InputGroupAddon>
-                                    <InputText v-model.number="text_weight" type="number" placeholder="น้ำหนัก(ความสำคัญ / ความยากง่ายของงาน)" autocomplete="off" step="0.01" />
+                                    <InputText
+                                        v-model.number="text_weight"
+                                        type="number"
+                                        placeholder="น้ำหนัก(ความสำคัญ / ความยากง่ายของงาน)"
+                                        autocomplete="off"
+                                        step="0.01"
+                                    />
                                 </InputGroup>
                             </div>  
                         </div> 
@@ -301,8 +303,19 @@
                             <div class="field col-12 md:col-12"> 
                                 <label for="text_search_no">เกณฑ์การประเมิน</label>
                                 <InputGroup>  
-                                    <InputText v-model="text_search_no" type="number" placeholder="ระดับ" autocomplete="off" class="col-12 md:col-2" /> 
-                                    <InputText v-model="text_search" type="text" placeholder="รายละเอียดเกณฑ์การประเมิน" autocomplete="off"/> 
+                                    <InputText
+                                        v-model="text_search_no"
+                                        type="number"
+                                        placeholder="ระดับ"
+                                        autocomplete="off"
+                                        class="col-12 md:col-2"
+                                    /> 
+                                    <InputText
+                                        v-model="text_search"
+                                        type="text"
+                                        placeholder="รายละเอียดเกณฑ์การประเมิน"
+                                        autocomplete="off"
+                                    /> 
                                     <Button icon="pi pi-save" label="บันทึก" severity="warning" @click="AddDatalist" />
                                 </InputGroup>  
                             </div>   
@@ -315,13 +328,30 @@
                             </Column> 
                             <Column field="ind_Items" header="ชื่อตัวชี้วัด / เกณฑ์การประเมิน" style="text-align: left;width: 80%">
                                 <template #body="Item"> 
-                                {{ Item.data.ind_Items }}
+                                    {{ Item.data.ind_Items }}
                                 </template>
                             </Column>  
                             <Column field="options" header="ตัวเลือก" style="text-align: center; width: 10%">
                                 <template #body="Item"> 
-                                    <Button style="text-align: center;" severity="primary" icon="pi pi-pencil" class="p-button-text" outlined rounded @click="EditRegislick(Item.data)"></Button> &nbsp;
-                                    <Button style="text-align: center;" severity="danger" icon="pi pi-trash" class="p-button-text" outlined rounded @click="DeleteRegislick(Item.data.ind_no)"></Button>
+                                    <Button
+                                        style="text-align: center;"
+                                        severity="primary"
+                                        icon="pi pi-pencil"
+                                        class="p-button-text"
+                                        outlined
+                                        rounded
+                                        @click="EditRegislick(Item.data)"
+                                    />
+                                    &nbsp;
+                                    <Button
+                                        style="text-align: center;"
+                                        severity="danger"
+                                        icon="pi pi-trash"
+                                        class="p-button-text"
+                                        outlined
+                                        rounded
+                                        @click="DeleteRegislick(Item.data.ind_no)"
+                                    />
                                 </template>
                             </Column> 
                         </DataTable>
@@ -333,8 +363,17 @@
                 <Button label="ยกเลิก" icon="pi pi-times" class="mb-2 mr-2" severity="danger" @click="cancelDialog" />
             </template>
         </Dialog> 
+
         <!-- คัดลอกข้อมูลแบบประเมิน --> 
-        <Dialog header="คัดลอกข้อมูลแบบประเมิน ป01"  maximizable v-model:visible="DialogCopy" :breakpoints="{ '960px': '75vw' }" :style="{ width: '60vw' }" :modal="true" position="top" >
+        <Dialog
+            header="คัดลอกข้อมูลแบบประเมิน ป01"
+            maximizable
+            v-model:visible="DialogCopy"
+            :breakpoints="{ '960px': '75vw' }"
+            :style="{ width: '60vw' }"
+            :modal="true"
+            position="top"
+        >
             <form>
                 <div class="p-fluid formgrid grid">
                     <div class="field col-12 md:col-12">
@@ -345,19 +384,14 @@
                             :key="round.evalua"
                             class="flex align-items-center mb-2"
                         >
-                            <!-- ใช้ PrimeVue RadioButton (หรือ <input type="radio"> ก็ได้) -->
                             <RadioButton
                                 :inputId="'round-' + round.evalua"
                                 name="evalRound"
-                                :value="round.evalua"
+                                :value="round"
                                 v-model="selectedEvalRound"
                             />
-                            <label
-                                class="ml-2"
-                                :for="'round-' + round.evalua"
-                            >
-                                รอบที่ {{ round.evalua }}
-                                วันที่ {{ round.start_date }} - {{ round.end_date }}
+                            <label class="ml-2" :for="'round-' + round.evalua"> 
+                                 {{round.d_evaluationround }} {{ round.d_date }}
                             </label>
                         </div>
 
@@ -369,13 +403,21 @@
             </form>
 
             <template #footer>
-                <Button label="บันทึก" icon="pi pi-check" class="mb-2 mr-2" @click="confirmCopyEvaluation"/>
-                <Button label="ยกเลิก" icon="pi pi-times" class="mb-2 mr-2" severity="danger" @click="cancelDialogcopy"/>
+                <Button label="บันทึก" icon="pi pi-check" class="mb-2 mr-2" @click="confirmCopyEvaluation" />
+                <Button label="ยกเลิก" icon="pi pi-times" class="mb-2 mr-2" severity="danger" @click="cancelDialogcopy" />
             </template>
         </Dialog> 
 
         <!-- แก้ไขข้อมูลเกณฑ์การประเมิน -->
-        <Dialog header="แก้ไขข้อมูลเกณฑ์การประเมิน" maximizable v-model:visible="DialogEditList" :breakpoints="{ '960px': '75vw' }" :style="{ width: '70vw' }" :modal="true" position="top">
+        <Dialog
+            header="แก้ไขข้อมูลเกณฑ์การประเมิน"
+            maximizable
+            v-model:visible="DialogEditList"
+            :breakpoints="{ '960px': '75vw' }"
+            :style="{ width: '70vw' }"
+            :modal="true"
+            position="top"
+        >
             <form>
                 <div class="p-fluid formgrid"> 
                     <form> 
@@ -385,11 +427,22 @@
                             </div>
                             <div class="field col-9 md:col-3"> 
                                 <label for="text_search_no">ระดับ</label>
-                                <InputText v-model="text_search_noEdit" type="number" placeholder="ระดับ" autocomplete="off" disabled />  
+                                <InputText
+                                    v-model="text_search_noEdit"
+                                    type="number"
+                                    placeholder="ระดับ"
+                                    autocomplete="off"
+                                    disabled
+                                />  
                             </div>
                             <div class="field col-3 md:col-9"> 
                                 <label for="text_search_no">รายละเอียดเกณฑ์การประเมิน</label>
-                                <InputText v-model="text_searchEdit" type="text" placeholder="รายละเอียดเกณฑ์การประเมิน" autocomplete="off"/>  
+                                <InputText
+                                    v-model="text_searchEdit"
+                                    type="text"
+                                    placeholder="รายละเอียดเกณฑ์การประเมิน"
+                                    autocomplete="off"
+                                />  
                             </div>    
                         </div> 
                     </form>
@@ -403,14 +456,13 @@
 
     </div>  
 </template> 
-<script> 
-import { ref } from 'vue';
+
+<script>
 import axios from 'axios';  
-import Swal from 'sweetalert2' 
+import Swal from 'sweetalert2';
 
 export default {
     props: {
-        // กำหนด props ที่จะรับข้อมูลจาก parent
         dataPor: {
             type: Object,
             required: true
@@ -423,6 +475,7 @@ export default {
             facid_Main: null,
             groupid_Main: null, 
             currentDate: new Date().toISOString().split('T')[0],
+
             products_personX: [],
             checkboxValue: [],
             selectedItems: [], 
@@ -431,32 +484,30 @@ export default {
             DialogAddP01: false,
             DialogCopy: false,
 
-            //เพิ่มมา
             products_person: [],    
-                itemsBtu: (item) => [
-                    {
-                        label: 'แก้ไขข้อมูล',
-                        icon: 'pi pi-refresh',
-                        command: () => {
-                            this.editDatax(item);
-                        }
-                    },
-                    {
-                        label: 'ลบข้อมูล',
-                        icon: 'pi pi-times',
-                        command: () => {
-                            this.delDatax(item);
-                            
-                        }
+            itemsBtu: (item) => [
+                {
+                    label: 'แก้ไขข้อมูล',
+                    icon: 'pi pi-refresh',
+                    command: () => {
+                        this.editDatax(item);
                     }
-                ],  
-             // Dialog
+                },
+                {
+                    label: 'ลบข้อมูล',
+                    icon: 'pi pi-times',
+                    command: () => {
+                        this.delDatax(item);
+                    }
+                }
+            ],  
+
             text_edt: null,
-            dropdownItemH: null ,
+            dropdownItemH: null,
             dropdownItemsH: [],
             text_no: null,
             text_name: null, 
-            dropdownItemTarget: null ,
+            dropdownItemTarget: null,
             dropdownItemsTarget: [
                 { name: 'ระดับเป้าหมาย 1', value: 1 },
                 { name: 'ระดับเป้าหมาย 2', value: 2 },
@@ -471,103 +522,93 @@ export default {
             dataP01: {}, 
             totalWeight: {},
             totalCalculatedScore: {},
-            WeightedScoreSum :{},
-            // 
+            WeightedScoreSum: {},
+
             DialogEditList: false,
             text_search_noEdit: null,
             text_searchEdit: null,
 
             // คัดลอกข้อมูลแบบประเมิน
-            evalRounds: [],        // เก็บรายการรอบประเมินทั้งหมด
-            selectedEvalRound: null, // เก็บ evalua ของรอบที่เลือก
-
+            evalRounds: [],
+            selectedEvalRound: null,
         } 
     }, 
-    async mounted(){ 
-        const { signIn, getSession, signOut } = await useAuth()
+    async mounted() { 
+        const { getSession } = await useAuth();
         const user = await getSession();
-       // console.log(user.user.name);
-        const {STAFFID, SCOPES} = user.user.name
-        const {staffdepartment, groupid, staffdepartmentname, groupname} = SCOPES
-        await this.setSession(STAFFID,staffdepartment,groupid); 
-        // this.showDataPerson();
+        const { STAFFID, SCOPES } = user.user.name;
+        const { staffdepartment, groupid } = SCOPES;
+        await this.setSession(STAFFID, staffdepartment, groupid); 
     }, 
     watch: {
-        // เฝ้าดูการเปลี่ยนแปลงของ dataPor
         dataPor: {
-            handler(newVal, oldVal) {
-                // console.log('dataPor changed:', newVal);
+            handler() {
                 this.showDataPerson();
-                    // ทำสิ่งที่ต้องการเมื่อ dataPor เปลี่ยนแปลง
             },
-            deep: true // ใช้ deep: true เพื่อดูการเปลี่ยนแปลงภายใน object
+            deep: true
         },
-            checkboxValue(newVal) {
-            // ตรวจสอบว่าช่องเลือกทั้งหมดถูกเลือกหรือไม่
+        checkboxValue(newVal) {
             const totalItems = this.products_person.flatMap(item => item.subP01s).length;
             this.selectAll = newVal.length === totalItems;
         },
     },
     computed: {
-        // isCurrentDateAfter() {
-        //     return new Date(this.currentDate).getTime() > new Date(this.dataPor.d_recordingday).getTime();
-        // },
         totalWeight() {
-    const total = this.products_personX.reduce((total, h) => {
-        return total + h.subP01sX.reduce((subTotal, subP01) => {
-            return subTotal + parseFloat(subP01.p01_weight);
-        }, 0);
-    }, 0);
-
-    const roundedTotal = parseFloat(total.toFixed(2));
-
-    if (roundedTotal > 100) {
-        Swal.fire({
-            icon: "warning",
-            title: "คะแนนเกินกำหนด",
-            text: "คะแนนรวมเกิน 100% กรุณาปรับค่าใหม่!",
-        });
-    }
-
-    return roundedTotal;
-},
-        totalCalculatedScore() {
-            // คำนวณค่ารวมของคะแนนที่คำนวณ
-            return this.products_personX.reduce((total, h) => {
+            const total = this.products_personX.reduce((total, h) => {
                 return total + h.subP01sX.reduce((subTotal, subP01) => {
-                    return subTotal + (subP01.p01_score * subP01.p01_weight / 100);
+                    return subTotal + parseFloat(subP01.p01_weight);
                 }, 0);
-            }, 0).toFixed(2); // ใช้ toFixed(2) เพื่อให้มีทศนิยม 2 ตำแหน่ง
+            }, 0);
+
+            const roundedTotal = parseFloat(total.toFixed(2));
+
+            if (roundedTotal > 100) {
+                Swal.fire({
+                    icon: "warning",
+                    title: "คะแนนเกินกำหนด",
+                    text: "คะแนนรวมเกิน 100% กรุณาปรับค่าใหม่!",
+                });
+            }
+
+            return roundedTotal;
+        },
+        totalCalculatedScore() {
+            return this.products_personX
+                .reduce((total, h) => {
+                    return total + h.subP01sX.reduce((subTotal, subP01) => {
+                        return subTotal + (subP01.p01_score * subP01.p01_weight / 100);
+                    }, 0);
+                }, 0)
+                .toFixed(2);
         },
         WeightedScoreSum() {
-            // คำนวณค่ารวมของคะแนนที่คำนวณ และหารด้วย 5
-            return this.products_personX.reduce((total, h) => {
-                return total + h.subP01sX.reduce((subTotal, subP01) => {
-                    // คำนวณคะแนนรวม (subP01.p01_score * subP01.p01_weight / 100) แล้วหารด้วย 5
-                    return subTotal + ((subP01.p01_score * subP01.p01_weight / 100) / 5);
-                }, 0);
-            }, 0).toFixed(2); // ใช้ toFixed(3) เพื่อแสดงทศนิยม 3 ตำแหน่ง
+            return this.products_personX
+                .reduce((total, h) => {
+                    return total + h.subP01sX.reduce((subTotal, subP01) => {
+                        return subTotal + ((subP01.p01_score * subP01.p01_weight / 100) / 5);
+                    }, 0);
+                }, 0)
+                .toFixed(2);
         }
     }, 
     methods: {  
-        setSession (staffid_Main,facid_Main,groupid_Main) {
-           // console.log('setSession');  
-            this.staffid_Main = staffid_Main
-            this.facid_Main = facid_Main
-            this.groupid_Main = groupid_Main  
+        setSession(staffid_Main, facid_Main, groupid_Main) {
+            this.staffid_Main = staffid_Main;
+            this.facid_Main = facid_Main;
+            this.groupid_Main = groupid_Main;  
         }, 
+
         // ดึงข้อมูลเข้าตาราง 
-        showDataPerson(){  
-            //console.log('dataPor: ',this.dataPor); 
-            axios.post('    http://127.0.0.1:8000/api/showDataPersonX',{
-            staff_id: this.staffid_Main,
-            fac_id: this.dataPor.fac_id,
-            year_id: this.dataPor.d_date, 
-            evalua: this.dataPor.evalua 
-            // group_id: this.groupid_Main,  
-            }).then(res => {     
-                // console.log(res.data);  
-                this.products_personX=res.data;
+        showDataPerson() {  
+            axios.post('http://127.0.0.1:8000/api/showDataPersonX', {
+                staff_id: this.staffid_Main,
+                fac_id: this.dataPor.fac_id,
+                year_id: this.dataPor.d_date, 
+                evalua: this.dataPor.evalua 
+            }).then(res => {    
+                console.log(res.data);
+                 
+                this.products_personX = res.data;
             })
             .catch(error => {
                 console.error('Error:', error);
@@ -575,45 +616,46 @@ export default {
         }, 
 
         // ดึงข้อมูลมาแก้ไข
-        async editDatax(data){    
-          await axios.post(' http://127.0.0.1:8000/api/edtDataPersonx',{
-              p01_id: data.p01_id, 
-          }).then(res => { 
-                  //console.log(data);   
+        async editDatax(data) {    
+            await axios.post('http://127.0.0.1:8000/api/edtDataPersonx', {
+                p01_id: data.p01_id, 
+            }).then(res => { 
                 this.DialogAdd = true; 
                 this.text_edt = res.data[0].p01_id;   
                 this.text_no = res.data[0].p01_no; 
                 this.text_name = res.data[0].p01_subject;  
-                const target_f = this.dropdownItemsTarget.filter(f=>f.value==res.data[0].p01_target)
+
+                const target_f = this.dropdownItemsTarget.filter(f => f.value == res.data[0].p01_target);
                 this.dropdownItemTarget = target_f.length > 0 ? target_f[0] : null; 
 
-                const h_f = this.dropdownItemsH.filter(f => f.value == res.data[0].p01_h)
+                const h_f = this.dropdownItemsH.filter(f => f.value == res.data[0].p01_h);
                 this.dropdownItemH = h_f.length > 0 ? h_f[0] : null; 
 
                 this.text_weight = res.data[0].p01_weight;  
                 this.products_list = res.data[0].sub_ITem; 
                 this.selectDataHEdt(res.data[0].p01_h); 
-          })
-          .catch(error => {
-              console.error('Error:', error);
-          });
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
         }, 
-        // ดึงข้อมูลภาระงาน
-        selectDataHEdt(he){  
-            axios.post('    http://127.0.0.1:8000/api/selectDataPersonH',{
-                fac_id : this.dataPor.fac_id,
-                year_id : this.dataPor.d_date ,
-                evalua : this.dataPor.evalua ,
+
+        // ดึงข้อมูลภาระงาน (ตอนแก้ไข)
+        selectDataHEdt(he) {  
+            axios.post('http://127.0.0.1:8000/api/selectDataPersonH', {
+                fac_id: this.dataPor.fac_id,
+                year_id: this.dataPor.d_date,
+                evalua: this.dataPor.evalua,
             }).then(res => {     
-                // console.log(res.data); 
-                this.dropdownItemsH=res.data;  
-                const h_f = res.data.filter(f=>f.id==he); 
+                this.dropdownItemsH = res.data;  
+                const h_f = res.data.filter(f => f.id == he); 
                 this.dropdownItemH = h_f.length > 0 ? h_f[0] : null;    
             })
             .catch(error => {
                 console.error('Error:', error);
             });
         },
+
         // ลบข้อมูล
         async delDatax(data) {        
             Swal.fire({
@@ -626,9 +668,9 @@ export default {
                 confirmButtonText: "Yes, delete it!"
             }).then((result) => {
                 if (result.isConfirmed) { 
-                    axios.post('    http://127.0.0.1:8000/api/delDataPersonx', {
+                    axios.post('http://127.0.0.1:8000/api/delDataPersonx', {
                         p01_id: data.p01_id
-                    }).then(res => { 
+                    }).then(() => { 
                         this.showDataPerson(); 
                         Swal.fire({
                             title: "ลบข้อมูลเสร็จสิ้น!",
@@ -641,97 +683,85 @@ export default {
                 }
             }); 
         },
+
         // printDataP01
         async printDataP01() {  
-            const { signIn, getSession, signOut } = await useAuth()
+            const { getSession } = await useAuth();
             const user = await getSession(); 
-            // console.log(user.user.name);   
+
             const form = {
                 staff_id: this.staffid_Main,
                 group_id: this.groupid_Main,
                 fac_id: this.dataPor.fac_id,
                 year_id: this.dataPor.d_date,
                 evalua: this.dataPor.evalua,
-                PREFIXFULLNAME:user.user.name.PREFIXFULLNAME,
-                STAFFNAME :user.user.name.STAFFNAME,
-                STAFFSURNAME:user.user.name.STAFFSURNAME,
-                POSITIONNAME:user.user.name.POSITIONNAME,
-                GROUPTYPENAME:user.user.name.GROUPTYPENAME,
-                POSTYPENAME:user.user.name.POSTYPENAME, 
-                SCOPES:user.user.name.SCOPES.staffdepartmentname
-                
-            }
-           
-            
+                PREFIXFULLNAME: user.user.name.PREFIXFULLNAME,
+                STAFFNAME: user.user.name.STAFFNAME,
+                STAFFSURNAME: user.user.name.STAFFSURNAME,
+                POSITIONNAME: user.user.name.POSITIONNAME,
+                GROUPTYPENAME: user.user.name.GROUPTYPENAME,
+                POSTYPENAME: user.user.name.POSTYPENAME, 
+                SCOPES: user.user.name.SCOPES.staffdepartmentname
+            };
 
             const queryParams = new URLSearchParams(form).toString();
-            // console.log(queryParams); 
-            const url = `    http://127.0.0.1:8000/report_p01?${queryParams}`;
+            const url = `http://127.0.0.1:8000/report_p01?${queryParams}`;
             window.open(url, '_blank');
- 
         },
 
-//*================== Start เลือกข้อมูลแบบประเมิน ป.01 ==================*//
-        // เปิดหน้าต่างสำหรับบันทึก *ดึงข้อมูล
-        OpenDialogP01(){  
-            axios.post('    http://127.0.0.1:8000/api/showDataPerson', { 
+        //*================== Start เลือกข้อมูลแบบประเมิน ป.01 ==================*//
+        OpenDialogP01() {  
+            axios.post('http://127.0.0.1:8000/api/showDataPerson', { 
                 fac_id: this.dataPor.fac_id,
                 year_id: this.dataPor.d_date,
-                evalua: this.dataPor.evalua ,
-                //staff_id: this.staffid_Main, 
+                evalua: this.dataPor.evalua,
             }).then(res => {     
-                //console.log(res.data);
-                
                 this.DialogAddP01 = true; 
                 this.products_person = res.data;
-                this.checkboxValue= [];
+                this.checkboxValue = [];
             })
             .catch(error => {
                 console.error('Error:', error);
             }); 
         }, 
-        // บันทึกข้อมูล ป01 *ดึงข้อมูล
+
         async savetablechkem() {    
-            let x = []
+            let x = [];
             this.products_person.forEach((v) => {
                 const selectedItems = v.subP01s.filter(item => this.checkboxValue.includes(item.p_id)); 
                 x = x.concat(selectedItems);
-            }) 
-            // console.log(x.length);  
-            if(x.length == 0){
-                Swal.fire("ไม่มีข้อมูล","กรุณาเลือกข้อคำถามจาก ตัวจัดการ !","error");
-            }else{
-            await axios.post('    http://127.0.0.1:8000/api/savePushDataP01',{
-                data: x,
-                staffid_Main: this.staffid_Main,
-            }).then(res => { 
-                //console.log(res.data);  
-                this.showDataPerson(); 
-                this.DialogAddP01 = false; 
-                Swal.fire({
-                    title: "เรียบร้อย!",
-                    text: "บันทึกข้อมูล แบบจัดการ ป01 เรียบร้อย!",
-                    icon: "success"
-                }); 
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });  
+            });
+
+            if (x.length == 0) {
+                Swal.fire("ไม่มีข้อมูล", "กรุณาเลือกข้อคำถามจาก ตัวจัดการ !", "error");
+            } else {
+                await axios.post('http://127.0.0.1:8000/api/savePushDataP01', {
+                    data: x,
+                    staffid_Main: this.staffid_Main,
+                }).then(() => { 
+                    this.showDataPerson(); 
+                    this.DialogAddP01 = false; 
+                    Swal.fire({
+                        title: "เรียบร้อย!",
+                        text: "บันทึกข้อมูล แบบจัดการ ป01 เรียบร้อย!",
+                        icon: "success"
+                    }); 
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });  
             }
         },
-        // ปิดหน้าต่างสำหรับบันทึก *ดึงข้อมูล
-        cancelDialogs(){
+
+        cancelDialogs() {
             this.DialogAddP01 = false; 
         },
-        cancelDialogcopy(){
+        cancelDialogcopy() {
             this.DialogCopy = false; 
         },
-//*================== End เลือกข้อมูลแบบประเมิน ป.01 ==================*//
 
-
-//*================== Start เพิ่มข้อมูลแบบประเมิน ==================*//
-        // เปิดหน้าต่างสำหรับบันทึก 
-        OpenDialogAdd(){
+        //*================== Start เพิ่มข้อมูลแบบประเมิน ==================*//
+        OpenDialogAdd() {
             this.DialogAdd = true; 
             this.text_edt = null;
             this.dropdownItemH = null;
@@ -746,24 +776,23 @@ export default {
         }, 
 
 
-         // คัดลอกข้อมูลแบบประเมิน
+        // ⭐ คัดลอกข้อมูลแบบประเมิน (ใช้ showDateSet)
         async copyEvaluationData() {
             try {
-                const res = await axios.post('http://127.0.0.1:8000/api/showdatator', {
-                    fac_id: this.dataPor.fac_id,
-                    year_id: this.dataPor.d_date,
-                    // ตามจริงอาจไม่ต้องใช้ staff / group แล้วแต่ logic ของคุณ
+                const res = await axios.post('http://127.0.0.1:8000/api/showDateSet', {
                     staff_id: this.staffid_Main,
+                    fac_id: this.facid_Main ?? this.dataPor.fac_id,
+                    group_id: this.groupid_Main
                 });
 
-                // เก็บรอบทั้งหมด
-                let rounds = res.data;
+                let rounds = res.data || [];
 
-                // ตัดรอบปัจจุบันออก (กันไม่ให้คัดลอกจากรอบเดียวกัน)
+                 
+                // ตัดรอบปัจจุบันออก
                 rounds = rounds.filter(r => r.evalua !== this.dataPor.evalua);
 
                 this.evalRounds = rounds;
-                this.selectedEvalRound = null; // เคลียร์ค่าที่เคยเลือก
+                this.selectedEvalRound = null;
                 this.DialogCopy = true;
             } catch (error) {
                 console.error('Error getEvalRounds:', error);
@@ -771,25 +800,25 @@ export default {
             }
         },
 
-        async confirmCopyEvaluation() {
+        async confirmCopyEvaluation() { 
             if (!this.selectedEvalRound) {
                 Swal.fire('ยังไม่ได้เลือกรอบ', 'กรุณาเลือกรอบประเมินที่ต้องการคัดลอก', 'warning');
                 return;
             }
 
             try {
-                await axios.post('http://127.0.0.1:8000/api/copyDataP01FromRound', {
+                this.xx = await axios.post('http://127.0.0.1:8000/api/copyDataP01FromRound', {
                     staff_id: this.staffid_Main,
                     fac_id: this.dataPor.fac_id,
                     year_id: this.dataPor.d_date,
-                    // คัดลอกจากรอบที่เลือก → ไปยังรอบปัจจุบัน
-                    from_evalua: this.selectedEvalRound,
+                    from_evalua: this.selectedEvalRound.evalua,
+                    year_evalua: this.selectedEvalRound.d_date,
                     to_evalua: this.dataPor.evalua,
                 });
+                //console.log('copyDataP01FromRound: ',this.xx.data);
+                
 
                 this.DialogCopy = false;
-
-                // รีเฟรชข้อมูล ป01 ของรอบปัจจุบัน
                 this.showDataPerson();
 
                 Swal.fire({
@@ -802,29 +831,24 @@ export default {
                 Swal.fire('ผิดพลาด', 'ไม่สามารถคัดลอกข้อมูลได้', 'error');
             }
         },
-        // สิ้นสุด คัดลอกข้อมูลแบบประเมินยังไม่เสร็จ
 
-
-
-
-        // ดึงข้อมูลภาระงาน
-        selectDataH(){  
-            axios.post(' http://127.0.0.1:8000/api/selectDataPersonH',{ 
-                fac_id : this.dataPor.fac_id ,
-                year_id : this.dataPor.d_date ,
-                evalua : this.dataPor.evalua ,
+        // ดึงข้อมูลภาระงาน (ตอนเพิ่มใหม่)
+        selectDataH() {  
+            axios.post('http://127.0.0.1:8000/api/selectDataPersonH', { 
+                fac_id: this.dataPor.fac_id,
+                year_id: this.dataPor.d_date,
+                evalua: this.dataPor.evalua,
             }).then(res => {     
-               console.log(res.data);  
-                this.dropdownItemsH=res.data;  
+                this.dropdownItemsH = res.data;  
             })
             .catch(error => {
                 console.error('Error:', error);
             });
         },
-        // บันทึกตัวชี้วัด / เกณฑ์การประเมิน
-        AddDatalist(){    
-            if(this.text_search_no == null || this.text_search == null){ 
-                Swal.fire("ไม่มีข้อมูล","กรุณาตรวจสอบข้อมูล ลำดับ - ชื่อตัวชี้วัด / เกณฑ์การประเมิน!","error");
+
+        AddDatalist() {    
+            if (this.text_search_no == null || this.text_search == null) { 
+                Swal.fire("ไม่มีข้อมูล", "กรุณาตรวจสอบข้อมูล ลำดับ - ชื่อตัวชี้วัด / เกณฑ์การประเมิน!", "error");
             } else {    
                 this.products_list.push({
                     ind_no: this.text_search_no,
@@ -835,49 +859,41 @@ export default {
                 this.text_search = null;
             } 
         },
-        // ลบตัวชี้วัด / เกณฑ์การประเมิน
-        DeleteRegislick(data){
+
+        DeleteRegislick(data) {
             this.products_list = this.products_list.filter(product => product.ind_no !== data); 
         },
- 
-        // แก้ไขตัวชี้วัด / เกณฑ์การประเมิน
-        EditRegislick(data){
-            //console.log(data);
+
+        EditRegislick(data) {
             this.text_search_noEdit = null;
             this.text_searchEdit = null;
-            if(data){
+            if (data) {
                 this.DialogEditList = true; 
                 this.text_search_noEdit = data.ind_no;
                 this.text_searchEdit = data.ind_Items;
             } 
         },
-        cancelDialogEdit(){ 
+
+        cancelDialogEdit() { 
             this.DialogEditList = false;  
         }, 
-        saveDataxEdit(){ 
-            // console.log({
-            //     text_search_noEdit: this.text_search_noEdit,
-            //     text_searchEdit: this.text_searchEdit
-            // });
 
-            // สมมติว่าเรามีฟังก์ชันสำหรับอัพเดตข้อมูลใน array
+        saveDataxEdit() { 
             let updatedItem = {
                 ind_no: this.text_search_noEdit,
                 ind_Items: this.text_searchEdit
             };
 
-            // ค้นหาข้อมูลที่ต้องการแก้ไขใน products_list และอัพเดต
             const index = this.products_list.findIndex(item => item.ind_no === this.text_search_noEdit);
             if (index !== -1) {
                 this.products_list[index] = updatedItem;
             }
 
-            // ปิด Dialog หลังบันทึกข้อมูล
             this.DialogEditList = false;  
         },  
-        // บันทึกแบบจัดการ ป.1 
+
         async saveDatax() {
-            await axios.post('    http://127.0.0.1:8000/api/saveDataP01User',{
+            await axios.post('http://127.0.0.1:8000/api/saveDataP01User', {
                 staff_id: this.staffid_Main,
                 fac_id: this.dataPor.fac_id,
                 year_id: this.dataPor.d_date, 
@@ -889,8 +905,7 @@ export default {
                 text_target: this.dropdownItemTarget.value,
                 text_weight: this.text_weight, 
                 products_list: this.products_list
-            }).then(res => {  
-                //  console.log(res.data); 
+            }).then(() => {  
                 this.DialogAdd = false;
                 this.showDataPerson(); 
                 Swal.fire({
@@ -898,17 +913,16 @@ export default {
                     text: "บันทึกข้อมูล แบบ ป01 เรียบร้อย!",
                     icon: "success"
                 });
-                
             })
             .catch(error => {
                 console.error('Error:', error);
             });
- 
         }, 
-        // ปิดบันทึกแบบจัดการ ป.1 
-        cancelDialog(){
+
+        cancelDialog() {
             this.DialogAdd = false;
         },   
+
         toggleSelectAll() {
             if (!this.products_person) {
                 console.error("products_person เป็น undefined หรือ null");
@@ -922,56 +936,53 @@ export default {
             } else {
                 this.checkboxValue = []; 
             }
-
-            //console.log("selectAll:", this.selectAll);
-            //console.log("checkboxValue:", this.checkboxValue);
         }
 
     }
 } 
-//*================== End เพิ่มข้อมูลแบบประเมิน ==================*// 
- </script>
+</script>
 
 <style scoped> 
-    label{
-        font-size: medium;
-        font-weight: 500;
-    }
-    .card-header {
-        text-align: left;  
-        margin: 0;  
-        padding: 0;  
-    }
-    .table {
-        width: 100%;
-        border-collapse: collapse;
-    }
-    .table th, .table td {
-        border: 1px solid #ddd;
-        padding: 8px;
-        text-align: center;
-    }
-    .table th {
-        background-color: #edf2bb;
-        font-weight: bold;
-    }
-    .table td {
-        vertical-align: top;
-    }
-    .d-flex {
+label {
+    font-size: medium;
+    font-weight: 500;
+}
+.card-header {
+    text-align: left;  
+    margin: 0;  
+    padding: 0;  
+}
+.table {
+    width: 100%;
+    border-collapse: collapse;
+}
+.table th,
+.table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: center;
+}
+.table th {
+    background-color: #edf2bb;
+    font-weight: bold;
+}
+.table td {
+    vertical-align: top;
+}
+.d-flex {
     display: flex;
     flex-wrap: nowrap;
-    }
-    .align-items-center {
-        align-items: center;
-    }
-    .ml-auto {
-        margin-left: auto;
-    }
-    .ml-4 {
-        margin-left: 1rem;
-    }
-    .mr-4 {
-        margin-right: 1rem;
-    }
+}
+.align-items-center {
+    align-items: center;
+}
+.ml-auto {
+    margin-left: auto;
+}
+.ml-4 {
+    margin-left: 1rem;
+}
+.mr-4 {
+    margin-right: 1rem;
+}
 </style>
