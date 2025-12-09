@@ -495,9 +495,7 @@ export default {
             this.text_position9 = data.leader_position9;
             this.text_namefully9 = data.leader_name9; 
 
-
-
-
+ 
         },
         delData(data){ 
             Swal.fire({
@@ -702,7 +700,7 @@ export default {
             this.text_position3 = data.posnameth;
             this.text_namefully3 = data.namefully;
         },
-             // User 4
+            // User 4
         async searchUserStaffid4(){  
             try { 
                 if(this.text_user4.length > 3){
