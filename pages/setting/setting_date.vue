@@ -111,7 +111,8 @@
                                         <input type="hidden" v-model="text_position4"> 
                                     </div> 
                                     <div class="field col-12 md:col-4">
-                                        <label for="text_user5" style="color: red;">**เจ้าหน้าที่บุคคล**</label>
+                                         <label for="text_user5">ผู้ประเมินคนที่ 5</label>
+                                        <!-- <label for="text_user5" style="color: red;">**เจ้าหน้าที่บุคคล**</label> -->
                                         <InputGroup>
                                             <InputGroupAddon>
                                                 <i class="pi pi-user"></i>
@@ -127,6 +128,88 @@
                                         <input type="hidden" v-model="text_staff5"> 
                                         <input type="hidden" v-model="text_position5"> 
                                     </div> 
+
+
+                                    <!-- เริ่ม -->
+
+                                    <div class="field col-12 md:col-4">
+                                        <label for="text_user6">ผู้ประเมินคนที่ 6</label>
+                                        <InputGroup>
+                                            <InputGroupAddon>
+                                                <i class="pi pi-user"></i>
+                                            </InputGroupAddon>
+                                            <InputText v-model="text_user6" type="text" placeholder="ชื่อผู้ประเมิน" autocomplete="off" @keyup="searchUserStaffid6" />  
+                                        </InputGroup> 
+                                        <span v-if="seen6">
+                                            <ul id="country-list">
+                                                <li v-for="(li) in listshoeusername6" :key="li.id" @click="nameUserclick6(li)">{{li.staffid}} : {{li.namefully}}</li>
+                                            </ul>
+                                        </span>
+                                        <input type="hidden" v-model="text_namefully6">   
+                                        <input type="hidden" v-model="text_staff6"> 
+                                        <input type="hidden" v-model="text_position6"> 
+                                    </div> 
+ 
+                                    <div class="field col-12 md:col-4">
+                                        <label for="text_user7">ผู้ประเมินคนที่ 7</label>
+                                        <InputGroup>
+                                            <InputGroupAddon>
+                                                <i class="pi pi-user"></i>
+                                            </InputGroupAddon>
+                                            <InputText v-model="text_user7" type="text" placeholder="ชื่อผู้ประเมิน" autocomplete="off" @keyup="searchUserStaffid7" />  
+                                        </InputGroup> 
+                                        <span v-if="seen7">
+                                            <ul id="country-list">
+                                                <li v-for="(li) in listshoeusername7" :key="li.id" @click="nameUserclick7(li)">{{li.staffid}} : {{li.namefully}}</li>
+                                            </ul>
+                                        </span>
+                                        <input type="hidden" v-model="text_namefully7">   
+                                        <input type="hidden" v-model="text_staff7"> 
+                                        <input type="hidden" v-model="text_position7"> 
+                                    </div> 
+
+                                    <div class="field col-12 md:col-4">
+                                        <label for="text_user8">ผู้ประเมินคนที่ 8</label>
+                                        <InputGroup>
+                                            <InputGroupAddon>
+                                                <i class="pi pi-user"></i>
+                                            </InputGroupAddon>
+                                            <InputText v-model="text_user8" type="text" placeholder="ชื่อผู้ประเมิน" autocomplete="off" @keyup="searchUserStaffid8" />  
+                                        </InputGroup> 
+                                        <span v-if="seen8">
+                                            <ul id="country-list">
+                                                <li v-for="(li) in listshoeusername8" :key="li.id" @click="nameUserclick8(li)">{{li.staffid}} : {{li.namefully}}</li>
+                                            </ul>
+                                        </span>
+                                        <input type="hidden" v-model="text_namefully8">   
+                                        <input type="hidden" v-model="text_staff8"> 
+                                        <input type="hidden" v-model="text_position8"> 
+                                    </div> 
+
+                                    <div class="field col-12 md:col-4">
+                                        <label for="text_user9" style="color: red;">**เจ้าหน้าที่บุคคล**</label>
+                                        <InputGroup>
+                                            <InputGroupAddon>
+                                                <i class="pi pi-user"></i>
+                                            </InputGroupAddon>
+                                            <InputText v-model="text_user9" type="text" placeholder="ชื่อผู้ประเมิน" autocomplete="off" @keyup="searchUserStaffid9" />  
+                                        </InputGroup> 
+                                        <span v-if="seen9">
+                                            <ul id="country-list">
+                                                <li v-for="(li) in listshoeusername9" :key="li.id" @click="nameUserclick9(li)">{{li.staffid}} : {{li.namefully}}</li>
+                                            </ul>
+                                        </span>
+                                        <input type="hidden" v-model="text_namefully9">   
+                                        <input type="hidden" v-model="text_staff9"> 
+                                        <input type="hidden" v-model="text_position9"> 
+                                    </div> 
+  
+                                    <!-- สิ้นสุด -->
+
+
+
+ 
+ 
                                 </div>  
                             </form>
                             <template #footer>
@@ -285,6 +368,30 @@ export default {
             listshoeusername5: null,
             text_staff5: null,
             text_position5: null, 
+            // คนที่ 6
+            seen6: false,
+            text_user6: null,
+            listshoeusername6: null,
+            text_staff6: null,
+            text_position6: null, 
+            // คนที่ 7
+            seen7: false,
+            text_user7: null,
+            listshoeusername7: null,
+            text_staff7: null,
+            text_position7: null,
+            // คนที่ 8
+            seen8: false,
+            text_user8: null,
+            listshoeusername8: null,
+            text_staff8: null,
+            text_position8: null,
+            // คนที่ 9
+            seen9: false,
+            text_user9: null,
+            listshoeusername9: null,
+            text_staff9: null,
+            text_position9: null,
              
         }
     },
@@ -362,11 +469,33 @@ export default {
             this.text_user4 =data.leader4+' : '+ data.leader_name4; 
             this.text_staff4 = data.leader4; 
             this.text_position4 = data.leader_position4;
-            this.text_namefully4 = data.leader_name4; 
+            this.text_namefully4 = data.leader_name4;  
             this.text_user5 =data.leader5+' : '+ data.leader_name5; 
             this.text_staff5 = data.leader5; 
             this.text_position5 = data.leader_position5;
             this.text_namefully5 = data.leader_name5; 
+
+            this.text_user6 =data.leader6+' : '+ data.leader_name6; 
+            this.text_staff6 = data.leader6; 
+            this.text_position6 = data.leader_position6;
+            this.text_namefully6 = data.leader_name6; 
+
+            this.text_user7 =data.leader7+' : '+ data.leader_name7; 
+            this.text_staff7 = data.leader7; 
+            this.text_position7 = data.leader_position7;
+            this.text_namefully7 = data.leader_name7; 
+
+            this.text_user8 =data.leader8+' : '+ data.leader_name8; 
+            this.text_staff8 = data.leader8; 
+            this.text_position8 = data.leader_position8;
+            this.text_namefully8 = data.leader_name8; 
+
+            this.text_user9 =data.leader9+' : '+ data.leader_name9; 
+            this.text_staff9 = data.leader9; 
+            this.text_position9 = data.leader_position9;
+            this.text_namefully9 = data.leader_name9; 
+
+
 
 
         },
@@ -435,10 +564,23 @@ export default {
                 text_namefully3: this.text_namefully3,   
                 text_staff4: this.text_staff4,
                 text_position4: this.text_position4,
-                text_namefully4: this.text_namefully4,  
+                text_namefully4: this.text_namefully4,   
                 text_staff5: this.text_staff5,
                 text_position5: this.text_position5,
-                text_namefully5: this.text_namefully5,  
+                text_namefully5: this.text_namefully5,   
+                text_staff6: this.text_staff6,
+                text_position6: this.text_position6,
+                text_namefully6: this.text_namefully6,   
+                text_staff7: this.text_staff7,
+                text_position7: this.text_position7,
+                text_namefully7: this.text_namefully7, 
+                text_staff8: this.text_staff8,
+                text_position8: this.text_position8,
+                text_namefully8: this.text_namefully8, 
+                text_staff9: this.text_staff9,
+                text_position9: this.text_position9,
+                text_namefully9: this.text_namefully9,
+
  
             }).then(res => {     
                  //console.log(res.data); 
@@ -609,7 +751,130 @@ export default {
             this.text_staff5 = data.staffid;
             this.text_position5 = data.posnameth;
             this.text_namefully5 = data.namefully;
+        },   
+          // User 6
+        async searchUserStaffid6(){  
+            try { 
+                if(this.text_user6.length > 3){
+                    const res = await axios.get(' http://127.0.0.1:8000/api/searchDataStaff', {  
+                        params: {
+                            staffid: this.text_user6
+                        }
+                    }); 
+                    //console.log('searchUserStaffid1: ',res.data);  
+                    this.seen6 = true; 
+                    this.listshoeusername6=res.data  
+                }
+            } catch (error) {
+                console.error('Error fetching evaluation data:', error);
+            } 
         },  
+        nameUserclick6(data){   
+            //console.log('nameUserclick1: ',data);
+            this.seen6 = false; 
+            this.text_user6 = data.staffid+' : '+data.namefully; 
+            this.text_staff6 = data.staffid;
+            this.text_position6 = data.posnameth;
+            this.text_namefully6 = data.namefully;
+        }, 
+        
+         // User 7
+        async searchUserStaffid7(){  
+            try { 
+                if(this.text_user7.length > 3){
+                    const res = await axios.get(' http://127.0.0.1:8000/api/searchDataStaff', {  
+                        params: {
+                            staffid: this.text_user7
+                        }
+                    }); 
+                    //console.log('searchUserStaffid1: ',res.data);  
+                    this.seen7 = true; 
+                    this.listshoeusername7=res.data  
+                }
+            } catch (error) {
+                console.error('Error fetching evaluation data:', error);
+            } 
+        },  
+        nameUserclick7(data){   
+            //console.log('nameUserclick1: ',data);
+            this.seen7 = false; 
+            this.text_user7 = data.staffid+' : '+data.namefully; 
+            this.text_staff7 = data.staffid;
+            this.text_position7 = data.posnameth;
+            this.text_namefully7 = data.namefully;
+        }, 
+
+          // User 8
+        async searchUserStaffid8(){  
+            try { 
+                if(this.text_user8.length > 3){
+                    const res = await axios.get(' http://127.0.0.1:8000/api/searchDataStaff', {  
+                        params: {
+                            staffid: this.text_user8
+                        }
+                    }); 
+                    //console.log('searchUserStaffid1: ',res.data);  
+                    this.seen8 = true; 
+                    this.listshoeusername8=res.data  
+                }
+            } catch (error) {
+                console.error('Error fetching evaluation data:', error);
+            } 
+        },  
+        nameUserclick8(data){   
+            //console.log('nameUserclick1: ',data);
+            this.seen8 = false; 
+            this.text_user8 = data.staffid+' : '+data.namefully; 
+            this.text_staff8 = data.staffid;
+            this.text_position8 = data.posnameth;
+            this.text_namefully8 = data.namefully;
+        }, 
+
+           // User 9
+        async searchUserStaffid9(){  
+            try { 
+                if(this.text_user9.length > 3){
+                    const res = await axios.get(' http://127.0.0.1:8000/api/searchDataStaff', {  
+                        params: {
+                            staffid: this.text_user9
+                        }
+                    }); 
+                    //console.log('searchUserStaffid1: ',res.data);  
+                    this.seen9 = true; 
+                    this.listshoeusername9=res.data  
+                }
+            } catch (error) {
+                console.error('Error fetching evaluation data:', error);
+            } 
+        },  
+        nameUserclick9(data){   
+            //console.log('nameUserclick1: ',data);
+            this.seen9 = false; 
+            this.text_user9 = data.staffid+' : '+data.namefully; 
+            this.text_staff9 = data.staffid;
+            this.text_position9 = data.posnameth;
+            this.text_namefully9 = data.namefully;
+        }, 
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     }
      
 }
