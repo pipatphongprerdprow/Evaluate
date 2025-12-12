@@ -15,13 +15,13 @@
                     </div>
                     <div class="col md:col-3 text-left"> 
                         <label for="dropdownItemYear">ปีงบประมาณ : {{ dataP01.year }}  {{ user.user.name.SCOPES?.staffdepartment }}</label> 
-                    </div>     --> 
+                    </div>      -->  
                     <div class="col md:col-6 text-right"> 
                         <Button icon="pi pi-plus" severity="warning" class="mb-2 mr-2" label="เพิ่มประเภทภาระงาน" @click="OpenDialogAddwork" /> 
                         <Button icon="pi pi-plus" severity="help" class="mb-2 mr-2" label="เพิ่มข้อมูลแบบประเมิน" @click="OpenDialogAdd" /> 
                         <Button  icon="pi pi-copy"  severity="success" class="mb-2" label="คัดลอกข้อมูลรอบประเมิน" @click="copyEvaluationData" />
  
-                        <Dialog header="จัดการแบบ ป01" maximizable v-model:visible="DialogAdd" :breakpoints="{ '960px': '75vw' }" :style="{ width: '100vw' }" :modal="true" position="top">
+                        <Dialog header="จัดการแบบ ป01" maximizable v-model:visible="DialogAdd" :breakpoints="{ '960px': '75vw' }" :style="{ width: '80vw' }" :modal="true" position="top">
                             <form>
                                 <InputText v-model="text_edt" type="hidden" style="display: none;" />
                                 <div class="p-fluid formgrid grid"> 
@@ -62,17 +62,16 @@
                                     </div>  
                                 </div> 
                                 <hr>
-                                <div class="p-fluid formgrid grid">
+                                <!-- <div class="p-fluid formgrid grid">
                                     <div class="field col-12 md:col-12"> 
                                         <label for="text_search_no">ตัวชี้วัด / เกณฑ์การประเมิน</label>
                                         <InputGroup>  
                                             <InputText v-model="text_search_no" type="number" placeholder="ลำดับ" autocomplete="off" class="col-12 md:col-2" /> 
-                                            <InputText v-model="text_search" type="text" placeholder="ชื่อตัวชี้วัด / เกณฑ์การประเมิน" autocomplete="off"/> 
-                                            <!-- <Button icon="pi pi-save" label="บันทึก" severity="warning" @click="AddDatalist" /> -->
+                                            <InputText v-model="text_search" type="text" placeholder="ชื่อตัวชี้วัด / เกณฑ์การประเมิน" autocomplete="off"/>  
                                              <Button icon="pi pi-save" label="บันทึก" severity="warning" @click.prevent="AddDatalist" /> 
                                         </InputGroup>  
                                     </div>   
-                                </div> 
+                                </div>  
                                 <DataTable :value="products_list" :rows="10" :paginator="true" responsiveLayout="scroll" dataKey="id">    
                                     <Column field="ind_no" header="ลำดับ" style="width: 10%">
                                         <template #body="Item">
@@ -90,7 +89,79 @@
                                             <Button severity="danger" icon="pi pi-trash" class="p-button-text" outlined rounded @click="DeleteRegislick(Item.data.ind_no)"></Button>
                                         </template>
                                     </Column> 
-                                </DataTable>
+                                </DataTable> -->
+ 
+                                <!-- ฟอร์มบันทึกตัวชี้วัด / เกณฑ์การประเมิน แบบบันทึกหลายรายการ -->
+                                <div class="p-fluid formgrid grid">
+                                    <div class="field col-12 md:col-12"> 
+                                        <div class="flex justify-content-between align-items-center mb-2">
+                                            <label class="mb-0" for="indicatorRows">
+                                                ตัวชี้วัด / เกณฑ์การประเมิน
+                                                <small class="ml-2 text-500">
+                                                    (เพิ่มได้สูงสุด {{ maxIndicatorLevels }} ระดับ ต่อหนึ่งรายการ)
+                                                </small>
+                                            </label>
+
+                                            <div class="flex items-center gap-3 mt-2">
+                                                <Button icon="pi pi-plus" label="เพิ่มแถว" class="p-button-sm p-button-rounded p-button-success"  @click="addIndicatorRow" /> 
+                                                <Button icon="pi pi-eraser" label="ล้างฟอร์ม" class="p-button-sm p-button-rounded p-button-warning" @click="resetIndicatorForm" />
+                                            </div> 
+                                        </div> 
+                                        <div class="formgrid grid mb-1 text-center text-700">
+                                            <div class="col-12 md:col-2 font-bold">ลำดับ</div>
+                                            <div class="col-12 md:col-9 font-bold">ชื่อตัวชี้วัด / เกณฑ์การประเมิน</div>
+                                            <div class="col-12 md:col-1"></div>
+                                        </div> 
+                                        <div v-for="(row, idx) in indicatorRows" :key="idx" class="field col-12 mb-2" >
+                                            <div class="formgrid grid align-items-center"> 
+                                                <div class="col-12 md:col-2">
+                                                    <InputText v-model="row.ind_no" type="number" placeholder="ลำดับ" autocomplete="off" />
+                                                </div>  
+                                                <div class="col-12 md:col-9"> 
+                                                    <InputText v-model="row.ind_Items"  type="text" placeholder="ชื่อตัวชี้วัด / เกณฑ์การประเมิน" autocomplete="off" />
+                                                </div> 
+                                                <div class="col-12 md:col-1 flex justify-content-center md:justify-content-end mt-2 md:mt-0">
+                                                    <Button  v-if="indicatorRows.length > 1" icon="pi pi-trash" severity="danger" class="p-button-text p-button-sm" @click="removeIndicatorRow(idx)" />
+                                                </div>
+                                            </div>
+                                        </div> 
+                                        <div class="field col-12 mt-2">
+                                            <div class="flex justify-content-center">
+                                                <Button icon="pi pi-save" label="เพิ่มเข้ารายการ" severity="info" size="small" class="p-button-rounded px-4 btn-add-indicator" @click.prevent="AddDatalist" />
+                                            </div>
+                                        </div>
+                                        <small class="block mt-1 text-600">
+                                            * ระบบจะไม่รับค่าลำดับซ้ำ และจำกัดสูงสุด {{ maxIndicatorLevels }} ระดับต่อรายการ
+                                        </small>
+                                    </div>
+                                </div> 
+                                <DataTable :value="products_list" :rows="10" :paginator="true" responsiveLayout="scroll" dataKey="id">
+                                    <Column field="ind_no" header="ลำดับ" style="width: 10%">
+                                        <template #body="Item">
+                                            ลำดับที่ {{ Item.data.ind_no }}
+                                        </template>
+                                    </Column>
+                                    <Column field="ind_Items" header="ชื่อตัวชี้วัด / เกณฑ์การประเมิน" style="width: 80%">
+                                        <template #body="Item">
+                                            {{ Item.data.ind_Items }}
+                                        </template>
+                                    </Column>
+                                    <!-- <Column field="options" header="ตัวเลือก" style="width: 10%">
+                                        <template #body="Item">
+                                            <Button style="text-align: center;" severity="primary" icon="pi pi-pencil" class="p-button-text" outlined rounded @click="Editcriteria(Item.data)" ></Button>
+                                            &nbsp;
+                                            <Button severity="danger" icon="pi pi-trash" class="p-button-text" outlined rounded @click="DeleteRegislick(Item.data.ind_no)" ></Button>
+                                        </template>
+                                    </Column> -->
+                                    <Column field="options" header="ตัวเลือก" headerStyle="text-align:center; width:10%;" bodyStyle="text-align:center;">
+                                        <template #body="Item">
+                                            <div class="flex justify-content-center gap-2">
+                                                <Button severity="primary" icon="pi pi-pencil" class="p-button-text p-button-rounded icon-btn-sm p-button-sm" outlined @click="Editcriteria(Item.data)" />
+                                                <Button severity="danger" icon="pi pi-trash" class="p-button-text p-button-rounded icon-btn-sm p-button-sm" outlined @click="DeleteRegislick(Item.data.ind_no)" />
+                                            </div>
+                                        </template>
+                                    </Column>
+                                </DataTable> 
                             </form>
                             <template #footer>
                                 <Button label="บันทึก" icon="pi pi-check" class="mb-2 mr-2" @click="saveData" /> 
@@ -207,7 +278,7 @@
                     <thead>
                         <tr>
                             <th rowspan="2" style="width: 20%;">(1) <br> กิจกรรม / โครงการ / งาน</th>
-                            <th rowspan="2" style="width: 24%;">
+                            <th rowspan="2" style="width: 23%;">
                             (2) <br> ตัวชี้วัด / เกณฑ์การประเมิน <br>
                             (1.ถูกต้อง 2.ครบถ้วน <br> 3.ตรงเวลา)
                             </th>
@@ -215,7 +286,7 @@
                             <th rowspan="2" style="width: 7%;">(4) <br> ค่าคะแนน ที่ได้</th>
                             <th rowspan="2" style="width: 10%;">(5) <br> น้ำหนัก (ความสำคัญ/ <br> ความยากง่ายของงาน)</th>
                             <th rowspan="2" style="width: 10%;">(6) <br> ค่าคะแนน <br>ถ่วงน้ำหนัก <br> (4) X (5) 100</th>
-                            <th rowspan="2" style="width: 9%;"><br> ตัวเลือก <br></th>
+                            <th rowspan="2" style="width: 10%;"><br> ตัวเลือก <br></th>
                         </tr>
                         <tr>
                             <th>1</th>  
@@ -235,21 +306,37 @@
                                     <!-- <td class="text-center" style="color: blue;"><b>{{ item.h_weight }}%</b></td> -->
                                     <td></td>
                                     <td></td>
-                                    <td>
+                                    <!-- <td>
                                         <Button severity="primary" icon="pi pi-pencil" class="p-button-text" outlined rounded  @click="Edtwork(item)"></Button>&nbsp; 
                                         <Button severity="danger" icon="pi pi-trash" class="p-button-text" outlined rounded @click="Delework(item)"></Button>
-                                    </td>
+                                    </td> -->
+                                     <td class="text-center">
+                                        <div class="flex justify-content-center gap-2">
+                                            <Button  severity="primary" icon="pi pi-pencil" class="p-button-text p-button-rounded icon-btn-sm p-button-sm" outlined @click="Edtwork(item)" /> 
+                                            <Button  severity="danger" icon="pi pi-trash" class="p-button-text p-button-rounded icon-btn-sm p-button-sm" outlined @click="Delework(item)" />
+                                        </div>
+                                    </td> 
                                 </tr>
                                 <!-- P01 -->
                                 <tr v-for="(subP01, idx) in item.subP01s" :key="idx" style="vertical-align: baseline;"> 
-                                    <td style="text-align: left;">{{ subP01.p_no }} {{ subP01.p_subject }}</td>
-                                    <td style="text-align: left;">
+                                    <td style="text-align: left;">{{ subP01.p_no }} {{ subP01.p_subject }}</td> 
+
+                                    <!-- แก้แดง -->
+                                    <!-- <td style="text-align: left;">
                                         <b>ตัวชี้วัดที่ {{ idx+1 }} {{ subP01.p_subject }}</b>
                                         <p v-for="(subIitem, idI) in subP01.subITems" :key="idI" style="padding-left: 8px;margin-bottom: 5px;">
                                             <div v-if="subIitem.ind_no!=0"><b>ระดับ {{ subIitem.ind_no }}</b> {{ subIitem.ind_Items }}</div>
                                             <div v-if="subIitem.ind_no==0"><b>{{ subIitem.ind_Items }}</b></div> 
                                         </p>
+                                    </td> -->
+                                    <td style="text-align: left;">
+                                        <b>ตัวชี้วัดที่ {{ idx + 1 }} {{ subP01.p_subject }}</b> 
+                                        <div v-for="(subItem, idI) in subP01.subITems" :key="idI" style="padding-left: 8px; margin-bottom: 5px;">
+                                            <template v-if="subItem.ind_no != 0"> <b>ระดับ {{ subItem.ind_no }}</b> {{ subItem.ind_Items }} </template>
+                                            <template v-else> <b>{{ subItem.ind_Items }}</b> </template>
+                                        </div>
                                     </td>
+
                                     <td style=" vertical-align: middle;" class="text-center"> 
                                         <b v-if="subP01.p_target==1">&#10003;</b> 
                                         <b v-if="subP01.p_target!=1"></b> 
@@ -366,7 +453,11 @@
                 text_search_no: null,
                 text_search: null,
                 editIndex: null,
-                products_list: [],
+                products_list: [], 
+                 maxIndicatorLevels: 5, // จำกัดไม่เกิน 5 ระดับ
+                indicatorRows: [
+                    { ind_no: null, ind_Items: '' }
+                ], 
 
                 //เพิ่มภาระงาน
                 text_search_nowork: null,
@@ -379,6 +470,11 @@
                 DialogCopy: false,
                 evalRounds: [],          // รายการรอบที่ใช้เป็นต้นทาง
                 selectedEvalRound: null, // รอบที่เลือกคัดลอกจาก
+
+
+               
+                 
+               
 
 
 
@@ -410,7 +506,11 @@
             //staff_id: staff_id
             }).then(res => {     
                // console.log(res.data);  
-                this.products_person=res.data;
+                //this.products_person=res.data;
+                 this.products_person = res.data.sort((a, b) => {
+                    return Number(a.h_no) - Number(b.h_no);
+                });
+                
             })
             .catch(error => {
                 console.error('Error:', error);
@@ -461,39 +561,40 @@
                 console.error('Error:', error);
             });
         },
-        // บันทึกตัวชี้วัด / เกณฑ์การประเมิน 
-        async AddDatalist() {
-            if (this.text_search_no == null || this.text_search == null) {
-                Swal.fire("กรุณาตรวจสอบข้อมูล ลำดับ - ชื่อตัวชี้วัด / เกณฑ์การประเมิน!");
-                return;
-            }
+        // บันทึกตัวชี้วัด / เกณฑ์การประเมิน ตัวเก่า
 
-            // ถ้ามี editIndex แสดงว่าเป็นโหมด "แก้ไข"
-            if (this.editIndex !== null) {
-                this.products_list[this.editIndex].ind_no = this.text_search_no;
-                this.products_list[this.editIndex].ind_Items = this.text_search;
-                this.editIndex = null; // ออกจากโหมดแก้ไข
-                Swal.fire("แก้ไขข้อมูลสำเร็จ", "", "success");
-            } else {
-                // ตรวจสอบจำนวนไม่เกิน 5 รายการ
-                if (this.products_list.length < 5) {
-                    this.products_list.push({
-                        ind_no: this.text_search_no,
-                        ind_Items: this.text_search
-                    });
-                    Swal.fire("เพิ่มข้อมูลสำเร็จ", "", "success");
-                } else {
-                    Swal.fire("ตัวชี้วัด / เกณฑ์การประเมิน ครบ 5 ระดับแล้ว!");
-                }
-            }
+        // async AddDatalist() {
+        //     if (this.text_search_no == null || this.text_search == null) {
+        //         Swal.fire("กรุณาตรวจสอบข้อมูล ลำดับ - ชื่อตัวชี้วัด / เกณฑ์การประเมิน!");
+        //         return;
+        //     }
 
-            // จัดเรียงตามลำดับ
-            this.products_list.sort((a, b) => a.ind_no - b.ind_no);
+        //     // ถ้ามี editIndex แสดงว่าเป็นโหมด "แก้ไข"
+        //     if (this.editIndex !== null) {
+        //         this.products_list[this.editIndex].ind_no = this.text_search_no;
+        //         this.products_list[this.editIndex].ind_Items = this.text_search;
+        //         this.editIndex = null; // ออกจากโหมดแก้ไข
+        //         Swal.fire("แก้ไขข้อมูลสำเร็จ", "", "success");
+        //     } else {
+        //         // ตรวจสอบจำนวนไม่เกิน 5 รายการ
+        //         if (this.products_list.length < 5) {
+        //             this.products_list.push({
+        //                 ind_no: this.text_search_no,
+        //                 ind_Items: this.text_search
+        //             });
+        //             Swal.fire("เพิ่มข้อมูลสำเร็จ", "", "success");
+        //         } else {
+        //             Swal.fire("ตัวชี้วัด / เกณฑ์การประเมิน ครบ 5 ระดับแล้ว!");
+        //         }
+        //     }
 
-            // ล้าง input
-            this.text_search_no = null;
-            this.text_search = null;
-        },
+        //     // จัดเรียงตามลำดับ
+        //     this.products_list.sort((a, b) => a.ind_no - b.ind_no);
+
+        //     // ล้าง input
+        //     this.text_search_no = null;
+        //     this.text_search = null;
+        // },
 
         //บันทึกภาระงาน
         AddDatalistwork(){
@@ -684,16 +785,18 @@
                         }); 
                     }
                 }); 
-            },   
+            },  
+
         //แก้ไขเกณฑ์/ตัวชี้วัดของ ป.01
-        Editcriteria(item) {
-            const index = this.products_list.findIndex(p => p.ind_no === item.ind_no);
-            if (index !== -1) {
-                this.text_search_no = item.ind_no;
-                this.text_search = item.ind_Items;
-                this.editIndex = index;
-            }
-        }, 
+        // Editcriteria(item) {
+        //     const index = this.products_list.findIndex(p => p.ind_no === item.ind_no);
+        //     if (index !== -1) {
+        //         this.text_search_no = item.ind_no;
+        //         this.text_search = item.ind_Items;
+        //         this.editIndex = index;
+        //     }
+        // }, 
+
         // ดึงข้อมูลภาระงาน
         selectDataHEdt(year,fac,he,evalua){  
             //console.log(year,fac,he,evalua);
@@ -815,25 +918,226 @@
             }
             return '';
         },
- 
+
+        addIndicatorRow() {
+            const remaining = this.maxIndicatorLevels - this.products_list.length - this.indicatorRows.length;
+            if (remaining <= 0) {
+                Swal.fire(
+                    'ครบจำนวนระดับแล้ว',
+                    `สามารถมีได้สูงสุด ${this.maxIndicatorLevels} ระดับต่อรายการ`,
+                    'warning'
+                );
+                return;
+            }
+
+            this.indicatorRows.push({
+                ind_no: null,
+                ind_Items: ''
+            });
+        },
+
+        removeIndicatorRow(index) {
+            this.indicatorRows.splice(index, 1);
+            if (this.indicatorRows.length === 0) {
+                this.resetIndicatorForm();
+            }
+        },
+
+        resetIndicatorForm() {
+            this.indicatorRows = [
+                { ind_no: null, ind_Items: '' }
+            ];
+            this.editIndex = null;
+        },
+
+        // บันทึกตัวชี้วัดหลายแถวเข้า products_list
+        AddDatalist() {
+            const validRows = this.indicatorRows.filter(r =>
+                r.ind_no !== null &&
+                r.ind_no !== '' &&
+                r.ind_Items &&
+                String(r.ind_Items).trim() !== ''
+            );
+
+            if (validRows.length === 0) {
+                Swal.fire(
+                    'ยังไม่มีข้อมูล',
+                    'กรุณากรอกข้อมูลตัวชี้วัดให้ครบอย่างน้อย 1 แถว',
+                    'warning'
+                );
+                return;
+            }
+
+            // โหมดแก้ไข
+            if (this.editIndex !== null) {
+                const row = validRows[0];
+
+                const duplicate = this.products_list.some((p, idx) =>
+                    idx !== this.editIndex && Number(p.ind_no) === Number(row.ind_no)
+                );
+                if (duplicate) {
+                    Swal.fire('ลำดับซ้ำ', 'มี "ลำดับ" ซ้ำกับรายการอื่นในตาราง', 'warning');
+                    return;
+                }
+
+                this.products_list[this.editIndex].ind_no = Number(row.ind_no);
+                this.products_list[this.editIndex].ind_Items = row.ind_Items;
+
+                Swal.fire('แก้ไขข้อมูลสำเร็จ', '', 'success');
+                this.editIndex = null;
+                this.resetIndicatorForm();
+                this.products_list.sort((a, b) => a.ind_no - b.ind_no);
+                return;
+            }
+
+            // โหมดเพิ่มใหม่
+            const totalAfterAdd = this.products_list.length + validRows.length;
+            if (totalAfterAdd > this.maxIndicatorLevels) {
+                const remaining = this.maxIndicatorLevels - this.products_list.length;
+                Swal.fire(
+                    'เกินจำนวนระดับที่กำหนด',
+                    `สามารถเพิ่มได้อีกเพียง ${remaining} ระดับ`,
+                    'warning'
+                );
+                return;
+            }
+
+            const existingNos = this.products_list.map(p => Number(p.ind_no));
+            const duplicateInExisting = validRows.some(r =>
+                existingNos.includes(Number(r.ind_no))
+            );
+            if (duplicateInExisting) {
+                Swal.fire(
+                    'ลำดับซ้ำ',
+                    'มี "ลำดับ" ซ้ำกับรายการเดิมในตาราง',
+                    'warning'
+                );
+                return;
+            }
+
+            validRows.forEach(r => {
+                this.products_list.push({
+                    ind_no: Number(r.ind_no),
+                    ind_Items: r.ind_Items
+                });
+            });
+
+            this.products_list.sort((a, b) => a.ind_no - b.ind_no);
+
+            Swal.fire(
+                'เพิ่มข้อมูลสำเร็จ',
+                `เพิ่มตัวชี้วัดจำนวน ${validRows.length} รายการ`,
+                'success'
+            );
+
+            this.resetIndicatorForm();
+        },
+
+        // ลบตัวชี้วัด / เกณฑ์การประเมิน
+        DeleteRegislick(ind_no) {
+            Swal.fire({
+                title: 'ยืนยันการลบ?',
+                text: 'คุณต้องการลบตัวชี้วัด / เกณฑ์การประเมิน นี้ใช่หรือไม่',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'ใช่, ลบเลย',
+                cancelButtonText: 'ยกเลิก'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // ลบออกจาก products_list
+                    this.products_list = this.products_list.filter(
+                        (product) => product.ind_no !== ind_no
+                    );
+
+                    Swal.fire({
+                        title: 'ลบแล้ว!',
+                        text: 'ลบตัวชี้วัดเรียบร้อย',
+                        icon: 'success',
+                        timer: 1200,
+                        showConfirmButton: false
+                    });
+                }
+            });
+        },
+
+
+        // แก้ไขเกณฑ์/ตัวชี้วัด → ดึงขึ้นมาใส่แถวแรกของฟอร์มหลายแถว
+        Editcriteria(item) {
+            const index = this.products_list.findIndex(p => p.ind_no === item.ind_no);
+            if (index !== -1) {
+                this.editIndex = index;
+                this.indicatorRows = [{
+                    ind_no: this.products_list[index].ind_no,
+                    ind_Items: this.products_list[index].ind_Items
+                }];
+            }
+        },
+
     } 
 }
   
   </script>
-  
-  <style scoped> 
-  label{
-      font-size: medium;
-      font-weight: 500;
-  }
-  .card-header {
-      text-align: left;  
-      margin: 0;  
-      padding: 0;  
-  }
-  .table th {
-      background-color: #edf2bb;
-      font-weight: bold;
-  }
-  
+
+   
+  <style > 
+
+label{
+    font-size: medium;
+    font-weight: 500;
+}
+.card-header {
+    text-align: left;  
+    margin: 0;  
+    padding: 0;  
+}
+.table th {
+    background-color: #edf2bb;
+    font-weight: bold;
+}
+.btn-add-indicator {
+    width: auto !important;       
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+    font-size: 0.9rem;
+}
+.p-button-rounded {
+    width: auto !important;       
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+    font-size: 0.9rem;
+}
+
+.p-button-sm .pi {
+        font-size: 0.9rem !important;
+    }
+.icon-btn-sm {
+    width: 36px !important;
+    height: 36px !important;
+    padding: 0 !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    border-radius: 50% !important;
+}
+
+.icon-btn-sm {
+    width: 36px !important;
+    height: 36px !important;
+    padding: 0 !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    border-radius: 50% !important;
+}
+
+.swal2-container {
+    z-index: 9999 !important;
+    } 
+
   </style>

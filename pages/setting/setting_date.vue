@@ -217,7 +217,7 @@
                                 <Button label="ยกเลิก" icon="pi pi-times" class="mb-2 mr-2" severity="danger" @click="resetDialog" />
                             </template>
                         </Dialog> 
-                        <Dialog header="จัดการ ป.01" v-model:visible="DialogDetail" :breakpoints="{ '960px': '90vw' }" :style="{ width: '90vw' }" :modal="true" position="top">
+                        <Dialog header="จัดการ ป.01" v-model:visible="DialogDetail" :breakpoints="{ '960px': '90vw' }" :style="{ width: '100vw' }" :modal="true" position="top">
                             <!-- {{ dataP01 }} -->
                             <P01 :dataP01="dataP01"></P01>
                             <template #footer>

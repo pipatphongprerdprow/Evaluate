@@ -6,6 +6,7 @@
                     <div class="col md:col-5"> 
                         <h3 class="mb-4 card-header"><i class="pi pi-credit-card" style="font-size: x-large;"></i> ตรวจติดตามแบบประเมิน</h3>    
                     </div>
+
                     <!-- {{ products }}  -->
 
                      <!-- {{ user.user }}    -->
@@ -141,14 +142,30 @@
                                                         </tr> 
                                                         <tr v-for="(subP01, idx) in h?.subP01sX || []" :key="idx">
                                                             <td style="text-align: left;">{{ subP01?.p01_no || '-' }} {{ subP01?.p01_subject || '-' }}</td>
-                                                            <td style="text-align: left;">
+
+                                                            <!-- แก้แดง -->
+                                                            <!-- <td style="text-align: left;">
                                                                 <b>ตัวชี้วัดที่ {{ idx+1 }} {{ subP01?.p01_subject || '-' }}</b>
                                                                 <p v-for="(subIitem, idI) in subP01?.subITems || []" :key="idI">
                                                                     <div v-if="subIitem?.ind_no !== 0"><b>ระดับ {{ subIitem?.ind_no }}</b> {{ subIitem?.ind_Items || '-' }}</div>
                                                                     <div v-else><b>{{ subIitem?.ind_Items || '-' }}</b></div>
                                                                 </p>
-                                                            </td>
+                                                            </td> -->
                                                             <td style="text-align: left;">
+                                                                <b>ตัวชี้วัดที่ {{ idx + 1 }} {{ subP01?.p01_subject || '-' }}</b>
+
+                                                                <div v-for="(subIitem, idI) in subP01?.subITems || []" :key="idI">
+                                                                    <div v-if="subIitem?.ind_no !== 0">
+                                                                        <b>ระดับ {{ subIitem?.ind_no }}</b> {{ subIitem?.ind_Items || '-' }}
+                                                                    </div>
+                                                                    <div v-else>
+                                                                        <b>{{ subIitem?.ind_Items || '-' }}</b>
+                                                                    </div>
+                                                                </div>
+                                                            </td> 
+
+                                                            <!-- แก้แดง -->
+                                                            <!-- <td style="text-align: left;">
                                                                 <p v-if="(subP01?.subITemP03ind || []).length > 0">
                                                                     <div v-for="level in [1, 2, 3, 4, 5]" :key="level">
                                                                         <div v-if="subP01?.subITemP03ind?.some(item => item?.p03ind_no === level + '')">
@@ -160,7 +177,25 @@
                                                                     </div>
                                                                 </p>
                                                                 <p v-else style="color: red;">- ไม่มีข้อมูล -</p>
-                                                            </td>
+                                                            </td> -->
+                                                            <td style="text-align: left;">
+                                                                <div v-if="(subP01?.subITemP03ind || []).length > 0">
+                                                                    <div v-for="level in [1, 2, 3, 4, 5]" :key="level">
+
+                                                                        <div v-if="subP01?.subITemP03ind?.some(item => item?.p03ind_no === level + '')">
+                                                                            <b>ระดับ {{ level }}</b>
+
+                                                                            <div v-for="(item, index) in subP01?.subITemP03ind?.filter(item => item?.p03ind_no === level + '')" :key="index">
+                                                                                <div>{{ index + 1 }}. {{ item?.p03ind_Items || '-' }}</div>
+                                                                            </div>
+                                                                        </div>
+
+                                                                    </div>
+                                                                </div>
+
+                                                                <div v-else style="color: red;">- ไม่มีข้อมูล -</div>
+                                                            </td> 
+
                                                             <td style="text-align: left;"> 
                                                                 <p v-for="(subIitemDoc, inDoc) in (subP01?.subITemP03doc || []).slice().sort((a, b) => a.doc_no - b.doc_no)" 
                                                                 :key="inDoc"> 
@@ -359,7 +394,9 @@
                                                         </tr> 
                                                         <tr v-for="(subP01, idx) in h.subP01sX" :key="idx" style="vertical-align: baseline;">
                                                             <td style="text-align: left;">{{ subP01.p01_no }} {{ subP01.p01_subject }}</td>
-                                                            <td style="text-align: left;">
+
+                                                            <!-- แก้แดง -->
+                                                            <!-- <td style="text-align: left;">
                                                                 <b>ตัวชี้วัดที่ {{ idx+1 }} {{ subP01.p01_subject }}</b>
                                                                 <p v-for="(subIitem, idI) in subP01.subITems" :key="idI" style="padding-left: 8px;margin-bottom: 5px;">
                                                                     <div v-if="subIitem.ind_no!=0" ><b>ระดับ {{ subIitem.ind_no }}</b> {{ subIitem.ind_Items }}</div>
@@ -371,7 +408,23 @@
                                                                     <br>
                                                                     <em style="color: red;">{{ subP01.p01_detail }}</em>
                                                                 </p>
+                                                            </td>  -->
+                                                            <td style="text-align: left;">
+                                                                <b>ตัวชี้วัดที่ {{ idx+1 }} {{ subP01.p01_subject }}</b> 
+                                                                <div v-for="(subIitem, idI) in subP01.subITems" :key="idI" style="padding-left: 8px; margin-bottom: 5px;"> 
+                                                                    <div v-if="subIitem.ind_no != 0">
+                                                                        <b>ระดับ {{ subIitem.ind_no }}</b> {{ subIitem.ind_Items }}
+                                                                    </div> 
+                                                                    <div v-else>
+                                                                        <b>{{ subIitem.ind_Items }}</b>
+                                                                    </div>
+                                                                </div> 
+                                                                <div v-if="subP01.p01_detail != null">
+                                                                    <b style="color: red;">ข้อเสนอแนะ</b><br>
+                                                                    <em style="color: red;">{{ subP01.p01_detail }}</em>
+                                                                </div>
                                                             </td> 
+
                                                             <!-- <td style="text-align: left;">
                                                                 <p v-for="(subIitemInd, inD) in subP01.subITemP03ind" :key="inD" style="padding-left: 8px;margin-bottom: 5px;">
                                                                     <div v-if="subIitemInd.p03ind_no!=0"><b>ระดับ {{ subIitemInd.p03ind_no }}</b> {{ subIitemInd.p03ind_Items }}</div>
@@ -1238,9 +1291,9 @@ export default {
                         evalua: this.tracking_date.evalua,
                         p_year: this.tracking_date.d_date
                     }
-                });
+                }); 
+                console.log('showDataEvalu: ',res.data);
                 this.products = res.data;
-                // console.log(res.data);
 
                 // ใช้ Promise.all เพื่อทำการเรียก cvb พร้อมกันหลายๆ รายการ
                 //await Promise.all(res.data.map(item => this.cvb(item)));

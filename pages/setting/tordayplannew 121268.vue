@@ -77,7 +77,7 @@
           </template>
         </Column> 
         <!-- ผู้รับผิดชอบ (แสดง 2 คน + นับส่วนเกิน) -->
-        <Column header="ผู้รับผิดชอบหลัก" style="min-width:12rem;max-width:18rem">
+        <Column header="ผู้รับผิดชอบ" style="min-width:12rem;max-width:18rem">
           <template #body="{data}">
             <div class="flex flex-wrap gap-1">
               <span 
@@ -275,6 +275,7 @@
             <AutoComplete v-model="currentPlan.owner" :multiple="true" :suggestions="ownerSuggestions" optionLabel="name" placeholder="พิมพ์ชื่อหรือรหัสพนักงานเพื่อค้นหา…" forceSelection dropdown @complete="searchOwners"/>
             <small class="text-gray-500">พิมพ์อย่างน้อย 3 ตัวอักษร เช่น รหัสพนักงาน หรือชื่อ-สกุล</small>
           </div>
+ 
           <div class="field col-12 md:col-6">
             <label class="font-semibold text-lg">วันที่เริ่มต้น <span class="text-red-500">*</span></label>
             <Calendar v-model="currentPlan.startDate" dateFormat="dd/mm/yy" showIcon required/>
@@ -423,8 +424,8 @@
                   @blur="onMainTaskChange(newTaskInStep.mainTask)"       
                   class="w-full"
                 />
-            </div>
- 
+            </div> 
+            
             <div class="field col-6">
                 <label class="font-semibold">รอบประเมิน</label>
                 <Dropdown v-model="newTaskInStep.evalRound" :options="evalRounds" optionLabel="label" optionValue="value" placeholder="กรุณาเลือกรอบการประเมิน" class="w-full" @change="onEvaluChange" />
@@ -812,8 +813,14 @@
             endTime:     t.endTime     ? new Date(t.endTime)     : null,
             createdDate: t.createdDate ? new Date(t.createdDate) : null,
 
+
+
+            eval_round_year: t.eval_round_year ?? t.d_date ?? null,
+            eval_round_code: t.eval_round_code ?? t.evalua ?? null,
+            porFormCode:     t.por_form       ?? t.por_form_code ?? t.por_code ?? null,
+
             evalu_steptasks: t.evalu_steptasks ?? t.eval_round_label ?? ((t.d_evaluationround && t.d_date) ? `${t.d_evaluationround} (${t.d_date})` : null),
-            por_detel: t.por_detel ?? t.por_form_label ?? t.por_form ?? null,
+            por_detel:       t.por_detel ?? t.por_form_label ?? t.por_form ?? null, 
           }))
         }))
       }
@@ -1166,32 +1173,151 @@
         : (v ?? '')
   }
 
-  async function openEditTaskDialogInTable(step, task, taskIndex){
-    showEditTaskDialog.value=true
-    Object.assign(currentEditingTask,{ stepId:step.id, taskId:task.id, taskIndex, taskType:task.taskType||'งานหลัก', mainTask:task.mainTask||null, description:task.description||'', responsible:task.responsible||[], dueDate:task.dueDate?new Date(task.dueDate):null, startTime:task.startTime?new Date(task.startTime):null, endTime:task.endTime?new Date(task.endTime):null, status:task.status||'', createdDate:task.createdDate?new Date(task.createdDate):null, staffId:task.staffId??session.staffId??null, evalRound: null,porForm: null})
-    if(currentEditingTask.taskType==='งานหลัก'){ await fetchPositionMainWorks() }
-    else if(currentEditingTask.taskType==='งานตำแหน่งอื่น'){ await fetchAllMainWorks() }
+  // async function openEditTaskDialogInTable(step, task, taskIndex){
+  //   showEditTaskDialog.value=true
+  //   Object.assign(currentEditingTask,{ stepId:step.id, taskId:task.id, taskIndex, taskType:task.taskType||'งานหลัก', mainTask:task.mainTask||null, description:task.description||'', responsible:task.responsible||[], dueDate:task.dueDate?new Date(task.dueDate):null, startTime:task.startTime?new Date(task.startTime):null, endTime:task.endTime?new Date(task.endTime):null, status:task.status||'', createdDate:task.createdDate?new Date(task.createdDate):null, staffId:task.staffId??session.staffId??null, evalRound: null,porForm: null,porFormCode: task.porFormCode ?? null, })
+  //   if(currentEditingTask.taskType==='งานหลัก'){ await fetchPositionMainWorks() }
+  //   else if(currentEditingTask.taskType==='งานตำแหน่งอื่น'){ await fetchAllMainWorks() }
 
+  //   normalizeEditingMainTask()
+  // }
+  async function openEditTaskDialogInTable(step, task, taskIndex){
+    showEditTaskDialog.value = true
+
+    
+    if (!evalRounds.value?.length) {
+      await fetchEvalRounds()
+    }
+
+    Object.assign(currentEditingTask, {
+      stepId: step.id,
+      taskId: task.id,
+      taskIndex,
+      taskType: task.taskType || 'งานหลัก',
+      mainTask: task.mainTask || null,
+      description: task.description || '',
+      responsible: task.responsible || [],
+      dueDate: task.dueDate ? new Date(task.dueDate) : null,
+      startTime: task.startTime ? new Date(task.startTime) : null,
+      endTime: task.endTime ? new Date(task.endTime) : null,
+      status: task.status || '',
+      createdDate: task.createdDate ? new Date(task.createdDate) : null,
+      staffId: task.staffId ?? session.staffId ?? null,
+  
+      porFormCode: task.porFormCode ?? null,
+      evalRound: null,    
+      porForm: null,
+    })
+ 
+    if (currentEditingTask.taskType === 'งานหลัก') {
+      await fetchPositionMainWorks()
+    } else if (currentEditingTask.taskType === 'งานตำแหน่งอื่น') {
+      await fetchAllMainWorks()
+    }
     normalizeEditingMainTask()
+ 
+    if (task.eval_round_year || task.eval_round_code) {
+      const found = (evalRounds.value || []).find(opt =>
+        String(opt.value.d_date)  === String(task.eval_round_year) &&
+        String(opt.value.evalua)  === String(task.eval_round_code)
+      )
+      currentEditingTask.evalRound = found ? found.value : null
+    }
+ 
+    if (currentEditingTask.evalRound) {
+      await onEditEvaluChange()  
+      if (currentEditingTask.porFormCode) {
+        currentEditingTask.porForm =
+          (porFormsAll.value || []).find(it => String(it.value) === String(currentEditingTask.porFormCode)) || null
+      }
+    }
   }
 
+
+
+  // async function saveEditedTask(){
+  //   const invalid = currentEditingTask.startTime && currentEditingTask.endTime && new Date(currentEditingTask.endTime) < new Date(currentEditingTask.startTime)
+  //   if(!currentEditingTask.description || invalid){
+  //     return Swal.fire({ icon:'error', title:'ข้อผิดพลาด', text: invalid? 'กรุณาตรวจสอบเวลาเริ่มต้น-สิ้นสุด':'กรุณาระบุภาระงาน' })
+  //   }
+  //   const payload={ id:currentEditingTask.taskId, taskType:currentEditingTask.taskType, mainTask:currentEditingTask.mainTask, description:currentEditingTask.description, startTime:toDateTimeStr(currentEditingTask.startTime), endTime:toDateTimeStr(currentEditingTask.endTime), status:'เสร็จสิ้น', fac_id:session.facId,por_form: currentEditingTask.porForm?.value ?? null,por_detel: currentEditingTask.porForm?.label ?? null }
+  //     try{
+  //       await axios.post(`${API}/Edtdatatasks`, payload)
+  //       const pIdx = allPlans.value.findIndex(p=> p.steps.some(s=> s.id===currentEditingTask.stepId))
+  //       if(pIdx===-1) return
+  //       const sIdx = allPlans.value[pIdx].steps.findIndex(s=> s.id===currentEditingTask.stepId)
+  //       if(sIdx===-1) return
+  //       allPlans.value[pIdx].steps[sIdx].tasks[currentEditingTask.taskIndex] = { id:currentEditingTask.taskId, taskType:currentEditingTask.taskType, mainTask:currentEditingTask.mainTask, description:currentEditingTask.description, startTime:currentEditingTask.startTime, endTime:currentEditingTask.endTime, status:'เสร็จสิ้น', createdDate:currentEditingTask.createdDate,evalu_steptasks: payload.evalu_steptasks,por_detel: payload.por_detel, }
+  //       showEditTaskDialog.value=false
+  //       Swal.fire({ icon:'success', title:'สำเร็จ', text:'แก้ไขภาระงานเรียบร้อยแล้ว', timer:1200, showConfirmButton:false })
+  //     }catch(e){ console.error(e); Swal.fire({ icon:'error', title:'ผิดพลาด', text:'แก้ไขภาระงานไม่สำเร็จ' }) }
+  //   }
   async function saveEditedTask(){
-    const invalid = currentEditingTask.startTime && currentEditingTask.endTime && new Date(currentEditingTask.endTime) < new Date(currentEditingTask.startTime)
+    const invalid = currentEditingTask.startTime && currentEditingTask.endTime &&
+                    new Date(currentEditingTask.endTime) < new Date(currentEditingTask.startTime)
     if(!currentEditingTask.description || invalid){
-      return Swal.fire({ icon:'error', title:'ข้อผิดพลาด', text: invalid? 'กรุณาตรวจสอบเวลาเริ่มต้น-สิ้นสุด':'กรุณาระบุภาระงาน' })
+      return Swal.fire({ icon:'error', title:'ข้อผิดพลาด',
+        text: invalid ? 'กรุณาตรวจสอบเวลาเริ่มต้น-สิ้นสุด' : 'กรุณาระบุภาระงาน' })
     }
-    const payload={ id:currentEditingTask.taskId, taskType:currentEditingTask.taskType, mainTask:currentEditingTask.mainTask, description:currentEditingTask.description, startTime:toDateTimeStr(currentEditingTask.startTime), endTime:toDateTimeStr(currentEditingTask.endTime), status:'เสร็จสิ้น', fac_id:session.facId,por_form: currentEditingTask.porForm?.value ?? null,por_detel: currentEditingTask.porForm?.label ?? null }
-      try{
-        await axios.post(`${API}/Edtdatatasks`, payload)
-        const pIdx = allPlans.value.findIndex(p=> p.steps.some(s=> s.id===currentEditingTask.stepId))
-        if(pIdx===-1) return
+ 
+    const er = currentEditingTask.evalRound
+    const evalLabel = er
+      ? `${er.d_evaluationround ?? ''}${er?.d_date ? ` (${er.d_date})` : ''}`.trim() || null
+      : null
+
+    const payload = {
+      id: currentEditingTask.taskId,
+      taskType: currentEditingTask.taskType,
+      mainTask: currentEditingTask.mainTask,
+      description: currentEditingTask.description,
+      startTime: toDateTimeStr(currentEditingTask.startTime),
+      endTime: toDateTimeStr(currentEditingTask.endTime),
+      status: 'เสร็จสิ้น',
+      fac_id: session.facId,
+ 
+      eval_round_year: er?.d_date ?? null,
+      eval_round_code: er?.evalua ?? null,
+      evalu_steptasks: evalLabel,
+      por_form:  currentEditingTask.porForm?.value ?? null,
+      por_detel: currentEditingTask.porForm?.label ?? null,
+    }
+
+    try{
+      await axios.post(`${API}/Edtdatatasks`, payload)
+ 
+      const pIdx = allPlans.value.findIndex(p=> p.steps.some(s=> s.id===currentEditingTask.stepId))
+      if (pIdx !== -1) {
         const sIdx = allPlans.value[pIdx].steps.findIndex(s=> s.id===currentEditingTask.stepId)
-        if(sIdx===-1) return
-        allPlans.value[pIdx].steps[sIdx].tasks[currentEditingTask.taskIndex] = { id:currentEditingTask.taskId, taskType:currentEditingTask.taskType, mainTask:currentEditingTask.mainTask, description:currentEditingTask.description, startTime:currentEditingTask.startTime, endTime:currentEditingTask.endTime, status:'เสร็จสิ้น', createdDate:currentEditingTask.createdDate,evalu_steptasks: payload.evalu_steptasks,por_detel: payload.por_detel, }
-        showEditTaskDialog.value=false
-        Swal.fire({ icon:'success', title:'สำเร็จ', text:'แก้ไขภาระงานเรียบร้อยแล้ว', timer:1200, showConfirmButton:false })
-      }catch(e){ console.error(e); Swal.fire({ icon:'error', title:'ผิดพลาด', text:'แก้ไขภาระงานไม่สำเร็จ' }) }
+        if (sIdx !== -1) {
+          allPlans.value[pIdx].steps[sIdx].tasks[currentEditingTask.taskIndex] = {
+            id: currentEditingTask.taskId,
+            taskType: currentEditingTask.taskType,
+            mainTask: currentEditingTask.mainTask,
+            description: currentEditingTask.description,
+            startTime: currentEditingTask.startTime,
+            endTime: currentEditingTask.endTime,
+            status: 'เสร็จสิ้น',
+            createdDate: currentEditingTask.createdDate,
+
+            // เก็บทั้ง label และ code
+            evalu_steptasks: payload.evalu_steptasks,
+            por_detel: payload.por_detel,
+            eval_round_year: payload.eval_round_year,
+            eval_round_code: payload.eval_round_code,
+            porFormCode: payload.por_form,
+          }
+        }
+      }
+
+      showEditTaskDialog.value = false
+      Swal.fire({ icon:'success', title:'สำเร็จ', text:'แก้ไขภาระงานเรียบร้อยแล้ว', timer:1200, showConfirmButton:false })
+    }catch(e){
+      console.error(e)
+      Swal.fire({ icon:'error', title:'ผิดพลาด', text:'แก้ไขภาระงานไม่สำเร็จ' })
     }
+  }
+
+
 
   async function updateStepStatus(plan, step, newStatus){
     if(!step?.id){ await Swal.fire({ icon:'warning', title:'ยังไม่สามารถบันทึก', text:'ขั้นตอนนี้ยังไม่มี ID' }); return }

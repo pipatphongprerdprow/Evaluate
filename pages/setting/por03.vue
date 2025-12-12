@@ -45,23 +45,32 @@
                             </tr>
                             <tr v-for="(subP01, idx) in h.subP01sX" :key="idx" style="vertical-align: baseline;">
                                 <td style="text-align: left;">{{ subP01.p01_no }} {{ subP01.p01_subject }}</td>
-                                <td style="text-align: left;">
+
+                                <!-- แก้แดง -->​
+                                <!-- <td style="text-align: left;">
                                     <b>ตัวชี้วัดที่ {{ idx+1 }} {{ subP01.p01_subject }}</b>
                                     <p v-for="(subIitem, idI) in subP01.subITems" :key="idI" style="padding-left: 8px;margin-bottom: 5px;">
                                         <div v-if="subIitem.ind_no!=0"><b>ระดับ {{ subIitem.ind_no }}</b> {{ subIitem.ind_Items }}</div>
                                         <div v-if="subIitem.ind_no==0"><b>{{ subIitem.ind_Items }}</b></div>
-                                    </p>
-                                    <!-- <p v-if="subP01.p01_detail != null">  
-                                        <b style="color: red;">ข้อเสนอแนะ</b>
-                                        <br>
-                                        <em style="color: red;">{{ subP01.p01_detail }}</em>
-                                    </p> -->
+                                    </p> 
                                     <p v-if="subP01.p01_detail !== null && currentDate >= dataPor.d_scoringday">  
                                         <b style="color: red;">ข้อเสนอแนะ</b>
                                         <br>
                                         <em style="color: red;">{{ subP01.p01_detail }}</em>
                                     </p>
+                                </td> -->
+                                <td style="text-align: left;">
+                                    <b>ตัวชี้วัดที่ {{ idx + 1 }} {{ subP01.p01_subject }}</b> 
+                                    <div  v-for="(subItem, idI) in subP01.subITems" :key="idI" style="padding-left: 8px; margin-bottom: 5px;" >
+                                        <template v-if="subItem.ind_no != 0"> <b>ระดับ {{ subItem.ind_no }}</b> {{ subItem.ind_Items }} </template>
+                                        <template v-else> <b>{{ subItem.ind_Items }}</b> </template>
+                                    </div> 
+                                    <p v-if="subP01.p01_detail !== null && currentDate >= dataPor.d_scoringday">
+                                        <b style="color: red;">ข้อเสนอแนะ</b><br />
+                                        <em style="color: red;">{{ subP01.p01_detail }}</em>
+                                    </p>
                                 </td>
+ 
                                 <td style="text-align: left;">
                                     <!-- วนลูปแสดงระดับ 1 ถึง 5 -->
                                     <div v-for="level in [1, 2, 3, 4, 5]" :key="level">
@@ -373,12 +382,12 @@
                         </div> -->
 
 
-                        <div class="col-12 md:col-8">
+                        <div class="col-12 md:col-9">
                             <label for="list_text_p03">รายงานชื่อตัวชี้วัด / เกณฑ์การประเมิน</label>
                             <InputText v-model="list_text_p03" type="text" placeholder="รายงานชื่อตัวชี้วัด / เกณฑ์การประเมิน" autocomplete="off"/>  
                         </div>  
-                        <div class="col-12 md:col-2" style="align-self: end;">
-                            <Button icon="pi pi-save" label="บันทึก" severity="warning" @click="AddDatalist" /> 
+                        <div class="col-12 md:col-1" style="align-self: end;">
+                            <Button icon="pi pi-plus" label="เพิ่ม" severity="warning" @click="AddDatalist" /> 
                         </div> 
                         <!-- <div class="field col-12 md:col-12">  
                             <label for="improvements">1) จุดเด่น และ/หรือ สิ่งที่ควรปรับปรุงแก้ไข</label>
@@ -439,13 +448,13 @@
 
 
         <!-- (หลักฐาน)รางานการปฏิบัติราชการตามตัวชี้วัด/เกณฑ์การประเมิน -->
-        <Dialog header="จัดการ หลักฐานที่แสดงถึงผลการปฏิบัติราชการตามเกณฑ์การประเมิน(หลักฐานเชิงประจักษ์)" maximizable v-model:visible="DialogDoc" :breakpoints="{ '960px': '75vw' }" :style="{ width: '70vw' }" :modal="true" position="top">
+        <Dialog header="จัดการ หลักฐานที่แสดงถึงผลการปฏิบัติราชการตามเกณฑ์การประเมิน(หลักฐานเชิงประจักษ์)" maximizable v-model:visible="DialogDoc" :breakpoints="{ '960px': '75vw' }" :style="{ width: '90vw' }" :modal="true" position="top">
             <form>
                 <InputText v-model="text_edtDoc" type="hidden" style="display: none;" /> 
                 <div class="p-fluid formgrid"> 
                     <div class="field col-12 md:col-6">
                         <label for="radioValueDoc">เลือกประเภทการแนปเอกสาร</label> 
-                        <b style="color: red;"> (รองรับขนาดไฟล์ไม่เกิน 8 Mb) </b>
+                        <b style="color: red;"> (รองรับขนาดไฟล์ไม่เกิน 10 Mb) </b>
 
                         <!-- <Dropdown v-model="radioValueDoc" :options="radioValueDocs" optionLabel="name" placeholder="เลือกระดับการประเมินตนเอง"></Dropdown>  -->
                         <div class="grid">
@@ -1152,26 +1161,37 @@ import InputText from 'primevue/inputtext';
                 this.products_doc_p03 = []; 
                 this.Data_Doc();
             }, 
-            handleFileChange(event) {
-                const files = event.target.files; // ไฟล์ที่ถูกเลือก
-                const maxFileSize = 10 * 1024 * 1024; // ขนาดไฟล์สูงสุด 10 MB
-                const validFiles = []; // สำหรับเก็บไฟล์ที่ผ่านการตรวจสอบ
+           handleFileChange(event) {
+                const files = event.target.files;
+                const maxFileSize = 10 * 1024 * 1024; // 10 MB
+                const validFiles = [];
+                let oversizedFiles = [];
 
-                // วนลูปตรวจสอบไฟล์แต่ละไฟล์
                 Array.from(files).forEach(file => {
                     if (file.size > maxFileSize) {
-                        alert(`ไฟล์ ${file.name} ไฟล์มีขนาดเกิน 15 MB `); // แจ้งเตือนเมื่อไฟล์เกินขนาด
+                        oversizedFiles.push(file.name);
                     } else {
-                        validFiles.push(file); // เก็บไฟล์ที่ผ่านเงื่อนไข
+                        validFiles.push(file);
                     }
-                });
+                }); 
+                if (oversizedFiles.length > 0) {
+                    Swal.fire({
+                        icon: "error",
+                        title: "ไฟล์มีขนาดเกิน 10 MB",
+                        html: `
+                            ไฟล์ต่อไปนี้มีขนาดเกินกำหนด:<br><br>
+                            <strong>${oversizedFiles.join("<br>")}</strong>
+                        `,
+                        confirmButtonText: "ตกลง",
+                    });
+                }
 
-                // เก็บเฉพาะไฟล์ที่ผ่านการตรวจสอบใน selectedFiles
+                // อัปเดตเฉพาะไฟล์ที่ผ่านการตรวจสอบ
                 this.selectedFiles = validFiles;
 
-                // แสดงไฟล์ที่ผ่านการอัปโหลดใน console
-                console.log("ไฟล์ที่อัปโหลด:", this.selectedFiles);
-            }, 
+                console.log("ไฟล์ที่ผ่านการตรวจสอบ:", this.selectedFiles);
+            },
+
             // handleFileChange(event) {
             //     const files = event.target.files;
             //     this.selectedFiles = Array.from(files);

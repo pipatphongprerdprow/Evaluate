@@ -214,9 +214,7 @@
                         <span v-else class="text-gray-400">ยังไม่เลือก</span>
                       </template>
                     </Column>
-                    <Column field="description" header="ภาระงานประจำวัน" style="flex:1;min-width:18rem"/>
-                    <Column header="รอบประเมิน" style="min-width:12rem">  <template #body="{data}"> <Tag v-if="data.evalu_steptasks" :value="data.evalu_steptasks" severity="info"/> <span v-else class="text-gray-400">-</span> </template> </Column>
-                    <Column header="แบบ ป. ที่สอดคล้อง" style="min-width:12rem"> <template #body="{data}"> <Tag v-if="data.por_detel" :value="data.por_detel" severity="success"/> <span v-else class="text-gray-400">-</span> </template> </Column>
+                    <Column field="description" header="ภาระงานประจำวัน" style="flex:1;min-width:18rem"/> 
                     <Column header="วันที่ลงบันทึก" style="width:7.5rem" class="text-center"><template #body="{data}">{{ formatDate(data.createdDate) }}</template></Column>
                     <Column header="เวลาที่ใช้ไป" style="width:7rem" class="text-center"><template #body="{data}">{{ getTaskTimeSpent(data) }}</template></Column>
                     <Column header="จัดการ" style="width:6rem" class="text-center">
@@ -380,14 +378,6 @@
       <div class="p-fluid formgrid grid">
         <div class="field col-6"><label class="font-semibold">ประเภทภาระงาน</label><Dropdown v-model="currentEditingTask.taskType" :options="taskTypes" optionLabel="label" optionValue="value" class="w-full" @change="onEditTaskTypeChange"/></div> 
         <div class="field col-6"> <label class="font-semibold">ภาระงานหลัก</label> <AutoComplete v-model="currentEditingTask.mainTask" :suggestions="mainTaskSuggestions" @complete="completeMainTask" placeholder="พิมพ์เพื่อค้นหา/เลือกภาระงานหลัก" dropdown @blur="normalizeEditingMainTask()" class="w-full" /> </div>
-      </div>
-      <div class="p-fluid formgrid grid">
-        <div class="field col-12 md:col-6">
-          <label class="font-semibold">รอบประเมิน</label> <Dropdown v-model="currentEditingTask.evalRound" :options="evalRounds" optionLabel="label" optionValue="value" placeholder="เลือกรอบประเมิน" class="w-full" @change="onEditEvaluChange" />
-        </div>
-        <div class="field col-12 md:col-6">
-          <label class="font-semibold">แบบ ป.ที่สอดคล้อง</label> <AutoComplete v-model="currentEditingTask.porForm" :suggestions="porFormSuggestions" field="label" placeholder="พิมพ์เพื่อค้นหา/เลือกแบบ ป." dropdown class="w-full" @complete="searchPorFormRemoteForEdit" />
-        </div>
       </div> 
       <div class="p-fluid formgrid grid">
         <div class="field col-12 md:col-6"><label class="font-semibold">ภาระงานประจำวัน</label><InputText v-model="currentEditingTask.description" placeholder="ระบุภาระงาน..." class="w-full"/></div>
@@ -397,8 +387,7 @@
       <template #footer>
         <div class="flex justify-end gap-2 pt-4"><Button label="ยกเลิก" icon="pi pi-times" class="p-button-text p-button-danger" @click="showEditTaskDialog=false"/><Button label="บันทึก" icon="pi pi-save" class="p-button-success" @click="saveEditedTask"/></div>
       </template>
-    </Dialog>
-
+    </Dialog> 
     <!-- Dialog: เพิ่มภาระงาน -->
     <Dialog v-model:visible="showAddTaskDialog" :breakpoints="{ '960px': '90vw' }" :style="{ width: '70vw' }" modal>
       <template #header>
@@ -413,36 +402,20 @@
 
             <!-- เลือกภาระงานหลัก (แสดงเมื่อประเภทงานไม่ใช่ 'งานอื่นๆ') --> 
             <div class="field col-12" v-if="newTaskInStep.taskType !== 'งานอื่นๆ'">
-              <label class="font-semibold">ภาระงานหลัก</label>
-                <AutoComplete
-                  v-model="newTaskInStep.mainTask"
-                  :suggestions="mainTaskSuggestions"
-                  @complete="completeMainTask"
-                  placeholder="พิมพ์เพื่อค้นหา/เลือกภาระงานหลัก"
-                  dropdown
-                  @item-select="({ value }) => onMainTaskChange(value)"   
-                  @blur="onMainTaskChange(newTaskInStep.mainTask)"       
-                  class="w-full"
+                <label class="font-semibold">ภาระงานหลัก</label> 
+                <InputText
+                    v-model="newTaskInStep.mainTask"
+                    placeholder="พิมพ์ภาระงานหลัก"
+                    class="w-full"
+                    @input="onMainTaskChange(newTaskInStep.mainTask)"
                 />
             </div> 
-            <div class="field col-6">
-                <label class="font-semibold">รอบประเมิน</label>
-                <Dropdown v-model="newTaskInStep.evalRound" :options="evalRounds" optionLabel="label" optionValue="value" placeholder="กรุณาเลือกรอบการประเมิน" class="w-full" @change="onEvaluChange" />
-            </div>
-            <div class="field col-6">
-              <label class="font-semibold">แบบ ป.ที่สอดคล้อง</label>
-                <AutoComplete v-model="newTaskInStep.porForm" :suggestions="porFormSuggestions" field="label" placeholder="พิมพ์เพื่อค้นหา/เลือกแบบ ป." dropdown class="w-full" @complete="searchPorFormRemote" />
-            </div>
-
- 
             <!-- ภาระงานประจำวัน (แสดงแบบต่างกันขึ้นอยู่กับประเภทงาน) -->
             <div class="field col-12">
-                <label class="font-semibold">ภาระงานประจำวัน</label>
-                <!-- ถ้าเลือก 'งานหลัก' แสดง Dropdown สำหรับเลือกภาระงาน -->
-                <Dropdown v-if="newTaskInStep.taskType === 'งานหลัก'" v-model="newTaskInStep.description" :options="subTasks" optionLabel="name" optionValue="name" placeholder="เลือกภาระงานประจำวัน" class="w-full" :disabled="!newTaskInStep.mainTask"/>
-                <!-- ถ้าไม่เลือก 'งานหลัก' ใช้ Textarea สำหรับกรอกภาระงานประจำวัน -->
-                <Textarea v-else v-model="newTaskInStep.description" placeholder="กรอกภาระงานประจำวัน" class="w-full"/>
-            </div> 
+                <label class="font-semibold">ภาระงานประจำวัน</label> 
+                  <InputText   v-if="newTaskInStep.taskType === 'งานหลัก'" v-model="newTaskInStep.description"  placeholder="พิมพ์ภาระงานประจำวัน" class="w-full" :disabled="!newTaskInStep.mainTask" />  
+                <Textarea  v-else v-model="newTaskInStep.description"  placeholder="กรอกภาระงานประจำวัน"  class="w-full" />
+            </div>
             <!-- เวลาเริ่มต้น -->
             <div class="field col-6">
                 <label class="font-semibold">เวลาเริ่มต้น</label>

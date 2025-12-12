@@ -21,8 +21,7 @@
                             <!-- <Button  icon="pi pi-copy"  severity="success" class="mb-2" label="คัดลอกข้อมูลรอบประเมิน" @click="copyEvaluationData" /> -->
                         </div> 
                     </div>  
-                </div>  
-                <!-- แสดงข้อมูลบันทึก -->
+                </div>   
                 <table class="table" >
                     <thead>
                         <tr>
@@ -59,13 +58,23 @@
                             </tr> 
                             <tr v-for="(subP01, idx) in h.subP01sX" :key="idx" style="vertical-align: baseline;"> 
                                 <td style="text-align: left;">{{ subP01.p01_no }} {{ subP01.p01_subject }}</td>
-                                <td style="text-align: left;">
+
+                                <!-- แก้แดง -->
+                                <!-- <td style="text-align: left;">
                                     <b>ตัวชี้วัดที่ {{ idx+1 }} {{ subP01.p01_subject }}</b>
                                     <p v-for="(subIitem, idI) in subP01.subITems" :key="idI" style="padding-left: 8px;margin-bottom: 5px;">
                                         <div v-if="subIitem.ind_no!=0"><b>ระดับ {{ subIitem.ind_no }}</b> {{ subIitem.ind_Items }}</div>
                                         <div v-if="subIitem.ind_no==0"><b>{{ subIitem.ind_Items }}</b></div>
                                     </p>
-                                </td>
+                                </td> --> 
+                                <td style="text-align: left;">
+                                    <b>ตัวชี้วัดที่ {{ idx + 1 }} {{ subP01.p01_subject }}</b> 
+                                    <div  v-for="(subIitem, idI) in subP01.subITems" :key="idI" style="padding-left: 8px; margin-bottom: 5px;" >
+                                        <span v-if="subIitem.ind_no != 0"> <b>ระดับ {{ subIitem.ind_no }}</b> {{ subIitem.ind_Items }} </span>
+                                        <span v-else> <b>{{ subIitem.ind_Items }}</b> </span>
+                                    </div>
+                                </td> 
+
                                 <td style=" vertical-align: middle;" class="text-center">
                                     <b v-if="subP01.p01_target==1">&#10003;</b> 
                                     <b v-if="subP01.p01_target!=1"></b> 
@@ -209,14 +218,23 @@
                                         <td class="text-center">
                                             <Checkbox :id="'checkOption-' + subP01.p_id" :name="'option-' + subP01.p_id" :value="subP01.p_id" v-model="checkboxValue" />
                                         </td>
-                                        <td style="text-align: left;">{{ subP01.p_no }} {{ subP01.p_subject }}</td>
-                                        <td style="text-align: left;">
+                                        <td style="text-align: left;">{{ subP01.p_no }} {{ subP01.p_subject }}</td> 
+
+                                        <!-- แก้แดง -->
+                                        <!-- <td style="text-align: left;">
                                             <b>ตัวชี้วัดที่ {{ idx+1 }} {{ subP01.p_subject }}</b>
                                             <p v-for="(subIitem, idI) in subP01.subITems" :key="idI" style="padding-left: 8px;margin-bottom: 5px;">
                                                 <div v-if="subIitem.ind_no!=0"><b>ระดับ {{ subIitem.ind_no }}</b> {{ subIitem.ind_Items }}</div>
                                                 <div v-if="subIitem.ind_no==0"><b>{{ subIitem.ind_Items }}</b></div>
                                             </p>
-                                        </td>
+                                        </td> --> 
+                                        <td style="text-align: left;">
+                                            <b>ตัวชี้วัดที่ {{ idx + 1 }} {{ subP01.p_subject }}</b> 
+                                            <div  v-for="(subIitem, idI) in subP01.subITems"  :key="idI" style="padding-left: 8px; margin-bottom: 5px;"  >
+                                                <span v-if="subIitem.ind_no != 0"> <b>ระดับ {{ subIitem.ind_no }}</b> {{ subIitem.ind_Items }} </span>
+                                                <span v-else> <b>{{ subIitem.ind_Items }}</b> </span>
+                                            </div>
+                                        </td> 
                                         <td class="text-center">
                                             <b v-if="subP01.p_target==1">&#10003;</b>
                                             <b v-if="subP01.p_target!=1"></b>
@@ -303,7 +321,7 @@
                                 <InputGroup>  
                                     <InputText v-model="text_search_no" type="number" placeholder="ระดับ" autocomplete="off" class="col-12 md:col-2" /> 
                                     <InputText v-model="text_search" type="text" placeholder="รายละเอียดเกณฑ์การประเมิน" autocomplete="off"/> 
-                                    <Button icon="pi pi-save" label="บันทึก" severity="warning" @click="AddDatalist" />
+                                    <Button icon="pi pi-plus" label="เพิ่ม" severity="warning" @click="AddDatalist" />
                                 </InputGroup>  
                             </div>   
                         </div> 
