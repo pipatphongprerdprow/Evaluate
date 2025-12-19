@@ -16,9 +16,8 @@ const resetTimeout = () => {
     clearTimeout(inactivityTimeout.value);
     inactivityTimeout.value = setTimeout(() => {
         signOut();
-    }, 1000 * 60 * 60 * 6); // 6 ชั่วโมง
-};
-
+    }, 1000 * 60 * 60 * 6);  
+}; 
 // ดักจับเหตุการณ์ของผู้ใช้
 onMounted(() => {
     bindOutsideClickListener();
@@ -83,7 +82,9 @@ const isOutsideClicked = (event) => {
 <template>
     <div class="layout-topbar">
         <router-link to="/" class="layout-topbar-logo">
-            <img src="~/assets/layout/images/evalua_MSU.jpg" alt="logo" style="width: 300px; height: auto;" />
+            <img src="~/assets/layout/images/MSU_PA.3.jpg" alt="logo" style="width: 330px; height: auto;" />
+            <!-- <img src="~/assets/layout/images/evalua_MSU.jpg" alt="logo" style="width: 300px; height: auto;" /> -->
+             
             <!-- <img src="~/assets/layout/images/kongkang.jpg" alt="logo" />
             <span>Evaluate Personnel MSU</span> -->
         </router-link>

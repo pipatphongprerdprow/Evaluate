@@ -32,7 +32,8 @@
             <div class="formgroup-inline mb-1">
                 <div class="d-flex align-items-center"> </div>
             </div> 
-            <TabView :activeIndex="activeIndex" @tabChange="onTabChange">
+            <!-- <TabView :activeIndex="activeIndex" @tabChange="onTabChange"> -->
+            <TabView :activeIndex="activeIndex" @tabChange="onTabChange" :class="{ 'lock-next-tabs': !isP01WeightOk }" >
                 <TabPanel header="แบบ ใบปะหน้า" value="0">
                     <div class="col md:col-12 text-right">
                         <Button label="Export" icon="pi pi-file-word" class="mr-2 mb-2" @click="printDataP01" />
@@ -112,9 +113,12 @@
                         </div>
                     </div>
                 </TabPanel>  
-                <TabPanel header="แบบ ป01" value="1">
+                <!-- <TabPanel header="แบบ ป01" value="1">
                     <Por01 :dataPor="product_date" />
-                </TabPanel> 
+                </TabPanel>  -->
+                <TabPanel header="แบบ ป01" value="1">
+                    <Por01 :dataPor="product_date" @weight-changed="onP01WeightChanged" />
+                </TabPanel>
                 <TabPanel header="แบบ ป02" value="2">
                     <Por02 :dataPor="product_date" :tab2Reload="por02key" />
                 </TabPanel> 
@@ -171,9 +175,9 @@ const user = await getSession();
                 pos_id: '',
                 postype_id: '',
                 evalua: '',
-                groupid_Main: '01',  
-
+                groupid_Main: '01',   
                 dataP01: {},
+                p01TotalWeight: 0,
 
                 user: {
                     user: {
@@ -235,7 +239,11 @@ const user = await getSession();
                     (a, b) => new Date(b.d_date) - new Date(a.d_date)
                 );
                 return [sorted[0]];
-            }
+            },
+            isP01WeightOk() {
+                const w = Number(this.p01TotalWeight || 0);
+                return Math.abs(w - 100) < 0.01;
+            }, 
         },
 
         methods: { 
@@ -339,20 +347,62 @@ const user = await getSession();
                 });
             },   
 
-            onTabChange(event) { 
-                if (this.product_date.d_date == null || this.product_date.d_date == undefined) {
-                    Swal.fire('error', 'กรุณาเลือก รอบการประเมิน ก่อน !', 'error'); 
-                } else {
-                    if (event.index == 2) {   
-                        this.por02key++; 
-                    } else if (event.index == 3) {   
-                        this.por03key++; 
-                    } else if (event.index == 4) {   
-                        this.por04key++;  
-                    } 
-                    this.currenttap = event.index;
+            // onTabChange(event) { 
+            //     if (this.product_date.d_date == null || this.product_date.d_date == undefined) {
+            //         Swal.fire('error', 'กรุณาเลือก รอบการประเมิน ก่อน !', 'error'); 
+            //     } else {
+            //         if (event.index == 2) {   
+            //             this.por02key++; 
+            //         } else if (event.index == 3) {   
+            //             this.por03key++; 
+            //         } else if (event.index == 4) {   
+            //             this.por04key++;  
+            //         } 
+            //         this.currenttap = event.index;
+            //     }
+            // }, 
+            onTabChange(event) {
+                // ต้องเลือกรอบก่อน
+                if (!this.product_date?.d_date) {
+                    Swal.fire({
+                    icon: 'warning',
+                    title: 'แจ้งเตือน',
+                    text: 'กรุณาเลือก รอบการประเมิน ก่อน !',
+                    confirmButtonText: 'ตกลง'
+                    });
+
+                    // ดึงกลับแท็บเดิม
+                    this.activeIndex = this.currenttap ?? 0;
+                    return;
                 }
-            }, 
+
+                // ถ้าจะไปแท็บ 2-4 แต่ weight ไม่ครบ/เกิน => กัน
+                if (event.index >= 2 && !this.isP01WeightOk) {
+                    const w = Number(this.p01TotalWeight || 0);
+                    const msg = w > 100
+                    ? `คะแนนรวมน้ำหนัก = ${w}% เกิน 100% กรุณาปรับให้เท่ากับ 100%`
+                    : `คะแนนรวมน้ำหนัก = ${w}% ยังไม่ครบ 100% กรุณาปรับให้เท่ากับ 100%`;
+
+                    Swal.fire({
+                    icon: 'warning',
+                    title: 'ยังไปแท็บอื่นไม่ได้',
+                    text: msg,
+                    confirmButtonText: 'ตกลง'
+                    });
+
+                    this.activeIndex = 1;   // บังคับค้างที่ ป01
+                    this.currenttap = 1;
+                    return;
+                }
+
+                // ผ่านแล้วค่อยเปลี่ยน
+                this.activeIndex = event.index;
+                this.currenttap = event.index;
+
+                if (event.index == 2) this.por02key++;
+                else if (event.index == 3) this.por03key++;
+                else if (event.index == 4) this.por04key++;
+            },
 
             async printDataP01() { 
                 const { signIn, getSession, signOut } = await useAuth();
@@ -398,6 +448,9 @@ const user = await getSession();
                     this.staffSuggestions = [];
                 });
             }, 
+            onP01WeightChanged(val) {
+                this.p01TotalWeight = Number(val || 0);
+            }, 
         },  
     };
 </script>
@@ -434,5 +487,10 @@ const user = await getSession();
     display: flex;
     align-items: center;
     gap: 40px;
+}
+.lock-next-tabs :deep(.p-tabview-nav li:nth-child(n+3)) {
+  pointer-events: none;     /* กดไม่ได้ */
+  opacity: 0.45;            /* ทำให้ดูเป็น disabled */
+  cursor: not-allowed;
 }
 </style>

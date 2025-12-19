@@ -2346,9 +2346,7 @@ export default {
 
 
         ///***********///
-
-
-
+ 
         async saveAssess() {
             try {
                 const response = await axios.post('http://127.0.0.1:8000/api/savedataAssess', { 
@@ -2358,8 +2356,7 @@ export default {
                     evalua: this.tracking_date.evalua, 
                     corecompetencies: this.coreCompetencies,
                     jobspecificcompetencies: this.jobSpecificCompetencies,
-                    otherCompetencies: this.otherCompetencies
-                    
+                    otherCompetencies: this.otherCompetencies 
                 }); 
                 // console.log( this.staffid_Main,this.facid_Main,this.dataPor.evalua, this.coreCompetencies,this.jobSpecificCompetencies, );
                 

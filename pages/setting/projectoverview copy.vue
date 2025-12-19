@@ -1,5 +1,5 @@
 <template>
-  <div class="page-wrap">
+  <div class="page-wrap">  
     <div class="hero">
       <div class="hero-left">
         <div class="hero-title">
@@ -25,54 +25,28 @@
           <div class="kpi-value">{{ averageProgress }}%</div>
         </div>
       </div>
-    </div>
-
+    </div>   
     <div class="filterbar card">
       <div class="grid align-items-end">
         <div class="col-12 md:col-3">
           <label class="block text-600 mb-1">ปีงบประมาณ</label>
-          <Dropdown
-            v-model="selectedFYBE"
-            :options="fyOptions"
-            optionLabel="label"
-            optionValue="value"
-            class="w-full"
-          />
+          <Dropdown v-model="selectedFYBE" :options="fyOptions" optionLabel="label" optionValue="value" class="w-full" />
         </div>
         <div class="col-12 md:col-3">
           <label class="block text-600 mb-1">ไตรมาส</label>
-          <Dropdown
-            v-model="selectedQuarter"
-            :options="quarterOptions"
-            optionLabel="label"
-            optionValue="value"
-            class="w-full"
-            placeholder="เลือกไตรมาส"
-          />
+          <Dropdown v-model="selectedQuarter" :options="quarterOptions" optionLabel="label" optionValue="value" class="w-full" placeholder="เลือกไตรมาส"/>
         </div>
         <div class="col-12 md:col-3">
           <label class="block text-600 mb-1">ประเภทแผน</label>
-          <Dropdown
-            v-model="selectedPlanType"
-            :options="planOptions"
-            optionLabel="label"
-            optionValue="value"
-            class="w-full"
-            placeholder="ทั้งหมด"
-          />
+          <Dropdown v-model="selectedPlanType" :options="planOptions" optionLabel="label" optionValue="value" class="w-full" placeholder="ทั้งหมด"/>
         </div>
-
+        <!-- <div class="col-12 md:col-3">
+          <label class="block text-600 mb-1">คณะ/หน่วยงาน/กอง</label>
+          <Dropdown v-model="selectedDepartment" :options="departmentOptions" optionLabel="label" optionValue="value" class="w-full" placeholder="ทั้งหมด"/>
+        </div> -->
         <div class="col-12 md:col-3">
           <label class="block text-600 mb-1">คณะ/หน่วยงาน/กอง</label>
-          <Dropdown
-            v-model="selectedDepartment"
-            :options="departmentOptions"
-            optionLabel="label"
-            optionValue="value"
-            class="w-full"
-            placeholder="ทั้งหมด"
-            :disabled="!isAdmin"
-          />
+          <Dropdown v-model="selectedDepartment" :options="departmentOptions" optionLabel="label" optionValue="value" class="w-full" placeholder="ทั้งหมด" :disabled="!isAdmin"/>
         </div>
 
         <div class="col-12 md:col-6 mt-3">
@@ -82,13 +56,7 @@
           </span>
         </div>
         <div class="col-12 md:col-6 mt-3 flex gap-2 justify-content-end">
-          <Button
-            :loading="searching"
-            icon="pi pi-refresh"
-            label="ค้นหาใหม่"
-            class="p-button-primary"
-            @click="handleSearch"
-          />
+          <Button :loading="searching" icon="pi pi-refresh" label="ค้นหาใหม่" class="p-button-primary" @click="handleSearch" />
           <Button icon="pi pi-times" class="p-button-secondary" label="ล้างตัวกรอง" @click="resetFilters" />
           <Button icon="pi pi-download" class="p-button-help" label="ส่งออก CSV" @click="exportCSV" />
         </div>
@@ -98,10 +66,10 @@
           <small class="text-600">กำลังโหลดข้อมูล…</small>
         </div>
       </div>
-    </div>
-
-    <div class="card p-3 mb-3">
-      <div class="grid p-fluid">
+    </div> 
+    <div class="card p-3 mb-3"> 
+      <div class="grid p-fluid"> 
+        <!-- ประเภทแผน -->
         <div class="col-12 lg:col-4">
           <Card class="h-full dash-card">
             <template #title>
@@ -120,8 +88,8 @@
               <div class="text-600 text-sm mt-2">รวม: <b>{{ dashTotals.total }}</b> โครงการ</div>
             </template>
           </Card>
-        </div>
-
+        </div> 
+        <!-- สถานะโครงการ -->
         <div class="col-12 lg:col-4">
           <Card class="h-full dash-card">
             <template #title>
@@ -164,6 +132,26 @@
           </Card>
         </div>
 
+        <!-- ความคืบหน้าโครงการ -->
+        <!-- <div class="col-12 lg:col-4">
+          <Card class="h-full dash-card">
+            <template #title>
+              <div class="card-head between">
+                <div><i class="pi pi-chart-line mr-2"></i>ความคืบหน้าโครงการ</div>
+                <span class="text-primary font-bold">เฉลี่ย {{ averageProgress }}%</span>
+              </div>
+            </template>
+            <template #content>
+              <div class="relative">
+                <div v-if="searching" class="overlay-loading"><ProgressSpinner style="width:28px;height:28px" strokeWidth="6" /></div>
+                <Chart type="bar" :data="progressChartData" :options="progressChartOptions" />
+              </div>
+              <div v-if="progressOverflowNote" class="text-500 text-xs mt-2">
+                * แสดงเฉพาะ {{ progressMaxBars }} โครงการแรก (เรียงตามชื่อ) เพื่อความอ่านง่าย
+              </div>
+            </template>
+          </Card>
+        </div> -->
         <div class="col-12 lg:col-4">
           <Card class="h-full dash-card">
             <template #title>
@@ -178,16 +166,12 @@
               <div class="relative">
                 <div v-if="searching" class="overlay-loading">
                   <ProgressSpinner style="width:28px;height:28px" strokeWidth="6" />
-                </div>
-
-                <Chart type="bar" :data="planTypeMinutesChartData" :options="planTypeMinutesChartOptions" />
-
+                </div> 
+                <!-- กราฟแท่งแสดงเวลารวม (นาที) ต่อประเภทแผน -->
+                <Chart type="bar" :data="planTypeMinutesChartData" :options="planTypeMinutesChartOptions" /> 
+                <!-- รายการสรุปด้านล่าง (เรียงจากมาก -> น้อย) -->
                 <div class="mt-3">
-                  <div
-                    v-for="row in planTypeMinutesList"
-                    :key="row.type"
-                    class="flex justify-content-between align-items-center py-1 border-bottom-1 surface-border"
-                  >
+                  <div v-for="row in planTypeMinutesList" :key="row.type" class="flex justify-content-between align-items-center py-1 border-bottom-1 surface-border">
                     <div class="text-700">
                       <i class="pi pi-sitemap mr-2"></i>{{ row.type }}
                     </div>
@@ -197,28 +181,16 @@
               </div>
             </template>
           </Card>
-        </div>
+        </div> 
       </div>
-    </div>
-
-    <div class="card p-3">
+    </div> 
+    <div class="card p-3"> 
       <div v-if="searching" class="p-6 text-600 text-center flex align-items-center justify-content-center">
         <ProgressSpinner style="width:36px;height:36px" strokeWidth="6" />
         <span class="ml-2">กำลังโหลดข้อมูล…</span>
-      </div>
-
+      </div> 
       <template v-else>
-        <DataTable
-          ref="dt"
-          :value="filteredProjects"
-          :paginator="true"
-          :rows="10"
-          :rowsPerPageOptions="[10,20,50]"
-          dataKey="__key"
-          responsiveLayout="scroll"
-          stripedRows
-          class="elevated-table"
-        >
+        <DataTable  ref="dt" :value="filteredProjects" :paginator="true" :rows="10" :rowsPerPageOptions="[10,20,50]" dataKey="__key" responsiveLayout="scroll" stripedRows class="elevated-table">
           <Column header="ไตรมาส" style="width: 10rem; text-align:center">
             <template #body="slotProps">
               <Tag :value="getQuarter(slotProps.data.startDate)" severity="info" />
@@ -233,14 +205,11 @@
 
           <Column header="ประเภทแผน" style="width: 9rem; text-align:center">
             <template #body="slotProps">
-              <Tag
-                :value="getPlanType(slotProps.data)"
-                :severity="getPlanTypeSeverity(getPlanType(slotProps.data))"
-                class="font-semibold"
-              />
+              <Tag :value="getPlanType(slotProps.data)" :severity="getPlanTypeSeverity(getPlanType(slotProps.data))" class="font-semibold"/>
             </template>
-          </Column>
+          </Column> 
 
+          <!-- ===== WOW: ชื่อโครงการ + Owners Avatar + Accent ===== -->
           <Column field="planLabel" header="ชื่อแผนงาน/โครงการ" style="min-width: 22rem">
             <template #body="slotProps">
               <div class="cell-card" :class="`type-${getPlanType(slotProps.data)}`">
@@ -256,122 +225,74 @@
                 </div>
                 <div class="cell-owners" v-if="(slotProps.data.owner||[]).length">
                   <AvatarGroup>
-                    <Avatar
-                      v-for="(o, i) in (slotProps.data.owner||[]).slice(0,4)"
-                      :key="i"
-                      :label="initials(o.name)"
-                      shape="circle"
-                      class="owner-avatar"
-                      :class="colorSeed(o.name)"
-                    />
-                    <Avatar
-                      v-if="(slotProps.data.owner||[]).length > 4"
-                      :label="`+${(slotProps.data.owner||[]).length-4}`"
-                      shape="circle"
-                      class="owner-avatar more"
-                    />
+                    <Avatar v-for="(o, i) in (slotProps.data.owner||[]).slice(0,4)" :key="i" :label="initials(o.name)" shape="circle" class="owner-avatar" :class="colorSeed(o.name)"/>
+                    <Avatar v-if="(slotProps.data.owner||[]).length > 4" :label="`+${(slotProps.data.owner||[]).length-4}`" shape="circle" class="owner-avatar more"/>
                   </AvatarGroup>
                 </div>
               </div>
             </template>
-          </Column>
-
+          </Column> 
           <Column header="เวลารวม (นาที)" style="width: 10rem; text-align:center">
             <template #body="slotProps">
               <span class="font-semibold">{{ getPlanTotalMinutes(slotProps.data).toLocaleString() }}</span>
             </template>
-          </Column>
-
+          </Column> 
           <Column header="ความคืบหน้า" style="width: 10.5rem; text-align:center">
             <template #body="slotProps">
-              <div
-                class="radial-wrap"
-                :style="radialStyle(getPlanProgress(slotProps.data))"
-                :class="{
-                  'rc-success': getPlanStatusLabel(slotProps.data)==='เสร็จสิ้น',
-                  'rc-warn': getPlanStatusLabel(slotProps.data)==='อยู่ระหว่างดำเนินการ'
-                }"
-              >
+              <div  class="radial-wrap" :style="radialStyle(getPlanProgress(slotProps.data))" :class="{ 'rc-success': getPlanStatusLabel(slotProps.data)==='เสร็จสิ้น', 'rc-warn': getPlanStatusLabel(slotProps.data)==='อยู่ระหว่างดำเนินการ' }">
                 <div class="radial-core">
                   <div class="radial-num">{{ getPlanProgress(slotProps.data) }}%</div>
                 </div>
               </div>
             </template>
-          </Column>
-
+          </Column> 
           <Column header="สถานะ" style="width: 10rem; text-align:center">
             <template #body="slotProps">
               <span class="status-pill" :class="getPlanStatusSeverity(slotProps.data)">
                 <i v-if="getPlanStatusLabel(slotProps.data)==='เสร็จสิ้น'" class="pi pi-check-circle mr-1"></i>
-                <i
-                  v-else-if="getPlanStatusLabel(slotProps.data)==='อยู่ระหว่างดำเนินการ'"
-                  class="pi pi-spinner mr-1 pi-spin"
-                ></i>
+                <i v-else-if="getPlanStatusLabel(slotProps.data)==='อยู่ระหว่างดำเนินการ'" class="pi pi-spinner mr-1 pi-spin"></i>
                 <i v-else class="pi pi-clock mr-1"></i>
                 {{ getPlanStatusLabel(slotProps.data) }}
               </span>
             </template>
-          </Column>
-
+          </Column> 
           <Column header="รายละเอียด" style="width: 8rem; text-align:center">
             <template #body="slotProps">
-              <Button
-                label="รายละเอียด"
-                icon="pi pi-search"
-                class="p-button-sm"
-                :disabled="searching"
-                @click="openPlanDrawer(null, slotProps.data)"
-              />
+              <Button label="รายละเอียด" icon="pi pi-search" class="p-button-sm" :disabled="searching" @click="openPlanDrawer(null, slotProps.data)"/>
             </template>
           </Column>
-        </DataTable>
-
+        </DataTable> 
         <div v-if="filteredProjects.length === 0" class="text-center text-500 py-5">
           ไม่พบโครงการตามเงื่อนไขที่เลือก
         </div>
       </template>
     </div>
 
-    <Sidebar
-      v-model:visible="planSidebarVisible"
-      position="right"
-      :modal="true"
-      :dismissable="true"
-      style="width: 920px; max-width: 100vw;"
-    >
+    <!-- ===== Drawer รายละเอียดแผน ===== -->
+    <Sidebar v-model:visible="planSidebarVisible" position="right" :modal="true" :dismissable="true" style="width: 920px; max-width: 100vw;">
       <template #header>
         <div class="flex items-center gap-3">
           <i class="pi pi-briefcase text-primary text-xl"></i>
           <div class="flex flex-column">
             <span class="text-lg font-bold line-clamp-1">{{ selectedPlan?.planLabel || '-' }}</span>
-            <small class="text-600"
-              ><i class="pi pi-user mr-1"></i>{{ (selectedPlan?.owner ?? []).map(o=>o.name).join(', ') || '-' }}</small
-            >
+            <small class="text-600"><i class="pi pi-user mr-1"></i>{{ (selectedPlan?.owner ?? []).map(o=>o.name).join(', ') || '-' }}</small>
           </div>
         </div>
       </template>
 
       <div v-if="selectedPlan" class="detail-wrap">
         <div class="summary">
-          <div class="summary-item">
-            <i class="pi pi-calendar text-600 mr-2"></i>{{ formatDate(selectedPlan.startDate) }} - {{ formatDate(selectedPlan.endDate) }}
-          </div>
-          <div class="summary-item">
-            <i class="pi pi-chart-line text-600 mr-2"></i>ความคืบหน้า: <b>{{ getPlanProgress(selectedPlan) }}%</b>
-          </div>
-          <div class="summary-item">
-            <i class="pi pi-clock text-600 mr-2"></i>เวลารวม: <b>{{ getPlanTotalMinutes(selectedPlan).toLocaleString() }}</b> นาที
-          </div>
+          <div class="summary-item"><i class="pi pi-calendar text-600 mr-2"></i>{{ formatDate(selectedPlan.startDate) }} - {{ formatDate(selectedPlan.endDate) }}</div>
+          <div class="summary-item"><i class="pi pi-chart-line text-600 mr-2"></i>ความคืบหน้า: <b>{{ getPlanProgress(selectedPlan) }}%</b></div>
+          <div class="summary-item"><i class="pi pi-clock text-600 mr-2"></i>เวลารวม: <b>{{ getPlanTotalMinutes(selectedPlan).toLocaleString() }}</b> นาที</div>
           <div class="summary-item"><i class="pi pi-sitemap text-600 mr-2"></i>{{ getQuarter(selectedPlan.startDate) }}</div>
           <div class="summary-item"><i class="pi pi-calendar-times text-600 mr-2"></i>ปีงบฯ: <b>{{ getYearBE(selectedPlan.startDate) }}</b></div>
-        </div>
-
+        </div> 
         <div class="legend">
           <span class="dot dot-gray"></span> รอดำเนินการ
           <span class="dot dot-amber ml-3"></span> อยู่ระหว่างดำเนินการ
           <span class="dot dot-green ml-3"></span> เสร็จสิ้น
-        </div>
-
+        </div> 
         <div class="timeline">
           <div v-for="(st, idx) in (selectedPlan.steps || [])" :key="st.id ?? idx" class="step-card">
             <div class="step-marker" :class="statusClass(getStepStatus(st))"></div>
@@ -380,17 +301,15 @@
                 <div class="step-title"><i class="pi pi-list mr-2 text-primary"></i>{{ st.name || ('ขั้นตอนที่ ' + (idx + 1)) }}</div>
                 <div class="step-right">
                   <i class="pi pi-users mr-2 text-600"></i>
-                  <span class="step-owners">{{ getStepOwnerNames(st) }}</span>
+                  <span class="step-owners">{{ getStepOwnerNames(st) }}</span>                      
                   <Tag class="ml-2" :value="getStepStatus(st)" :severity="getStepSeverity(st)" />
                 </div>
               </div>
-
               <div class="step-meta">
                 <span><i class="pi pi-calendar mr-1"></i>{{ formatDate(st.startDate) }} - {{ formatDate(st.endDate) }}</span>
                 <span class="ml-3"><i class="pi pi-percentage mr-1"></i>{{ getStepProgress(st) }}%</span>
                 <span class="ml-3"><i class="pi pi-clock mr-1"></i>{{ getStepTotalMinutes(st).toLocaleString() }} นาที</span>
               </div>
-
               <div class="task-list" v-if="(st.tasks||[]).length">
                 <div v-for="(t,i) in st.tasks" :key="i" class="task-item">
                   <div class="task-header">
@@ -426,7 +345,8 @@ import Chart from 'primevue/chart'
 import Avatar from 'primevue/avatar'
 import AvatarGroup from 'primevue/avatargroup'
 
-const { getSession } = await useAuth()
+const { getSession } = await useAuth() 
+
 const API = 'http://127.0.0.1:8000/api'
 
 /* ===== state หลัก ===== */
@@ -435,54 +355,12 @@ const facIdMain = ref('')
 const groupIdMain = ref('')
 const selectedEvaluationRound = ref(null)
 const evaluationRounds = ref([])
-const products = ref([])
+const products = ref([]) 
 const hasSearched = ref(true)
 const searching = ref(false)
 let reqSeq = 0
 let debounceTimer = null
-
-/* ====== helper: normalize คน (ชื่อ/รหัส) ====== */
-function pickName(o){
-  if(!o) return ''
-  if(typeof o === 'string') return o.trim()
-  return String(
-    o.name ??
-    o.namefully ??
-    o.fullname ??
-    o.staffname ??
-    o.staff_name ??
-    o.thai_name ??
-    o.displayName ??
-    o.title ??
-    ''
-  ).trim()
-}
-function pickId(o){
-  if(!o) return null
-  return o.id ?? o.staffid ?? o.staff_id ?? o.STAFFID ?? o.code ?? null
-}
-function peopleFromAny(v){
-  if(!v) return []
-  if(typeof v === 'string'){
-    return v.split(',').map(s=>({ id:null, name:s.trim() })).filter(x=>x.name)
-  }
-  if(typeof v === 'object' && !Array.isArray(v)){
-    const name = pickName(v)
-    const id = pickId(v)
-    return name ? [{ id, name }] : []
-  }
-  if(Array.isArray(v)){
-    return v.map(x=>{
-      if(typeof x === 'string') return { id:null, name:x.trim() }
-      const name = pickName(x)
-      const id = pickId(x)
-      return { id, name }
-    }).filter(x=>x.name)
-  }
-  return []
-}
-
-/* ===== chart aggregate ===== */
+ 
 const planTypeMinutesMap = computed(() => {
   const map = new Map()
   ;(filteredProjects.value || []).forEach(p => {
@@ -492,19 +370,21 @@ const planTypeMinutesMap = computed(() => {
   })
   return map
 })
-
+ 
 const planTypeMinutesList = computed(() => {
   return Array.from(planTypeMinutesMap.value.entries())
     .map(([type, minutes]) => ({ type, minutes }))
     .sort((a,b) => b.minutes - a.minutes)
 })
 
+/* รวมทั้งหมดทุกประเภท (ไว้โชว์ที่หัวการ์ด) */
 const totalMinutesAllTypes = computed(() => {
   let sum = 0
   for (const v of planTypeMinutesMap.value.values()) sum += v
   return sum
 })
 
+/* Chart Data */
 const planTypeMinutesChartData = computed(() => {
   const labels = planTypeMinutesList.value.map(x => x.type)
   const data = planTypeMinutesList.value.map(x => x.minutes)
@@ -520,13 +400,14 @@ const planTypeMinutesChartData = computed(() => {
   }
 })
 
+/* Chart Options */
 const planTypeMinutesChartOptions = {
   plugins: {
     legend: { display: false },
     tooltip: {
       callbacks: {
         label: (ctx) => {
-          const val = Number(ctx.raw || 0)
+          const val = Number(ctx.raw || 0) 
           const hrs = (val / 60).toFixed(1)
           return ` ${val.toLocaleString()} นาที (~${hrs} ชม.)`
         }
@@ -542,7 +423,7 @@ const planTypeMinutesChartOptions = {
     }
   }
 }
-
+ 
 /* ===== ตัวกรอง ===== */
 const selectedPlanType = ref('ALL')
 const planOptions = [
@@ -555,6 +436,15 @@ const planOptions = [
 ]
 
 const selectedDepartment = ref('ALL')
+// const departmentOptions = computed(() => {
+//   const set = new Map()
+//   ;(products.value || []).forEach(p => {
+//     const id = String(p.departmentid || p.fac_id || '')
+//     const name = p.departmentname || p.fac_name || 'ไม่ระบุหน่วยงาน'
+//     if (!set.has(id)) set.set(id, name)
+//   })
+//   return [{ label: 'ทั้งหมด', value: 'ALL' }, ...Array.from(set, ([value, label]) => ({ value, label }))]
+// })
 
 const departmentOptions = computed(() => {
   const set = new Map()
@@ -567,6 +457,7 @@ const departmentOptions = computed(() => {
   const arr = [{ label: 'ทั้งหมด', value: 'ALL' }, ...Array.from(set, ([value, label]) => ({ value, label }))]
 
   if (isAdmin.value) return arr
+  // non-admin: แสดงเฉพาะคณะของตน (ถ้าไม่มี id จะ fallback เป็นทั้งหมด 1 รายการไม่รวม ALL)
   const myId = String(facIdMain.value || '')
   const onlyMine = arr.filter(o => String(o.value) === myId)
   return onlyMine.length ? onlyMine : arr.filter(o => o.value !== 'ALL')
@@ -613,7 +504,11 @@ const periodRange = computed(()=> fyQuarterToRange(selectedFYAD.value, selectedQ
 /* ===== map/normalize ===== */
 function ownersFromAny(p){
   const v = p?.owner ?? p?.owners ?? p?.owner_ids ?? p?.responsible ?? null
-  return peopleFromAny(v)
+  if(!v) return []
+  if(Array.isArray(v)) return v.map(o => (o && typeof o==='object') ? { id:o.id||o.staffid||null, name: o.name||o.namefully||o.staffname||'' } : { id:null, name:String(o) })
+  if(typeof v==='string') return v.split(',').map(s=>({id:null,name:s.trim()}))
+  if(typeof v==='object') return [{ id: v.id||v.staffid||null, name: v.name||v.namefully||v.staffname||'' }]
+  return []
 }
 function normalizeStatus(v){
   if(v==null) return 'รอดำเนินการ'
@@ -645,10 +540,7 @@ function mapApiToState(arr){
         status: normalizeStatus(t.status),
         startTime: t.startTime?new Date(t.startTime):(t.start_time?new Date(t.start_time):null),
         endTime: t.endTime?new Date(t.endTime):(t.end_time?new Date(t.end_time):null),
-        createdDate: t.createdDate?new Date(t.createdDate):(t.created_date?new Date(t.created_date):null),
-
-        // ✅ normalize ผู้รับผิดชอบงานย่อย ให้เป็น {id,name}
-        responsible: peopleFromAny(t.responsible ?? t.owner ?? t.owners ?? t.staff ?? t.staffs ?? t.staff_list)
+        createdDate: t.createdDate?new Date(t.createdDate):(t.created_date?new Date(t.created_date):null)
       })) : []
     })) : []
   }))
@@ -683,9 +575,7 @@ async function fetchEvaluationRounds(){
   try{
     const res = await axios.post(`${API}/showDateSetleader`, { staff_id: staffIdMain.value, fac_id: facIdMain.value, group_id: groupIdMain.value })
     evaluationRounds.value = res.data
-  }catch{
-    Swal.fire({ icon:'error', title:'ข้อผิดพลาด', text:'ไม่สามารถโหลดรอบการประเมินได้' })
-  }
+  }catch{ Swal.fire({ icon:'error', title:'ข้อผิดพลาด', text:'ไม่สามารถโหลดรอบการประเมินได้' }) }
 }
 async function fetchAllStaff(){
   try{
@@ -699,9 +589,7 @@ async function fetchAllStaff(){
       }
     })
     products.value = res.data || []
-  }catch{
-    Swal.fire({ icon:'error', title:'ข้อผิดพลาด', text:'โหลดรายชื่อบุคลากรไม่สำเร็จ' })
-  }
+  }catch{ Swal.fire({ icon:'error', title:'ข้อผิดพลาด', text:'โหลดรายชื่อบุคลากรไม่สำเร็จ' }) }
 }
 
 /* ====== รายคณะ + รวม/ลบซ้ำ owners/steps/tasks ====== */
@@ -752,6 +640,7 @@ async function buildProjectBoard() {
 
   await Promise.all(jobs)
 
+  // รวมและลบซ้ำตาม id จริง
   const byPlan = new Map()
 
   const mergeUniquePlan = (a, b) => {
@@ -836,6 +725,7 @@ function defaultProjectSort(a,b){
   return (a.planLabel||'').localeCompare(b.planLabel||'', 'th')
 }
 
+/* filter รวมตาราง + ค้นหา */
 const filteredProjects = computed(()=>{
   let arr = [...projects.value]
   if(selectedPlanType.value !== 'ALL'){
@@ -945,7 +835,7 @@ function getStepProgress(step){
     score += ts === 'เสร็จสิ้น' ? 1 : ts === 'อยู่ระหว่างดำเนินการ' ? 0.5 : 0
   })
   return Math.round((score / tasks.length) * 100)
-}
+} 
 function initials(name='') {
   const parts = String(name).trim().split(/\s+/).slice(0,2)
   return parts.map(p=>p[0]?.toUpperCase?.() || '').join('')
@@ -967,7 +857,18 @@ const selectedPlan = ref(null)
 const planSidebarVisible = ref(false)
 function openPlanDrawer(_, plan){ selectedPlan.value = plan; planSidebarVisible.value = true }
 
-/* ===== Actions: Export CSV (ไฟล์เดียว) ===== */
+/* ===== Actions ===== exportCSV  */
+// function exportCSV(){ dt.value?.exportCSV() }
+// function resetFilters(){
+//   selectedFYBE.value = thisFY + 543
+//   selectedQuarter.value = 'ALL'
+//   selectedPlanType.value = 'ALL'
+//   selectedDepartment.value = 'ALL'
+//   tableSearch.value = ''
+//   handleSearch()
+// }
+
+/* ===== Actions: Export CSV (สรุปโครงการ + รายละเอียดงานย่อย) ===== */
 function csvEscape(v){
   if (v == null) return ''
   const s = String(v).replace(/\r?\n/g, ' ')
@@ -989,18 +890,16 @@ function joinNames(arr){
 function ownersForPlan(p){
   const fromPlan = joinNames(p.owner||[])
   if (fromPlan) return fromPlan
-
-  // fallback: ถ้ามีในงานย่อย
   const set = new Map()
   ;(p.steps||[]).forEach(st=>{
     (st.tasks||[]).forEach(t=>{
-      peopleFromAny(t.responsible).forEach(x=>{
+      (t.responsible||[]).forEach(x=>{
         const key = `${x.id}-${x.name||''}`
-        if(!set.has(key)) set.set(key, x.name || '')
+        if(!set.has(key)) set.set(key, x.name||`ผู้รับผิดชอบ #${x.id}`)
       })
     })
   })
-  return Array.from(set.values()).filter(Boolean).join(', ')
+  return Array.from(set.values()).join(', ')
 }
 
 /* ---------- สรุปรายโครงการ ---------- */
@@ -1043,8 +942,7 @@ const exportTaskRows = computed(()=>{
     (p.steps||[]).forEach(st=>{
       (st.tasks||[]).forEach(t=>{
         const minutes = getTaskMinutes(t)
-        // ✅ ใช้ชื่อจริงจาก responsible ที่ normalize แล้ว
-        const resp = peopleFromAny(t.responsible).map(r=>r.name).filter(Boolean).join(', ')
+        const resp = (t.responsible||[]).map(r=>r.name||`ผู้รับผิดชอบ #${r.id}`).join(', ')
         rows.push([
           getYearBE(p.startDate),
           getQuarter(p.startDate),
@@ -1064,40 +962,28 @@ const exportTaskRows = computed(()=>{
   return rows
 })
 
-/* ---------- รวมไฟล์เดียว: สรุป + รายละเอียด ---------- */
-const exportCombinedRows = computed(()=>{
-  const rows = []
-
-  rows.push(['===== สรุปรายโครงการ ====='])
-  exportProjectRows.value.forEach(r => rows.push(r))
-
-  rows.push([])
-  rows.push([])
-
-  rows.push(['===== รายละเอียดงานย่อย ====='])
-  exportTaskRows.value.forEach(r => rows.push(r))
-
-  return rows
-})
-
-/* ---------- ปุ่มส่งออกหลัก (ไฟล์เดียว) ---------- */
+/* ---------- ปุ่มส่งออกหลัก ---------- */
 async function exportCSV() {
-  const ok = await Swal.fire({
+  const { value: action } = await Swal.fire({
     title: 'ส่งออกข้อมูล',
-    text: 'จะส่งออกเป็นไฟล์เดียว (สรุปโครงการ + รายละเอียดงานย่อย) ใช่ไหม?',
+    text: 'เลือกประเภทที่ต้องการส่งออก',
     icon: 'question',
     showCancelButton: true,
-    confirmButtonText: '✅ ส่งออกไฟล์เดียว',
+    showDenyButton: true,
+    confirmButtonText: '📊 สรุปรายโครงการ',
+    denyButtonText: '📝 รายละเอียดงานย่อย',
     cancelButtonText: 'ยกเลิก'
-  })
-
-  if (ok.isConfirmed) {
-    downloadCSV('รายงานโครงการ_สรุป+รายละเอียด.csv', exportCombinedRows.value)
-    Swal.fire('สำเร็จ', 'ส่งออกไฟล์เดียวเรียบร้อยแล้ว', 'success')
+  }); 
+  if (action) {
+    // ถ้ากดปุ่ม Confirm (สรุปรายโครงการ)
+    downloadCSV('สรุปรายโครงการ.csv', exportProjectRows.value);
+    Swal.fire('สำเร็จ', 'ส่งออก "สรุปรายโครงการ" แล้ว', 'success');
+  } else if (action === false) {
+    // ถ้ากดปุ่ม Deny (รายละเอียดงานย่อย)
+    downloadCSV('รายละเอียดงานย่อย.csv', exportTaskRows.value);
+    Swal.fire('สำเร็จ', 'ส่งออก "รายละเอียดงานย่อย" แล้ว', 'success');
   }
-}
-
-/* ===== reset ===== */
+} 
 function resetFilters(){
   selectedFYBE.value = thisFY + 543
   selectedQuarter.value = 'ALL'
@@ -1107,6 +993,7 @@ function resetFilters(){
   handleSearch()
 }
 
+ 
 /* ===== Search flow + debounce ===== */
 async function handleSearch(){
   if(!isPeriodValid.value){ Swal.fire('แจ้งเตือน','กรุณาเลือกปีงบประมาณและไตรมาสก่อน','warning'); return }
@@ -1125,6 +1012,7 @@ function handleSearchDebounced(delay=250){
 }
 async function reloadAll(){
   if(!selectedEvaluationRound.value){
+    // Swal.fire('แจ้งเตือน', 'กรุณาเลือกรอบการประเมินก่อน', 'error'); return
     return;
   }
   await fetchAllStaff()
@@ -1138,8 +1026,24 @@ watch(selectedFYBE, (be) => {
 })
 watch(selectedQuarter, () => { if (selectedFYBE.value) handleSearchDebounced() })
 watch([selectedPlanType, selectedDepartment], () => { handleSearchDebounced() })
+ 
 
 /* ===== เริ่มต้น ===== */
+// onMounted(async ()=>{
+//   const session = await getSession()
+//   if(session?.user?.name){
+//     const { STAFFID, SCOPES } = session.user.name
+//     const { staffdepartment, groupid } = SCOPES || {}
+//     staffIdMain.value = String(STAFFID || '')
+//     facIdMain.value = String(staffdepartment || '')
+//     groupIdMain.value = String(groupid || '')
+//     await fetchEvaluationRounds()
+//     if(evaluationRounds.value.length>0){
+//       selectedEvaluationRound.value = evaluationRounds.value[0]
+//       await handleSearch()
+//     }
+//   }
+// }) 
 const isAdmin = ref(false)
 
 onMounted(async ()=>{
@@ -1150,16 +1054,16 @@ onMounted(async ()=>{
     staffIdMain.value = String(STAFFID || '')
     facIdMain.value = String(staffdepartment || '')
     groupIdMain.value = String(groupid || '')
-
+ 
     const roles = []
-      .concat(SCOPES?.roles || [])
-      .concat(SCOPES?.role ? [SCOPES.role] : [])
-      .map(r=>String(r).toLowerCase())
+        .concat(SCOPES?.roles || [])
+        .concat(SCOPES?.role ? [SCOPES.role] : [])
+        .map(r=>String(r).toLowerCase())
+      isAdmin.value = SCOPES?.is_admin === true || roles.includes('admin') || roles.includes('superadmin')
 
-    isAdmin.value = SCOPES?.is_admin === true || roles.includes('admin') || roles.includes('superadmin')
-
-    if(!isAdmin.value && facIdMain.value){
-      selectedDepartment.value = String(facIdMain.value)
+      // ถ้าไม่ใช่แอดมิน → ล็อคคณะทันที
+      if(!isAdmin.value && facIdMain.value){
+        selectedDepartment.value = String(facIdMain.value)
     }
 
     await fetchEvaluationRounds()
@@ -1169,160 +1073,159 @@ onMounted(async ()=>{
     }
   }
 })
+
 </script>
 
-<style>
-.page-wrap{ display:flex; flex-direction:column; gap:1rem; }
+<style> 
+  .page-wrap{ display:flex; flex-direction:column; gap:1rem; }
+  
+  .hero{
+    background: linear-gradient(135deg, #eef2ff 0%, #ecfeff 100%);
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    padding: 18px 20px;
+    display:flex; align-items:center; justify-content:space-between; gap:16px;
+  }
+  .hero-title{
+    font-size: 1.25rem; font-weight: 800; color:#0f172a;
+    display:flex; align-items:center;
+  }
+  .hero-sub{ color:#475569; font-size:.9rem; }
+  
+  .kpi-row{ display:grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap:10px; width: 52%; }
+  .kpi-card{
+    background: linear-gradient(180deg, rgba(255,255,255,.9), rgba(255,255,255,.75));
+    backdrop-filter: blur(6px);
+    border:1px solid rgba(226,232,240,.9); border-radius:14px; padding:10px 12px;
+    box-shadow:0 8px 24px rgba(15,23,42,.08), inset 0 1px 0 rgba(255,255,255,.8);
+    transition: transform .18s ease, box-shadow .18s ease;
+  }
+  .kpi-card:hover{ transform: translateY(-2px); box-shadow: 0 14px 32px rgba(15,23,42,.12); }
+  .kpi-label{ color:#64748b; font-size:.8rem; }
+  .kpi-value{ font-weight:800; font-size:1.3rem; color:#0f172a; }
+  
+  .filterbar{
+    position: sticky; top: 8px; z-index: 20;
+    padding: 14px 16px !important; border-radius: 14px;
+    border:1px solid #eef2f7;
+    box-shadow:0 6px 24px rgba(2,6,23,.06);
+  }
+  
+  .dash-center{
+    position:absolute; inset:0;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    pointer-events:none;
+  }
+  .dot{ width:10px; height:10px; border-radius:9999px; margin:0 auto; }
+  .dot-gray{ background:#9CA3AF; }
+  .dot-amber{ background:#F59E0B; }
+  .dot-green{ background:#22C55E; }
+  .card-head{ font-weight:700; color:#0f172a; display:flex; align-items:center; }
+  .card-head.between{ display:flex; align-items:center; justify-content:space-between; }
+  .dash-card{ border-radius:14px; border:1px solid #eef2f7; }
+  
+  .overlay-loading{
+    position:absolute; inset:0;
+    background: rgba(255,255,255,.7);
+    display:flex; align-items:center; justify-content:center;
+    z-index: 5;
+    border-radius: .75rem;
+    text-align: center;
+    padding: 12px;
+  }
+  
+  .elevated-table{ box-shadow: 0 8px 18px rgba(2,6,23,.05); border-radius: 12px; }
+  .p-datatable .p-datatable-tbody > tr{
+    transition: background .15s ease, box-shadow .15s ease, transform .15s ease;
+  }
+  .p-datatable .p-datatable-tbody > tr:hover{
+    background: #fbfdff;
+    box-shadow: 0 8px 18px rgba(2,6,23,.06);
+    transform: translateZ(0);
+  }
 
-.hero{
-  background: linear-gradient(135deg, #eef2ff 0%, #ecfeff 100%);
-  border: 1px solid #e5e7eb;
-  border-radius: 16px;
-  padding: 18px 20px;
-  display:flex; align-items:center; justify-content:space-between; gap:16px;
-}
-.hero-title{
-  font-size: 1.25rem; font-weight: 800; color:#0f172a;
-  display:flex; align-items:center;
-}
-.hero-sub{ color:#475569; font-size:.9rem; }
-
-.kpi-row{ display:grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap:10px; width: 52%; }
-.kpi-card{
-  background: linear-gradient(180deg, rgba(255,255,255,.9), rgba(255,255,255,.75));
-  backdrop-filter: blur(6px);
-  border:1px solid rgba(226,232,240,.9); border-radius:14px; padding:10px 12px;
-  box-shadow:0 8px 24px rgba(15,23,42,.08), inset 0 1px 0 rgba(255,255,255,.8);
-  transition: transform .18s ease, box-shadow .18s ease;
-}
-.kpi-card:hover{ transform: translateY(-2px); box-shadow: 0 14px 32px rgba(15,23,42,.12); }
-.kpi-label{ color:#64748b; font-size:.8rem; }
-.kpi-value{ font-weight:800; font-size:1.3rem; color:#0f172a; }
-
-.filterbar{
-  position: sticky; top: 8px; z-index: 20;
-  padding: 14px 16px !important; border-radius: 14px;
-  border:1px solid #eef2f7;
-  box-shadow:0 6px 24px rgba(2,6,23,.06);
-}
-
-.dash-center{
-  position:absolute; inset:0;
-  display:flex; flex-direction:column; align-items:center; justify-content:center;
-  pointer-events:none;
-}
-.dot{ width:10px; height:10px; border-radius:9999px; margin:0 auto; }
-.dot-gray{ background:#9CA3AF; }
-.dot-amber{ background:#F59E0B; }
-.dot-green{ background:#22C55E; }
-.card-head{ font-weight:700; color:#0f172a; display:flex; align-items:center; }
-.card-head.between{ display:flex; align-items:center; justify-content:space-between; }
-.dash-card{ border-radius:14px; border:1px solid #eef2f7; }
-
-.overlay-loading{
-  position:absolute; inset:0;
-  background: rgba(255,255,255,.7);
-  display:flex; align-items:center; justify-content:center;
-  z-index: 5;
-  border-radius: .75rem;
-  text-align: center;
-  padding: 12px;
-}
-
-.elevated-table{ box-shadow: 0 8px 18px rgba(2,6,23,.05); border-radius: 12px; }
-.p-datatable .p-datatable-tbody > tr{
-  transition: background .15s ease, box-shadow .15s ease, transform .15s ease;
-}
-.p-datatable .p-datatable-tbody > tr:hover{
-  background: #fbfdff;
-  box-shadow:0 8px 18px rgba(2,6,23,.06);
-  transform: translateZ(0);
-}
-
-.cell-card{
-  display:flex; align-items:center; justify-content:space-between; gap:12px;
-  border: 1px solid #eef2f7; background:#fff; border-radius:12px; padding:10px 12px;
-  position:relative; overflow:hidden;
-  box-shadow: 0 6px 16px rgba(2,6,23,.04);
-}
-.cell-card:before{
-  content:""; position:absolute; left:0; top:0; bottom:0; width:4px; border-radius:12px 0 0 12px;
-  background: var(--type-accent, #c7d2fe);
-}
-.cell-card .title-row{ display:flex; align-items:center; gap:8px; font-weight:700; color:#0f172a; }
-.cell-card .title{ max-width: 34ch; }
-.cell-card .sub-row{ color:#64748b; font-size:.8rem; margin-top:2px; display:flex; align-items:center; }
-.cell-owners{ display:flex; align-items:center; }
-
-.type-แผนปฏิบัติการ { --type-accent:#34d399; }
-.type-โครงการ       { --type-accent:#60a5fa; }
-.type-นโยบาย         { --type-accent:#fbbf24; }
-.type-มติประชุม      { --type-accent:#a78bfa; }
-.type-ไม่ระบุ         { --type-accent:#cbd5e1; }
-
-.owner-avatar{ width:28px!important; height:28px!important; font-size:.75rem!important; border:2px solid #fff; box-shadow:0 2px 6px rgba(2,6,23,.12); }
-.owner-avatar.more{ background:#f1f5f9!important; color:#334155!important; }
-.av1{ background:#1d4ed8!important; }
-.av2{ background:#059669!important; }
-.av3{ background:#b45309!important; }
-.av4{ background:#7c3aed!important; }
-.av5{ background:#0ea5e9!important; }
-.av6{ background:#f43f5e!important; }
-
-.radial-wrap{
-  --radial-color: #3B82F6;
-  width:64px; height:64px; border-radius:9999px; display:inline-flex; align-items:center; justify-content:center;
-  background: conic-gradient(var(--radial-color) 0deg, #eef2f7 0deg);
-  box-shadow: 0 6px 14px rgba(2,6,23,.08);
-  position: relative;
-  animation: pop .18s ease-out;
-}
-.radial-wrap::after{
-  content:""; position:absolute; inset:6px; border-radius:9999px; background:#fff;
-}
-.radial-core{ position:relative; z-index:1; width:100%; height:100%; display:flex; align-items:center; justify-content:center; }
-.radial-num{ font-weight:800; font-size:.9rem; color:#0f172a; }
-.radial-wrap.rc-success{ --radial-color:#16a34a; }
-.radial-wrap.rc-warn{ --radial-color:#f59e0b; }
-@keyframes pop{ from{ transform:scale(.92); opacity:.6 } to{ transform:scale(1); opacity:1 } }
-
-.status-pill{
-  display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border-radius:9999px;
-  font-weight:700; font-size:.8rem; letter-spacing:.2px; background:#eef2f7; color:#334155;
-}
-.status-pill.success{ background:#ecfdf5; color:#065f46; }
-.status-pill.warning{ background:#fff7ed; color:#9a3412; }
-.status-pill.info{ background:#eff6ff; color:#1e40af; }
-
-.detail-wrap { padding: 8px 6px 24px; }
-.summary { display:flex; flex-wrap:wrap; gap:12px; background:#f8fafc; border:1px solid #eef2f7; border-radius:12px; padding:10px 12px; margin-bottom:10px; }
-.summary-item { display:flex; align-items:center; color:#475569; }
-.legend { color:#64748b; margin:6px 2px 14px; display:flex; align-items:center; gap:16px; }
-.timeline { position:relative; margin-left:18px; }
-.timeline:before { content:""; position:absolute; left:-9px; top:0; bottom:0; width:2px; background:#e5e7eb; }
-.step-card { position:relative; margin-bottom:14px; }
-.step-marker { position:absolute; left:-14px; top:10px; width:12px; height:12px; border-radius:9999px; border:2px solid #fff; box-shadow:0 0 0 2px rgba(0,0,0,.06); }
-.step-marker.is-pending { background:#9ca3af; }
-.step-marker.is-progress { background:#f59e0b; }
-.step-marker.is-done { background:#22c55e; }
-.step-body { background:#fff; border:1px solid #eef2f7; border-radius:12px; padding:12px; box-shadow:0 4px 10px rgba(0,0,0,.04); }
-.step-head { display:flex; align-items:center; justify-content:space-between; }
-.step-title { font-weight:700; color:#0f172a; display:flex; align-items:center; }
-.step-meta { color:#475569; margin-top:4px; font-size:.9rem; display:flex; flex-wrap:wrap; gap:6px 0; }
-.task-list { margin-top:10px; margin-left:32px; display:flex; flex-direction:column; gap:8px; }
-.task-item { border-left:2px solid #e5e7eb; padding-left:12px; border-radius:6px; background:#fafafa; }
-.task-header { display:flex; align-items:center; }
-.task-title { color:#444; font-weight:500; }
-.task-bullet { width:10px; height:10px; border-radius:9999px; display:inline-block; margin-right:6px; }
-.task-bullet.is-pending { background:#2465d6; }
-.task-bullet.is-progress { background:#f59e0b; }
-.task-bullet.is-done { background:#22c55e; }
-.task-meta { margin-top:4px; color:#4b5563; font-size:.9rem; display:flex; flex-wrap:wrap; gap:6px 0; }
-.chip { padding:2px 8px; border-radius:9999px; font-size:.75rem; font-weight:600; margin-right:8px; border:1px solid transparent; background:#f1f5f9; }
-.chip-main { background:#ecfeff; border-color:#67e8f9; }
-.chip-otherpos { background:#fef9c3; border-color:#fde047; }
-.chip-other { background:#e0e7ff; border-color:#818cf8; }
-.empty-task { color:#94a3b8; font-style:italic; margin-top:8px; }
-
-.p-paginator { border-top: 1px solid #f1f5f9; margin-top: .75rem; padding-top: .5rem; }
+  .cell-card{
+    display:flex; align-items:center; justify-content:space-between; gap:12px;
+    border: 1px solid #eef2f7; background:#fff; border-radius:12px; padding:10px 12px;
+    position:relative; overflow:hidden;
+    box-shadow: 0 6px 16px rgba(2,6,23,.04);
+  }
+  .cell-card:before{
+    content:""; position:absolute; left:0; top:0; bottom:0; width:4px; border-radius:12px 0 0 12px;
+    background: var(--type-accent, #c7d2fe);
+  }
+  .cell-card .title-row{ display:flex; align-items:center; gap:8px; font-weight:700; color:#0f172a; }
+  .cell-card .title{ max-width: 34ch; }
+  .cell-card .sub-row{ color:#64748b; font-size:.8rem; margin-top:2px; display:flex; align-items:center; }
+  .cell-owners{ display:flex; align-items:center; }
+  
+  .type-แผนปฏิบัติการ { --type-accent:#34d399; }
+  .type-โครงการ       { --type-accent:#60a5fa; }
+  .type-นโยบาย         { --type-accent:#fbbf24; }
+  .type-มติประชุม      { --type-accent:#a78bfa; }
+  .type-ไม่ระบุ         { --type-accent:#cbd5e1; }
+  
+  .owner-avatar{ width:28px!important; height:28px!important; font-size:.75rem!important; border:2px solid #fff; box-shadow:0 2px 6px rgba(2,6,23,.12); }
+  .owner-avatar.more{ background:#f1f5f9!important; color:#334155!important; }
+  .av1{ background:#1d4ed8!important; }
+  .av2{ background:#059669!important; }
+  .av3{ background:#b45309!important; }
+  .av4{ background:#7c3aed!important; }
+  .av5{ background:#0ea5e9!important; }
+  .av6{ background:#f43f5e!important; }
+  
+  .radial-wrap{
+    --radial-color: #3B82F6;
+    width:64px; height:64px; border-radius:9999px; display:inline-flex; align-items:center; justify-content:center;
+    background: conic-gradient(var(--radial-color) 0deg, #eef2f7 0deg);
+    box-shadow: 0 6px 14px rgba(2,6,23,.08);
+    position: relative;
+    animation: pop .18s ease-out;
+  }
+  .radial-wrap::after{
+    content:""; position:absolute; inset:6px; border-radius:9999px; background:#fff;
+  }
+  .radial-core{ position:relative; z-index:1; width:100%; height:100%; display:flex; align-items:center; justify-content:center; }
+  .radial-num{ font-weight:800; font-size:.9rem; color:#0f172a; }
+  .radial-wrap.rc-success{ --radial-color:#16a34a; }
+  .radial-wrap.rc-warn{ --radial-color:#f59e0b; }
+  @keyframes pop{ from{ transform:scale(.92); opacity:.6 } to{ transform:scale(1); opacity:1 } }
+  
+  .status-pill{
+    display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border-radius:9999px;
+    font-weight:700; font-size:.8rem; letter-spacing:.2px; background:#eef2f7; color:#334155;
+  }
+  .status-pill.success{ background:#ecfdf5; color:#065f46; }
+  .status-pill.warning{ background:#fff7ed; color:#9a3412; }
+  .status-pill.info{ background:#eff6ff; color:#1e40af; } 
+  .detail-wrap { padding: 8px 6px 24px; }
+  .summary { display:flex; flex-wrap:wrap; gap:12px; background:#f8fafc; border:1px solid #eef2f7; border-radius:12px; padding:10px 12px; margin-bottom:10px; }
+  .summary-item { display:flex; align-items:center; color:#475569; }
+  .legend { color:#64748b; margin:6px 2px 14px; display:flex; align-items:center; gap:16px; }
+  .timeline { position:relative; margin-left:18px; }
+  .timeline:before { content:""; position:absolute; left:-9px; top:0; bottom:0; width:2px; background:#e5e7eb; }
+  .step-card { position:relative; margin-bottom:14px; }
+  .step-marker { position:absolute; left:-14px; top:10px; width:12px; height:12px; border-radius:9999px; border:2px solid #fff; box-shadow:0 0 0 2px rgba(0,0,0,.06); }
+  .step-marker.is-pending { background:#9ca3af; }
+  .step-marker.is-progress { background:#f59e0b; }
+  .step-marker.is-done { background:#22c55e; }
+  .step-body { background:#fff; border:1px solid #eef2f7; border-radius:12px; padding:12px; box-shadow:0 4px 10px rgba(0,0,0,.04); }
+  .step-head { display:flex; align-items:center; justify-content:space-between; }
+  .step-title { font-weight:700; color:#0f172a; display:flex; align-items:center; }
+  .step-meta { color:#475569; margin-top:4px; font-size:.9rem; display:flex; flex-wrap:wrap; gap:6px 0; }
+  .task-list { margin-top:10px; margin-left:32px; display:flex; flex-direction:column; gap:8px; }
+  .task-item { border-left:2px solid #e5e7eb; padding-left:12px; border-radius:6px; background:#fafafa; }
+  .task-header { display:flex; align-items:center; }
+  .task-title { color:#444; font-weight:500; }
+  .task-bullet { width:10px; height:10px; border-radius:9999px; display:inline-block; margin-right:6px; }
+  .task-bullet.is-pending { background:#2465d6; }
+  .task-bullet.is-progress { background:#f59e0b; }
+  .task-bullet.is-done { background:#22c55e; }
+  .task-meta { margin-top:4px; color:#4b5563; font-size:.9rem; display:flex; flex-wrap:wrap; gap:6px 0; }
+  .chip { padding:2px 8px; border-radius:9999px; font-size:.75rem; font-weight:600; margin-right:8px; border:1px solid transparent; background:#f1f5f9; }
+  .chip-main { background:#ecfeff; border-color:#67e8f9; }
+  .chip-otherpos { background:#fef9c3; border-color:#fde047; }
+  .chip-other { background:#e0e7ff; border-color:#818cf8; }
+  .empty-task { color:#94a3b8; font-style:italic; margin-top:8px; } 
+  .p-paginator { border-top: 1px solid #f1f5f9; margin-top: .75rem; padding-top: .5rem; }
 </style>
