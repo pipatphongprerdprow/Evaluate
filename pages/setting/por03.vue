@@ -17,14 +17,14 @@
                 <!-- แสดงข้อมูลบันทึก --> 
                 <table class="table">
                     <thead>
-                        <tr>
-                            <th rowspan="2" style="width: 17%;">กิจกรรม / โครงการ / งาน</th>
-                            <th rowspan="2" style="width: 26%;">ตัวชี้วัด / เกณฑ์การประเมิน</th>
-                            <th rowspan="2" style="width: 25%;">รายงานการปฏิบัติราชการ<br> ตามตัวชี้วัด/เกณฑ์การประเมิน</th>
-                            <th rowspan="2" style="width: 20%;">หลักฐานที่แสดงถึง<br> ผลการปฏิบัติราชการ<br>ตามเกณฑ์การประเมิน<br>(หลักฐานเชิงประจักษ์)</th>
-                            <th colspan="5" style="width: 11%;">ระดับการประเมินตนเอง<br> (ค่าคะแนนที่ได้)</th>
-                            <th v-if="currentDate >= dataPor.d_scoringday" rowspan="2" style="width: 9%;">ค่าคะแนนที่ได้</th>
-                            <th rowspan="2" style="width: 10%;"><br> ตัวเลือก <br></th>
+                       <tr>
+                            <th rowspan="2" style="width:16%;">กิจกรรม / โครงการ / งาน</th>
+                            <th rowspan="2" style="width:24%;">ตัวชี้วัด / เกณฑ์การประเมิน</th>
+                            <th rowspan="2" style="width:23%;">รายงานการปฏิบัติราชการ<br> ตามตัวชี้วัด/เกณฑ์การประเมิน</th>
+                            <th rowspan="2" style="width:19%;">หลักฐานที่แสดงถึง<br> ผลการปฏิบัติราชการ<br>ตามเกณฑ์การประเมิน<br>(หลักฐานเชิงประจักษ์)</th>
+                            <th colspan="5" style="width:10%;">ระดับการประเมินตนเอง<br> (ค่าคะแนนที่ได้)</th>
+                            <th v-if="currentDate >= dataPor.d_scoringday" rowspan="2" style="width:4%;">ค่าคะแนนที่ได้</th>
+                            <th rowspan="2" style="width:4%;"><br> ตัวเลือก <br></th>
                         </tr>
                         <tr>
                             <th>1</th>
@@ -37,28 +37,16 @@
                     <tbody>
                         <template v-for="(h, ind) in products_personP03" :key="ind"> 
                             <tr>
-                                <td style="text-align: left;" colspan="9">
+                                <td
+                                    style="text-align:left;"
+                                    :colspan="currentDate >= dataPor.d_scoringday ? 11 : 10"
+                                >
                                     <b style="color: blue;">{{ h.h_no }}. {{ h.nameH }}</b>
                                 </td>
-                                <td class="text-center" style="color: blue;"><b></b></td>
-
                             </tr>
                             <tr v-for="(subP01, idx) in h.subP01sX" :key="idx" style="vertical-align: baseline;">
                                 <td style="text-align: left;">{{ subP01.p01_no }} {{ subP01.p01_subject }}</td>
-
-                                <!-- แก้แดง -->​
-                                <!-- <td style="text-align: left;">
-                                    <b>ตัวชี้วัดที่ {{ idx+1 }} {{ subP01.p01_subject }}</b>
-                                    <p v-for="(subIitem, idI) in subP01.subITems" :key="idI" style="padding-left: 8px;margin-bottom: 5px;">
-                                        <div v-if="subIitem.ind_no!=0"><b>ระดับ {{ subIitem.ind_no }}</b> {{ subIitem.ind_Items }}</div>
-                                        <div v-if="subIitem.ind_no==0"><b>{{ subIitem.ind_Items }}</b></div>
-                                    </p> 
-                                    <p v-if="subP01.p01_detail !== null && currentDate >= dataPor.d_scoringday">  
-                                        <b style="color: red;">ข้อเสนอแนะ</b>
-                                        <br>
-                                        <em style="color: red;">{{ subP01.p01_detail }}</em>
-                                    </p>
-                                </td> -->
+ 
                                 <td style="text-align: left;">
                                     <b>ตัวชี้วัดที่ {{ idx + 1 }} {{ subP01.p01_subject }}</b> 
                                     <div  v-for="(subItem, idI) in subP01.subITems" :key="idI" style="padding-left: 8px; margin-bottom: 5px;" >
@@ -69,8 +57,7 @@
                                         <b style="color: red;">ข้อเสนอแนะ</b><br />
                                         <em style="color: red;">{{ subP01.p01_detail }}</em>
                                     </p>
-                                </td>
- 
+                                </td> 
                                 <td style="text-align: left;">
                                     <!-- วนลูปแสดงระดับ 1 ถึง 5 -->
                                     <div v-for="level in [1, 2, 3, 4, 5]" :key="level">
@@ -88,18 +75,7 @@
                                     <p v-if="subP01.subITemP03ind.length == 0" style="padding-left: 8px;margin-bottom: 5px;">
                                         <b style="color: red;">- ไม่มีข้อมูล -</b>
                                     </p>
-                                </td> 
-
-
-                                <!-- <td style="text-align: left;"> 
-                                    <p v-for="(subIitemDoc, inDoc) in subP01.subITemP03doc" :key="inDoc" style="padding-left: 8px;margin-bottom: 5px;"> 
-                                        <a v-if="subIitemDoc.doc_file!=null && subIitemDoc.doc_link==null" :href="'   http://127.0.0.1:8000/storage/uploadsP03/'+subIitemDoc.doc_file" target="_blank"><b>ระดับ</b> <b>{{subIitemDoc.doc_no }}</b> {{ subIitemDoc.doc_name }}</a> 
-                                        <a v-if="subIitemDoc.doc_link!=null && subIitemDoc.doc_file==null" :href="subIitemDoc.doc_link" target="_blank"><b>ระดับ</b> <b>{{ subIitemDoc.doc_no }}</b> {{ subIitemDoc.doc_name }}</a> 
-                                    </p>
-                                    <p v-if="subP01.subITemP03doc.length == 0" style="padding-left: 8px;margin-bottom: 5px;">
-                                        <b style="color: red;">- ไม่มีข้อมูล -</b>
-                                    </p>
-                                </td>  -->
+                                </td>  
                                 <td style="text-align: left;"> 
                                     <p v-for="(subIitemDoc, inDoc) in subP01.subITemP03doc.slice().sort((a, b) => a.doc_no - b.doc_no)" 
                                     :key="inDoc" 
@@ -578,9 +554,7 @@
                     <Button label="บันทึก" icon="pi pi-check" class="mb-2 mr-2" @click="saveDataScoreP03" />
                     <Button label="ยกเลิก" icon="pi pi-times" class="mb-2 mr-2" severity="danger" @click="DialogScore = false" />
                 </template>
-        </Dialog>
-
-
+        </Dialog> 
 </template> 
 <script>
 import { ref, onMounted } from 'vue';

@@ -268,11 +268,12 @@
             <label class="font-semibold text-lg">ชื่อแผนปฏิบัติงาน <span class="text-red-500">*</span></label>
             <InputText v-model="currentPlan.planLabel" placeholder="ระบุชื่อแผนปฏิบัติงาน" required/>
           </div>
-          <div class="field col-12">
+
+          <!-- <div class="field col-12">
             <label class="font-semibold text-lg">ผู้รับผิดชอบหลัก <span class="text-red-500">*</span></label>
             <AutoComplete v-model="currentPlan.owner" :multiple="true" :suggestions="ownerSuggestions" optionLabel="name" placeholder="พิมพ์ชื่อหรือรหัสพนักงานเพื่อค้นหา…" forceSelection dropdown @complete="searchOwners"/>
             <small class="text-gray-500">พิมพ์อย่างน้อย 3 ตัวอักษร เช่น รหัสพนักงาน หรือชื่อ-สกุล</small>
-          </div>
+          </div> -->
  
           <div class="field col-12 md:col-6">
             <label class="font-semibold text-lg">วันที่เริ่มต้น <span class="text-red-500">*</span></label>
