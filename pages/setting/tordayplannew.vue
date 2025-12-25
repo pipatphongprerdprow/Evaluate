@@ -214,7 +214,7 @@
                         <span v-else class="text-gray-400">ยังไม่เลือก</span>
                       </template>
                     </Column>
-                    <Column field="description" header="ภาระงานประจำวัน" style="flex:1;min-width:18rem"/> 
+                    <Column field="description" header="ภาระงานประจำวัน" style="flex:1;min-width:18rem"/>   
                     <Column header="วันที่ลงบันทึก" style="width:7.5rem" class="text-center"><template #body="{data}">{{ formatDate(data.createdDate) }}</template></Column>
                     <Column header="เวลาที่ใช้ไป" style="width:7rem" class="text-center"><template #body="{data}">{{ getTaskTimeSpent(data) }}</template></Column>
                     <Column header="จัดการ" style="width:6rem" class="text-center">
@@ -412,10 +412,23 @@
             </div> 
             <!-- ภาระงานประจำวัน (แสดงแบบต่างกันขึ้นอยู่กับประเภทงาน) -->
             <div class="field col-12">
-                <label class="font-semibold">ภาระงานประจำวัน</label> 
-                  <InputText   v-if="newTaskInStep.taskType === 'งานหลัก'" v-model="newTaskInStep.description"  placeholder="พิมพ์ภาระงานประจำวัน" class="w-full" :disabled="!newTaskInStep.mainTask" />  
+                <label class="font-semibold">ภาระงานประจำวัน</label>
+                  <InputText  v-if="newTaskInStep.taskType === 'งานหลัก'" v-model="newTaskInStep.description"  placeholder="พิมพ์ภาระงานประจำวัน" class="w-full" :disabled="!newTaskInStep.mainTask" />  
                 <Textarea  v-else v-model="newTaskInStep.description"  placeholder="กรอกภาระงานประจำวัน"  class="w-full" />
             </div>
+
+
+
+
+            <!-- แก้ใหม่ 22/12/68 -->
+            <div class="field col-12">
+              <label class="font-semibold text-lg">ผู้รับผิดชอบ </label>
+              <AutoComplete v-model="currentPlan.owner" :multiple="true" :suggestions="ownerSuggestions" optionLabel="name" placeholder="พิมพ์ชื่อหรือรหัสพนักงานเพื่อค้นหา…" forceSelection dropdown @complete="searchOwners"/>
+              <small class="text-gray-500">พิมพ์อย่างน้อย 3 ตัวอักษร เช่น รหัสพนักงาน หรือชื่อ-สกุล</small>
+            </div>
+                
+
+
             <!-- เวลาเริ่มต้น -->
             <div class="field col-6">
                 <label class="font-semibold">เวลาเริ่มต้น</label>
