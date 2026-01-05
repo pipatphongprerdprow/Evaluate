@@ -56,9 +56,13 @@ export default defineNuxtConfig({
       originEnvKey: 'AUTH_ORIGIN',
 
       // localhost
-        baseURL: 'http://localhost:3000/evaluate/api/auth',
+        // baseURL: 'http://localhost:3000/evaluate/api/auth',
+    // เปิดใช้จริงpa.msu.ac.th
+        // baseURL: 'https://pa.msu.ac.th/evaluate/api/auth',
+
+ 
       // เปิดใช้จริง
-    //   baseURL: 'https://survey.msu.ac.th/evaluate/api/auth',
+      baseURL: 'https://survey.msu.ac.th/evaluate/api/auth',
 
       provider: {
           type: 'authjs',

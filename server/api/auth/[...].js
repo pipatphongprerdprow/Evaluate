@@ -28,8 +28,11 @@ export default NuxtAuthHandler({
           grant_type: "authorization_code",
           response_type: 'code',
 
-          // ใช้จริงเปิดตัวนี้
+          // ใช้จริงตัวเก่า
           // redirect_uri: 'https://survey.msu.ac.th/evaluate/api/auth/callback/erpauth',
+
+          // ใช้จริงเปิดตัวนี้ pa.msu.ac.th
+          // redirect_uri: 'https://pa.msu.ac.th/evaluate/api/auth/callback/erpauth',
 
           //localhost
           redirect_uri: 'http://localhost:3000/evaluate/api/auth/callback/erpauth',
@@ -45,6 +48,12 @@ export default NuxtAuthHandler({
       //ใช้จริงเปิด
       // clientId: '9e04ac52-608f-4d13-8674-1374b228d6d0',
       // clientSecret: 'vertmZth5V0el1CN4LxZfzOyOch0DZ782RI0OQqI',
+
+
+
+      //ใช้จริงโดเมน pa.msu.ac.th
+      // clientId: 'a0b4a79e-6336-4a61-bab1-644d910b091b',
+      // clientSecret: 'KdyGFSXJ2Sfwl9YCVZrXxzhUXMESzfRaH01LMk28',
 
       // localhost
       clientId: '9e054c96-e655-4e11-90b4-24092280b0bb',
