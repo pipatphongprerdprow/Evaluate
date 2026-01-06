@@ -48,7 +48,7 @@
                             <th>ผลสัมฤทธิ์ของงาน</th>  
                             <th>ผลรวมสัดส่วน <br>70 หรือ 50</th>  
                             <th>พฤติกรรมการปฏิบัติราชการ</th>
-                            <th>ผลรวมสัดส่วน <br>30 หรือ 50 </th>   
+                            <th>ผลรวมสัดส่วน <br>30 หรืิอ 50 </th>   
                             <th>ผลคะแนน</th>  
                             <th>ประเมิน</th>  
                         </tr>
@@ -87,9 +87,9 @@
                             </td>  
                             <td class="text-center" style="color: blue;"><b>{{ Item.tb_tor ? Item.tb_tor.persen : '' }}</b></td>  
                             <td class="text-center" style="color: blue;"><b>{{ Item.tb_tor ? Item.tb_tor.achievement_score : '' }}</b></td>   
-                            <td class="text-center" style="color: green;"><b>{{ calcAchievement(Item) }}</b></td>
+                            <td class="text-center" style="color: red;"><b>{{ calcAchievement(Item) }}</b></td>
                             <td class="text-center" style="color: blue;"><b>{{ Item.tb_tor ? Item.tb_tor.behavior : '' }}</b></td> 
-                            <td class="text-center" style="color: green;"><b>{{ calcBehavior(Item) }}</b></td>   
+                            <td class="text-center" style="color: red;"><b>{{ calcBehavior(Item) }}</b></td>   
                             <td class="text-center" style="color: blue;"><b>{{ Item.tb_tor ? Item.tb_tor.sum_score : '' }} </b></td>  
                             <td style="text-align: center;width: 10%;">  
                                 <div v-if="Item.tb_tor">
