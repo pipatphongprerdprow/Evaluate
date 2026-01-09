@@ -87,18 +87,13 @@
                             </td>  
                             <td class="text-center" style="color: blue;"><b>{{ Item.tb_tor ? Item.tb_tor.persen : '' }}</b></td>  
                             <td class="text-center" style="color: blue;"><b>{{ Item.tb_tor ? Item.tb_tor.achievement_score : '' }}</b></td>   
-                            <td class="text-center" style="color: green;"><b>{{ calcAchievement(Item) }}</b></td>
+                            <td class="text-center" style="color: brown;"><b>{{ calcAchievement(Item) }}</b></td>
                             <td class="text-center" style="color: blue;"><b>{{ Item.tb_tor ? Item.tb_tor.behavior : '' }}</b></td> 
-                            <td class="text-center" style="color: green;"><b>{{ calcBehavior(Item) }}</b></td>   
+                            <td class="text-center" style="color: brown;"><b>{{ calcBehavior(Item) }}</b></td>   
                             <td class="text-center" style="color: blue;"><b>{{ Item.tb_tor ? Item.tb_tor.sum_score : '' }} </b></td>  
                             <td style="text-align: center;width: 10%;">  
                                 <div v-if="Item.tb_tor">
-                                    <Button 
-                                        label="ประเมิน" 
-                                        class="mb-2 mr-2" 
-                                        icon="pi pi-list" 
-                                        @click="openDataEvalu(Item)" 
-                                    />  
+                                    <Button  label="ประเมิน" class="mb-2 mr-2" icon="pi pi-list" @click="openDataEvalu(Item)" />  
                                 </div>
                                 <div v-else>
                                     <p style="color: brown;">-รอข้อมูลการประเมิน-</p>

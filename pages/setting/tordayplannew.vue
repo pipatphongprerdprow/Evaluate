@@ -35,21 +35,8 @@
         </div>
       </div>
 
-      <DataTable
-        :value="filteredPlansSorted"
-        v-model:expandedRows="expandedPlans"
-        dataKey="id"
-        responsiveLayout="scroll"
-        stripedRows
-        paginator
-        :rows="10"
-        :rowsPerPageOptions="[10,20,50]"
-        paginatorPosition="bottom"
-        :showCurrentPageReport="true"
-        currentPageReportTemplate="แสดง {first}-{last} จาก {totalRecords}"
-      >
-        <Column expander style="width:2rem"/>
-
+      <DataTable :value="filteredPlansSorted" v-model:expandedRows="expandedPlans" dataKey="id" responsiveLayout="scroll" stripedRows paginator :rows="10" :rowsPerPageOptions="[10,20,50]" paginatorPosition="bottom" :showCurrentPageReport="true" currentPageReportTemplate="แสดง {first}-{last} จาก {totalRecords}" >
+        <Column expander style="width:2rem"/> 
         <Column header="ไตรมาส" style="width:8.5rem;min-width:8rem;text-align:center">
           <template #body="{data}">
             <Tag :value="getQuarter(data.startDate)" class="tag-sm w-full justify-center" severity="info"/>
@@ -221,7 +208,7 @@
 
                     <Column field="description" header="ภาระงานประจำวัน" style="flex:1;min-width:18rem"/>
 
-                    <Column header="รอบประเมิน" style="min-width:12rem">
+                    <!-- <Column header="รอบประเมิน" style="min-width:12rem">
                       <template #body="{data}">
                         <Tag v-if="data.evalu_steptasks" :value="data.evalu_steptasks" severity="info"/>
                         <span v-else class="text-gray-400">-</span>
@@ -233,26 +220,19 @@
                         <Tag v-if="data.por_detel" :value="data.por_detel" severity="success"/>
                         <span v-else class="text-gray-400">-</span>
                       </template>
-                    </Column>
+                    </Column> -->
 
                     <Column header="ผู้รับผิดชอบ" style="min-width:14rem">
                       <template #body="{data}">
                         <div class="flex flex-wrap gap-1">
-                          <span
-                            v-for="o in (data.responsible || [])"
-                            :key="o.id"
-                            class="owner-chip"
-                          >
+                          <span v-for="o in (data.responsible || [])" :key="o.id" class="owner-chip" >
                             {{ getOwnerDisplay(o) }}
-                          </span>
-
+                          </span> 
                           <span v-if="!(data.responsible || []).length" class="text-gray-400">-</span>
                         </div>
                       </template>
                     </Column>
-                      
-
-                    
+                       
                     <Column header="วันที่ลงบันทึก" style="width:7.5rem" class="text-center">
                       <template #body="{data}">{{ formatDate(data.createdDate) }}</template>
                     </Column>
@@ -464,35 +444,25 @@
       <div class="p-fluid formgrid grid">
         <div class="field col-6">
           <label class="font-semibold">ประเภทภาระงาน</label>
-          <Dropdown v-model="currentEditingTask.taskType" :options="taskTypes" optionLabel="label" optionValue="value"
-                    class="w-full" @change="onEditTaskTypeChange"/>
+          <Dropdown v-model="currentEditingTask.taskType" :options="taskTypes" optionLabel="label" optionValue="value" class="w-full" @change="onEditTaskTypeChange"/>
         </div>
         <div class="field col-6">
           <label class="font-semibold">ภาระงานหลัก</label>
-          <AutoComplete v-model="currentEditingTask.mainTask" :suggestions="mainTaskSuggestions"
-                        @complete="completeMainTask" placeholder="พิมพ์เพื่อค้นหา/เลือกภาระงานหลัก"
-                        dropdown @blur="normalizeEditingMainTask()" class="w-full" />
+          <AutoComplete v-model="currentEditingTask.mainTask" :suggestions="mainTaskSuggestions" @complete="completeMainTask" placeholder="พิมพ์เพื่อค้นหา/เลือกภาระงานหลัก" dropdown @blur="normalizeEditingMainTask()" class="w-full" />
         </div>
-      </div>
-
+      </div> 
       <div class="p-fluid formgrid grid">
         <div class="field col-12 md:col-6">
           <label class="font-semibold">ผู้รับผิดชอบ</label>
-          <AutoComplete v-model="currentEditingTask.responsible" :multiple="true" :suggestions="taskOwnerSuggestions"
-                        optionLabel="name" placeholder="พิมพ์ชื่อหรือรหัสพนักงานเพื่อค้นหา…" forceSelection dropdown
-                        class="w-full" @complete="searchTaskOwners" />
+          <AutoComplete v-model="currentEditingTask.responsible" :multiple="true" :suggestions="taskOwnerSuggestions" optionLabel="name" placeholder="พิมพ์ชื่อหรือรหัสพนักงานเพื่อค้นหา…" forceSelection dropdown class="w-full" @complete="searchTaskOwners" />
           <small class="text-gray-500">พิมพ์อย่างน้อย 3 ตัวอักษร เช่น รหัสพนักงาน หรือชื่อ-สกุล</small>
-        </div>
-
+        </div> 
         <div class="field col-12 md:col-6">
           <label class="font-semibold">ชื่อหัวหน้างาน/หัวหน้ากลุ่มงาน</label>
-          <AutoComplete v-model="currentEditingTask.supervisor" :suggestions="supervisorSuggestions"
-                        optionLabel="name" placeholder="พิมพ์ชื่อหรือรหัสพนักงานเพื่อค้นหา…" forceSelection dropdown
-                        class="w-full" @complete="searchSupervisors" />
+          <AutoComplete v-model="currentEditingTask.supervisor" :suggestions="supervisorSuggestions" optionLabel="name" placeholder="พิมพ์ชื่อหรือรหัสพนักงานเพื่อค้นหา…" forceSelection dropdown class="w-full" @complete="searchSupervisors" />
           <small class="text-gray-500">พิมพ์อย่างน้อย 3 ตัวอักษร</small>
         </div>
-      </div>
-
+      </div> 
       <div class="p-fluid formgrid grid">
         <div class="field col-12 md:col-6">
           <label class="font-semibold">ภาระงานประจำวัน</label>
@@ -528,48 +498,37 @@
       <div class="p-fluid grid">
         <div class="field col-12">
           <label class="font-semibold">ประเภทภาระงาน</label>
-          <Dropdown v-model="newTaskInStep.taskType" :options="taskTypes" optionLabel="label" optionValue="value"
-                    placeholder="เลือกประเภทภาระงาน" class="w-full" @change="onTaskTypeChange"/>
+          <Dropdown v-model="newTaskInStep.taskType" :options="taskTypes" optionLabel="label" optionValue="value" placeholder="เลือกประเภทภาระงาน" class="w-full" @change="onTaskTypeChange"/>
         </div>
 
         <div class="field col-12" v-if="newTaskInStep.taskType !== 'งานอื่นๆ'">
           <label class="font-semibold">ภาระงานหลัก</label>
-          <AutoComplete
-            v-model="newTaskInStep.mainTask"
-            :suggestions="mainTaskSuggestions"
-            @complete="completeMainTask"
-            placeholder="พิมพ์เพื่อค้นหา/เลือกภาระงานหลัก"
-            dropdown
-            @item-select="({ value }) => onMainTaskChange(value)"
-            @blur="onMainTaskChange(newTaskInStep.mainTask)"
-            class="w-full"
-          />
+          <AutoComplete v-model="newTaskInStep.mainTask" :suggestions="mainTaskSuggestions" @complete="completeMainTask" placeholder="พิมพ์เพื่อค้นหา/เลือกภาระงานหลัก" dropdown @item-select="({ value }) => onMainTaskChange(value)" @blur="onMainTaskChange(newTaskInStep.mainTask)" class="w-full" />
+        </div> 
+        <div class="field col-12">
+          <label class="font-semibold">ภาระงานประจำวัน</label>
+          <Dropdown v-if="newTaskInStep.taskType === 'งานหลัก'"
+            v-model="newTaskInStep.description" :options="subTasks" optionLabel="name" optionValue="name"
+            placeholder="เลือกภาระงานประจำวัน" class="w-full" :disabled="!newTaskInStep.mainTask"/>
+          <Textarea v-else v-model="newTaskInStep.description" placeholder="กรอกภาระงานประจำวัน" class="w-full"/>
         </div>
 
         <div class="field col-6">
           <label class="font-semibold">ผู้รับผิดชอบ</label>
           <AutoComplete v-model="newTaskInStep.responsible" :multiple="true" :suggestions="taskOwnerSuggestions"
-                        optionLabel="name" placeholder="พิมพ์ชื่อหรือรหัสพนักงานเพื่อค้นหา…" forceSelection dropdown
-                        class="w-full" @complete="searchTaskOwners"/>
+            optionLabel="name" placeholder="พิมพ์ชื่อหรือรหัสพนักงานเพื่อค้นหา…" forceSelection dropdown
+            class="w-full" @complete="searchTaskOwners"/>
           <small class="text-gray-500">พิมพ์อย่างน้อย 3 ตัวอักษร</small>
         </div>
 
         <div class="field col-6">
           <label class="font-semibold">ชื่อหัวหน้างาน/หัวหน้ากลุ่มงาน</label>
           <AutoComplete v-model="newTaskInStep.supervisor" :suggestions="supervisorSuggestions"
-                        optionLabel="name" placeholder="พิมพ์ชื่อหรือรหัสพนักงานเพื่อค้นหา…" forceSelection dropdown
-                        class="w-full" @complete="searchSupervisors"/>
+            optionLabel="name" placeholder="พิมพ์ชื่อหรือรหัสพนักงานเพื่อค้นหา…" forceSelection dropdown
+            class="w-full" @complete="searchSupervisors"/>
           <small class="text-gray-500">พิมพ์อย่างน้อย 3 ตัวอักษร</small>
-        </div>
-
-        <div class="field col-12">
-          <label class="font-semibold">ภาระงานประจำวัน</label>
-          <Dropdown v-if="newTaskInStep.taskType === 'งานหลัก'"
-                    v-model="newTaskInStep.description" :options="subTasks" optionLabel="name" optionValue="name"
-                    placeholder="เลือกภาระงานประจำวัน" class="w-full" :disabled="!newTaskInStep.mainTask"/>
-          <Textarea v-else v-model="newTaskInStep.description" placeholder="กรอกภาระงานประจำวัน" class="w-full"/>
-        </div>
-
+        </div> 
+ 
         <div class="field col-6">
           <label class="font-semibold">เวลาเริ่มต้น</label>
           <Calendar v-model="newTaskInStep.startTime" :showTime="true" hourFormat="24" placeholder="เวลาเริ่มต้น"/>
@@ -669,10 +628,7 @@ const filteredPlansSorted = computed(() => {
   if (!q) return base
   return base.filter(p => planMatchesQuery(p, q))
 })
-
-/* ---------------------------
-   SESSION / INIT
---------------------------- */
+ 
 const isLoading = ref(true)
 const API = 'http://127.0.0.1:8000/api'
 
@@ -725,12 +681,7 @@ onMounted(async () => {
     isLoading.value = false
   }
 })
-
-/* ---------------------------
-   TIME NORMALIZE (✅ FIX HERE)
-   - PrimeVue Calendar showTime จะมี "วันที่" ติดมา
-   - เราบังคับให้ start/end อยู่วันเดียวกันก่อนตรวจและก่อนส่ง
---------------------------- */
+ 
 function setTimeOnDate(baseDate, timeDate) {
   const base = new Date(baseDate)
   const t = new Date(timeDate)
@@ -749,10 +700,7 @@ function isTimeRangeValid(start, end, baseDate) {
   const { s, e } = normalizeStartEndSameDay(start, end, baseDate)
   return (!s || !e) ? true : (e >= s)
 }
-
-/* ---------------------------
-   TASKS / WORKS DATA
---------------------------- */
+ 
 const mainTasks = ref([])
 const subTasks = ref([])
 
@@ -807,10 +755,7 @@ function completeMainTask(e) {
   const labels = [...new Set((mainTasks.value || []).map(o => o?.label).filter(Boolean))]
   mainTaskSuggestions.value = labels.filter(l => l.toLowerCase().includes(q)).slice(0, 30)
 }
-
-/* ---------------------------
-   PLANS STATE
---------------------------- */
+ 
 const allPlans = ref([])
 const allPlansSorted = computed(() => [...(allPlans.value || [])].sort((a, b) => {
   const A = a.updatedDate ? new Date(a.updatedDate) : new Date(a.createdDate)
@@ -895,8 +840,7 @@ const isFirstStepValid = computed(() =>
 const isSecondStepValid = computed(() => currentPlan.steps.length > 0)
 const isFinalStepValid = computed(() => isFirstStepValid.value && isSecondStepValid.value)
 const isNewStepValid = computed(() => newStepName.value && newStepDates.value?.length === 2 && newStepDates.value[0] && newStepDates.value[1])
-
-// ✅ FIX: ตรวจเวลาแบบ normalize วันเดียวกัน
+ 
 const isNewTaskInStepValid = computed(() => {
   const t = newTaskInStep
   const base = new Date() // งานประจำวันอิงวันปัจจุบันตอนบันทึก
@@ -943,10 +887,7 @@ const getTaskTimeSpent = (task) => {
   const diffMin = Math.round(Math.max(0, new Date(task.endTime) - new Date(task.startTime)) / (1000 * 60))
   return `${diffMin} นาที`
 }
-
-/* ---------------------------
-   MAP API -> STATE
---------------------------- */
+ 
 function toDateSafe(d) {
   if (!d) return null
   const dt = typeof d === 'string' ? new Date(d) : d
@@ -1025,10 +966,7 @@ function belongsToMe(plan) {
   const ownerMatch = Array.isArray(plan.owner) && plan.owner.some(o => Number(o.id) === me)
   return staffField === me || ownerMatch
 }
-
-/* ---------------------------
-   PLAN CRUD
---------------------------- */
+ 
 function openPlanDialog() {
   isEditMode.value = false
   showPlanDialog.value = true
@@ -1151,10 +1089,7 @@ async function savePlan() {
     Swal.fire({ icon: 'error', title: 'ผิดพลาด', text: 'บันทึกไม่สำเร็จ' })
   }
 }
-
-/* ---------------------------
-   STEPS CRUD
---------------------------- */
+ 
 function addStep() {
   if (!isNewStepValid.value) return Swal.fire({ icon: 'error', title: 'ข้อผิดพลาด', text: 'กรุณาใส่ชื่อขั้นตอนและช่วงเวลาให้ครบถ้วน' })
   currentPlan.steps.push({ id: Date.now(), name: newStepName.value, startDate: newStepDates.value[0], endDate: newStepDates.value[1], tasks: [] })
@@ -1210,10 +1145,7 @@ async function saveEditedStep() {
     Swal.fire({ icon: 'error', title: 'ผิดพลาด', text: 'แก้ไขขั้นตอนไม่สำเร็จ' })
   }
 }
-
-/* ---------------------------
-   ADD STEP FOR PLAN DIALOG
---------------------------- */
+ 
 const showAddStepForPlanDialog = ref(false)
 const addStepForm = reactive({
   planId: null,
@@ -1284,10 +1216,7 @@ async function saveNewStepForPlan() {
     Swal.fire({ icon: 'error', title: 'ผิดพลาด', text: 'เพิ่มขั้นตอนไม่สำเร็จ' })
   }
 }
-
-/* ---------------------------
-   TASK ADD/EDIT
---------------------------- */
+ 
 const taskTypes = [
   { label: 'งานหลัก', value: 'งานหลัก' },
   { label: 'งานตำแหน่งอื่น', value: 'งานตำแหน่งอื่น' },
@@ -1409,8 +1338,7 @@ async function openEditTaskDialogInTable(step, task, taskIndex) {
     }
   }
 }
-
-/* ✅ FIX: เพิ่มภาระงาน - normalize เวลา + ส่ง supervisor_id */
+ 
 async function addTaskToStepFromMain() {
   if (!isNewTaskInStepValid.value) {
     return Swal.fire({
@@ -1420,8 +1348,7 @@ async function addTaskToStepFromMain() {
     })
   }
 
-  try {
-    // ✅ normalize เวลาให้อยู่วันเดียวกันก่อนส่ง
+  try { 
     const baseDate = new Date()
     const { s: startNorm, e: endNorm } = normalizeStartEndSameDay(newTaskInStep.startTime, newTaskInStep.endTime, baseDate)
 
@@ -1447,7 +1374,7 @@ async function addTaskToStepFromMain() {
       fac_id: session.facId,
       responsible: (newTaskInStep.responsible || []).map(o => ({ id: o.id })),
 
-      supervisor_id: newTaskInStep.supervisor?.id ?? null, // ✅
+      supervisor_id: newTaskInStep.supervisor?.id ?? null, 
 
       eval_round_year: er?.d_date ?? null,
       eval_round_code: er?.evalua ?? null,
@@ -1489,15 +1416,13 @@ async function addTaskToStepFromMain() {
     Swal.fire({ icon: 'error', title: 'ผิดพลาด', text: 'เพิ่มภาระงานไม่สำเร็จ' })
   }
 }
-
-/* ✅ FIX: แก้ไขภาระงาน - normalize เวลา + ส่ง supervisor_id */
+ 
 async function saveEditedTask() {
   const needDesc = currentEditingTask.taskType !== 'งานอื่นๆ'
   if (needDesc && !(currentEditingTask.description || '').trim()) {
     return Swal.fire({ icon: 'error', title: 'ข้อผิดพลาด', text: 'กรุณาระบุภาระงาน' })
   }
-
-  // ✅ normalize เวลาให้อยู่วันเดียวกันก่อนตรวจ/ส่ง
+ 
   const baseDate = currentEditingTask.createdDate || currentEditingTask.startTime || currentEditingTask.endTime || new Date()
   const { s: startNorm, e: endNorm } = normalizeStartEndSameDay(currentEditingTask.startTime, currentEditingTask.endTime, baseDate)
 
@@ -1533,8 +1458,7 @@ async function saveEditedTask() {
 
   try {
     await axios.post(`${API}/Edtdatatasks`, payload)
-
-    // ✅ อัปเดต local ด้วยค่าที่ normalize แล้ว
+ 
     currentEditingTask.startTime = startNorm
     currentEditingTask.endTime = endNorm
 
@@ -1572,10 +1496,7 @@ async function saveEditedTask() {
     Swal.fire({ icon: 'error', title: 'ผิดพลาด', text: 'แก้ไขภาระงานไม่สำเร็จ' })
   }
 }
-
-/* ---------------------------
-   STEP STATUS
---------------------------- */
+ 
 async function updateStepStatus(plan, step, newStatus) {
   if (!step?.id) { await Swal.fire({ icon: 'warning', title: 'ยังไม่สามารถบันทึก', text: 'ขั้นตอนนี้ยังไม่มี ID' }); return }
   const old = step.status ?? null
@@ -1592,10 +1513,7 @@ async function updateStepStatus(plan, step, newStatus) {
     step.__saving = false
   }
 }
-
-/* ---------------------------
-   DELETE TASK / STEP
---------------------------- */
+ 
 async function confirmRemoveTaskInTable(step, taskIndex) {
   const ok = await Swal.fire({ title: 'ยืนยันการลบ', text: 'คุณต้องการลบภาระงานนี้ใช่หรือไม่?', icon: 'warning', showCancelButton: true })
   if (!ok.isConfirmed) return
@@ -1623,10 +1541,7 @@ async function confirmRemoveStepById(planId, stepId) {
     Swal.fire({ icon: 'error', title: 'ผิดพลาด', text: 'ลบขั้นตอนไม่สำเร็จ' })
   }
 }
-
-/* ---------------------------
-   STAFF AUTOCOMPLETE
---------------------------- */
+ 
 const ownerSuggestions = ref([])
 function mapStaffToOption(x) {
   return { id: Number(x.staffid) || x.id || null, name: x.namefully || x.name || '', staffid: x.staffid || null, posnameth: x.posnameth || null }
@@ -1685,10 +1600,7 @@ async function searchSupervisors(e) {
     }
   }, 250)
 }
-
-/* ---------------------------
-   HELPERS
---------------------------- */
+ 
 function getPlanTypeSeverity(t) {
   switch (t) {
     case 'แผนปฏิบัติการ': return 'success'
@@ -1714,10 +1626,7 @@ function getYear(dateInput) {
   if (!d) return '-'
   return String(d.getFullYear() + 543)
 }
-
-/* ---------------------------
-   EVAL ROUNDS & POR FORMS
---------------------------- */
+ 
 async function fetchEvalRounds() {
   if (!session.staffId || !session.facId) {
     evalRounds.value = []

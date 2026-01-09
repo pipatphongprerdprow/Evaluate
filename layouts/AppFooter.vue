@@ -11,7 +11,7 @@ const { layoutConfig } = useLayout();
 <template>
     <div class="layout-footer">
         <img src="~/assets/layout/images/kongkang.jpg" alt="logo" height="40" class="mr-2"  />
-        <span class="font-medium ml-2">Evaluate Personnel MSU</span>
+        <span class="font-medium ml-2">MSU Performance Appraisal</span>
     </div>
 </template>
 <style lang="scss" scoped></style>
