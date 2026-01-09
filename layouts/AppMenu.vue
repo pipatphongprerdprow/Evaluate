@@ -1,14 +1,14 @@
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, watch } from 'vue';
 import AppMenuItem from './AppMenuItem.vue';
 import axios from 'axios';
-import { watch } from 'vue';
 
-const { getSession } = useAuth();
-const user = await getSession();
-const groupid = user?.user?.name?.SCOPES?.groupid || '';
-const staff = user?.user?.name?.STAFFID || '';
-const faculty = user?.user?.name?.SCOPES?.staffdepartment || '';
+const { status, data: sessionData } = useAuthState();
+
+// ใช้ computed เพื่อดึงข้อมูล user จาก session
+const groupid = computed(() => sessionData.value?.user?.name?.SCOPES?.groupid || '');
+const staff = computed(() => sessionData.value?.user?.name?.STAFFID || '');
+const faculty = computed(() => sessionData.value?.user?.name?.SCOPES?.staffdepartment || '');
 
 const allMenus = ref([
     {
@@ -69,9 +69,18 @@ const group_chkUser = ref(null);
 
 const fetchUserGroup = async () => {
     try {
-        //console.log('user: ',user);
+        // ใช้ .value สำหรับ computed properties
+        const staffValue = staff.value;
+        const facultyValue = faculty.value;
         
-        const res = await axios.post('    http://127.0.0.1:8000/api/testUser', { staff, faculty }); 
+        if (!staffValue) {
+            return; // ถ้ายังไม่มี staff ให้ return ออกไปก่อน
+        }
+        
+        const res = await axios.post('http://127.0.0.1:8000/api/testUser', { 
+            staff: staffValue, 
+            faculty: facultyValue 
+        }); 
         //console.log('fetchUserGroup: ',res.data);
         
         group_chkUser.value = res.data?.[0]?.status_user || res.data?.status_user || null;
@@ -80,9 +89,12 @@ const fetchUserGroup = async () => {
     }
 }; 
 
-onMounted(async () => {
-    await fetchUserGroup(); 
-});
+// Watch สำหรับเรียก fetchUserGroup เมื่อ session เปลี่ยน
+watch(status, async (newStatus) => {
+    if (newStatus === 'authenticated') {
+        await fetchUserGroup();
+    }
+}, { immediate: true });
 
 // // กรองเมนูตาม group_chkUser
 const model = computed(() => {

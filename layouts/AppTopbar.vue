@@ -8,8 +8,8 @@ const topbarMenuActive = ref(false);
 const router = useRouter();
 const inactivityTimeout = ref(null); // ตัวแปรเก็บ timeout
 
-const { signIn, getSession, signOut } = await useAuth();
-const sessionData = await getSession();
+const { signIn, signOut } = useAuth();
+const { status, data: sessionData } = useAuthState();
 
 // ฟังก์ชันรีเซ็ต timeout ทุกครั้งที่มีการใช้งาน
 const resetTimeout = () => {
@@ -98,7 +98,7 @@ const isOutsideClicked = (event) => {
         </button>
 
         <div class="layout-topbar-menu" :class="topbarMenuClasses">
-            <template v-if="Object.keys(sessionData).length === 0">
+            <template v-if="status !== 'authenticated'">
                 <button @click="signIn('erpauth')" class="p-link layout-topbar-button pr-4">
                     <i class="pi pi-sign-in"></i>
                     <i style="font-size: 1.25em;margin-left: 0.25em;margin-right: 1em;text-wrap: nowrap;">เข้าสู่ระบบ</i>
