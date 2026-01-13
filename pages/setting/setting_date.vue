@@ -454,43 +454,92 @@ export default {
             this.dateEnd = data.d_enddate;
             this.dateAnnounce = data.d_scoringday; 
 
-            this.text_user1 =data.leader1+' : '+ data.leader_name1;
+            // this.text_user1 =data.leader1+' : '+ data.leader_name1;
+            if (data.leader1 && data.leader_name1) {
+                this.text_user1 = data.leader1 + ' : ' + data.leader_name1
+            } else {
+                this.text_user1 = ''    
+            }
             this.text_staff1 = data.leader1; 
             this.text_position1 = data.leader_position1; 
             this.text_namefully1 = data.leader_name1; 
-            this.text_user2 =data.leader2+' : '+ data.leader_name2; 
+
+            // this.text_user2 =data.leader2+' : '+ data.leader_name2;
+            if (data.leader2 && data.leader_name2) {
+                this.text_user2 = data.leader2 + ' : ' + data.leader_name2
+            } else {
+                this.text_user2 = ''    
+            } 
             this.text_staff2 = data.leader2; 
             this.text_position2 = data.leader_position2; 
             this.text_namefully2 = data.leader_name2; 
-            this.text_user3 =data.leader3+' : '+ data.leader_name3; 
+
+            // this.text_user3 =data.leader3+' : '+ data.leader_name3; 
+            if (data.leader3 && data.leader_name3) {
+                this.text_user3 = data.leader3 + ' : ' + data.leader_name3
+            } else {
+                this.text_user3 = ''    
+            }
             this.text_staff3 = data.leader3; 
             this.text_position3 = data.leader_position3;
             this.text_namefully3 = data.leader_name3;
-            this.text_user4 =data.leader4+' : '+ data.leader_name4; 
+
+            // this.text_user4 =data.leader4+' : '+ data.leader_name4; 
+            if (data.leader4 && data.leader_name4) {
+                this.text_user4 = data.leader4 + ' : ' + data.leader_name4
+            } else {
+                this.text_user4 = ''    
+            }
             this.text_staff4 = data.leader4; 
             this.text_position4 = data.leader_position4;
             this.text_namefully4 = data.leader_name4;  
-            this.text_user5 =data.leader5+' : '+ data.leader_name5; 
+
+            // this.text_user5 =data.leader5+' : '+ data.leader_name5; 
+            if (data.leader5 && data.leader_name5) {
+                this.text_user5 = data.leader5 + ' : ' + data.leader_name5
+            } else {
+                this.text_user5 = ''    
+            }
             this.text_staff5 = data.leader5; 
             this.text_position5 = data.leader_position5;
             this.text_namefully5 = data.leader_name5; 
 
-            this.text_user6 =data.leader6+' : '+ data.leader_name6; 
+            // this.text_user6 =data.leader6+' : '+ data.leader_name6; 
+            if (data.leader6 && data.leader_name6) {
+                this.text_user6 = data.leader6 + ' : ' + data.leader_name6
+            } else {
+                this.text_user6 = ''    
+            }
             this.text_staff6 = data.leader6; 
             this.text_position6 = data.leader_position6;
             this.text_namefully6 = data.leader_name6; 
 
-            this.text_user7 =data.leader7+' : '+ data.leader_name7; 
+            // this.text_user7 =data.leader7+' : '+ data.leader_name7; 
+            if (data.leader7 && data.leader_name7) {
+                this.text_user7 = data.leader7 + ' : ' + data.leader_name7
+            } else {
+                this.text_user7 = ''    
+            } 
             this.text_staff7 = data.leader7; 
             this.text_position7 = data.leader_position7;
             this.text_namefully7 = data.leader_name7; 
 
-            this.text_user8 =data.leader8+' : '+ data.leader_name8; 
+            // this.text_user8 =data.leader8+' : '+ data.leader_name8; 
+            if (data.leader8 && data.leader_name8) {
+                this.text_user8 = data.leader8 + ' : ' + data.leader_name8
+            } else {
+                this.text_user8 = ''    
+            }
             this.text_staff8 = data.leader8; 
             this.text_position8 = data.leader_position8;
             this.text_namefully8 = data.leader_name8; 
 
-            this.text_user9 =data.leader9+' : '+ data.leader_name9; 
+            // this.text_user9 =data.leader9+' : '+ data.leader_name9; 
+            if (data.leader9 && data.leader_name9) {
+                this.text_user9 = data.leader9 + ' : ' + data.leader_name9
+            } else {
+                this.text_user9 = ''    
+            }
             this.text_staff9 = data.leader9; 
             this.text_position9 = data.leader_position9;
             this.text_namefully9 = data.leader_name9; 
@@ -608,29 +657,63 @@ export default {
             return new Intl.DateTimeFormat('th-TH', options).format(new Date(date));
         },
         // User 1
-        async searchUserStaffid1(){  
-            try { 
-                if (this.previousName && this.text_user1.length < this.previousName.length) {  
-                    this.text_staff1 = null;
-                    this.text_position1 = null;
-                    this.text_namefully1 = null;
+        // async searchUserStaffid1(){  
+        //     try { 
+        //         if (this.previousName && this.text_user1.length < this.previousName.length) {  
+        //             this.text_staff1 = null;
+        //             this.text_position1 = null;
+        //             this.text_namefully1 = null;
+        //         }
+
+        //         if(this.text_user1.length > 3){
+        //             const res = await axios.get('http://127.0.0.1:8000/api/searchDataStaff', {  
+        //                 params: {
+        //                     staffid: this.text_user1
+        //                 }
+        //             }); 
+        //             console.log('searchUserStaffid1: ',res.data);  
+        //             this.seen = true; 
+        //             this.listshoeusername1=res.data  
+        //         }
+        //         this.previousName = this.text_user1;
+        //     } catch (error) {
+        //         console.error('Error fetching evaluation data:', error);
+        //     } 
+        // },  
+ 
+        async searchUserStaffid1(){
+            try {
+                // ✅ เพิ่ม: ถ้าลบจนว่าง -> ล้างค่าที่จะบันทึก
+                if (!this.text_user1 || this.text_user1.trim().length === 0) {
+                this.text_staff1 = null
+                this.text_position1 = null
+                this.text_namefully1 = null
+                this.seen = false
+                this.listshoeusername1 = null
+                return
                 }
 
-                if(this.text_user1.length > 3){
-                    const res = await axios.get('http://127.0.0.1:8000/api/searchDataStaff', {  
-                        params: {
-                            staffid: this.text_user1
-                        }
-                    }); 
-                    console.log('searchUserStaffid1: ',res.data);  
-                    this.seen = true; 
-                    this.listshoeusername1=res.data  
+                // ✅ เพิ่ม: ถ้าพิมพ์สั้น (<4) ให้ถือว่ายังไม่เลือกคน
+                if (this.text_user1.length < 4) {
+                this.text_staff1 = null
+                this.text_position1 = null
+                this.text_namefully1 = null
+                this.seen = false
+                this.listshoeusername1 = null
+                return
                 }
-                this.previousName = this.text_user1;
-            } catch (error) {
-                console.error('Error fetching evaluation data:', error);
-            } 
-        },  
+
+                // ค้นหาเหมือนเดิม
+                const res = await axios.get('http://127.0.0.1:8000/api/searchDataStaff', {
+                params: { staffid: this.text_user1 }
+                })
+                this.seen = true
+                this.listshoeusername1 = res.data
+            } catch (e) {
+                console.error(e)
+            }
+        },
+
         nameUserclick1(data){   
             //console.log('nameUserclick1: ',data);
             this.seen = false; 
@@ -641,26 +724,59 @@ export default {
         },
 
         // User 2
-        async searchUserStaffid2(){  
-            try { 
-                if (this.previousName && this.text_user2.length < this.previousName.length) {  
-                    this.text_staff2 = null;
-                    this.text_position2 = null;
-                    this.text_namefully2 = null; 
+        // async searchUserStaffid2(){  
+        //     try { 
+        //         if (this.previousName && this.text_user2.length < this.previousName.length) {  
+        //             this.text_staff2 = null;
+        //             this.text_position2 = null;
+        //             this.text_namefully2 = null; 
+        //         }
+        //         if(this.text_user2.length > 3){
+        //             const res = await axios.get(' http://127.0.0.1:8000/api/searchDataStaff', {  
+        //                 params: {
+        //                     staffid: this.text_user2
+        //                 }
+        //             }); 
+        //             //console.log('searchUserStaffid2: ',res.data);  
+        //             this.seen2 = true; 
+        //             this.listshoeusername2=res.data  
+        //         }
+        //     } catch (error) {
+        //         console.error('Error fetching evaluation data:', error);
+        //     } 
+        // },  
+
+        async searchUserStaffid2(){
+            try {
+                // ✅ เพิ่ม: ถ้าลบจนว่าง -> ล้างค่าที่จะบันทึก
+                if (!this.text_user2 || this.text_user2.trim().length === 0) {
+                this.text_staff2 = null
+                this.text_position2 = null
+                this.text_namefully2 = null
+                this.seen2 = false
+                this.listshoeusername2 = null
+                return
                 }
-                if(this.text_user2.length > 3){
-                    const res = await axios.get(' http://127.0.0.1:8000/api/searchDataStaff', {  
-                        params: {
-                            staffid: this.text_user2
-                        }
-                    }); 
-                    //console.log('searchUserStaffid2: ',res.data);  
-                    this.seen2 = true; 
-                    this.listshoeusername2=res.data  
+
+                // ✅ เพิ่ม: ถ้าพิมพ์สั้น (<4) ให้ถือว่ายังไม่เลือกคน
+                if (this.text_user2.length < 4) {
+                this.text_staff2 = null
+                this.text_position2 = null
+                this.text_namefully2 = null
+                this.seen2 = false
+                this.listshoeusername2 = null
+                return
                 }
-            } catch (error) {
-                console.error('Error fetching evaluation data:', error);
-            } 
+
+                // ค้นหาเหมือนเดิม
+                const res = await axios.get('http://127.0.0.1:8000/api/searchDataStaff', {
+                params: { staffid: this.text_user2 }
+                })
+                this.seen2 = true
+                this.listshoeusername2 = res.data
+            } catch (e) {
+                console.error(e)
+            }
         },  
         nameUserclick2(data){   
             //console.log('nameUserclick1: ',data);
@@ -671,27 +787,60 @@ export default {
             this.text_namefully2 = data.namefully;
         },
              // User 3
-        async searchUserStaffid3(){  
-            try { 
-                if (this.previousName && this.text_user3.length < this.previousName.length) {  
-                    this.text_staff3 = null;
-                    this.text_position3 = null;
-                    this.text_namefully3 = null; 
+        // async searchUserStaffid3(){  
+        //     try { 
+        //         if (this.previousName && this.text_user3.length < this.previousName.length) {  
+        //             this.text_staff3 = null;
+        //             this.text_position3 = null;
+        //             this.text_namefully3 = null; 
+        //         }
+        //         if(this.text_user3.length > 3){
+        //             const res = await axios.get(' http://127.0.0.1:8000/api/searchDataStaff', {  
+        //                 params: {
+        //                     staffid: this.text_user3
+        //                 }
+        //             }); 
+        //             //console.log('searchUserStaffid3: ',res.data);  
+        //             this.seen3 = true; 
+        //             this.listshoeusername3=res.data  
+        //         }
+        //     } catch (error) {
+        //         console.error('Error fetching evaluation data:', error);
+        //     } 
+        // },  
+
+        async searchUserStaffid3(){
+            try {
+                // ✅ เพิ่ม: ถ้าลบจนว่าง -> ล้างค่าที่จะบันทึก
+                if (!this.text_user3 || this.text_user3.trim().length === 0) {
+                    this.text_staff3 = null
+                    this.text_position3 = null
+                    this.text_namefully3 = null
+                    this.seen3 = false
+                    this.listshoeusername3 = null
+                    return
                 }
-                if(this.text_user3.length > 3){
-                    const res = await axios.get(' http://127.0.0.1:8000/api/searchDataStaff', {  
-                        params: {
-                            staffid: this.text_user3
-                        }
-                    }); 
-                    //console.log('searchUserStaffid3: ',res.data);  
-                    this.seen3 = true; 
-                    this.listshoeusername3=res.data  
+
+                // ✅ เพิ่ม: ถ้าพิมพ์สั้น (<4) ให้ถือว่ายังไม่เลือกคน
+                if (this.text_user3.length < 4) {
+                this.text_staff3 = null
+                this.text_position3 = null
+                this.text_namefully3 = null
+                this.seen3 = false
+                this.listshoeusername3 = null
+                return
                 }
-            } catch (error) {
-                console.error('Error fetching evaluation data:', error);
-            } 
-        },  
+
+                // ค้นหาเหมือนเดิม
+                const res = await axios.get('http://127.0.0.1:8000/api/searchDataStaff', {
+                params: { staffid: this.text_user3 }
+                })
+                this.seen3 = true
+                this.listshoeusername3 = res.data
+            } catch (e) {
+                console.error(e)
+            }
+        },   
         nameUserclick3(data){   
             //console.log('nameUserclick3: ',data);
             this.seen3 = false; 
@@ -700,23 +849,58 @@ export default {
             this.text_position3 = data.posnameth;
             this.text_namefully3 = data.namefully;
         },
+
             // User 4
-        async searchUserStaffid4(){  
-            try { 
-                if(this.text_user4.length > 3){
-                    const res = await axios.get(' http://127.0.0.1:8000/api/searchDataStaff', {  
-                        params: {
-                            staffid: this.text_user4
-                        }
-                    }); 
-                    //console.log('searchUserStaffid1: ',res.data);  
-                    this.seen4 = true; 
-                    this.listshoeusername4=res.data  
+        // async searchUserStaffid4(){  
+        //     try { 
+        //         if(this.text_user4.length > 3){
+        //             const res = await axios.get(' http://127.0.0.1:8000/api/searchDataStaff', {  
+        //                 params: {
+        //                     staffid: this.text_user4
+        //                 }
+        //             }); 
+        //             //console.log('searchUserStaffid1: ',res.data);  
+        //             this.seen4 = true; 
+        //             this.listshoeusername4=res.data  
+        //         }
+        //     } catch (error) {
+        //         console.error('Error fetching evaluation data:', error);
+        //     } 
+        // },  
+
+         async searchUserStaffid4(){
+            try {
+                // ✅ เพิ่ม: ถ้าลบจนว่าง -> ล้างค่าที่จะบันทึก
+                if (!this.text_user4 || this.text_user4.trim().length === 0) {
+                    this.text_staff4 = null
+                    this.text_position4 = null
+                    this.text_namefully4 = null
+                    this.seen4 = false
+                    this.listshoeusername4 = null
+                    return
                 }
-            } catch (error) {
-                console.error('Error fetching evaluation data:', error);
-            } 
-        },  
+
+                // ✅ เพิ่ม: ถ้าพิมพ์สั้น (<4) ให้ถือว่ายังไม่เลือกคน
+                if (this.text_user4.length < 4) {
+                    this.text_staff4 = null
+                    this.text_position4 = null
+                    this.text_namefully4 = null
+                    this.seen4 = false
+                    this.listshoeusername4 = null
+                    return
+                }
+
+                // ค้นหาเหมือนเดิม
+                const res = await axios.get('http://127.0.0.1:8000/api/searchDataStaff', {
+                params: { staffid: this.text_user4 }
+                })
+                this.seen4 = true
+                this.listshoeusername4 = res.data
+            } catch (e) {
+                console.error(e)
+            }
+        }, 
+
         nameUserclick4(data){   
             //console.log('nameUserclick4: ',data);
             this.seen4 = false; 
@@ -726,22 +910,56 @@ export default {
             this.text_namefully4 = data.namefully;
         },
              // User 5
-        async searchUserStaffid5(){  
-            try { 
-                if(this.text_user5.length > 3){
-                    const res = await axios.get(' http://127.0.0.1:8000/api/searchDataStaff', {  
-                        params: {
-                            staffid: this.text_user5
-                        }
-                    }); 
-                    //console.log('searchUserStaffid1: ',res.data);  
-                    this.seen5 = true; 
-                    this.listshoeusername5=res.data  
+        // async searchUserStaffid5(){  
+        //     try { 
+        //         if(this.text_user5.length > 3){
+        //             const res = await axios.get(' http://127.0.0.1:8000/api/searchDataStaff', {  
+        //                 params: {
+        //                     staffid: this.text_user5
+        //                 }
+        //             }); 
+        //             //console.log('searchUserStaffid1: ',res.data);  
+        //             this.seen5 = true; 
+        //             this.listshoeusername5=res.data  
+        //         }
+        //     } catch (error) {
+        //         console.error('Error fetching evaluation data:', error);
+        //     } 
+        // },  
+
+        async searchUserStaffid5(){
+            try {
+                // ✅ เพิ่ม: ถ้าลบจนว่าง -> ล้างค่าที่จะบันทึก
+                if (!this.text_user5 || this.text_user5.trim().length === 0) {
+                    this.text_staff5 = null
+                    this.text_position5 = null
+                    this.text_namefully5 = null
+                    this.seen5 = false
+                    this.listshoeusername5 = null
+                    return
                 }
-            } catch (error) {
-                console.error('Error fetching evaluation data:', error);
-            } 
-        },  
+
+                // ✅ เพิ่ม: ถ้าพิมพ์สั้น (<4) ให้ถือว่ายังไม่เลือกคน
+                if (this.text_user5.length < 4) {
+                    this.text_staff5 = null
+                    this.text_position5 = null
+                    this.text_namefully5 = null
+                    this.seen5 = false
+                    this.listshoeusername5 = null
+                    return
+                }
+
+                // ค้นหาเหมือนเดิม
+                const res = await axios.get('http://127.0.0.1:8000/api/searchDataStaff', {
+                params: { staffid: this.text_user5 }
+                })
+                this.seen5 = true
+                this.listshoeusername5 = res.data
+            } catch (e) {
+                console.error(e)
+            }
+        },
+
         nameUserclick5(data){   
             //console.log('nameUserclick1: ',data);
             this.seen5 = false; 
@@ -751,22 +969,55 @@ export default {
             this.text_namefully5 = data.namefully;
         },   
           // User 6
-        async searchUserStaffid6(){  
-            try { 
-                if(this.text_user6.length > 3){
-                    const res = await axios.get(' http://127.0.0.1:8000/api/searchDataStaff', {  
-                        params: {
-                            staffid: this.text_user6
-                        }
-                    }); 
-                    //console.log('searchUserStaffid1: ',res.data);  
-                    this.seen6 = true; 
-                    this.listshoeusername6=res.data  
+        // async searchUserStaffid6(){  
+        //     try { 
+        //         if(this.text_user6.length > 3){
+        //             const res = await axios.get(' http://127.0.0.1:8000/api/searchDataStaff', {  
+        //                 params: {
+        //                     staffid: this.text_user6
+        //                 }
+        //             }); 
+        //             //console.log('searchUserStaffid1: ',res.data);  
+        //             this.seen6 = true; 
+        //             this.listshoeusername6=res.data  
+        //         }
+        //     } catch (error) {
+        //         console.error('Error fetching evaluation data:', error);
+        //     } 
+        // }, 
+        
+        async searchUserStaffid6(){
+            try {
+                // ✅ เพิ่ม: ถ้าลบจนว่าง -> ล้างค่าที่จะบันทึก
+                if (!this.text_user6 || this.text_user6.trim().length === 0) {
+                    this.text_staff6 = null
+                    this.text_position6 = null
+                    this.text_namefully6 = null
+                    this.seen6 = false
+                    this.listshoeusername6 = null
+                    return
                 }
-            } catch (error) {
-                console.error('Error fetching evaluation data:', error);
-            } 
-        },  
+
+                // ✅ เพิ่ม: ถ้าพิมพ์สั้น (<4) ให้ถือว่ายังไม่เลือกคน
+                if (this.text_user6.length < 4) {
+                    this.text_staff6 = null
+                    this.text_position6 = null
+                    this.text_namefully6 = null
+                    this.seen6 = false
+                    this.listshoeusername6 = null
+                    return
+                }
+
+                // ค้นหาเหมือนเดิม
+                const res = await axios.get('http://127.0.0.1:8000/api/searchDataStaff', {
+                params: { staffid: this.text_user6 }
+                })
+                this.seen6 = true
+                this.listshoeusername6 = res.data
+            } catch (e) {
+                console.error(e)
+            }
+        }, 
         nameUserclick6(data){   
             //console.log('nameUserclick1: ',data);
             this.seen6 = false; 
@@ -777,22 +1028,56 @@ export default {
         }, 
         
          // User 7
-        async searchUserStaffid7(){  
-            try { 
-                if(this.text_user7.length > 3){
-                    const res = await axios.get(' http://127.0.0.1:8000/api/searchDataStaff', {  
-                        params: {
-                            staffid: this.text_user7
-                        }
-                    }); 
-                    //console.log('searchUserStaffid1: ',res.data);  
-                    this.seen7 = true; 
-                    this.listshoeusername7=res.data  
+        // async searchUserStaffid7(){  
+        //     try { 
+        //         if(this.text_user7.length > 3){
+        //             const res = await axios.get(' http://127.0.0.1:8000/api/searchDataStaff', {  
+        //                 params: {
+        //                     staffid: this.text_user7
+        //                 }
+        //             }); 
+        //             //console.log('searchUserStaffid1: ',res.data);  
+        //             this.seen7 = true; 
+        //             this.listshoeusername7=res.data  
+        //         }
+        //     } catch (error) {
+        //         console.error('Error fetching evaluation data:', error);
+        //     } 
+        // },  
+
+        async searchUserStaffid7(){
+            try {
+                // ✅ เพิ่ม: ถ้าลบจนว่าง -> ล้างค่าที่จะบันทึก
+                if (!this.text_user7 || this.text_user7.trim().length === 0) {
+                    this.text_staff7 = null
+                    this.text_position7 = null
+                    this.text_namefully7 = null
+                    this.seen7 = false
+                    this.listshoeusername7 = null
+                    return
                 }
-            } catch (error) {
-                console.error('Error fetching evaluation data:', error);
-            } 
-        },  
+
+                // ✅ เพิ่ม: ถ้าพิมพ์สั้น (<4) ให้ถือว่ายังไม่เลือกคน
+                if (this.text_user7.length < 4) {
+                    this.text_staff7 = null
+                    this.text_position7 = null
+                    this.text_namefully7 = null
+                    this.seen7 = false
+                    this.listshoeusername7 = null
+                    return
+                }
+
+                // ค้นหาเหมือนเดิม
+                const res = await axios.get('http://127.0.0.1:8000/api/searchDataStaff', {
+                params: { staffid: this.text_user7 }
+                })
+                this.seen7 = true
+                this.listshoeusername7 = res.data
+            } catch (e) {
+                console.error(e)
+            }
+        },
+
         nameUserclick7(data){   
             //console.log('nameUserclick1: ',data);
             this.seen7 = false; 
@@ -803,22 +1088,56 @@ export default {
         }, 
 
           // User 8
-        async searchUserStaffid8(){  
-            try { 
-                if(this.text_user8.length > 3){
-                    const res = await axios.get(' http://127.0.0.1:8000/api/searchDataStaff', {  
-                        params: {
-                            staffid: this.text_user8
-                        }
-                    }); 
-                    //console.log('searchUserStaffid1: ',res.data);  
-                    this.seen8 = true; 
-                    this.listshoeusername8=res.data  
+        // async searchUserStaffid8(){  
+        //     try { 
+        //         if(this.text_user8.length > 3){
+        //             const res = await axios.get(' http://127.0.0.1:8000/api/searchDataStaff', {  
+        //                 params: {
+        //                     staffid: this.text_user8
+        //                 }
+        //             }); 
+        //             //console.log('searchUserStaffid1: ',res.data);  
+        //             this.seen8 = true; 
+        //             this.listshoeusername8=res.data  
+        //         }
+        //     } catch (error) {
+        //         console.error('Error fetching evaluation data:', error);
+        //     } 
+        // },  
+
+        async searchUserStaffid8(){
+            try {
+                // ✅ เพิ่ม: ถ้าลบจนว่าง -> ล้างค่าที่จะบันทึก
+                if (!this.text_user8 || this.text_user8.trim().length === 0) {
+                    this.text_staff8 = null
+                    this.text_position8 = null
+                    this.text_namefully8 = null
+                    this.seen8 = false
+                    this.listshoeusername8 = null
+                    return
                 }
-            } catch (error) {
-                console.error('Error fetching evaluation data:', error);
-            } 
-        },  
+
+                // ✅ เพิ่ม: ถ้าพิมพ์สั้น (<4) ให้ถือว่ายังไม่เลือกคน
+                if (this.text_user8.length < 4) {
+                    this.text_staff8 = null
+                    this.text_position8 = null
+                    this.text_namefully8 = null
+                    this.seen8 = false
+                    this.listshoeusername8 = null
+                    return
+                }
+
+                // ค้นหาเหมือนเดิม
+                const res = await axios.get('http://127.0.0.1:8000/api/searchDataStaff', {
+                params: { staffid: this.text_user8 }
+                })
+                this.seen8 = true
+                this.listshoeusername8 = res.data
+            } catch (e) {
+                console.error(e)
+            }
+        },
+
         nameUserclick8(data){   
             //console.log('nameUserclick1: ',data);
             this.seen8 = false; 
@@ -829,22 +1148,56 @@ export default {
         }, 
 
            // User 9
-        async searchUserStaffid9(){  
-            try { 
-                if(this.text_user9.length > 3){
-                    const res = await axios.get(' http://127.0.0.1:8000/api/searchDataStaff', {  
-                        params: {
-                            staffid: this.text_user9
-                        }
-                    }); 
-                    //console.log('searchUserStaffid1: ',res.data);  
-                    this.seen9 = true; 
-                    this.listshoeusername9=res.data  
+        // async searchUserStaffid9(){  
+        //     try { 
+        //         if(this.text_user9.length > 3){
+        //             const res = await axios.get(' http://127.0.0.1:8000/api/searchDataStaff', {  
+        //                 params: {
+        //                     staffid: this.text_user9
+        //                 }
+        //             }); 
+        //             //console.log('searchUserStaffid1: ',res.data);  
+        //             this.seen9 = true; 
+        //             this.listshoeusername9=res.data  
+        //         }
+        //     } catch (error) {
+        //         console.error('Error fetching evaluation data:', error);
+        //     } 
+        // },  
+
+        async searchUserStaffid9(){
+            try {
+                // ✅ เพิ่ม: ถ้าลบจนว่าง -> ล้างค่าที่จะบันทึก
+                if (!this.text_user9 || this.text_user9.trim().length === 0) {
+                    this.text_staff9 = null
+                    this.text_position9 = null
+                    this.text_namefully9 = null
+                    this.seen9 = false
+                    this.listshoeusername9 = null
+                    return
                 }
-            } catch (error) {
-                console.error('Error fetching evaluation data:', error);
-            } 
-        },  
+
+                // ✅ เพิ่ม: ถ้าพิมพ์สั้น (<4) ให้ถือว่ายังไม่เลือกคน
+                if (this.text_user9.length < 4) {
+                    this.text_staff9 = null
+                    this.text_position9 = null
+                    this.text_namefully9 = null
+                    this.seen9 = false
+                    this.listshoeusername9 = null
+                    return
+                }
+
+                // ค้นหาเหมือนเดิม
+                const res = await axios.get('http://127.0.0.1:8000/api/searchDataStaff', {
+                params: { staffid: this.text_user9 }
+                })
+                this.seen9 = true
+                this.listshoeusername9 = res.data
+            } catch (e) {
+                console.error(e)
+            }
+        },
+
         nameUserclick9(data){   
             //console.log('nameUserclick1: ',data);
             this.seen9 = false; 

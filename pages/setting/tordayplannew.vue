@@ -87,8 +87,14 @@
               </span>
             </div>
           </template>
+        </Column> 
+        <Column header="ชื่อหัวหน้ากลุ่มงาน/หัวหน้างาน" style="min-width:14rem;max-width:18rem">
+          <template #body="{data}">
+            <span v-if="data.supervisor?.name">{{ data.supervisor.name }}</span>
+            <span v-else class="text-gray-400">-</span>
+          </template>
         </Column>
-
+ 
         <Column header="ความคืบหน้า" style="width:11rem;min-width:10rem">
           <template #body="{data}">
             <div class="flex items-center gap-2">
@@ -308,9 +314,16 @@
             <AutoComplete v-model="currentPlan.owner" :multiple="true" :suggestions="ownerSuggestions"
                           optionLabel="name" placeholder="พิมพ์ชื่อหรือรหัสพนักงานเพื่อค้นหา…" forceSelection dropdown
                           @complete="searchOwners"/>
-            <small class="text-gray-500">พิมพ์อย่างน้อย 3 ตัวอักษร เช่น รหัสพนักงาน หรือชื่อ-สกุล</small>
+            <small class="text-red-600 font-semibold"> * พิมพ์อย่างน้อย 3 ตัวอักษร เช่น รหัสพนักงาน หรือชื่อ-สกุล (ไม่ต้องใส่คำนำหน้า)</small>
           </div>
 
+
+          <div class="field col-12">
+            <label class="font-semibold">ชื่อหัวหน้างาน/หัวหน้ากลุ่มงาน</label>
+            <AutoComplete v-model="currentPlan.supervisor" :suggestions="supervisorSuggestions" optionLabel="name" placeholder="พิมพ์ชื่อหรือรหัสพนักงานเพื่อค้นหา…" forceSelection dropdown class="w-full" @complete="searchSupervisors" />
+            <small class="text-red-600 font-semibold" >พิมพ์อย่างน้อย 3 ตัวอักษร เช่น รหัสพนักงาน หรือชื่อ-สกุล (ไม่ต้องใส่คำนำหน้า)</small>
+          </div> 
+ 
           <div class="field col-12 md:col-6">
             <label class="font-semibold text-lg">วันที่เริ่มต้น <span class="text-red-500">*</span></label>
             <Calendar v-model="currentPlan.startDate" dateFormat="dd/mm/yy" showIcon required/>
@@ -452,16 +465,18 @@
         </div>
       </div> 
       <div class="p-fluid formgrid grid">
-        <div class="field col-12 md:col-6">
+        <div class="field col-12 md:col-12">
           <label class="font-semibold">ผู้รับผิดชอบ</label>
           <AutoComplete v-model="currentEditingTask.responsible" :multiple="true" :suggestions="taskOwnerSuggestions" optionLabel="name" placeholder="พิมพ์ชื่อหรือรหัสพนักงานเพื่อค้นหา…" forceSelection dropdown class="w-full" @complete="searchTaskOwners" />
           <small class="text-gray-500">พิมพ์อย่างน้อย 3 ตัวอักษร เช่น รหัสพนักงาน หรือชื่อ-สกุล</small>
         </div> 
-        <div class="field col-12 md:col-6">
+
+        <!-- <div class="field col-12 md:col-6">
           <label class="font-semibold">ชื่อหัวหน้างาน/หัวหน้ากลุ่มงาน</label>
           <AutoComplete v-model="currentEditingTask.supervisor" :suggestions="supervisorSuggestions" optionLabel="name" placeholder="พิมพ์ชื่อหรือรหัสพนักงานเพื่อค้นหา…" forceSelection dropdown class="w-full" @complete="searchSupervisors" />
           <small class="text-gray-500">พิมพ์อย่างน้อย 3 ตัวอักษร</small>
-        </div>
+        </div> -->
+
       </div> 
       <div class="p-fluid formgrid grid">
         <div class="field col-12 md:col-6">
@@ -501,7 +516,7 @@
           <Dropdown v-model="newTaskInStep.taskType" :options="taskTypes" optionLabel="label" optionValue="value" placeholder="เลือกประเภทภาระงาน" class="w-full" @change="onTaskTypeChange"/>
         </div>
 
-        <div class="field col-12" v-if="newTaskInStep.taskType !== 'งานอื่นๆ'">
+        <!-- <div class="field col-12" v-if="newTaskInStep.taskType !== 'งานอื่นๆ'">
           <label class="font-semibold">ภาระงานหลัก</label>
           <AutoComplete v-model="newTaskInStep.mainTask" :suggestions="mainTaskSuggestions" @complete="completeMainTask" placeholder="พิมพ์เพื่อค้นหา/เลือกภาระงานหลัก" dropdown @item-select="({ value }) => onMainTaskChange(value)" @blur="onMainTaskChange(newTaskInStep.mainTask)" class="w-full" />
         </div> 
@@ -511,9 +526,18 @@
             v-model="newTaskInStep.description" :options="subTasks" optionLabel="name" optionValue="name"
             placeholder="เลือกภาระงานประจำวัน" class="w-full" :disabled="!newTaskInStep.mainTask"/>
           <Textarea v-else v-model="newTaskInStep.description" placeholder="กรอกภาระงานประจำวัน" class="w-full"/>
-        </div>
+        </div> -->
 
-        <div class="field col-6">
+        <div class="field col-12" v-if="newTaskInStep.taskType !== 'งานอื่นๆ'">
+          <label class="font-semibold">ภาระงานหลัก</label>
+          <Textarea v-model="newTaskInStep.mainTask" placeholder="กรอกภาระงานหลัก" class="w-full" autoResize />
+        </div> 
+        <div class="field col-12">
+          <label class="font-semibold">ภาระงานประจำวัน</label>
+          <Textarea v-model="newTaskInStep.description" placeholder="กรอกภาระงานประจำวัน" class="w-full" autoResize />
+        </div> 
+
+        <div class="field col-12">
           <label class="font-semibold">ผู้รับผิดชอบ</label>
           <AutoComplete v-model="newTaskInStep.responsible" :multiple="true" :suggestions="taskOwnerSuggestions"
             optionLabel="name" placeholder="พิมพ์ชื่อหรือรหัสพนักงานเพื่อค้นหา…" forceSelection dropdown
@@ -521,13 +545,13 @@
           <small class="text-gray-500">พิมพ์อย่างน้อย 3 ตัวอักษร</small>
         </div>
 
-        <div class="field col-6">
+        <!-- <div class="field col-6">
           <label class="font-semibold">ชื่อหัวหน้างาน/หัวหน้ากลุ่มงาน</label>
           <AutoComplete v-model="newTaskInStep.supervisor" :suggestions="supervisorSuggestions"
             optionLabel="name" placeholder="พิมพ์ชื่อหรือรหัสพนักงานเพื่อค้นหา…" forceSelection dropdown
             class="w-full" @complete="searchSupervisors"/>
           <small class="text-gray-500">พิมพ์อย่างน้อย 3 ตัวอักษร</small>
-        </div> 
+        </div>  -->
  
         <div class="field col-6">
           <label class="font-semibold">เวลาเริ่มต้น</label>
@@ -781,7 +805,7 @@ const planYears = [
   { label: '2570', value: '2570' },
 ]
 
-const currentPlan = reactive({ id: null, planYear: null, planType: null, planLabel: '', owner: [], startDate: null, endDate: null, steps: [] })
+const currentPlan = reactive({ id: null, planYear: null, planType: null, planLabel: '', owner: [],supervisor: null, startDate: null, endDate: null, steps: [] })
 const newStepName = ref('')
 const newStepDates = ref([])
 const expandedPlans = ref([])
@@ -960,18 +984,28 @@ async function fetchPlans() {
   }
 }
 
+// function belongsToMe(plan) {
+//   const me = Number(session.staffId)
+//   const staffField = Number(plan.staff_id ?? plan.staffId ?? plan.created_by ?? plan.createdBy ?? null)
+//   const ownerMatch = Array.isArray(plan.owner) && plan.owner.some(o => Number(o.id) === me)
+//   return staffField === me || ownerMatch
+// }
+
 function belongsToMe(plan) {
   const me = Number(session.staffId)
   const staffField = Number(plan.staff_id ?? plan.staffId ?? plan.created_by ?? plan.createdBy ?? null)
   const ownerMatch = Array.isArray(plan.owner) && plan.owner.some(o => Number(o.id) === me)
-  return staffField === me || ownerMatch
+  const supervisorMatch = Number(plan.supervisor?.id ?? plan.supervisor_id ?? null) === me
+  return staffField === me || ownerMatch || supervisorMatch
 }
+
+
  
 function openPlanDialog() {
   isEditMode.value = false
   showPlanDialog.value = true
   activeTabIndex.value = 0
-  Object.assign(currentPlan, { id: null, planYear: null, planType: null, planLabel: '', owner: [], startDate: null, endDate: null, steps: [] })
+  Object.assign(currentPlan, { id: null, planYear: null, planType: null, planLabel: '', owner: [], supervisor: null, startDate: null, endDate: null, steps: [] })
   newStepName.value = ''
   newStepDates.value = []
 }
@@ -1048,6 +1082,9 @@ async function savePlan() {
     startDate: toDateStr(currentPlan.startDate),
     endDate: toDateStr(currentPlan.endDate),
     owner: (currentPlan.owner || []).map(o => ({ id: o.id, name: o.name })),
+    supervisor: currentPlan.supervisor
+      ? { id: currentPlan.supervisor.id, name: currentPlan.supervisor.name }
+      : null,
     staff_id: session.staffId,
     fac_id: session.facId,
   }
