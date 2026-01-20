@@ -63,35 +63,49 @@
                     </div> -->
                 </div>
                 <DataTable :value="products_date" :rows="10" :paginator="true" responsiveLayout="scroll" dataKey="id">
-                    <Column field="Tb_name" header="ชื่อ" style="width: 25%; text-align: center;">
+                    <Column field="Tb_name" header="ชื่อ-สกุล" style="width: 20%; text-align: center;">
                         <template #body="Item">
                             <div style="display: flex; justify-content: center; align-items: center;">
                                 <b>{{ Item.data.name_use }}</b>
                             </div>
                         </template>
                     </Column>
-                    <Column field="Tb_name" header="คณะ/หน่วยงาน" style="width: 25%; text-align: center;">
+                    <Column field="Tb_name" header="คณะ/หน่วยงาน" style="width: 20%; text-align: center;">
                         <template #body="Item">
                             <div style="display: flex; justify-content: center; align-items: center;">
                                 <b>{{ Item.data.name_fac }}</b>
                             </div>
                         </template>
                     </Column>
-                    <Column field="Tb_ind" header="สถานะ/สิทธิ์การเข้าใช้งาน" style="width: 25%; text-align: center;">
+                    <Column field="Tb_ind" header="ตำแหน่ง" style="width: 20%; text-align: center;">
                         <template #body="Item">
                             <div style="display: flex; justify-content: center; align-items: center;">
                                 <b>{{ Item.data.status_name }}</b>
                             </div>
                         </template>
                     </Column>
-                    <Column field="options" header="ตัวเลือก" headerStyle="text-align: center;" bodyStyle="text-align: center;">
+                    <Column field="Tb_ind" header="Username" style="width: 20%; text-align: center;">
+                        <template #body="Item">
+                            <div style="display: flex; justify-content: center; align-items: center;">
+                                <b>{{ Item.data.status_name }}</b>
+                            </div>
+                        </template>
+                    </Column>
+                    <Column field="Tb_ind" header="Password" style="width: 20%; text-align: center;">
+                        <template #body="Item">
+                            <div style="display: flex; justify-content: center; align-items: center;">
+                                <b>{{ Item.data.status_name }}</b>
+                            </div>
+                        </template>
+                    </Column>
+                    <!-- <Column field="options" header="ตัวเลือก" headerStyle="text-align: center;" bodyStyle="text-align: center;">
                         <template #body="Item">
                             <div style="display: flex; justify-content: center; align-items: center; gap: 5px;">
                                 <Button icon="pi pi-pencil" severity="success" class="p-button-sm" @click="editData(Item.data)" />
                                 <Button icon="pi pi-trash" severity="danger" class="p-button-sm" @click="delData(Item.data)" />
                             </div>
                         </template>
-                    </Column>
+                    </Column> -->
                 </DataTable>
             </div>
         </div>
