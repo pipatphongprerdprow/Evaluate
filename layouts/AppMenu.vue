@@ -50,9 +50,12 @@ const allMenus = ref([
             { label: 'จัดการ รอบประเมิน', icon: 'pi pi-fw pi-calendar', to: '/setting/setting_date' },
             { label: 'ตรวจสอบ แบบประเมิน', icon: 'pi pi-fw pi-star', to: '/setting/checkevaluate' },
             { label: 'เพิ่มสิทธิ์การใช้งาน', icon: 'pi pi-fw pi-user-plus', to: '/setting/setting_user' },
+            { label: 'จัดการสิทธิ์บุคคล', icon: 'pi pi-fw pi-user', to: '/setting/setting_useradmin' }, 
         ]
     }, 
-     {
+
+      
+    {
         id: 'Ad',
         label: 'คำนวนค่างาน',
         items: [ 
@@ -114,7 +117,7 @@ const model = computed(() => {
         case '4':
             return allMenus.value.filter(menu => [ 'home','executive',].includes(menu.id));//ผู้บริหารสูงขึ้นไป
         case '5':
-            return allMenus.value.filter(menu => [ 'home', 'tor', 'manual','Ad','torday',].includes(menu.id));//admin
+            return allMenus.value.filter(menu => [ 'home', 'tor', 'manual','Ad','torday',].includes(menu.id));//admin 
         default:
             return allMenus.value.filter(menu => ['home', 'manual'].includes(menu.id));
     }
