@@ -58,10 +58,21 @@
  
                             <p>
                                 <strong>ชื่อผู้ประเมิน:</strong>
-                                <AutoComplete
+                                <!-- <AutoComplete
                                     v-model="assessor"
                                     :suggestions="staffSuggestions"
                                     optionLabel="namefully"
+                                    placeholder="ชื่อผู้ประเมิน"
+                                    forceSelection
+                                    dropdown
+                                    @complete="searchStaff"
+                                    style="width: 300px;"
+                                /> -->
+
+                                <AutoComplete
+                                    v-model="assessor"
+                                    :suggestions="staffSuggestions"
+                                    optionLabel="displayName"
                                     placeholder="ชื่อผู้ประเมิน"
                                     forceSelection
                                     dropdown
@@ -73,21 +84,34 @@
                                 <strong>ตำแหน่งผู้ประเมิน :</strong>
                                 <InputText type="text" placeholder="ตำแหน่งผู้ประเมิน" v-model="assessor_position" style="width: 265px;" />
                             </p>  
-                            <p>
+                            <!-- <p>
                                 <strong>รายละเอียดข้อตกลง ระหว่าง วันที่ : </strong>
                                 {{ product_date.d_evaluationround }} {{ product_date.d_date }}
-                            </p>
+                            </p> -->
+
+                            <p>
+                                <strong>รายละเอียดข้อตกลง ระหว่าง วันที่ : </strong>
+                                    {{ displayEvaluationPeriod }}
+                            </p> 
                         </div> 
                         <br> 
                         <div class="ml-4 mr-4" style="text-align: center;">
                             <label for="dropdownProportion"><b>สัดส่วน :</b></label>
-                            <Dropdown
+                            <!-- <Dropdown
                                 id="dropdownProportions"
                                 v-model="dropdownProportion"
                                 :options="dropdownProportions"
                                 optionLabel="name"
                                 placeholder="เลือกสัดส่วน"
-                            />
+                            /> -->
+                            <Dropdown
+                                id="dropdownProportions"
+                                v-model="dropdownProportion"
+                                :options="dropdownProportions"
+                                optionLabel="name"
+                                optionValue="value"
+                                placeholder="เลือกสัดส่วน"
+                            /> 
                         </div> 
                         <br> 
                         <div class="ml-4 mr-4" style="text-align: center;">
@@ -244,6 +268,30 @@ const user = await getSession();
                 const w = Number(this.p01TotalWeight || 0);
                 return Math.abs(w - 100) < 0.01;
             }, 
+            displayEvaluationPeriod() { 
+                const rawRound = String(this.product_date?.d_evaluationround ?? '');
+                const rawDate  = this.product_date?.d_date ?? ''; 
+                const dateText =
+                    typeof rawDate === 'string'
+                    ? rawDate
+                    : rawDate instanceof Date
+                        ? rawDate.toLocaleDateString('th-TH')
+                        : String(rawDate); 
+                const combined = `${rawRound} ${dateText}`; 
+                const roundNo = (rawRound.match(/รอบที่\s*(\d+)/)?.[1]) || '';
+                const roundText = (rawRound.match(/^(.*?รอบที่\s*\d+)/)?.[1]) || (roundNo ? `รอบที่ ${roundNo}` : rawRound); 
+                const prop = String(this.dropdownProportion ?? '').replace(/\s+/g,'');
+                const is5050 = prop === '50:50'; 
+                if (!is5050) return `${rawRound} ${dateText}`.trim(); 
+                const yearText = (combined.match(/25\d{2}/)?.[0]) || ''; 
+                const map = {
+                    '1': 'วันที่ 1 ตุลาคม ถึง วันที่ 31 มีนาคม',
+                    '2': 'วันที่ 1 เมษายน ถึง วันที่ 30 กันยายน',
+                }; 
+                const range = map[roundNo];
+                if (!range) return `${roundText}${yearText ? ` ${yearText}` : ''}`.trim(); 
+                return `${roundText} ${range}${yearText ? ` ${yearText}` : ''}`.trim();
+            }, 
         },
 
         methods: { 
@@ -292,9 +340,12 @@ const user = await getSession();
                         Swal.fire('error', 'กรุณาเลือก สัดส่วน', 'error');
                     } else { 
                         const assessorName =
-                            this.assessor && typeof this.assessor === 'object'
-                                ? this.assessor.namefully
-                                : this.assessor;
+                            // this.assessor && typeof this.assessor === 'object'
+                            //     ? this.assessor.namefully
+                            //     : this.assessor;
+                             this.assessor && typeof this.assessor === 'object'
+                                ? (this.assessor.displayName || this.assessor.namefully)
+                                : (this.assessor || '');
 
                         const formData = {
                             p_year: this.product_date.d_date,
@@ -304,10 +355,12 @@ const user = await getSession();
                             pos_id: this.pos_id,
                             postype_id: this.postype_id,
                             fac_id: this.facid_Main,
-                            dropdownProportion: this.dropdownProportion.value, 
-                            assessor: assessorName,
+                            // dropdownProportion: this.dropdownProportion.value, 
+                            dropdownProportion: this.dropdownProportion, 
+                            assessor: assessorName, 
+                            assessor_position: this.assessor_position,
+                            record_evalua: this.displayEvaluationPeriod,
 
-                            assessor_position: this.assessor_position
                         }; 
 
                         axios.post('http://127.0.0.1:8000/api/saveDatator', formData)
@@ -337,11 +390,21 @@ const user = await getSession();
                 })
                 .then(response => {
                     const dataSet = response.data[0] || {};
-                    this.assessor = dataSet.assessor || null;               
+
+                    // this.assessor = dataSet.assessor || null;    
+                    const nameFromDb = dataSet.assessor || '';
+                        this.assessor = nameFromDb
+                        ? { displayName: nameFromDb, namefully: nameFromDb }
+                        : null;
+
+                     this.assessor_position = dataSet.assessor_position || null;
+                    
+
                     this.assessor_position = dataSet.assessor_position || null; 
 
-                    const persen = this.dropdownProportions.filter(f => f.value == dataSet.persen);
-                    this.dropdownProportion = persen.length > 0 ? persen[0] : null;  
+                    // const persen = this.dropdownProportions.filter(f => f.value == dataSet.persen);
+                    // this.dropdownProportion = persen.length > 0 ? persen[0] : null;  
+                    this.dropdownProportion = dataSet.persen || null;  // ควรเป็น "50:50" หรือ "70:30"
                 })
                 .catch(error => { 
                 });
@@ -413,7 +476,11 @@ const user = await getSession();
                     group_id: this.groupid_Main,
                     fac_id: this.facid_Main,
                     year_id: this.product_date.d_date,
-                    evalua: this.product_date.evalua, 
+                    evalua: this.product_date.evalua,
+
+                    period_text: this.displayEvaluationPeriod,
+                    persen: this.dropdownProportion,    
+
                     PREFIXFULLNAME: user.user.name.PREFIXFULLNAME,
                     STAFFNAME: user.user.name.STAFFNAME,
                     STAFFSURNAME: user.user.name.STAFFSURNAME,
@@ -428,26 +495,50 @@ const user = await getSession();
                 window.location.href = url;
             },  
 
+            // searchStaff(event) {
+            //     const query = (event.query || '').trim();
+
+            //     if (!query || query.length < 2) {
+            //         this.staffSuggestions = [];
+            //         return;
+            //     }
+
+            //     axios.get('http://127.0.0.1:8000/api/searchDataStaff', {
+            //         params: {
+            //             staffid: query    
+            //         }
+            //     })
+            //     .then((res) => { 
+            //         this.staffSuggestions = res.data || []; 
+            //     })
+            //     .catch((error) => {
+            //         this.staffSuggestions = [];
+            //     });
+            // }, 
+
             searchStaff(event) {
                 const query = (event.query || '').trim();
-
                 if (!query || query.length < 2) {
                     this.staffSuggestions = [];
                     return;
                 }
 
                 axios.get('http://127.0.0.1:8000/api/searchDataStaff', {
-                    params: {
-                        staffid: query    
-                    }
+                    params: { staffid: query }
                 })
-                .then((res) => { 
-                    this.staffSuggestions = res.data || []; 
+                .then((res) => {
+                    const rows = res.data || [];
+                    this.staffSuggestions = rows.map(r => ({
+                    ...r,
+                    displayName: `${r.prefixfullname || r.PREFIXFULLNAME || ''}${r.namefully || ''}`.trim()
+                    }));
                 })
-                .catch((error) => {
+                .catch(() => {
                     this.staffSuggestions = [];
                 });
-            }, 
+                },
+
+
             onP01WeightChanged(val) {
                 this.p01TotalWeight = Number(val || 0);
             }, 

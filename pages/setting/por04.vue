@@ -9,7 +9,8 @@
                     <h5 class="mb-4"><i class="" style="font-size: x-large;"></i> ส่วนที่ 1 ข้อมูลของผู้รับการประเมิน</h5>  
                     <!-- ตาราง ก. สมรรถนะหลัก -->
                     <div class="employee-info">   
-                        <p v-if="dataPor"><strong>รอบการประเมิน:</strong> {{dataPor.d_evaluationround}} {{ dataPor.d_date }} </p>
+                        <!-- <p v-if="dataPor"><strong>รอบการประเมิน:</strong> {{dataPor.d_evaluationround}} {{ dataPor.d_date }} </p> -->
+                         <p><strong>รอบการประเมิน:</strong> {{ evaluationPeriodText }}</p>
                         <p><strong>ชื่อผู้รับการประเมิน:</strong> {{ user.user.name.PREFIXFULLNAME }} {{ user.user.name.STAFFNAME }} {{ user.user.name.STAFFSURNAME }} </p>
                         <p><strong>ตำแหน่ง:</strong> {{ user.user.name.POSITIONNAME }} </p>
                         <!-- <p><strong>ระดับตำแหน่ง:</strong>{{ user.user.name.POSTYPENAME }} </p> -->
@@ -249,6 +250,8 @@ export default {
             // Anurak
             assessorText: [],
             assessor_positionText: [],
+            recordEvaluaText: '',
+ 
             // ปีงบประมาณ
             dropdownItemYear: { name: 'ปีงบประมาณ 2568', code: 2568 },
             dropdownItemsYear: [
@@ -467,6 +470,14 @@ export default {
             });  
             return zeroScoreCount * 2;
         },  
+        evaluationPeriodText() { 
+            if (this.recordEvaluaText && String(this.recordEvaluaText).trim() !== '') {
+                return String(this.recordEvaluaText).trim();
+            } 
+            const r = this.dataPor?.d_evaluationround ?? '';
+            const d = this.dataPor?.d_date ?? '';
+            return `${r} ${d}`.trim();
+        },  
     }, 
     methods: { 
          insertscore1(scoreA04) { 
@@ -523,12 +534,20 @@ export default {
                 evalua: this.dataPor.evalua,
                 p_staffid: this.staffid_Main
             })
+            // .then(res => {
+            //      //console.log('Response',res.data);  
+            //     this.assessorText = res.data[0].assessor; 
+            //     this.assessor_positionText = res.data[0].assessor_position;
+            //     this.showscoresum = res.data[0] 
+            // })
             .then(res => {
-                 //console.log('Response',res.data);  
-                this.assessorText = res.data[0].assessor; 
-                this.assessor_positionText = res.data[0].assessor_position;
-                this.showscoresum = res.data[0] 
-            })
+                const row = res.data?.[0] || {};
+
+                this.assessorText = row.assessor || '';
+                this.assessor_positionText = row.assessor_position || '';
+                this.showscoresum = row; 
+                this.recordEvaluaText = row.record_evalua || '';
+            }) 
             .catch(error => {
                 console.error('Error fetching data:', error);
             });
@@ -560,6 +579,7 @@ export default {
                 fac_id: this.dataPor.fac_id,
                 year_id: this.dataPor.d_date,
                 evalua: this.dataPor.evalua ,
+                period_text: this.evaluationPeriodText, 
                 PREFIXFULLNAME:user.user.name.PREFIXFULLNAME,
                 STAFFNAME :user.user.name.STAFFNAME,
                 STAFFSURNAME:user.user.name.STAFFSURNAME,
