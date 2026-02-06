@@ -160,7 +160,7 @@
                                                     <template v-for="(h, ind) in products_Tab2" :key="ind">
                                                         <tr>
                                                             <td style="text-align: left;" colspan="10">
-                                                                <b style="color: blue;">{{ h.id }}. {{ h.nameH }}</b> 
+                                                                <b style="color: blue;">{{ h.h_no }}. {{ h.nameH }}</b> 
                                                             </td> 
                                                             <td class="text-center" style="color: blue;"> <b>{{ h.p01_weight??0 }}%</b></td>
                                                             <td></td>

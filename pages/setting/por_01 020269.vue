@@ -22,23 +22,23 @@
               <Button
                 icon="pi pi-search"
                 severity="help"
-                class="mb-2 mr-6"
+                class="mb-2 mr-4"
                 label="เลือกข้อมูลแบบประเมิน ป.01"
                 @click="OpenDialogP01"
               />
               <Button
                 icon="pi pi-plus"
                 severity="info"
-                class="mb-2 mr-6"
+                class="mb-2 mr-4"
                 label="เพิ่มข้อมูลแบบประเมิน"
                 @click="OpenDialogAdd"
-              /> 
-              <Button
+              />
+               <Button
                 icon="pi pi-copy"
                 severity="primary"
-                class="mb-2 mr-6"
-                label="คัดลอกข้อมูลแบบประเมิน"
-                @click="copyEvaluationData"
+                class="mb-2 mr-4"
+                label="คัดลอกแบบประเมิน"
+                @click="copyEvaluationDatap01"
               />
             </div>
           </div>
@@ -200,7 +200,14 @@
 
     <!-- เลือกข้อมูลแบบประเมิน ป.01 -->
     <Dialog
-      header="จัดการแบบ ป01" maximizable v-model:visible="DialogAddP01" :breakpoints="{ '960px': '75vw' }" :style="{ width: '90vw' }" :modal="true" position="top" > 
+      header="จัดการแบบ ป01"
+      maximizable
+      v-model:visible="DialogAddP01"
+      :breakpoints="{ '960px': '75vw' }"
+      :style="{ width: '90vw' }"
+      :modal="true"
+      position="top"
+    >
       <form>
         <div class="p-fluid formgrid grid">
           <div class="field col-12 md:col-12">
@@ -411,152 +418,6 @@
       </template>
     </Dialog>
 
- 
-    <!-- คัดลอกข้อมูลแบบประเมิน -->
-    <Dialog header="คัดลอกข้อมูลแบบประเมิน ป01" v-model:visible="DialogCopy" :modal="true" :dismissableMask="true" :draggable="false" :breakpoints="{ '960px': '75vw' }" :style="{ width: '95vw' }" >
-      <div class="copy-dialog">
-        <div class="grid align-items-start">
-          <div class="col-12 md:col-8">
-            <div class="copy-title">
-              <div class="copy-title-main">เลือกปีงบประมาณและรอบประเมินที่ต้องการคัดลอก</div>
-            </div>
-            <div class="copy-note">
-              * เลือกปี/รอบที่เคยบันทึกแบบ ป01 ไว้ แล้วคัดลอกมาใช้ใน
-              ปี {{ dataPor.d_date }} รอบที่ {{ dataPor.evalua }}
-            </div>
-          </div> 
-          <div class="col-12 md:col-4">
-            <label class="copy-dd-label">เลือกรอบประเมินที่ต้องการคัดลอก</label>
-            <Dropdown v-model="selectedEvalRound" :options="evalRoundOptions" optionLabel="label" placeholder="เลือกรอบ" class="w-full" :showClear="true" :disabled="loadingRounds" />
-          </div>
-        </div> 
-        <!-- โหลดรอบ -->
-        <div v-if="loadingRounds" class="copy-loading">
-          <i class="pi pi-spin pi-spinner mr-2"></i> กำลังโหลดข้อมูล...
-        </div>
-
-        <div v-else-if="!evalRounds || evalRounds.length === 0" class="copy-empty">
-          ไม่พบรอบประเมินที่สามารถคัดลอกได้
-        </div> 
-        <!-- เมื่อเลือกรอบแล้ว ให้โหลดรายการต้นทาง -->
-        <div v-if="selectedEvalRound" class="mt-3">
-          <div v-if="loadingCopyItems" class="copy-loading">
-            <i class="pi pi-spin pi-spinner mr-2"></i> กำลังโหลดรายการต้นทาง...
-          </div>
-
-          <div v-else-if="!products_personCopy || products_personCopy.length === 0" class="copy-empty">
-            ไม่พบข้อมูลที่เคยบันทึกไว้ในรอบที่เลือก
-          </div> 
-          <div v-else>
-            <div class="mb-2" style="display:flex; gap:.75rem; align-items:center;">
-              <Checkbox v-model="selectAllCopy" @change="toggleSelectAllCopy" />
-              <span style="font-weight:600;">เลือกทั้งหมด</span>
-
-              <span style="margin-left:auto; color:#666;">
-                เลือกแล้ว {{ checkboxValueCopy.length }} รายการ
-              </span>
-            </div>
-
-            <table class="table">
-              <thead>
-                <tr>
-                  <th rowspan="2" style="width: 9%;">ตัวเลือก</th>
-                  <th rowspan="2" style="width: 20%;">(1) กิจกรรม / โครงการ / งาน</th>
-                  <th rowspan="2" style="width: 24%;">(2) ตัวชี้วัด / เกณฑ์การประเมิน</th>
-                  <th colspan="5" style="width: 15%;">(3) ระดับค่าเป้าหมาย</th>
-                  <th rowspan="2" style="width: 7%;">(4) คะแนน</th>
-                  <th rowspan="2" style="width: 10%;">(5) น้ำหนัก</th>
-                  <th rowspan="2" style="width: 10%;">(6) ถ่วงน้ำหนัก</th>
-                </tr>
-                <tr>
-                  <th>1</th><th>2</th><th>3</th><th>4</th><th>5</th>
-                </tr>
-              </thead>
-
-              <tbody>
-                <template v-for="(h, hi) in products_personCopy" :key="hi">
-                   <tr>
-                    <td style="text-align:left" colspan="5">
-                      <b style="color: blue;">ต้นทาง: {{ h.h_no }}. {{ h.nameH }}</b>
-                    </td> 
-                    <td colspan="6" style="text-align:left">
-                      <span style="font-weight:600;">ย้ายไปอยู่ใต้ (ปีปัจจุบัน):</span>
-                      <Dropdown v-model="mapH[h.h_id]" :options="targetHOptions" optionLabel="nameH" optionValue="id" placeholder="เลือก nameH ปลายทาง" class="w-full" :showClear="true" />
-                    </td>
-                  </tr>
-
-                  <tr
-                    v-for="(subP01, idx) in h.subP01s"
-                    :key="subP01.p_id"
-                    style="vertical-align: baseline;"
-                  >
-                    <td class="text-center">
-                      <Checkbox :value="subP01.p_id" v-model="checkboxValueCopy" />
-                    </td>
-
-                    <td style="text-align:left">
-                      {{ subP01.p_no }} {{ subP01.p_subject }}
-                    </td>
-
-                    <td style="text-align:left">
-                      <b>ตัวชี้วัดที่ {{ idx + 1 }} {{ subP01.p_subject }}</b>
-                      <div
-                        v-for="(it, i2) in subP01.subITems"
-                        :key="i2"
-                        style="padding-left: 8px; margin-bottom: 5px;"
-                      >
-                        <span v-if="it.ind_no != 0">
-                          <b>ระดับ {{ it.ind_no }}</b> {{ it.ind_Items }}
-                        </span>
-                        <span v-else>
-                          <b>{{ it.ind_Items }}</b>
-                        </span>
-                      </div>
-                    </td>
-
-                    <td class="text-center"><b v-if="subP01.p_target == 1">&#10003;</b></td>
-                    <td class="text-center"><b v-if="subP01.p_target == 2">&#10003;</b></td>
-                    <td class="text-center"><b v-if="subP01.p_target == 3">&#10003;</b></td>
-                    <td class="text-center"><b v-if="subP01.p_target == 4">&#10003;</b></td>
-                    <td class="text-center"><b v-if="subP01.p_target == 5">&#10003;</b></td>
-
-                    <td class="text-center">{{ safeNumber(subP01.p_score) }}</td>
-                    <td class="text-center">{{ safeNumber(subP01.p_weight) }}%</td>
-                    <td class="text-center">
-                      {{ ((safeNumber(subP01.p_score) * safeNumber(subP01.p_weight)) / 100).toFixed(2) }}
-                    </td>
-                  </tr>
-                </template>
-              </tbody>
-            </table> 
-            <div class="grid mt-2 align-items-center">
-              <div class="col-12 md:col-6">
-                <div style="display:flex; gap:.75rem; align-items:center;">
-                  <Checkbox v-model="overwriteCopy" :binary="true" />
-                  <span>ทับข้อมูลปลายทางก่อนคัดลอก</span>
-                </div>
-              </div>
-
-              <!-- <div class="col-12 md:col-6">
-                <label class="copy-dd-label mt-2">
-                  **กรุณา** เลือกประเภทภาระงาน ของปีปัจจุบัน
-                </label>
-                  <Dropdown v-model="selectedTargetH" :options="targetHOptions" optionLabel="nameH" optionValue="id" placeholder="เลือก ประเภทภาระงาน ปลายทาง" class="w-full" :showClear="true" :disabled="loadingTargetH" />
-              </div> -->
-            </div>
-          </div>
-        </div>
-      </div> 
-      <template #footer>
-        <div class="copy-footer">
-          <Button label="บันทึก" icon="pi pi-check" class="p-button-success" :disabled=" !selectedEvalRound || loadingRounds || loadingCopyItems || checkboxValueCopy.length === 0 || !selectedTargetH "  @click="confirmCopyEvaluation" />
-          <Button label="ยกเลิก" icon="pi pi-times" severity="danger" @click="cancelDialogcopy" />
-        </div>
-      </template>
-    </Dialog> 
-    <!-- จบการคัดลอกข้อมูลแบบประเมิน -->
-
-
     <!-- แก้ไขข้อมูลเกณฑ์การประเมิน -->
     <Dialog
       header="แก้ไขข้อมูลเกณฑ์การประเมิน"
@@ -610,39 +471,14 @@ export default {
     return {
       staffid_Main: null,
       facid_Main: null,
-      groupid_Main: null,
-
-      currentDate: new Date().toISOString().split("T")[0],
-
+      groupid_Main: null, 
+      currentDate: new Date().toISOString().split("T")[0], 
       products_personX: [],
-      products_person: [],
-
+      products_person: [], 
       checkboxValue: [],
-      selectAll: false,
-
+      selectAll: false, 
       DialogAdd: false,
       DialogAddP01: false,
-
-      DialogAddcopy: false,
-
-      DialogCopy: false,
-      evalRounds: [],
-      selectedEvalRound: null,
-      loadingRounds: false,
-
-      products_personCopy: [],     // รายการต้นทางที่โหลดมาโชว์
-      checkboxValueCopy: [],       // p_id ที่เลือกคัดลอก
-      selectAllCopy: false,
-      loadingCopyItems: false,
-      overwriteCopy: true,  
-
-      //  nameH ของปี/รอบปัจจุบัน (ปลายทาง)
-      targetHOptions: [],
-      loadingTargetH: false,
-      selectedTargetH: null,   // เลือกปลายทางแบบรวม (ถ้าต้องการ) 
-      mapH: {},
-
-
 
       // Dialog add/edit
       text_edt: null,
@@ -661,12 +497,18 @@ export default {
       text_weight: null,
       text_search_no: null,
       text_search: null,
-      products_list: [],
-
+      products_list: [], 
       // edit list
       DialogEditList: false,
       text_search_noEdit: null,
       text_searchEdit: null,
+
+      // คัดลอกรอบประเมิน
+      DialogCopy: false,
+      evalRounds: [],
+      selectedEvalRound: null,
+
+
     };
   },
 
@@ -708,29 +550,7 @@ export default {
         }
       },
       immediate: true,
-    }, 
-
-    selectedEvalRound: {
-      handler(val) {
-        if (!val) {
-          this.products_personCopy = [];
-          this.checkboxValueCopy = [];
-          this.selectAllCopy = false;
-          return;
-        }
-        this.loadCopyItems();
-      },
-      deep: true,
     },
-
-    // ✅ เพิ่มใหม่: sync ปุ่มเลือกทั้งหมด
-    checkboxValueCopy(newVal) {
-      const totalItems = (this.products_personCopy || [])
-        .flatMap(h => h.subP01s || []).length;
-      this.selectAllCopy = totalItems > 0 && newVal.length === totalItems;
-    },
-
-
   },
 
   computed: {
@@ -772,19 +592,6 @@ export default {
 
       return total.toFixed(2);
     },
-    evalRoundOptions() {
-      return (this.evalRounds || []).map((r) => {
-        const evalua = String(r.evalua);
-        const year = String(r.year);
-
-        return {
-          ...r,
-          label: `ปี ${year} | รอบที่ ${evalua} (${this.getRoundDesc(evalua)})`,
-        };
-      });
-    },
-
-
   },
 
   methods: {
@@ -814,7 +621,7 @@ export default {
       this.groupid_Main = groupid_Main;
     },
 
-    async showDataPerson() {
+    showDataPerson() {
       if (!this.dataPor || !this.dataPor.d_date || !this.dataPor.evalua) return;
 
       axios
@@ -923,19 +730,122 @@ export default {
       this.selectDataH();
     },
 
-     OpenDialogAddcopy() {
-      this.DialogAddcopy = true;
-      this.text_edt = null;
-      this.dropdownItemH = null;
-      this.text_no = null;
-      this.text_name = null;
-      this.dropdownItemTarget = null;
-      this.text_weight = null;
-      this.text_search_no = null;
-      this.text_search = null;
-      this.products_list = [];
-      this.selectDataH();
+  // เปิด Dialog คัดลอกรอบประเมิน
+    async copyEvaluationDatap01() {
+      try {
+        // โหลดรอบที่คัดลอกได้ (ของ staff คนนี้เท่านั้น)
+        const res = await axios.post("http://127.0.0.1:8000/api/getEvalRoundsForCopyp01", {
+          fac_id: this.dataPor.fac_id,
+          year_id: this.dataPor.d_date,
+          evalua: this.dataPor.evalua,
+          staff_id: this.staffid_Main, // ✅ สำคัญ
+        });
+
+        this.evalRounds = res.data || [];
+        this.selectedEvalRound = null;
+
+        const toYear = Number(this.dataPor.d_date);
+        const toEval = Number(this.dataPor.evalua);
+
+        // auto: ปีเดียวกัน รอบก่อนหน้า
+        const auto = this.evalRounds.find(r =>
+          Number(r.year) === toYear && Number(r.evalua) === (toEval - 1)
+        );
+
+        if (auto) {
+          // ถ้าปลายทางมีข้อมูลแล้ว ถามก่อนว่าจะทับไหม
+          const hasData = (this.products_personX || []).length > 0;
+
+          let overwrite = false;
+          if (hasData) {
+            const r = await Swal.fire({
+              title: "มีข้อมูลอยู่แล้ว",
+              text: "ต้องการคัดลอกทับข้อมูลเดิมของรอบนี้หรือไม่?",
+              icon: "warning",
+              showCancelButton: true,
+              confirmButtonText: "ทับข้อมูล",
+              cancelButtonText: "ยกเลิก",
+            });
+            if (!r.isConfirmed) return;
+            overwrite = true;
+          }
+
+          await this.copyFromRound(auto, overwrite);
+          return;
+        }
+
+        // ถ้าไม่เจอ auto -> เปิด Dialog ให้เลือกเอง
+        this.DialogCopy = true;
+
+      } catch (error) {
+        console.error("getEvalRoundsForCopyp01 error:", error);
+        Swal.fire("ผิดพลาด", "ไม่สามารถโหลดข้อมูลปี/รอบประเมินได้", "error");
+      }
     },
+
+    async copyFromRound(round, overwrite = false) {
+      try {
+        await axios.post("http://127.0.0.1:8000/api/copyDataP01FromRoundp01", {
+          fac_id: this.dataPor.fac_id,
+          staff_id: this.staffid_Main,
+
+          from_year: round.year,
+          from_evalua: round.evalua,
+
+          to_year: this.dataPor.d_date,
+          to_evalua: this.dataPor.evalua,
+
+          overwrite,
+        });
+
+        this.DialogCopy = false;
+        this.selectedEvalRound = null;
+
+        // ✅ รีเฟรชให้แสดงทันที
+        await this.showDataPerson();
+
+        Swal.fire("สำเร็จ", "คัดลอกแบบประเมิน ป01 เรียบร้อยแล้ว", "success");
+      } catch (error) {
+        console.error("copyDataP01FromRoundp01 error:", error);
+        Swal.fire("ผิดพลาด", "ไม่สามารถคัดลอกข้อมูลได้", "error");
+      }
+    },
+
+    async confirmCopyEvaluation() {
+      if (!this.selectedEvalRound) {
+        Swal.fire("ยังไม่ได้เลือก", "กรุณาเลือกรอบที่ต้องการคัดลอก", "warning");
+        return;
+      }
+
+      // ถามทับถ้ามีข้อมูลแล้ว
+      let overwrite = false;
+      const hasData = (this.products_personX || []).length > 0;
+      if (hasData) {
+        const r = await Swal.fire({
+          title: "มีข้อมูลอยู่แล้ว",
+          text: "ต้องการคัดลอกทับข้อมูลเดิมของรอบนี้หรือไม่?",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonText: "ทับข้อมูล",
+          cancelButtonText: "ยกเลิก",
+        });
+        if (!r.isConfirmed) return;
+        overwrite = true;
+      }
+
+      await this.copyFromRound(this.selectedEvalRound, overwrite);
+    },
+    cancelDialogcopy() {
+      this.DialogCopy = false;
+      this.selectedEvalRound = null;
+    },
+
+
+
+
+
+
+
 
     selectDataH() {
       axios
@@ -1064,9 +974,6 @@ export default {
     cancelDialog() {
       this.DialogAdd = false;
     },
-    cancelDialogcopy() {
-      this.DialogAddcopy = false;
-    },
 
     async editDatax(data) {
       try {
@@ -1164,194 +1071,6 @@ export default {
       } 
       return errors;
     },
-
-    isSelectedRound(round) {
-      if (!this.selectedEvalRound) return false;
-      return (
-        String(this.selectedEvalRound.year) === String(round.year) &&
-        String(this.selectedEvalRound.evalua) === String(round.evalua)
-      );
-    },
-
-    getRoundDesc(evalua) {
-      const round = parseInt(evalua, 10);
-      if (round === 1) return "วันที่ 1 กันยายน ถึง วันที่ 28/29 กุมภาพันธ์";
-      if (round === 2) return "วันที่ 1 มีนาคม ถึง วันที่ 31 สิงหาคม";
-      return "";
-    },
-
-    // เปิด Dialog + โหลดรอบที่สามารถคัดลอกได้
-    copyEvaluationData() {
-      this.DialogCopy = true;
-      this.selectedEvalRound = null;
-      this.loadingRounds = true;
-
-      this.loadTargetHOptions();
-
-      axios
-        .post("http://127.0.0.1:8000/api/getEvalRoundsForCopy", {
-          staff_id: this.staffid_Main,      // แนะนำส่งไปด้วย จะได้ดึงเฉพาะของคนนี้
-          fac_id: this.dataPor.fac_id,
-          year_id: this.dataPor.d_date,     // ปลายทาง
-          evalua: this.dataPor.evalua,      // ปลายทาง
-        })
-        .then((res) => {
-          this.evalRounds = Array.isArray(res.data) ? res.data : [];
-        })
-        .catch((error) => {
-          console.error("getEvalRoundsForCopy error:", error);
-          Swal.fire("ผิดพลาด", "ไม่สามารถโหลดข้อมูลปี/รอบประเมินได้", "error");
-          this.evalRounds = [];
-        })
-        .finally(() => {
-          this.loadingRounds = false;
-        });
-    },
-
-    // ยืนยันคัดลอก
-    async confirmCopyEvaluation() {
-      if (!this.selectedEvalRound) {
-        Swal.fire("ยังไม่ได้เลือก", "กรุณาเลือกปี/รอบต้นทาง", "warning");
-        return;
-      }
-      if (!this.checkboxValueCopy || this.checkboxValueCopy.length === 0) {
-        Swal.fire("ยังไม่ได้เลือกข้อ", "กรุณาเลือกข้อที่จะคัดลอกอย่างน้อย 1 ข้อ", "warning");
-        return;
-      }
-
-      const fromYear = this.selectedEvalRound.year;
-      const fromEvalua = this.selectedEvalRound.evalua;
-      const toYear = this.dataPor.d_date;
-      const toEvalua = this.dataPor.evalua;
-
-      if (String(fromYear) === String(toYear) && String(fromEvalua) === String(toEvalua)) {
-        Swal.fire("เลือกซ้ำ", "คุณเลือกปี/รอบเดียวกับปลายทาง กรุณาเลือกต้นทางใหม่", "warning");
-        return;
-      }
-
-      const missingMap = (this.products_personCopy || [])
-        .filter(h => (h.subP01s || []).some(p => this.checkboxValueCopy.includes(p.p_id)))
-        .some(h => !this.mapH[h.h_id]);
-
-      if (missingMap) {
-        Swal.fire("ยังไม่เลือก nameH ปลายทาง", "กรุณาเลือก nameH ปลายทางให้ครบทุกกลุ่ม", "warning");
-        return;
-      }
-
-
-
-      try {
-        await axios.post("http://127.0.0.1:8000/api/copySelectedP01Items", {
-          staff_id: this.staffid_Main,
-          fac_id: this.dataPor.fac_id,
-          from_year: fromYear,
-          from_evalua: fromEvalua,
-          to_year: toYear,
-          to_evalua: toEvalua,
-          selected_pids: this.checkboxValueCopy,
-          overwrite: this.overwriteCopy,
-          target_h_id: this.selectedTargetH, 
-          mapH: this.mapH, 
-        });
-
-        this.DialogCopy = false;
-        await this.showDataPerson();
-
-        Swal.fire({
-          icon: "success",
-          title: "คัดลอกสำเร็จ!",
-          text: `คัดลอกจาก ปี ${fromYear} รอบที่ ${fromEvalua} → ปี ${toYear} รอบที่ ${toEvalua}`,
-        });
-      } catch (e) {
-        console.error(e);
-        Swal.fire("ผิดพลาด", "ไม่สามารถคัดลอกข้อมูลได้", "error");
-      }
-    },
-
-     
-    cancelDialogcopy() {
-      // ปิด Dialog คัดลอก (DialogCopy)
-      this.DialogCopy = false;
-      this.selectedEvalRound = null;
-    },
-
-    async loadCopyItems() {
-      this.loadingCopyItems = true;
-      this.products_personCopy = [];
-      this.checkboxValueCopy = [];
-      this.selectAllCopy = false; 
-      try {
-        const res = await axios.post("http://127.0.0.1:8000/api/getP01ItemsForCopy", {
-          staff_id: this.staffid_Main,
-          fac_id: this.dataPor.fac_id,
-          from_year: this.selectedEvalRound.year,
-          from_evalua: this.selectedEvalRound.evalua,
-        });
-
-        this.products_personCopy = Array.isArray(res.data) ? res.data : [];
-
-        this.mapH = {};
-          (this.products_personCopy || []).forEach((h, idx) => { 
-            if (this.selectedTargetH) {
-              this.mapH[h.h_id] = this.selectedTargetH;
-              return;
-            } 
-            const t = this.targetHOptions[idx];
-            if (t) this.mapH[h.h_id] = t.id;
-        });
-
-      } catch (e) {
-        console.error(e);
-        Swal.fire("ผิดพลาด", "โหลดข้อมูลต้นทางไม่สำเร็จ", "error");
-      } finally {
-        this.loadingCopyItems = false;
-      }
-    },
-    toggleSelectAllCopy() {
-      if (!this.products_personCopy) return;
-
-      if (this.selectAllCopy) {
-        this.checkboxValueCopy = this.products_personCopy.flatMap(h =>
-          (h.subP01s || []).map(p => p.p_id)
-        );
-      } else {
-        this.checkboxValueCopy = [];
-      }
-    },
-
-    async loadTargetHOptions() {
-      this.loadingTargetH = true;
-      try {
-        const res = await axios.post("http://127.0.0.1:8000/api/selectDataPersonH", {
-          fac_id: this.dataPor.fac_id,
-          year_id: this.dataPor.d_date,   //  ปีปัจจุบัน (ปลายทาง)
-          evalua: this.dataPor.evalua,    //  รอบปัจจุบัน (ปลายทาง)
-        });
-        this.targetHOptions = Array.isArray(res.data) ? res.data : [];
- 
-        if (!this.selectedTargetH && this.targetHOptions.length > 0) {
-          this.selectedTargetH = this.targetHOptions[0].id;
-        }
-      } catch (e) {
-        this.targetHOptions = [];
-      } finally {
-        this.loadingTargetH = false;
-      }
-    },
-
-
-
-
-
-
-
-
-
-
-
-
-
-
  
   },
 };
@@ -1400,78 +1119,4 @@ label {
 .mr-4 {
   margin-right: 1rem;
 }
-.copy-dialog {
-  padding: 0.25rem 0.5rem;
-}
-
-.copy-title {
-  margin-bottom: 0.75rem;
-}
-.copy-title-main {
-  font-weight: 700;
-  font-size: 1.05rem;
-}
-
-.copy-loading,
-.copy-empty {
-  padding: 1rem;
-  border-radius: 10px;
-  background: #f7f7f7;
-  color: #555;
-}
-
-.copy-list {
-  margin-top: 0.5rem;
-}
-
-.copy-item {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.75rem;
-  padding: 0.75rem 0.75rem;
-  border-radius: 10px;
-  cursor: pointer;
-  transition: 0.15s ease;
-}
-
-.copy-item:hover {
-  background: #f5f8ff;
-}
-
-.copy-item.active {
-  background: #eef6ff;
-  outline: 1px solid rgba(59, 130, 246, 0.35);
-}
-
-.copy-label {
-  cursor: pointer;
-  user-select: none;
-}
-
-.copy-label-line1 {
-  font-size: 0.98rem;
-}
-
-.copy-label-desc {
-  color: #555;
-  margin: 0 0.35rem;
-}
-
-.copy-note {
-  margin-top: 0.75rem;
-  font-size: 0.9rem;
-  color: #6b7280;
-}
-
-.copy-footer {
-  display: flex;
-  justify-content: flex-end;
-  gap: 0.5rem;
-}
-.copy-dd-label{
-  display:block;
-  font-weight:600;
-  margin-bottom: .35rem;
-}
-
 </style>

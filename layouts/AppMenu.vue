@@ -27,18 +27,18 @@ const allMenus = ref([
     //     items: [{ label: 'ประวัติการประเมิน', icon: 'pi pi-fw pi-clock', to: '/setting/history' }]
     // },
 
-    {
-        id: 'torday',
-        label: 'แบบบันทึกภาระงานประจำวัน',
-        items: [{ label: 'แบบบันทึกภาระงานประจำวัน', icon: 'pi pi-fw pi-calendar', to: '/setting/tordayplannew' }]
-    },
+    // {
+    //     id: 'torday',
+    //     label: 'แบบบันทึกภาระงานประจำวัน',
+    //     items: [{ label: 'แบบบันทึกภาระงานประจำวัน', icon: 'pi pi-fw pi-calendar', to: '/setting/tordayplannew' }]
+    // },
     {
         id: 'executive',
         label: 'ผู้บริหาร',
         items: [
             { label: 'ตรวจติดตามแบบประเมิน', icon: 'pi pi-bell', to: '/setting/tracking' },
-            { label: 'ตรวจติดตามภาระงานประจำวัน', icon: 'pi pi-file', to: '/setting/checkedialy' },
-            { label: 'รายงานภาพรวมโครงการ', icon: 'pi pi-chart-bar', to: '/setting/projectoverview' }
+            //{ label: 'ตรวจติดตามภาระงานประจำวัน', icon: 'pi pi-file', to: '/setting/checkedialy' },
+            //{ label: 'รายงานภาพรวมโครงการ', icon: 'pi pi-chart-bar', to: '/setting/projectoverview' }
 
         ],
          //items: [{ label: 'ตรวจติดตามภาระงานประจำวัน', icon: 'pi pi-bell', to: '/setting/checkedialy' }]
@@ -50,18 +50,18 @@ const allMenus = ref([
             { label: 'จัดการ รอบประเมิน', icon: 'pi pi-fw pi-calendar', to: '/setting/setting_date' },
             { label: 'ตรวจสอบ แบบประเมิน', icon: 'pi pi-fw pi-star', to: '/setting/checkevaluate' },
             { label: 'เพิ่มสิทธิ์การใช้งาน', icon: 'pi pi-fw pi-user-plus', to: '/setting/setting_user' },
-            { label: 'จัดการสิทธิ์บุคคล', icon: 'pi pi-fw pi-user', to: '/setting/setting_useradmin' }, 
+            //{ label: 'จัดการสิทธิ์บุคคล', icon: 'pi pi-fw pi-user', to: '/setting/setting_useradmin' }, 
         ]
     }, 
 
       
-    {
-        id: 'Ad',
-        label: 'คำนวนค่างาน',
-        items: [ 
-            { label: 'ตรวจสอบค่างาน', icon: 'pi pi-calculator', to: '/setting/workcalculate' }, 
-        ]
-    },
+    // {
+    //     id: 'Ad',
+    //     label: 'คำนวนค่างาน',
+    //     items: [ 
+    //         { label: 'ตรวจสอบค่างาน', icon: 'pi pi-calculator', to: '/setting/workcalculate' }, 
+    //     ]
+    // },
     {
         id: 'manual',
         label: 'คู่มือการใช้งานระบบ'

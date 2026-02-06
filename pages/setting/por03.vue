@@ -218,6 +218,8 @@
                                             type="text" 
                                             placeholder="0" 
                                             autocomplete="off" 
+                                            :min="0"
+                                            :max="5"
                                             showButtons
                                             :disabled="currentDate > dataPor.d_enddate" 
                                         />
@@ -305,12 +307,12 @@
                     </div>
                 </div>
                 <DataTable :value="products_Tab3" :rows="10" :paginator="true" responsiveLayout="scroll" dataKey="id">
-                    <Column field="p04_re1" header="ความรู้/ทักษะ/สมรรถนะ ที่ต้องการพัฒนา" style="width: 35%">
+                    <Column field="p04_re1" header="ความรู้/ทักษะ/สมรรถนะ ที่ต้องการพัฒนา" style="width: 25%">
                         <template #body="slotProps">
                             {{ slotProps.data.p04_re1 }}
                         </template>
                     </Column>
-                    <Column field="p04_re2" header="วิธีการพัฒนา" style="width: 35%">
+                    <Column field="p04_re2" header="วิธีการพัฒนา" style="width: 25%">
                         <template #body="slotProps">
                             {{ slotProps.data.p04_re2 }}
                         </template>
@@ -320,14 +322,20 @@
                             {{ slotProps.data.p04_re3 }}
                         </template>
                     </Column>
-                    <Column style="text-align: center; width: 10%">
+                    <!-- <Column style="text-align: center; width: 10%">
                         <template #body="slotProps">
+                            <Button severity="danger" icon="pi pi-trash" class="p-button-text" outlined rounded @click="DeleteRegislick(slotProps.data.id)" />
+                        </template>
+                    </Column> -->
+                    <Column style="text-align: center; width: 20%">
+                        <template #body="slotProps">
+                            <Button severity="primary" icon="pi pi-pencil" class="p-button-text" outlined rounded @click="openEditP04(slotProps.data)"/>
+                            &nbsp;
                             <Button severity="danger" icon="pi pi-trash" class="p-button-text" outlined rounded @click="DeleteRegislick(slotProps.data.id)" />
                         </template>
                     </Column>
                 </DataTable>  
-            </div>
-
+            </div> 
         </div>
     </div>
        
@@ -501,9 +509,12 @@
                     </div>  
                 </div> 
             </form>
-                <template #footer> 
+                <!-- <template #footer> 
                     <Button label="ตกลง"  class="mb-2 mr-2" severity="contrast" @click="DialogDoc = false" />
-                </template>
+                </template> -->
+                <template #footer> 
+                    <Button label="ตกลง" class="mb-2 mr-2" severity="contrast" @click="closeDocDialogWithSuccess" />
+                </template>  
         </Dialog>
 
          <!-- แก้ไขชื่อหลักฐานเชิงปนะจักษ์ -->
@@ -555,6 +566,29 @@
                     <Button label="ยกเลิก" icon="pi pi-times" class="mb-2 mr-2" severity="danger" @click="DialogScore = false" />
                 </template>
         </Dialog> 
+
+        <!-- /*============= แก้ไขสมรรถนะ =============*/ -->  
+         <Dialog  header="แก้ไขข้อมูลทักษะที่ต้องการพัฒนา" v-model:visible="DialogEditP04" :modal="true" :style="{ width: '70vw' }" position="top" >
+            <div class="p-fluid formgrid grid">
+                <div class="field col-12 md:col-12">
+                    <label>ความรู้/ทักษะ/สมรรถนะ ที่ต้องการพัฒนา</label>
+                        <Textarea v-model="editP04_re1" rows="4" />
+                </div> 
+                <div class="field col-12 md:col-12">
+                    <label>วิธีการพัฒนา</label>
+                        <Textarea v-model="editP04_re2" rows="4" />
+                </div>
+
+                <div class="field col-12 md:col-12">
+                    <label>ช่วงเวลาที่ต้องการพัฒนา</label>
+                        <Textarea v-model="editP04_re3" rows="4" />
+                </div>
+            </div> 
+            <template #footer>
+                <Button label="บันทึก" icon="pi pi-check" class="mb-2 mr-2" @click="saveEditP04" />
+                <Button label="ยกเลิก" icon="pi pi-times" class="mb-2 mr-2" severity="danger" @click="DialogEditP04 = false" />
+            </template>
+        </Dialog> 
 </template> 
 <script>
 import { ref, onMounted } from 'vue';
@@ -582,8 +616,15 @@ import InputText from 'primevue/inputtext';
                 facid_Main: null,
                 groupid_Main: null, 
                 currentDate: new Date().toISOString().split('T')[0], 
+    /*=========== แก้ไขสมรรถนะ =============*/     
+                DialogEditP04: false,
+                editP04_id: null,
+                editP04_re1: null,
+                editP04_re2: null,
+                editP04_re3: null, 
 /*=========== 1.ผลสัมฤทธิ์ของงาน =============*/                
-            products_personP03: [], 
+                products_personP03: [], 
+                docSavedSuccess: false, 
             itemsBtu: (item) => [
                 {
                     label: 'รายงานการปฏิบัติราชการ',
@@ -1133,6 +1174,7 @@ import InputText from 'primevue/inputtext';
                 this.doc_name = null;
                 this.doc_link = null;
                 this.products_doc_p03 = []; 
+                this.docSavedSuccess = false;
                 this.Data_Doc();
             }, 
            handleFileChange(event) {
@@ -1216,6 +1258,7 @@ import InputText from 'primevue/inputtext';
                                     this.showDataP03();
                                     this.Data_Doc();
                                     this.resetFormFields();  // รีเซ็ตฟิลด์หลังจากบันทึกสำเร็จ
+
                                 })
                                 .catch(error => {
                                     console.error('Error:', error);
@@ -1247,6 +1290,14 @@ import InputText from 'primevue/inputtext';
                                     this.showDataP03();
                                     this.Data_Doc();
                                     this.resetFormFields();  // รีเซ็ตฟิลด์หลังจากบันทึกสำเร็จ
+                                    this.docSavedSuccess = true;
+                                    Swal.fire({
+                                        position: "top-end",
+                                        icon: "success",
+                                        title: "บันทึกหลักฐานสำเร็จ",
+                                        showConfirmButton: false,
+                                        timer: 1000
+                                    });
                                 })
                                 .catch(error => {
                                     console.error('Error:', error);
@@ -1297,39 +1348,88 @@ import InputText from 'primevue/inputtext';
                 }); 
             },
             // ลบรายงานผลการปฏิบัติราชการตามตัวชี้วัด/ เกณฑ์การประเมิน
-            async delDataDoc(data) {        
-            Swal.fire({
-                title: "คุณต้องการลบแบบ ป03 ใช่หรือไม่ ?",
-                text: "เมื่อคลิกปุ่ม Yes, delete it! ข้อมูลจะถูกลบทันที!",
-                icon: "warning",
-                showCancelButton: true,
-                confirmButtonColor: "#3085d6",
-                cancelButtonColor: "#d33",
-                confirmButtonText: "Yes, delete it!"
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    axios.post('   http://127.0.0.1:8000/api/delDocP03', {
-                        p01_id: data.p01_id
-                    }).then(res => { 
-                        this.showDataP03();
-                        this.Data_Doc();
-                        this.radioValue = 'doc';
-                        this.doc_no = null;
-                        this.doc_name = null;
-                        this.doc_link = null;
-                        this.$refs.upload.value = null;
 
-                        Swal.fire({
-                            title: "ลบข้อมูลเสร็จสิ้น!",
-                            text: "ข้อมูลของคุณถูกลบแล้ว",
-                            icon: "success"
-                        });
-                    }).catch(error => {
-                        console.error('Error:', error);
-                    }); 
+            // async delDataDoc(data) {        
+            //     Swal.fire({
+            //         title: "คุณต้องการลบแบบ ป03 ใช่หรือไม่ ?",
+            //         text: "เมื่อคลิกปุ่ม Yes, delete it! ข้อมูลจะถูกลบทันที!",
+            //         icon: "warning",
+            //         showCancelButton: true,
+            //         confirmButtonColor: "#3085d6",
+            //         cancelButtonColor: "#d33",
+            //         confirmButtonText: "Yes, delete it!"
+            //     }).then((result) => {
+            //         if (result.isConfirmed) {
+            //             axios.post('   http://127.0.0.1:8000/api/delDocP03', {
+            //                 p01_id: data.p01_id
+            //             }).then(res => { 
+            //                 this.showDataP03();
+            //                 this.Data_Doc();
+            //                 this.radioValue = 'doc';
+            //                 this.doc_no = null;
+            //                 this.doc_name = null;
+            //                 this.doc_link = null;
+            //                 this.$refs.upload.value = null;
+
+            //                 Swal.fire({
+            //                     title: "ลบข้อมูลเสร็จสิ้น!",
+            //                     text: "ข้อมูลของคุณถูกลบแล้ว",
+            //                     icon: "success"
+            //                 });
+            //             }).catch(error => {
+            //                 console.error('Error:', error);
+            //             }); 
+            //         }
+            //     }); 
+            // },
+            async delDataDoc(data) {
+                const result = await Swal.fire({
+                    title: "คุณต้องการลบแบบ ป03 ใช่หรือไม่ ?",
+                    text: "เมื่อคลิกปุ่ม Yes, delete it! ข้อมูลจะถูกลบทันที!",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#3085d6",
+                    cancelButtonColor: "#d33",
+                    confirmButtonText: "Yes, delete it!"
+                });
+
+                if (!result.isConfirmed) return;
+
+                try {
+                    await axios.post('http://127.0.0.1:8000/api/delDocP03', {
+                    p01_id: data.p01_id
+                    });
+
+                    // ✅ (ทางเลือก) เคลียร์ค่าที่แสดงในแถวทันที กัน ✓ ค้างระหว่างโหลด
+                    data.score = null;
+                    data.p01_score = null;
+
+                    await this.showDataP03();
+                    await this.Data_Doc();
+
+                    this.radioValue = 'doc';
+                    this.doc_no = null;
+                    this.doc_name = null;
+                    this.doc_link = null;
+                    if (this.$refs.upload) this.$refs.upload.value = null;
+
+                    await Swal.fire({
+                    title: "ลบข้อมูลเสร็จสิ้น!",
+                    text: "ข้อมูลของคุณถูกลบแล้ว",
+                    icon: "success"
+                    });
+
+                } catch (error) {
+                    console.error('Error:', error);
+                    Swal.fire("error", "เกิดข้อผิดพลาดในการลบข้อมูล!", "error");
                 }
-            }); 
             },
+ 
+
+
+
+
+            
             async mounted() {
                 const  { signIn, getSession, signOut } = await useAuth()
                 const user = await getSession();
@@ -1858,8 +1958,7 @@ import InputText from 'primevue/inputtext';
                 // ปิด Dialog หลังบันทึกข้อมูล
                 this.DialogEditListP03 = false;  
             },
-
-
+ 
             //// แก้ไขหลักฐานเชิงประจัก เฉพาะชื่อไฟล์ 
 
             EditDataDocFilename(data){
@@ -1988,7 +2087,91 @@ import InputText from 'primevue/inputtext';
                 if (parts.length <= 2) return activityText.trim(); 
                 return parts.slice(2).join(' ');
             },
- 
+
+            openEditP04(row) {
+                this.editP04_id = row.id;
+                this.editP04_re1 = row.p04_re1;
+                this.editP04_re2 = row.p04_re2;
+                this.editP04_re3 = row.p04_re3;
+                this.DialogEditP04 = true;
+                },
+
+            async saveEditP04() {
+                try {
+                    // ✅ เรียก API อัปเดต (คุณต้องมี endpoint ฝั่ง Laravel)
+                    const res = await axios.post('http://127.0.0.1:8000/api/updateEvaTab03xx', {
+                    id: this.editP04_id,
+                    p04_re1: this.editP04_re1,
+                    p04_re2: this.editP04_re2,
+                    p04_re3: this.editP04_re3
+                    });
+
+                    // ✅ อัปเดตในตารางทันที (ไม่ต้อง reload ทั้งหน้า)
+                    const idx = this.products_Tab3.findIndex(x => x.id === this.editP04_id);
+                    if (idx !== -1) {
+                    this.products_Tab3[idx].p04_re1 = this.editP04_re1;
+                    this.products_Tab3[idx].p04_re2 = this.editP04_re2;
+                    this.products_Tab3[idx].p04_re3 = this.editP04_re3;
+                    }
+
+                    this.DialogEditP04 = false;
+
+                    Swal.fire({
+                    position: "top-end",
+                    icon: "success",
+                    title: "แก้ไขข้อมูลสำเร็จ",
+                    showConfirmButton: false,
+                    timer: 1000
+                    });
+
+                } catch (error) {
+                    console.error(error);
+                    Swal.fire("error", "เกิดข้อผิดพลาดในการแก้ไขข้อมูล", "error");
+                }
+            }, 
+            confirmCloseDocDialog() {
+                // ถ้ามีข้อมูลในตาราง = ถือว่าบันทึกครบระดับหนึ่ง (หรือใช้ flag อย่างเดียวก็ได้)
+                const hasData = Array.isArray(this.products_doc_p03) && this.products_doc_p03.length > 0;
+
+                if (this.docSavedSuccess || hasData) {
+                    Swal.fire({
+                    icon: "success",
+                    title: "บันทึกข้อมูลสำเร็จ",
+                    text: "บันทึกหลักฐานเชิงประจักษ์เรียบร้อยแล้ว",
+                    confirmButtonText: "ตกลง"
+                    }).then(() => {
+                    this.DialogDoc = false;
+                    });
+                } else {
+                    // ถ้ายังไม่ได้บันทึกอะไรเลย จะปิดเลยหรือเตือนก็ได้
+                    Swal.fire({
+                    icon: "warning",
+                    title: "ยังไม่มีการบันทึก",
+                    text: "คุณยังไม่ได้บันทึกหลักฐาน ต้องการปิดหน้าต่างหรือไม่?",
+                    showCancelButton: true,
+                    confirmButtonText: "ปิดหน้าต่าง",
+                    cancelButtonText: "ยกเลิก"
+                    }).then((result) => {
+                    if (result.isConfirmed) {
+                        this.DialogDoc = false;
+                    }
+                    });
+                }
+            },
+            closeDocDialogWithSuccess() {
+                // 1) ปิด dialog ทันที
+                this.DialogDoc = false;
+
+                // 2) แจ้งเตือนหลังปิด (หน่วงนิดเดียวให้ dialog ปิดก่อน)
+                this.$nextTick(() => {
+                    Swal.fire({
+                    icon: "success",
+                    title: "บันทึกข้อมูลสำเร็จ",
+                    text: "บันทึกหลักฐานเชิงประจักษ์เรียบร้อยแล้ว",
+                    confirmButtonText: "ตกลง",
+                    });
+                });
+            }, 
         },
     } 
      

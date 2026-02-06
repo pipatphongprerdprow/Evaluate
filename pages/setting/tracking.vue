@@ -1260,6 +1260,7 @@ export default {
         },
 
         calcAchievement(item) {
+            console.log('calcAchievement: ', item);
             if (!item?.tb_tor?.persen) return '';
             const { wAch } = this.parsePersen(item.tb_tor.persen);
             const ach = parseFloat(item.tb_tor.achievement_score) || 0;
