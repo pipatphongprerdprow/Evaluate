@@ -81,12 +81,35 @@
               </tr>
 
               <tr v-for="(subP01, idx) in h.subP01sX" :key="idx" style="vertical-align: baseline;">
-                <td style="text-align: left;">
+                <!-- <td style="text-align: left;">
                   {{ subP01.p01_no }} {{ subP01.p01_subject }}
-                </td>
+                </td> -->
 
+                <!-- <td style="text-align:left;">
+                  <template v-for="(ln, i) in parseActivityText(subP01.p01_subject).lines" :key="i">
+                    <div :style="{ paddingLeft: ln.indent + 'px' }">
+                      <b v-if="ln.type === 'main'">{{ ln.text }}</b>
+                      <span v-else>• {{ ln.text }}</span>
+                    </div>
+                  </template>
+                </td> -->
+
+               <td style="text-align:left;">
+                  <template v-for="(ln, i) in parseActivityText(subP01.p01_subject).lines" :key="i"> 
+                    <div v-if="ln.type === 'main'" style="font-weight:700; margin-bottom:4px;">
+                      {{ ln.text }}
+                    </div>  
+                    <div v-else class="subline">
+                      <span class="subno">{{ ln.no }}</span>
+                      <span class="subtext">{{ ln.text }}</span>
+                    </div> 
+                  </template>
+                </td>
+ 
                 <td style="text-align: left;">
-                  <b>ตัวชี้วัดที่ {{ idx + 1 }} {{ subP01.p01_subject }}</b>
+                  <!-- <b>ตัวชี้วัดที่ {{ idx + 1 }} {{ subP01.p01_subject }}</b> -->
+                   <b>ตัวชี้วัดที่ {{ idx + 1 }} {{ getMainSubject(subP01.p01_subject) }}</b>
+
                   <div
                     v-for="(subIitem, idI) in subP01.subITems"
                     :key="idI"
@@ -101,41 +124,41 @@
                   </div>
                 </td>
 
-                <td style="vertical-align: middle;" class="text-center">
+                <td style="vertical-align: top;" class="text-center">
                   <b v-if="subP01.p01_target == 1">&#10003;</b>
                 </td>
-                <td style="vertical-align: middle;" class="text-center">
+                <td style="vertical-align: top;" class="text-center">
                   <b v-if="subP01.p01_target == 2">&#10003;</b>
                 </td>
-                <td style="vertical-align: middle;" class="text-center">
+                <td style="vertical-align: top;" class="text-center">
                   <b v-if="subP01.p01_target == 3">&#10003;</b>
                 </td>
-                <td style="vertical-align: middle;" class="text-center">
+                <td style="vertical-align: top;" class="text-center">
                   <b v-if="subP01.p01_target == 4">&#10003;</b>
                 </td>
-                <td style="vertical-align: middle;" class="text-center">
+                <td style="vertical-align: top;" class="text-center">
                   <b v-if="subP01.p01_target == 5">&#10003;</b>
                 </td>
 
-                <td style="vertical-align: middle;" class="text-center">
+                <td style="vertical-align: top;" class="text-center">
                   <div v-if="currentDate >= dataPor.d_scoringday">
                     {{ subP01.p01_score }}
                   </div>
                   <div v-else>0</div>
                 </td>
 
-                <td style="vertical-align: middle;" class="text-center">
+                <td style="vertical-align: top;" class="text-center">
                   {{ safeNumber(subP01.p01_weight) }}%
                 </td>
 
-                <td style="vertical-align: middle;" class="text-center">
+                <td style="vertical-align: top;" class="text-center">
                   <div v-if="currentDate >= dataPor.d_scoringday">
                     {{ ((safeNumber(subP01.p01_score) * safeNumber(subP01.p01_weight)) / 100).toFixed(2) }}
                   </div>
                   <div v-else>0.00</div>
                 </td>
-
-                <td style="vertical-align: middle;" class="text-center">
+                 <!-- middle ตรงกลาง -->
+                <td style="vertical-align: top;" class="text-center">
                   <div v-if="currentDate < dataPor.d_recordingday">
                     <SplitButton
                       label="เลือก"
@@ -323,10 +346,10 @@
               </div>
 
               <div class="field col-12 md:col-6">
-                <label for="text_name">ชื่อตัวชี้วัด</label>
+                <label for="text_name">ชื่อกิจกรรม / โครงการ / งาน</label>
                 <InputGroup>
                   <InputGroupAddon><i class="pi pi-book"></i></InputGroupAddon>
-                  <Textarea v-model="text_name" rows="1" placeholder="ชื่อตัวชี้วัด" autocomplete="off" />
+                  <Textarea v-model="text_name" rows="1" placeholder="ชื่อกิจกรรม / โครงการ / งาน" autocomplete="off" />
                 </InputGroup>
               </div>
 
@@ -354,9 +377,8 @@
                   />
                 </InputGroup>
               </div>
-            </div>
-
-            <hr /> 
+            </div> 
+            <!-- <hr /> 
             <div class="p-fluid formgrid grid">
               <div class="field col-12 md:col-12">
                 <label for="text_search_no">เกณฑ์การประเมิน</label>
@@ -366,51 +388,67 @@
                   <Button icon="pi pi-plus" label="เพิ่ม" severity="warning" @click.prevent="AddDatalist" />
                 </InputGroup>
               </div>
-            </div>
+            </div> --> 
 
+            <hr />
+              <div class="p-fluid formgrid grid"> 
+                <div class="field col-12">
+                  <div class="grid align-items-center"> 
+                    <div class="col-11">
+                      <label>
+                        เกณฑ์การประเมิน (เพิ่มได้สูงสุด 5 แถว แล้วกด “เพิ่ม”)
+                      </label>
+                    </div>  
+                    <div class="col-1 text-right">
+                      <Button icon="pi pi-plus" label="เพิ่มแถว" severity="info" :disabled="criteriaDrafts.length >= maxCriteriaRows" @click.prevent="addCriteriaRow" />
+                    </div>
+                    &nbsp;
+                  </div> 
+                   <div v-for="(row, idx) in criteriaDrafts" :key="idx" class="mb-3 grid align-items-center" >
+                    <div class="col-12 md:col-2">
+                      <InputText v-model.number="row.ind_no" type="number" placeholder="ระดับ" class="w-full" />
+                    </div> 
+                    <div class="col-12 md:col-9">
+                      <InputText v-model="row.ind_Items" placeholder="รายละเอียดเกณฑ์การประเมิน" class="w-full" />
+                    </div> 
+                    <div class="col-12 md:col-1 text-center">
+                      <Button icon="pi pi-trash" severity="danger" class="p-button-text" rounded outlined :disabled="criteriaDrafts.length === 1"  @click.prevent="removeCriteriaRow(idx)" />
+                    </div>
+                  </div>
+
+                  <div class="grid justify-content-center mt-3">
+                    <div class="col-12 md:col-1 text-center">
+                      <Button icon="pi pi-check" label="เพิ่ม" severity="warning" @click.prevent="commitCriteriaDrafts" class="w-full" />
+                    </div>
+                  </div> 
+                  <small class="text-500">
+                    ตอนนี้มี {{ criteriaDrafts.length }} / {{ maxCriteriaRows }} แถว
+                  </small>
+                </div>
+              </div> 
             <DataTable :value="products_list" :rows="10" :paginator="true" responsiveLayout="scroll" dataKey="id">
               <Column field="ind_no" header="ระดับ" style="width: 10%">
                 <template #body="Item">ระดับที่ {{ Item.data.ind_no }}</template>
-              </Column>
-
+              </Column> 
               <Column field="ind_Items" header="ชื่อตัวชี้วัด / เกณฑ์การประเมิน" style="text-align: left;width: 80%">
                 <template #body="Item">{{ Item.data.ind_Items }}</template>
-              </Column>
-
+              </Column> 
               <Column field="options" header="ตัวเลือก" style="text-align: center; width: 10%">
                 <template #body="Item">
-                  <Button
-                    style="text-align: center;"
-                    severity="primary"
-                    icon="pi pi-pencil"
-                    class="p-button-text"
-                    outlined
-                    rounded
-                    @click="EditRegislick(Item.data)"
-                  />
+                  <Button style="text-align: center;" severity="primary" icon="pi pi-pencil" class="p-button-text" outlined rounded @click="EditRegislick(Item.data)" />
                   &nbsp;
-                  <Button
-                    style="text-align: center;"
-                    severity="danger"
-                    icon="pi pi-trash"
-                    class="p-button-text"
-                    outlined
-                    rounded
-                    @click="DeleteRegislick(Item.data.ind_no)"
-                  />
+                  <Button style="text-align: center;" severity="danger" icon="pi pi-trash" class="p-button-text" outlined rounded @click="DeleteRegislick(Item.data.ind_no)" />
                 </template>
               </Column>
             </DataTable>
           </form>
         </div>
-      </form>
-
+      </form> 
       <template #footer>
         <Button label="บันทึก" icon="pi pi-check" class="mb-2 mr-2" @click="saveDatax" />
         <Button label="ยกเลิก" icon="pi pi-times" class="mb-2 mr-2" severity="danger" @click="cancelDialog" />
       </template>
     </Dialog>
-
  
     <!-- คัดลอกข้อมูลแบบประเมิน -->
     <Dialog header="คัดลอกข้อมูลแบบประเมิน ป01" v-model:visible="DialogCopy" :modal="true" :dismissableMask="true" :draggable="false" :breakpoints="{ '960px': '75vw' }" :style="{ width: '95vw' }" >
@@ -641,6 +679,9 @@ export default {
       loadingTargetH: false,
       selectedTargetH: null,   // เลือกปลายทางแบบรวม (ถ้าต้องการ) 
       mapH: {},
+
+      criteriaDrafts: [{ ind_no: null, ind_Items: "" }],
+        maxCriteriaRows: 5,
 
 
 
@@ -921,6 +962,7 @@ export default {
       this.text_search = null;
       this.products_list = [];
       this.selectDataH();
+      this.criteriaDrafts = [{ ind_no: null, ind_Items: "" }];
     },
 
      OpenDialogAddcopy() {
@@ -935,6 +977,7 @@ export default {
       this.text_search = null;
       this.products_list = [];
       this.selectDataH();
+      this.criteriaDrafts = [{ ind_no: null, ind_Items: "" }];
     },
 
     selectDataH() {
@@ -993,7 +1036,19 @@ export default {
       this.DialogEditList = false;
     },
 
+    //บิวแก้100269
     // async saveDatax() {
+    //   const errors = this.validateBeforeSave();
+    //   if (errors.length > 0) {
+    //     Swal.fire({
+    //       icon: "warning",
+    //       title: "ข้อมูลยังไม่ครบ",
+    //       html: `<div style="text-align:left">${errors.map(e => `• ${e}`).join("<br>")}</div>`,
+    //       confirmButtonText: "ตกลง",
+    //     });
+    //     return;
+    //   }
+
     //   try {
     //     await axios.post("http://127.0.0.1:8000/api/saveDataP01User", {
     //       staff_id: this.staffid_Main,
@@ -1021,6 +1076,7 @@ export default {
     //     console.error("Error:", error);
     //   }
     // },
+
     async saveDatax() {
       const errors = this.validateBeforeSave();
       if (errors.length > 0) {
@@ -1033,6 +1089,9 @@ export default {
         return;
       }
 
+      // ✅ เพิ่ม: แยกหัวข้อหลักจาก text_name
+      const parsed = this.parseActivityText(this.text_name);
+
       try {
         await axios.post("http://127.0.0.1:8000/api/saveDataP01User", {
           staff_id: this.staffid_Main,
@@ -1042,7 +1101,13 @@ export default {
           text_edt: this.text_edt,
           dropdownItemH: this.dropdownItemH?.id,
           text_no: this.text_no,
+
+          // ✅ เดิม: เก็บ raw ทั้งหมด (รวมข้อย่อย)
           text_name: this.text_name,
+
+          // ✅ เพิ่มใหม่: เก็บเฉพาะหัวข้อหลัก (บรรทัดแรก) เอาไปใช้โชว์ที่อื่น
+          text_name_main: parsed.mainTitle,
+
           text_target: this.dropdownItemTarget?.value,
           text_weight: this.text_weight,
           products_list: this.products_list,
@@ -1060,7 +1125,7 @@ export default {
         console.error("Error:", error);
       }
     },
-
+ 
     cancelDialog() {
       this.DialogAdd = false;
     },
@@ -1341,6 +1406,108 @@ export default {
 
 
 
+    addCriteriaRow() {
+      if (this.criteriaDrafts.length >= this.maxCriteriaRows) return;
+      this.criteriaDrafts.push({ ind_no: null, ind_Items: "" });
+    },
+
+    removeCriteriaRow(idx) {
+      if (this.criteriaDrafts.length === 1) return;
+      this.criteriaDrafts.splice(idx, 1);
+    },
+
+    commitCriteriaDrafts() {
+      const drafts = this.criteriaDrafts.map(x => ({
+        ind_no: Number(x.ind_no),
+        ind_Items: (x.ind_Items || "").trim()
+      }));
+
+      const errors = [];
+
+      if (drafts.some(d => !Number.isFinite(d.ind_no) || d.ind_no < 1 || d.ind_no > 5)) {
+        errors.push("กรุณากรอกระดับให้ถูกต้อง (1-5) ให้ครบทุกแถว");
+      }
+      if (drafts.some(d => !d.ind_Items)) {
+        errors.push("กรุณากรอกรายละเอียดเกณฑ์การประเมินให้ครบทุกแถว");
+      }
+
+      const dupInDraft = drafts.map(d => d.ind_no).filter((v, i, a) => a.indexOf(v) !== i);
+      if (dupInDraft.length > 0) errors.push("ระดับในรายการที่กรอก ห้ามซ้ำกัน");
+
+      const existingLevels = new Set((this.products_list || []).map(x => Number(x.ind_no)));
+      if (drafts.some(d => existingLevels.has(d.ind_no))) {
+        errors.push("มีระดับที่ซ้ำกับรายการที่เพิ่มไว้แล้วในตารางด้านล่าง");
+      }
+
+      if (errors.length > 0) {
+        Swal.fire({
+          icon: "warning",
+          title: "ข้อมูลยังไม่ถูกต้อง",
+          html: `<div style="text-align:left">${errors.map(e => `• ${e}`).join("<br>")}</div>`
+        });
+        return;
+      }
+
+      this.products_list = [...(this.products_list || []), ...drafts]
+        .sort((a, b) => Number(a.ind_no) - Number(b.ind_no));
+
+      this.criteriaDrafts = [{ ind_no: null, ind_Items: "" }];
+    },
+
+    //เรียงหัวข้อหลัก/ย่อย
+    parseActivityText(raw) {
+      const text = String(raw || "").trim();
+      if (!text) return { mainTitle: "", lines: [] };
+
+      const rows = text
+        .split(/\r?\n/)
+        .map(r => r.trim())
+        .filter(Boolean);
+
+      // ตัดเลขหัวข้อหลัก "1. " ออก (ถ้าอยากให้โชว์เลขหัวข้อหลักด้วย บอกได้)
+      const cleanMain = (s) =>
+        s.replace(/^(\d+\.)\s*/, "")
+        .replace(/^[-•]\s*/, "")
+        .trim();
+
+      const mainTitle = cleanMain(rows[0]);
+
+      const lines = rows.map((r, idx) => {
+        const isMain = idx === 0;
+
+        if (isMain) {
+          return { type: "main", text: cleanMain(r) };
+        }
+
+        // ข้อย่อย: ตัด bullet ออกก่อน
+        let s = r.replace(/^[-•]\s*/, "").trim();
+
+        // แยกเลขข้อออกมาเป็นคอลัมน์: 1. / 1.1. / 12.3.4.
+        const m = s.match(/^(\d+(?:\.\d+)*\.)\s*(.*)$/);
+        const no = m ? m[1] : "";            // เช่น "1." "1.1."
+        const body = m ? (m[2] || "") : s;   // ข้อความหลังเลข
+
+        return {
+          type: "sub",
+          no,
+          text: body.trim(),
+        };
+      });
+
+      return { mainTitle, lines };
+    },
+
+
+    getMainSubject(raw) {
+      const parsed = this.parseActivityText(raw);
+      return parsed.mainTitle || "";
+    },
+
+
+
+
+
+
 
 
 
@@ -1473,5 +1640,6 @@ label {
   font-weight:600;
   margin-bottom: .35rem;
 }
+ 
 
 </style>

@@ -164,10 +164,25 @@
                                                             </td> 
                                                             <td class="text-center" style="color: blue;"> <b>{{ h.p01_weight??0 }}%</b></td>
                                                             <td></td>
-                                                        </tr> 
+                                                        </tr>  
+
+                                                        
                                                         <tr v-for="(subP01, idx) in h.subP01sX" :key="idx" style="vertical-align: baseline;">
-                                                            <td style="text-align: left;">{{ subP01.p01_no }} {{ subP01.p01_subject }}</td>
-                                                            <td style="text-align: left;">
+                                                            <!-- <td style="text-align: left;">{{ subP01.p01_no }} {{ subP01.p01_subject }}</td> --> 
+                                                            <td style="text-align:left;">
+                                                                <template v-for="(ln, i) in parseActivityText(subP01.p01_subject).lines" :key="i">
+                                                                    <div v-if="ln.type === 'main'" style="font-weight:700; margin-bottom:4px;">
+                                                                    <!-- {{ subP01.p01_no }} {{ ln.text }} -->
+                                                                    {{ stripLeadingNo(ln.text) }}
+                                                                    </div>
+                                                                    <div v-else class="subline">
+                                                                        <span class="subno">{{ ln.no }}</span>
+                                                                        <span class="subtext">{{ ln.text }}</span>
+                                                                    </div>
+                                                                </template>
+                                                            </td> 
+ 
+                                                            <!-- <td style="text-align: left;">
                                                                 <b>ตัวชี้วัดที่ {{ idx+1 }} {{ subP01.p01_subject }}</b>
                                                                 <p v-for="(subIitem, idI) in subP01.subITems" :key="idI" style="padding-left: 8px;margin-bottom: 5px;">
                                                                     <div v-if="subIitem.ind_no!=0" ><b>ระดับ {{ subIitem.ind_no }}</b> {{ subIitem.ind_Items }}</div>
@@ -179,7 +194,22 @@
                                                                     <br>
                                                                     <em style="color: red;">{{ subP01.p01_detail }}</em>
                                                                 </p>
-                                                            </td>  
+                                                            </td>   -->
+
+                                                            <td style="text-align: left;">
+                                                                <!-- <b>ตัวชี้วัดที่ {{ idx + 1 }} {{ subP01?.p01_subject || '-' }}</b> -->
+                                                                 <b>ตัวชี้วัดที่ {{ idx + 1 }} {{ getMainSubject(subP01.p01_subject) }}</b>
+
+                                                                <div v-for="(subIitem, idI) in subP01?.subITems || []" :key="idI">
+                                                                    <div v-if="subIitem?.ind_no !== 0">
+                                                                        <b>ระดับ {{ subIitem?.ind_no }}</b> {{ subIitem?.ind_Items || '-' }}
+                                                                    </div>
+                                                                    <div v-else>
+                                                                        <b>{{ subIitem?.ind_Items || '-' }}</b>
+                                                                    </div>
+                                                                </div>
+                                                            </td> 
+ 
                                                             <td style="text-align: left;">
                                                                 <!-- วนลูปแสดงระดับ 1 ถึง 5 -->
                                                                 <div v-for="level in [1, 2, 3, 4, 5]" :key="level">
@@ -246,6 +276,8 @@
                                                             <td style=" vertical-align: middle;" class="text-center">{{ subP01.p01_weight }}%</td> 
                                                             <td style=" vertical-align: middle;" class="text-center">{{ (subP01.p01_score * subP01.p01_weight / 100).toFixed(2) }}</td>
                                                         </tr>
+
+
                                                         </template>
                                                         <tr>
                                                             <td style="text-align: right" colspan="9">
@@ -1506,6 +1538,62 @@ export default {
                 console.error('Error:', error);
             });
         }, 
+
+        //110269
+        normalizeActivityRaw(raw) {
+            let s = String(raw || "").trim();
+            if (!s) return "";
+
+            // รองรับกรณีมี <br>
+            s = s.replace(/<br\s*\/?>/gi, "\n");
+
+            // ถ้าข้อความยาว ๆ มาจาก API แบบ “1. ... 2. ... 3. ...” แต่ไม่มี \n
+            // ให้แทรก \n ก่อนเลขข้อ (ยกเว้นตัวแรก)
+            s = s.replace(/(\s)(\d+(?:\.\d+)*\.)\s+/g, "\n$2 ");
+
+            // ลบช่องว่างซ้อน
+            s = s.replace(/[ \t]+/g, " ").replace(/\n{2,}/g, "\n");
+
+            return s.trim();
+        },
+
+        parseActivityText(raw) {
+            const text = this.normalizeActivityRaw(raw);
+            if (!text) return { mainTitle: "", lines: [] };
+
+            const rows = text
+                .split(/\r?\n/)
+                .map(r => r.trim())
+                .filter(Boolean);
+
+            const cleanMain = (s) =>
+                s.replace(/^(\d+\.)\s*/, "")
+                .replace(/^[-•]\s*/, "")
+                .trim();
+
+            const mainTitle = cleanMain(rows[0] || "");
+
+            const lines = rows.map((r, idx) => {
+                if (idx === 0) return { type: "main", text: cleanMain(r) };
+
+                let s = r.replace(/^[-•]\s*/, "").trim();
+                const m = s.match(/^(\d+(?:\.\d+)*\.)\s*(.*)$/);
+                const no = m ? m[1] : "";
+                const body = m ? (m[2] || "") : s;
+
+                return { type: "sub", no, text: body.trim() };
+            });
+
+            return { mainTitle, lines };
+        },
+
+        getMainSubject(raw) {
+            return this.parseActivityText(raw).mainTitle || "";
+        },
+
+        stripLeadingNo(text) {
+            return String(text || '').replace(/^\s*\d+(?:\.\d+)*\.\s*/, '').trim();
+        },
  
         //29/10/67
         saveScore() {

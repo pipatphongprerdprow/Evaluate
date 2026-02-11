@@ -27,8 +27,7 @@
                         <tr v-for="(row1, index) in coreCompetencies" :key="index">
                             <td
                                 style="text-align: left; cursor: pointer; color: #0d47a1;"
-                                @click="openCompetencyDialog('core', row1)"
-                            >
+                                @click="openCompetencyDialog('core', row1)" >
                                 {{ row1.activity }}
                             </td>  
                             <td>
@@ -512,15 +511,99 @@ export default {
                 }
             })
         },
+        
+        //บิวแก้090269
+        // showdataPo(){   
+        //     //  let postypetext = ['128'].includes(this.posadio) ? `ระดับชำนาญการพิเศษ` : `ระดับ${this.postypename}`;
+        //     //  let postypenameid = ['128'].includes(this.posadio) ? 90 : this.postypenameid;
+        //     //  let positionname = ['128'].includes(this.posadio) ? `ระดับชำนาญการพิเศษ` : `ระดับ${this.postypename}`; 
+             
+        //     let postypetext = this.posadio === '128' ? `ระดับชำนาญการพิเศษ` : `ระดับ${this.postypename}`; 
+        //     let postypenameid = this.posadio === '128' ? 90 : this.postypenameid;
+        //     let positionname = this.posadio === '128' ? `ระดับชำนาญการพิเศษ` : `ระดับ${this.postypename}`;  
+    
+        //     // console.log(postypenameid, 'postypenameid');
 
-        showdataPo(){  
-            let postypetext = this.posadio === '128' ? `ระดับชำนาญการพิเศษ` : `ระดับ${this.postypename}`;
-            let postypenameid = this.posadio === '128' ? 90 : this.postypenameid;
-            let positionname = this.posadio === '128' ? `ระดับชำนาญการพิเศษ` : `ระดับ${this.postypename}`;
+        //     const levelMapping = {
+        //         'ระดับปฏิบัติการ': 1,
+        //         'ระดับปฏิบัติงาน': 1, 
+        //         'ระดับชำนาญการ': 2,
+        //         'ระดับชำนาญงาน': 2,
+        //         'ระดับชำนาญการพิเศษ': 3,
+        //         'ระดับชำนาญงานพิเศษ': 3,
+        //         'อาจารย์': 3,
+        //         'ระดับเชี่ยวชาญ': 4,
+        //         'ระดับเชี่ยวชาญพิเศษ': 5
+        //     };
+  
+        //     let personnel = levelMapping[postypetext] || 0;
+
+        //     this.coreCompetencies = [
+        //         { id: 1, activity: 'ก. 1 การมุ่งผลสัมฤทธิ์', indicator: personnel, data_table1: '', selfAssessment: '' },
+        //         { id: 2, activity: 'ก. 2 การบริการที่ดี', indicator: personnel, data_table1: '', selfAssessment: '' },
+        //         { id: 3, activity: 'ก. 3 การสั่งสมความเชี่ยวชาญในงานอาชีพ', indicator: personnel, data_table1: '', selfAssessment: '' },
+        //         { id: 4, activity: 'ก. 4 การยึดมั่นในความถูกต้องชอบธรรมและจริยธรรม', indicator: personnel, data_table1: '', selfAssessment: '' },
+        //         { id: 5, activity: 'ก. 5 การทำงานเป็นทีม', indicator: personnel, data_table1: '', selfAssessment: '' }
+        //     ];
+             
+        //     this.jobSpecificCompetencies = [];  
+
+        //     const Mapping = { '128': 1 };   
+        //     const blacklist = ['110105', '110146', '160018',];  //ต้องการให้ผู้บริหารไม่ขึ้นเลข1 ค. ให้ใส่staffid
+        //     let executive = Mapping[this.posadio] || 0;
+        //     if (blacklist.includes(String(this.staffid_Main))) {
+        //         executive = 0;
+        //     }
+
+        //     this.otherCompetencies = [
+        //         { id: 12, activity: 'ค. 1 สภาวะผู้นำ', indicator3: executive, datatable3: '', selfAssessment3: '' },
+        //         { id: 13, activity: 'ค. 2 วิสัยทัศน์', indicator3: executive, datatable3: '', selfAssessment3: '' },
+        //         { id: 14, activity: 'ค. 3 การวางกลยุทธ์ภาครัฐ', indicator3: executive, datatable3: '', selfAssessment3: '' },
+        //         { id: 15, activity: 'ค. 4 ศักยภาพเพื่อนำการปรับเปลี่ยน', indicator3: executive, datatable3: '', selfAssessment3: '' },
+        //         { id: 16, activity: 'ค. 5 การสอนงานและการมอบหมายงาน', indicator3: executive, datatable3: '', selfAssessment3: '' }
+        //     ];
+  
+        //     this.showPostype(positionname, postypenameid);
+  
+        //     axios.post('   http://127.0.0.1:8000/api/showDataPo',{
+        //         staff_id: this.staffid_Main,
+        //         fac_id: this.facid_Main,
+        //         year_id: this.dataPor.d_date,
+        //         record: this.dataPor.evalua,
+        //         postypename: postypetext
+        //         }).then(res => {     
+        //         if (res.data.length > 0) {
+        //             const data = res.data[0]; 
+        //             this.coreCompetencies = this.coreCompetencies.map(item => {
+        //                 if (data[`p${item.id}`] !== undefined) {
+        //                     return {
+        //                         ...item,
+        //                         data_table1: data[`p${item.id}`],
+        //                         selfAssessment: data[`pa_${item.id}`]
+        //                     };
+        //                 }
+        //                 return item;
+        //             });  
+        //             this.improvements = data.improvements ?? '- ไม่มีข้อมูล -';
+        //             this.suggestions = data.suggestions ?? '- ไม่มีข้อมูล -'; 
+        //         } 
+        //     })
+        //     .catch(error => {
+        //         console.error('Error:', error);
+        //     });
+        // },
+
+        showdataPo() {
+
+            // 🔹 เงื่อนไขระดับชำนาญการพิเศษ
+            const isSpecialExpert = this.posadio === '128' || (this.postypenameid === '137' && this.positionname === 'ผู้บริหาร'); 
+                let postypetext = isSpecialExpert ? 'ระดับชำนาญการพิเศษ' : `ระดับ${this.postypename}`; 
+                let postypenameid = isSpecialExpert ? 90 : this.postypenameid; 
+                let positionname = isSpecialExpert ? 'ระดับชำนาญการพิเศษ' : `ระดับ${this.postypename}`; 
 
             const levelMapping = {
                 'ระดับปฏิบัติการ': 1,
-                'ระดับปฏิบัติงาน': 1, 
+                'ระดับปฏิบัติงาน': 1,
                 'ระดับชำนาญการ': 2,
                 'ระดับชำนาญงาน': 2,
                 'ระดับชำนาญการพิเศษ': 3,
@@ -528,10 +611,9 @@ export default {
                 'อาจารย์': 3,
                 'ระดับเชี่ยวชาญ': 4,
                 'ระดับเชี่ยวชาญพิเศษ': 5
-            };
-  
+            }; 
             let personnel = levelMapping[postypetext] || 0;
-
+ 
             this.coreCompetencies = [
                 { id: 1, activity: 'ก. 1 การมุ่งผลสัมฤทธิ์', indicator: personnel, data_table1: '', selfAssessment: '' },
                 { id: 2, activity: 'ก. 2 การบริการที่ดี', indicator: personnel, data_table1: '', selfAssessment: '' },
@@ -539,12 +621,16 @@ export default {
                 { id: 4, activity: 'ก. 4 การยึดมั่นในความถูกต้องชอบธรรมและจริยธรรม', indicator: personnel, data_table1: '', selfAssessment: '' },
                 { id: 5, activity: 'ก. 5 การทำงานเป็นทีม', indicator: personnel, data_table1: '', selfAssessment: '' }
             ];
-             
-            this.jobSpecificCompetencies = [];  
 
-            const Mapping = { '128': 1 };   
-            const blacklist = ['110105', '110999', '110999'];  
+             
+            this.jobSpecificCompetencies = [];
+
+           
+            const Mapping = { '128': 1 };
+            const blacklist = ['110105', '110146', '160018']; // staffid ที่ไม่ให้ขึ้น ค.
+
             let executive = Mapping[this.posadio] || 0;
+
             if (blacklist.includes(String(this.staffid_Main))) {
                 executive = 0;
             }
@@ -556,18 +642,21 @@ export default {
                 { id: 15, activity: 'ค. 4 ศักยภาพเพื่อนำการปรับเปลี่ยน', indicator3: executive, datatable3: '', selfAssessment3: '' },
                 { id: 16, activity: 'ค. 5 การสอนงานและการมอบหมายงาน', indicator3: executive, datatable3: '', selfAssessment3: '' }
             ];
-  
+ 
             this.showPostype(positionname, postypenameid);
-  
-            axios.post('   http://127.0.0.1:8000/api/showDataPo',{
+
+             
+            axios.post('http://127.0.0.1:8000/api/showDataPo', {
                 staff_id: this.staffid_Main,
                 fac_id: this.facid_Main,
                 year_id: this.dataPor.d_date,
                 record: this.dataPor.evalua,
                 postypename: postypetext
-            }).then(res => {     
+            })
+            .then(res => {
                 if (res.data.length > 0) {
-                    const data = res.data[0]; 
+                    const data = res.data[0];
+
                     this.coreCompetencies = this.coreCompetencies.map(item => {
                         if (data[`p${item.id}`] !== undefined) {
                             return {
@@ -577,16 +666,17 @@ export default {
                             };
                         }
                         return item;
-                    });  
+                    });
+
                     this.improvements = data.improvements ?? '- ไม่มีข้อมูล -';
-                    this.suggestions = data.suggestions ?? '- ไม่มีข้อมูล -'; 
-                } 
+                    this.suggestions  = data.suggestions  ?? '- ไม่มีข้อมูล -';
+                }
             })
             .catch(error => {
                 console.error('Error:', error);
             });
         },
-
+ 
         showPostype(postypename, postypenameid){
             const postypetext = postypename;
             axios.post('   http://127.0.0.1:8000/api/showdatapostypenameAdmin', {

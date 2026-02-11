@@ -155,18 +155,24 @@
                                                             </td> 
                                                         </tr> 
                                                         <tr v-for="(subP01, idx) in h?.subP01sX || []" :key="idx">
-                                                            <td style="text-align: left;">{{ subP01?.p01_no || '-' }} {{ subP01?.p01_subject || '-' }}</td>
+                                                            <!-- <td style="text-align: left;">{{ subP01?.p01_no || '-' }} {{ subP01?.p01_subject || '-' }}</td> -->
+                                                             <td style="text-align:left;">
+                                                                <template v-for="(ln, i) in parseActivityText(subP01.p01_subject).lines" :key="i">
+                                                                    <div v-if="ln.type === 'main'" style="font-weight:700; margin-bottom:4px;">
+                                                                    <!-- {{ subP01.p01_no }} {{ ln.text }} -->
+                                                                    {{ stripLeadingNo(ln.text) }}
+                                                                    </div>
+                                                                    <div v-else class="subline">
+                                                                    <span class="subno">{{ ln.no }}</span>
+                                                                    <span class="subtext">{{ ln.text }}</span>
+                                                                    </div>
+                                                                </template>
+                                                            </td> 
 
-                                                            <!-- แก้แดง -->
-                                                            <!-- <td style="text-align: left;">
-                                                                <b>ตัวชี้วัดที่ {{ idx+1 }} {{ subP01?.p01_subject || '-' }}</b>
-                                                                <p v-for="(subIitem, idI) in subP01?.subITems || []" :key="idI">
-                                                                    <div v-if="subIitem?.ind_no !== 0"><b>ระดับ {{ subIitem?.ind_no }}</b> {{ subIitem?.ind_Items || '-' }}</div>
-                                                                    <div v-else><b>{{ subIitem?.ind_Items || '-' }}</b></div>
-                                                                </p>
-                                                            </td> -->
+
                                                             <td style="text-align: left;">
-                                                                <b>ตัวชี้วัดที่ {{ idx + 1 }} {{ subP01?.p01_subject || '-' }}</b>
+                                                                <!-- <b>ตัวชี้วัดที่ {{ idx + 1 }} {{ subP01?.p01_subject || '-' }}</b> -->
+                                                                 <b>ตัวชี้วัดที่ {{ idx + 1 }} {{ getMainSubject(subP01.p01_subject) }}</b>
 
                                                                 <div v-for="(subIitem, idI) in subP01?.subITems || []" :key="idI">
                                                                     <div v-if="subIitem?.ind_no !== 0">
@@ -177,21 +183,7 @@
                                                                     </div>
                                                                 </div>
                                                             </td> 
-
-                                                            <!-- แก้แดง -->
-                                                            <!-- <td style="text-align: left;">
-                                                                <p v-if="(subP01?.subITemP03ind || []).length > 0">
-                                                                    <div v-for="level in [1, 2, 3, 4, 5]" :key="level">
-                                                                        <div v-if="subP01?.subITemP03ind?.some(item => item?.p03ind_no === level + '')">
-                                                                            <b>ระดับ {{ level }}</b>
-                                                                            <div v-for="(item, index) in subP01?.subITemP03ind?.filter(item => item?.p03ind_no === level + '')" :key="index">
-                                                                                <div>{{ index + 1 }}. {{ item?.p03ind_Items || '-' }}</div>
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                </p>
-                                                                <p v-else style="color: red;">- ไม่มีข้อมูล -</p>
-                                                            </td> -->
+ 
                                                             <td style="text-align: left;">
                                                                 <div v-if="(subP01?.subITemP03ind || []).length > 0">
                                                                     <div v-for="level in [1, 2, 3, 4, 5]" :key="level">
@@ -335,7 +327,7 @@
                                                                
                                                                 <td> 
                                                                     <!-- <template v-if="Number(posadio) === 128">  -->
-                                                                    <template v-if="Number(posadio) === 128 && !['110105','110200','110999'].includes(String(staffid_Main))"> 
+                                                                    <template v-if="Number(posadio) === 128 && !['110105','110146', '160018'].includes(String(staffid_Main))"> 
                                                                         <InputNumber 
                                                                             v-model.number="row3.selfAssessment3" 
                                                                             type="text" 
@@ -1216,6 +1208,8 @@ export default {
         // this.showAssesstack(); 
 
     },   
+
+
     methods: { 
         setSession(staffid_Main, facid_Main, groupid_Main, postypename, postypenameid) {
             // console.log('postypename:',postypename);
@@ -1465,7 +1459,8 @@ export default {
 
             // ⬇️ ทุกงานที่ทำตอนเปิด Dialog ค่อนข้างเยอะ กดครั้งเดียวให้โชว์โหลดตลอดจนเสร็จ
             await this.withLoading(async () => {
-                this.getAadioPosition(data.staffid)
+                // this.getAadioPosition(data.staffid) บิวแก้090269
+                await this.getAadioPosition(data.staffid)
                 this.dataStaffid = data.staffid
 
                 await this.showDataEvalu()
@@ -1997,37 +1992,149 @@ export default {
                     console.error('Error fetching data:', error);
                 });
         },
-        async showdataPo(staff_id, facid_Main, d_date, evalua, posnameid) {  
-            // ตรวจสอบว่า currentstaff มีค่าหรือไม่
-            if (!this.currentstaff || this.currentstaff.length === 0) {
-                console.error("Error: currentstaff is undefined or empty.");
-                return;
-            } 
-             // ---- NEW: blacklist ----
-            const BLACKLIST = ['110105'];                // เพิ่มรหัสอื่นได้ เช่น '110200', '110999'
-            const isBlacklisted = BLACKLIST.includes(String(staff_id));
+        // async showdataPo(staff_id, facid_Main, d_date, evalua, posnameid) {  
+        //     // ตรวจสอบว่า currentstaff มีค่าหรือไม่
+        //     if (!this.currentstaff || this.currentstaff.length === 0) {
+        //         console.error("Error: currentstaff is undefined or empty.");
+        //         return;
+        //     } 
+        //      // ---- NEW: blacklist ----
+        //     const BLACKLIST = ['110105','110146', '160018'];                // เพิ่มรหัสอื่นได้ เช่น '110200', '110999'
+        //     const isBlacklisted = BLACKLIST.includes(String(staff_id));
 
 
-            console.log('this.posadio',this.posadio); 
-            console.log('this.currentstaff[0]?.postypenameth: ',this.currentstaff[0]?.postypenameth);
-            // console.log('this.currentstaff[0]?.postypename: ',this.currentstaff[0]?.postypename);
+        //     console.log('this.posadio',this.posadio); 
+        //     console.log('this.currentstaff[0]?.postypenameth: ',this.currentstaff[0]?.postypenameth);
+        //     // console.log('this.currentstaff[0]?.postypename: ',this.currentstaff[0]?.postypename);
 
 
             
  
-            //030968
-            //this.postypenameth = this.currentstaff[0]?.postypenameth  ?? (this.posadio === '128' ? 'ชำนาญการพิเศษ' : 'ปฏิบัติการ');
+        //     //030968
+        //     //this.postypenameth = this.currentstaff[0]?.postypenameth  ?? (this.posadio === '128' ? 'ชำนาญการพิเศษ' : 'ปฏิบัติการ');
 
-            if (this.posadio === '128') {
-                    this.postypenameth = 'ชำนาญการพิเศษ';
+        //     if (this.posadio === '128') {
+        //             this.postypenameth = 'ชำนาญการพิเศษ';
+        //     } else {
+        //         this.postypenameth = this.currentstaff[0]?.postypenameth || 'ปฏิบัติการ';
+        //     }
+
+        //     // console.log("postypenameth:", this.postypenameth);
+
+        //     let postypetext = `ระดับ${this.postypenameth}`;  
+
+        //     const levelMapping = {
+        //         'ระดับปฏิบัติการ': 1,
+        //         'ระดับปฏิบัติงาน': 1,
+        //         'ระดับชำนาญการ': 2,
+        //         'ระดับชำนาญงาน': 2,
+        //         'ระดับชำนาญการพิเศษ': 3,
+        //         'ระดับชำนาญงานพิเศษ': 3,
+        //         'อาจารย์': 3,
+        //         'ระดับเชี่ยวชาญ': 4,
+        //         'ระดับเชี่ยวชาญพิเศษ': 5
+        //     };
+        //     let xr = levelMapping[postypetext] || 0; 
+
+        //     this.coreCompetencies = [
+        //         { id: 1, activity: 'ก. 1 การมุ่งผลสัมฤทธิ์', indicator: xr, data_table1: '', selfAssessment: '' },
+        //         { id: 2, activity: 'ก. 2 การบริการที่ดี', indicator: xr, data_table1: '', selfAssessment: '' },
+        //         { id: 3, activity: 'ก. 3 การสั่งสมความเชี่ยวชาญในงานอาชีพ', indicator: xr, data_table1: '', selfAssessment: '' },
+        //         { id: 4, activity: 'ก. 4 การยึดมั่นในความถูกต้องชอบธรรมและจริยธรรม', indicator: xr, data_table1: '', selfAssessment: '' },
+        //         { id: 5, activity: 'ก. 5 การทำงานเป็นทีม', indicator: xr, data_table1: '', selfAssessment: '' }
+        //     ];  
+        //     this.jobSpecificCompetencies = []; 
+
+        //     //160968
+        //     // const Mapping = {
+        //     //     '128': 1
+        //     // };  
+        //     // let executive = Mapping[this.posadio] || 0; 
+        //     const Mapping = { '128': 1 };  
+        //         let executive = Mapping[this.posadio] || 0; 
+
+        //         // ---- NEW: ถ้าอยู่ใน blacklist → ไม่เป็น executive
+        //         if (isBlacklisted) {
+        //             executive = 0;
+        //     }
+
+        //     this.otherCompetencies = [
+        //         { id: 12, activity: 'ค. 1 สภาวะผู้นำ', indicator3: executive, datatable3: '', selfAssessment3: '' },
+        //         { id: 13, activity: 'ค. 2 วิสัยทัศน์', indicator3: executive, datatable3: '', selfAssessment3: '' },
+        //         { id: 14, activity: 'ค. 3 การวางกลยุทธ์ภาครัฐ', indicator3: executive, datatable3: '', selfAssessment3: '' },
+        //         { id: 15, activity: 'ค. 4 ศักยภาพเพื่อนำการปรับเปลี่ยน', indicator3: executive, datatable3: '', selfAssessment3: '' },
+        //         { id: 16, activity: 'ค. 5 การสอนงานและการมอบหมายงาน', indicator3: executive, datatable3: '', selfAssessment3: '' }
+        //     ]; 
+
+        //     // this.showPostype(this.currentstaff[0]?.postypenameth, this.postypenameid); // แก้ไข ตัวป2
+        //    await this.showPostype(this.currentstaff[0]?.postypenameth, posnameid);
+
+        //    await axios.post('http://127.0.0.1:8000/api/showDataPo', {
+        //         staff_id: staff_id,
+        //         fac_id: facid_Main,
+        //         year_id: d_date,
+        //         record: evalua,
+        //         postypename: postypetext
+        //     }).then(res => {     
+        //         console.log('this.showDataPo',res.data); 
+        //         if (res.data.length > 0) {
+        //             const data = res.data[0]; 
+        //             this.coreCompetencies = this.coreCompetencies.map(item => {
+        //                 if (data[`p${item.id}`] !== undefined) {
+        //                     return {
+        //                         ...item,
+        //                         data_table1: data[`p${item.id}`],
+        //                         selfAssessment: data[`pa_${item.id}`]
+        //                     };
+        //                 } 
+        //                 return item;
+        //             });  
+        //         } 
+        //     })
+        //     .catch(error => {
+        //         console.error('Error:', error);
+        //     });
+        // }, 
+
+        normalizeLevelName(v) {
+            const s = String(v ?? '').trim();
+            return s.replace(/^ระดับ\s*/, '').trim();
+        },
+ 
+        async showdataPo(staff_id, facid_Main, d_date, evalua, posnameid) {  
+
+            if (!this.currentstaff || this.currentstaff.length === 0) {
+                console.error("Error: currentstaff is undefined or empty.");
+                return;
+            } 
+            const BLACKLIST = ['110105','110146','160018'];
+            const isBlacklisted = BLACKLIST.includes(String(staff_id));
+
+            // const isExecutiveRole = normalizeLevelName(this.currentstaff[0]?.posnameth) === 'ผู้บริหาร';090269
+            const isExecutiveRole = this.normalizeLevelName(this.currentstaff[0]?.posnameth) === 'ผู้บริหาร';
+ 
+            const isSpecialExpert =
+                // this.posadio === '128' ||090269
+                String(this.posadio) === '128' ||
+                (
+                    String(posnameid) === '137' &&
+                    // this.currentstaff[0]?.postypenameth === 'ผู้บริหาร'090269
+                    isExecutiveRole
+                );
+ 
+            if (isSpecialExpert && !isBlacklisted) {
+                this.postypenameth = 'ชำนาญการพิเศษ';
             } else {
-                this.postypenameth = this.currentstaff[0]?.postypenameth || 'ปฏิบัติการ';
+                // this.postypenameth = this.currentstaff[0]?.postypenameth || 'ปฏิบัติการ';  090269
+                this.postypenameth = this.normalizeLevelName(this.currentstaff[0]?.postypenameth) || 'ปฏิบัติการ';
+
             }
 
-            // console.log("postypenameth:", this.postypenameth);
-
-            let postypetext = `ระดับ${this.postypenameth}`;  
-
+            // let postypetext = `ระดับ${this.postypenameth}`;090269
+             
+            const levelName = this.normalizeLevelName(this.postypenameth);
+            const postypetext = `ระดับ${levelName}`;
+ 
             const levelMapping = {
                 'ระดับปฏิบัติการ': 1,
                 'ระดับปฏิบัติงาน': 1,
@@ -2039,28 +2146,25 @@ export default {
                 'ระดับเชี่ยวชาญ': 4,
                 'ระดับเชี่ยวชาญพิเศษ': 5
             };
-            let xr = levelMapping[postypetext] || 0; 
 
+            // let xr = levelMapping[postypetext] || 0;090269
+            let xr = levelMapping[postypetext] ?? 0;
+             
             this.coreCompetencies = [
                 { id: 1, activity: 'ก. 1 การมุ่งผลสัมฤทธิ์', indicator: xr, data_table1: '', selfAssessment: '' },
                 { id: 2, activity: 'ก. 2 การบริการที่ดี', indicator: xr, data_table1: '', selfAssessment: '' },
                 { id: 3, activity: 'ก. 3 การสั่งสมความเชี่ยวชาญในงานอาชีพ', indicator: xr, data_table1: '', selfAssessment: '' },
                 { id: 4, activity: 'ก. 4 การยึดมั่นในความถูกต้องชอบธรรมและจริยธรรม', indicator: xr, data_table1: '', selfAssessment: '' },
                 { id: 5, activity: 'ก. 5 การทำงานเป็นทีม', indicator: xr, data_table1: '', selfAssessment: '' }
-            ];  
-            this.jobSpecificCompetencies = []; 
+            ];
 
-            //160968
-            // const Mapping = {
-            //     '128': 1
-            // };  
-            // let executive = Mapping[this.posadio] || 0; 
-            const Mapping = { '128': 1 };  
-                let executive = Mapping[this.posadio] || 0; 
+            this.jobSpecificCompetencies = [];
+ 
+            const Mapping = { '128': 1 };
+            let executive = Mapping[this.posadio] || 0;
 
-                // ---- NEW: ถ้าอยู่ใน blacklist → ไม่เป็น executive
-                if (isBlacklisted) {
-                    executive = 0;
+            if (isBlacklisted) {
+                executive = 0;
             }
 
             this.otherCompetencies = [
@@ -2070,20 +2174,20 @@ export default {
                 { id: 15, activity: 'ค. 4 ศักยภาพเพื่อนำการปรับเปลี่ยน', indicator3: executive, datatable3: '', selfAssessment3: '' },
                 { id: 16, activity: 'ค. 5 การสอนงานและการมอบหมายงาน', indicator3: executive, datatable3: '', selfAssessment3: '' }
             ]; 
+            // await this.showPostype(this.postypenameth, posnameid);090269
+            await this.showPostype(levelName, posnameid);
+ 
+            try {
+                const res = await axios.post('http://127.0.0.1:8000/api/showDataPo', {
+                    staff_id: staff_id,
+                    fac_id: facid_Main,
+                    year_id: d_date,
+                    record: evalua,
+                    postypename: postypetext
+                });
 
-            // this.showPostype(this.currentstaff[0]?.postypenameth, this.postypenameid); // แก้ไข ตัวป2
-           await this.showPostype(this.currentstaff[0]?.postypenameth, posnameid);
-
-           await axios.post('http://127.0.0.1:8000/api/showDataPo', {
-                staff_id: staff_id,
-                fac_id: facid_Main,
-                year_id: d_date,
-                record: evalua,
-                postypename: postypetext
-            }).then(res => {     
-                console.log('this.showDataPo',res.data); 
                 if (res.data.length > 0) {
-                    const data = res.data[0]; 
+                    const data = res.data[0];
                     this.coreCompetencies = this.coreCompetencies.map(item => {
                         if (data[`p${item.id}`] !== undefined) {
                             return {
@@ -2091,15 +2195,14 @@ export default {
                                 data_table1: data[`p${item.id}`],
                                 selfAssessment: data[`pa_${item.id}`]
                             };
-                        } 
+                        }
                         return item;
-                    });  
-                } 
-            })
-            .catch(error => {
+                    });
+                }
+            } catch (error) {
                 console.error('Error:', error);
-            });
-        }, 
+            }
+        },
  
         //29/10/67
         saveScore() {
@@ -2393,8 +2496,7 @@ export default {
                 console.error('❌ Error:', error);
             }); 
         },
-
-
+ 
         ///***********///
  
         async saveAssess() {
@@ -2456,8 +2558,65 @@ export default {
             window.open(url, '_blank');
  
         },     
-    }, 
-    
+
+ 
+     //110269
+        normalizeActivityRaw(raw) {
+            let s = String(raw || "").trim();
+            if (!s) return "";
+
+            // รองรับกรณีมี <br>
+            s = s.replace(/<br\s*\/?>/gi, "\n");
+
+            // ถ้าข้อความยาว ๆ มาจาก API แบบ “1. ... 2. ... 3. ...” แต่ไม่มี \n
+            // ให้แทรก \n ก่อนเลขข้อ (ยกเว้นตัวแรก)
+            s = s.replace(/(\s)(\d+(?:\.\d+)*\.)\s+/g, "\n$2 ");
+
+            // ลบช่องว่างซ้อน
+            s = s.replace(/[ \t]+/g, " ").replace(/\n{2,}/g, "\n");
+
+            return s.trim();
+        },
+
+        parseActivityText(raw) {
+            const text = this.normalizeActivityRaw(raw);
+            if (!text) return { mainTitle: "", lines: [] };
+
+            const rows = text
+                .split(/\r?\n/)
+                .map(r => r.trim())
+                .filter(Boolean);
+
+            const cleanMain = (s) =>
+                s.replace(/^(\d+\.)\s*/, "")
+                .replace(/^[-•]\s*/, "")
+                .trim();
+
+            const mainTitle = cleanMain(rows[0] || "");
+
+            const lines = rows.map((r, idx) => {
+                if (idx === 0) return { type: "main", text: cleanMain(r) };
+
+                let s = r.replace(/^[-•]\s*/, "").trim();
+                const m = s.match(/^(\d+(?:\.\d+)*\.)\s*(.*)$/);
+                const no = m ? m[1] : "";
+                const body = m ? (m[2] || "") : s;
+
+                return { type: "sub", no, text: body.trim() };
+            });
+
+            return { mainTitle, lines };
+        },
+
+        getMainSubject(raw) {
+            return this.parseActivityText(raw).mainTitle || "";
+        },
+
+        stripLeadingNo(text) {
+            return String(text || '').replace(/^\s*\d+(?:\.\d+)*\.\s*/, '').trim();
+        },
+ 
+    },  
     filters: {
         removeC: function (value) {
             if (!value) return '';
@@ -2706,6 +2865,6 @@ td:nth-child(3) {
   background: rgba(255,255,255,.7);
   display:flex; flex-direction:column; align-items:center; justify-content:center;
   z-index: 9999;
-}
+} 
 
 </style>

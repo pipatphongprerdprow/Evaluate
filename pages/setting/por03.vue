@@ -258,7 +258,8 @@
                                     </td> -->
                                     <td> 
                                         <!-- <template v-if="posadio === '128'"> -->
-                                        <template v-if="posadio === '128' && String(staffid_Main) !== '110105'">
+                                            <!-- <template v-if="posadio === '128' && String(staffid_Main) !== '110105'"></template> -->
+                                        <template v-if="posadio === '128' && !['110105', '110146','160018'].includes(String(staffid_Main))">
                                             <InputNumber 
                                                 v-model.number="row3.datatable3" 
                                                 type="text" 
@@ -1021,7 +1022,11 @@ import InputText from 'primevue/inputtext';
         watch: { 
             tab3Reload(v) { 
                 // console.log("por03 tab3Reload",v);
-                this.showDataP03();   
+                this.showDataP03(); 
+                  // ✅ เพิ่ม 3 บรรทัดนี้
+    this.showdataPo();
+    this.getjobSpecificCompetencies();
+    this.showAssess();
             }, 
             // เฝ้าดูการเปลี่ยนแปลงของ dataPor
             dataPor: {
@@ -1424,17 +1429,12 @@ import InputText from 'primevue/inputtext';
                     Swal.fire("error", "เกิดข้อผิดพลาดในการลบข้อมูล!", "error");
                 }
             },
- 
-
-
-
-
-            
+  
             async mounted() {
                 const  { signIn, getSession, signOut } = await useAuth()
                 const user = await getSession();
             }, 
-/*============= ค่าคะแนนที่ได้ =============*/
+            /*============= ค่าคะแนนที่ได้ =============*/
             OpenDialogScore(item){ 
                 // console.log(item); 
                 this.DialogScore = true;
@@ -1505,29 +1505,175 @@ import InputText from 'primevue/inputtext';
                 // console.log('Response', res.data);
             })
             }, 
-            showdataPo(){  
-                 //console.log('positionname: ',this.positionname);
+            //บิวแก้090269
+            // showdataPo(){  
+            //      //console.log('positionname: ',this.positionname);
 
-                 // Biw 7/8/68 อันเก่า ก่อนเปลี่ยน 
-                // let postypetext = this.positionname === 'ผู้บริหาร' ? `ระดับชำนาญการพิเศษ` : `ระดับ${this.postypename}`;
-                // let postypenameid = this.positionname === 'ผู้บริหาร' ? 90 : this.postypenameid;
-                // let positionname = this.positionname === 'ผู้บริหาร' ? `ระดับชำนาญการพิเศษ` : `ระดับ${this.postypename}`;
+            //      // Biw 7/8/68 อันเก่า ก่อนเปลี่ยน 
+            //     // let postypetext = this.positionname === 'ผู้บริหาร' ? `ระดับชำนาญการพิเศษ` : `ระดับ${this.postypename}`;
+            //     // let postypenameid = this.positionname === 'ผู้บริหาร' ? 90 : this.postypenameid;
+            //     // let positionname = this.positionname === 'ผู้บริหาร' ? `ระดับชำนาญการพิเศษ` : `ระดับ${this.postypename}`;
 
 
-                let postypetext = this.posadio === '128' ? `ระดับชำนาญการพิเศษ` : `ระดับ${this.postypename}`;
-                let postypenameid = this.posadio === '128' ? 90 : this.postypenameid;
-                let positionname = this.posadio === '128' ? `ระดับชำนาญการพิเศษ` : `ระดับ${this.postypename}`;
+            //     let postypetext = this.posadio === '128' ? `ระดับชำนาญการพิเศษ` : `ระดับ${this.postypename}`;
+            //     let postypenameid = this.posadio === '128' ? 90 : this.postypenameid;
+            //     let positionname = this.posadio === '128' ? `ระดับชำนาญการพิเศษ` : `ระดับ${this.postypename}`;
 
-                 // 👇 ยกเว้น staffid 110105 → กลับไปใช้เงื่อนไขปกติ
-                if (String(this.staffid_Main) === '110105') {
+            //      // 👇 ยกเว้น staffid 110105 → กลับไปใช้เงื่อนไขปกติ
+            //     // if (String(this.staffid_Main) === '110105','110146','160018') {
+            //     //     postypetext   = `ระดับ${this.postypename}`;
+            //     //     postypenameid = this.postypenameid;
+            //     //     positionname  = `ระดับ${this.postypename}`;
+            //     // }
+
+            //     const blacklist = ['110105','110146','160018']; 
+            //         if (blacklist.includes(String(this.staffid_Main))) {
+            //         postypetext   = `ระดับ${this.postypename}`;
+            //         postypenameid = this.postypenameid;
+            //         positionname  = `ระดับ${this.postypename}`;
+            //     }
+
+            //     // console.log('postypetext: ',postypetext);
+            //     // console.log('postypenameid: ',postypenameid);
+                
+            //     const levelMapping = {
+            //         'ระดับปฏิบัติการ': 1,
+            //         'ระดับปฏิบัติงาน': 1,
+            //         'ระดับชำนาญการ': 2,
+            //         'ระดับชำนาญงาน': 2,
+            //         'ระดับชำนาญการพิเศษ': 3,
+            //         'ระดับชำนาญงานพิเศษ': 3,
+            //         'อาจารย์': 3,
+            //         'ระดับเชี่ยวชาญ': 4,
+            //         'ระดับเชี่ยวชาญพิเศษ': 5
+            //     };
+            //     let xr = levelMapping[postypetext] || 0;
+
+            //     // ตั้งค่า coreCompetencies กลับไปเป็นค่าเริ่มต้น
+            //     this.coreCompetencies = [
+            //         { id: 1, activity: 'ก. 1 การมุ่งผลสัมฤทธิ์', indicator: xr, data_table1: '',selfAssessment:'' },
+            //         { id: 2, activity: 'ก. 2 การบริการที่ดี', indicator: xr, data_table1: '',selfAssessment:''  },
+            //         { id: 3, activity: 'ก. 3 การสั่งสมความเชี่ยวชาญในงานอาชีพ', indicator: xr, data_table1: '',selfAssessment:''  },
+            //         { id: 4, activity: 'ก. 4 การยึดมั่นในความถูกต้องชอบธรรมและจริยธรรม', indicator: xr, data_table1: '',selfAssessment:''  },
+            //         { id: 5, activity: 'ก. 5 การทำงานเป็นทีม', indicator: xr, data_table1: '',selfAssessment:''  }
+            //     ];   
+            //     this.jobSpecificCompetencies = []; 
+            //         // jobSpecificCompetencies: [
+            //         //     { id: 6, activity: 'ข. 1 การคิดวิเคราะห์12', indicator: '0', data_table2: '' },
+            //         //     { id: 7, activity: 'ข. 2 การดำเนินการเชิงรุก111', indicator: '0', data_table2: '' },
+            //         //     { id: 8, activity: 'ข. 3 ความผูกพันที่มีต่อส่วนราชการ111', indicator: '0', data_table2: '' },
+            //         //     { id: 9, activity: 'ข. 4 การมองภาพองค์รวม222', indicator: '0', data_table2: '' },
+            //         //     { id: 10, activity: 'ข. 5 การสืบเสาะหาข้อมูล2222', indicator: '0', data_table2: '' },
+            //         //     { id: 11, activity: 'ข. 6 การตรวจสอบความถูกต้องตามกระบวนงาน122222', indicator: '0', data_table2: '' }
+            //         // ], 
+            //         // ปรับ Mapping ให้ใช้ this.positionname แทน postypetext
+
+
+            //         // Biw 7/8/68 อันเก่า ก่อนเปลี่ยน
+            //         // const Mapping = {
+            //         //     'ผู้บริหาร': 1
+            //         // };  
+            //         // let executive = Mapping[this.positionname] || 0;
+
+            //         //160968บิว
+            //         //  const Mapping = {
+            //         //     '128': 1
+            //         // };  
+            //         // let executive = Mapping[this.posadio] || 0;
+            //         const Mapping = { '128': 1 };
+            //         let executive = Mapping[this.posadio] || 0;
+
+            //             // 👇 ยกเว้น staffid 110105 → ไม่ให้เป็น executive
+            //             // if (String(this.staffid_Main) === '110105','110146','160018') {
+            //             //     executive = 0;
+            //             // }
+            //             if (blacklist.includes(String(this.staffid_Main))) {
+            //                 executive = 0;
+            //             }
+
+
+            //         // console.log('executive:', executive); 
+            //         // ตั้งค่า otherCompetencies
+            //         this.otherCompetencies = [
+            //             { id: 12, activity: 'ค. 1 สภาวะผู้นำ', indicator3: executive, datatable3: '', selfAssessment3: '' },
+            //             { id: 13, activity: 'ค. 2 วิสัยทัศน์', indicator3: executive, datatable3: '', selfAssessment3: '' },
+            //             { id: 14, activity: 'ค. 3 การวางกลยุทธ์ภาครัฐ', indicator3: executive, datatable3: '', selfAssessment3: '' },
+            //             { id: 15, activity: 'ค. 4 ศักยภาพเพื่อนำการปรับเปลี่ยน', indicator3: executive, datatable3: '', selfAssessment3: '' },
+            //             { id: 16, activity: 'ค. 5 การสอนงานและการมอบหมายงาน', indicator3: executive, datatable3: '', selfAssessment3: '' }
+            //         ];
+            //     //console.log(this.coreCompetencies);
+                
+                
+            //     // ตั้งค่า jobSpecificCompetencies กลับไปเป็นค่าเริ่มต้น 
+            //     // this.showPostype(this.postypename,this.postypenameid);
+            //     this.showPostype(positionname,postypenameid); 
+                
+            //     axios.post('   http://127.0.0.1:8000/api/showDataPo',{
+            //         staff_id: this.staffid_Main,
+            //         fac_id: this.facid_Main,
+            //         year_id: this.dataPor.d_date,
+            //         record: this.dataPor.evalua,
+            //         postypename: postypetext
+            //     }).then(res => {     
+            //         // console.log('showDataPo > ',res.data);    
+            //         if(res.data.length > 0){
+            //             const data = res.data[0]; 
+            //             this.coreCompetencies = this.coreCompetencies.map(item => {
+            //                 if (data[`p${item.id}`] !== undefined) {
+            //                     return {
+            //                         ...item,
+            //                         data_table1: data[`p${item.id}`],
+            //                         selfAssessment: data[`pa_${item.id}`]
+            //                     };
+            //                 }
+            //                 return item;
+            //             }); 
+
+            //             // this.jobSpecificCompetencies.forEach(item => {
+            //             //     if (item.id === 6) {
+            //             //         item.data_table2 = data.p6;  // Update based on the API response
+            //             //     } else if (item.id === 7) {
+            //             //         item.data_table2 = data.p7;  // Update based on the API response
+            //             //     } else if (item.id === 8) {
+            //             //         item.data_table2 = data.p8;  // Add more conditions if necessary
+            //             //     } else if (item.id === 9) {
+            //             //         item.data_table2 = data.p9;  // Add more conditions if necessary
+            //             //     } else if (item.id === 10) {
+            //             //         item.data_table2 = data.p10;  // Add more conditions if necessary
+            //             //     } else if (item.id === 11) {
+            //             //         item.data_table2 = data.p11;  // Add more conditions if necessary
+            //             //     }
+            //             // });
+            //         } 
+            //     })
+            //     .catch(error => {
+            //         console.error('Error:', error);
+            //     });
+            // },
+
+            showdataPo(){   
+                const blacklist = ['110105','110146','160018']; 
+
+                const isSpecialExpert =
+                    this.posadio === '128' ||
+                    (this.postypenameid === '137' && this.positionname === 'ผู้บริหาร');
+
+                let postypetext = isSpecialExpert
+                    ? 'ระดับชำนาญการพิเศษ'
+                    : `ระดับ${this.postypename}`;
+
+                let postypenameid = isSpecialExpert
+                    ? 90
+                    : this.postypenameid;
+
+                let positionname = isSpecialExpert
+                    ? 'ระดับชำนาญการพิเศษ'
+                    : `ระดับ${this.postypename}`; 
+                if (blacklist.includes(String(this.staffid_Main))) {
                     postypetext   = `ระดับ${this.postypename}`;
                     postypenameid = this.postypenameid;
                     positionname  = `ระดับ${this.postypename}`;
-                }
-
-                // console.log('postypetext: ',postypetext);
-                // console.log('postypenameid: ',postypenameid);
-                
+                } 
                 const levelMapping = {
                     'ระดับปฏิบัติการ': 1,
                     'ระดับปฏิบัติงาน': 1,
@@ -1539,74 +1685,44 @@ import InputText from 'primevue/inputtext';
                     'ระดับเชี่ยวชาญ': 4,
                     'ระดับเชี่ยวชาญพิเศษ': 5
                 };
-                let xr = levelMapping[postypetext] || 0;
 
-                // ตั้งค่า coreCompetencies กลับไปเป็นค่าเริ่มต้น
+                let xr = levelMapping[postypetext] || 0; 
                 this.coreCompetencies = [
-                    { id: 1, activity: 'ก. 1 การมุ่งผลสัมฤทธิ์', indicator: xr, data_table1: '',selfAssessment:'' },
-                    { id: 2, activity: 'ก. 2 การบริการที่ดี', indicator: xr, data_table1: '',selfAssessment:''  },
-                    { id: 3, activity: 'ก. 3 การสั่งสมความเชี่ยวชาญในงานอาชีพ', indicator: xr, data_table1: '',selfAssessment:''  },
-                    { id: 4, activity: 'ก. 4 การยึดมั่นในความถูกต้องชอบธรรมและจริยธรรม', indicator: xr, data_table1: '',selfAssessment:''  },
-                    { id: 5, activity: 'ก. 5 การทำงานเป็นทีม', indicator: xr, data_table1: '',selfAssessment:''  }
-                ];   
+                    { id: 1, activity: 'ก. 1 การมุ่งผลสัมฤทธิ์', indicator: xr, data_table1: '', selfAssessment:'' },
+                    { id: 2, activity: 'ก. 2 การบริการที่ดี', indicator: xr, data_table1: '', selfAssessment:'' },
+                    { id: 3, activity: 'ก. 3 การสั่งสมความเชี่ยวชาญในงานอาชีพ', indicator: xr, data_table1: '', selfAssessment:'' },
+                    { id: 4, activity: 'ก. 4 การยึดมั่นในความถูกต้องชอบธรรมและจริยธรรม', indicator: xr, data_table1: '', selfAssessment:'' },
+                    { id: 5, activity: 'ก. 5 การทำงานเป็นทีม', indicator: xr, data_table1: '', selfAssessment:'' }
+                ];
+
                 this.jobSpecificCompetencies = []; 
-                    // jobSpecificCompetencies: [
-                    //     { id: 6, activity: 'ข. 1 การคิดวิเคราะห์12', indicator: '0', data_table2: '' },
-                    //     { id: 7, activity: 'ข. 2 การดำเนินการเชิงรุก111', indicator: '0', data_table2: '' },
-                    //     { id: 8, activity: 'ข. 3 ความผูกพันที่มีต่อส่วนราชการ111', indicator: '0', data_table2: '' },
-                    //     { id: 9, activity: 'ข. 4 การมองภาพองค์รวม222', indicator: '0', data_table2: '' },
-                    //     { id: 10, activity: 'ข. 5 การสืบเสาะหาข้อมูล2222', indicator: '0', data_table2: '' },
-                    //     { id: 11, activity: 'ข. 6 การตรวจสอบความถูกต้องตามกระบวนงาน122222', indicator: '0', data_table2: '' }
-                    // ], 
-                    // ปรับ Mapping ให้ใช้ this.positionname แทน postypetext
+                const Mapping = { '128': 1 };
+                let executive = Mapping[this.posadio] || 0;
 
+                if (blacklist.includes(String(this.staffid_Main))) {
+                    executive = 0;
+                }
 
-                    // Biw 7/8/68 อันเก่า ก่อนเปลี่ยน
-                    // const Mapping = {
-                    //     'ผู้บริหาร': 1
-                    // };  
-                    // let executive = Mapping[this.positionname] || 0;
-
-                    //160968บิว
-                    //  const Mapping = {
-                    //     '128': 1
-                    // };  
-                    // let executive = Mapping[this.posadio] || 0;
-                    const Mapping = { '128': 1 };
-                    let executive = Mapping[this.posadio] || 0;
-
-                        // 👇 ยกเว้น staffid 110105 → ไม่ให้เป็น executive
-                        if (String(this.staffid_Main) === '110105') {
-                            executive = 0;
-                    }
-
-
-                    // console.log('executive:', executive); 
-                    // ตั้งค่า otherCompetencies
-                    this.otherCompetencies = [
-                        { id: 12, activity: 'ค. 1 สภาวะผู้นำ', indicator3: executive, datatable3: '', selfAssessment3: '' },
-                        { id: 13, activity: 'ค. 2 วิสัยทัศน์', indicator3: executive, datatable3: '', selfAssessment3: '' },
-                        { id: 14, activity: 'ค. 3 การวางกลยุทธ์ภาครัฐ', indicator3: executive, datatable3: '', selfAssessment3: '' },
-                        { id: 15, activity: 'ค. 4 ศักยภาพเพื่อนำการปรับเปลี่ยน', indicator3: executive, datatable3: '', selfAssessment3: '' },
-                        { id: 16, activity: 'ค. 5 การสอนงานและการมอบหมายงาน', indicator3: executive, datatable3: '', selfAssessment3: '' }
-                    ];
-                //console.log(this.coreCompetencies);
-                
-                
-                // ตั้งค่า jobSpecificCompetencies กลับไปเป็นค่าเริ่มต้น 
-                // this.showPostype(this.postypename,this.postypenameid);
-                this.showPostype(positionname,postypenameid); 
-                
-                axios.post('   http://127.0.0.1:8000/api/showDataPo',{
+                this.otherCompetencies = [
+                    { id: 12, activity: 'ค. 1 สภาวะผู้นำ', indicator3: executive, datatable3: '', selfAssessment3: '' },
+                    { id: 13, activity: 'ค. 2 วิสัยทัศน์', indicator3: executive, datatable3: '', selfAssessment3: '' },
+                    { id: 14, activity: 'ค. 3 การวางกลยุทธ์ภาครัฐ', indicator3: executive, datatable3: '', selfAssessment3: '' },
+                    { id: 15, activity: 'ค. 4 ศักยภาพเพื่อนำการปรับเปลี่ยน', indicator3: executive, datatable3: '', selfAssessment3: '' },
+                    { id: 16, activity: 'ค. 5 การสอนงานและการมอบหมายงาน', indicator3: executive, datatable3: '', selfAssessment3: '' }
+                ]; 
+                this.showPostype(positionname, postypenameid);
+ 
+                axios.post('http://127.0.0.1:8000/api/showDataPo',{
                     staff_id: this.staffid_Main,
                     fac_id: this.facid_Main,
                     year_id: this.dataPor.d_date,
                     record: this.dataPor.evalua,
                     postypename: postypetext
-                }).then(res => {     
-                    // console.log('showDataPo > ',res.data);    
+                })
+                .then(res => {     
                     if(res.data.length > 0){
                         const data = res.data[0]; 
+
                         this.coreCompetencies = this.coreCompetencies.map(item => {
                             if (data[`p${item.id}`] !== undefined) {
                                 return {
@@ -1616,29 +1732,14 @@ import InputText from 'primevue/inputtext';
                                 };
                             }
                             return item;
-                        }); 
-
-                        // this.jobSpecificCompetencies.forEach(item => {
-                        //     if (item.id === 6) {
-                        //         item.data_table2 = data.p6;  // Update based on the API response
-                        //     } else if (item.id === 7) {
-                        //         item.data_table2 = data.p7;  // Update based on the API response
-                        //     } else if (item.id === 8) {
-                        //         item.data_table2 = data.p8;  // Add more conditions if necessary
-                        //     } else if (item.id === 9) {
-                        //         item.data_table2 = data.p9;  // Add more conditions if necessary
-                        //     } else if (item.id === 10) {
-                        //         item.data_table2 = data.p10;  // Add more conditions if necessary
-                        //     } else if (item.id === 11) {
-                        //         item.data_table2 = data.p11;  // Add more conditions if necessary
-                        //     }
-                        // });
+                        });
                     } 
                 })
                 .catch(error => {
                     console.error('Error:', error);
                 });
             },
+ 
             showPostype(postypename,postypenameid){
                 // console.log(postypename); 
                 var postypetext = postypename;
@@ -1700,7 +1801,7 @@ import InputText from 'primevue/inputtext';
                     console.error('Error fetching data:', error);
                 });
             } ,
-/*============= ความรู้/ทักษะ/สมรรถนะ ที่ต้องการพัฒนา =============*/ 
+            /*============= ความรู้/ทักษะ/สมรรถนะ ที่ต้องการพัฒนา =============*/ 
             chkp03data(){ 
                 this.products_Tab3 = [];
                 axios.post('   http://127.0.0.1:8000/api/showData04Tab3',{
