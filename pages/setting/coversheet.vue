@@ -9,6 +9,7 @@
                         </h5>  
                         <small style="color: red;font-size: larger;">* กรุณาเลือกรอบประเมิน เพื่อทำแบบประเมิน</small>
                     </div>  
+                    <!-- เลือกหลายรอบ -->
                     <div class="col md:col-6">  
                         <label for="product_date"></label>  
                         <Dropdown
@@ -22,6 +23,17 @@
                             @change="showdatator"
                         />
                     </div>
+                    <!-- เลือกรอบล่าสุดรอบเดียว -->
+                     <!-- <Dropdown
+                        id="product_date"
+                        v-model="product_date"
+                        :options="latestProductOnly"
+                        autoFilterFocus
+                        :optionLabel="(item) => `${item.d_evaluationround} ${item.d_date}`"
+                        placeholder="รอบการประเมิน (ล่าสุด)"
+                        style="max-width: 500px;width: 100%;border: outset;"
+                        @change="showdatator" 
+                    />  -->
                 </div> 
             </div>
         </div>  
@@ -313,7 +325,7 @@ const user = await getSession();
                     staffdepartment: this.facid_Main
                 };
             },
-
+            // เลือกหลายรอบการประเมิน
             showDataSet() {
                 axios.post('http://127.0.0.1:8000/api/showDateSet', {
                     staff_id: this.staffid_Main,
@@ -327,6 +339,31 @@ const user = await getSession();
                     console.error('Error:', error);
                 });
             }, 
+
+            //เลือกรอบล่าสุด
+            // showDataSet() {
+            //     axios.post('http://127.0.0.1:8000/api/showDateSet', {
+            //         staff_id: this.staffid_Main,
+            //         fac_id: this.facid_Main,
+            //         group_id: this.groupid_Main
+            //     })
+            //     .then((res) => {
+            //         this.products_date = res.data || [];
+
+            //         if (this.products_date.length > 0) {
+            //         const latest = [...this.products_date].sort(
+            //             (a, b) => new Date(b.d_date) - new Date(a.d_date)
+            //         )[0];
+
+            //         this.product_date = latest;     // set ให้ v-model
+            //         this.showdatator();             // โหลด TOR ตามรอบล่าสุด
+            //         }
+            //     })
+            //     .catch((error) => {
+            //         console.error('Error:', error);
+            //     });
+            // }, 
+
 
             saveDatator() {
                 if (this.product_date.d_date == null || this.product_date.d_date == undefined) {

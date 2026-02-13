@@ -39,7 +39,7 @@
                                     </div>
                                 </div>
 
-                                <div class="p-fluid formgrid grid"> 
+                                <!-- <div class="p-fluid formgrid grid"> 
                                     <div class="field col-12 md:col-4">
                                         <label for="openevalua_text" style="color: red;font-weight: 600;">วันที่เปิดรอบประเมิน</label>  
                                         <InputText type="date" id="inputgroup" v-model="openevalua" />
@@ -48,26 +48,10 @@
                                         <label for="closeevalua_text" style="color: red;font-weight: 600;" >วันที่ปิดรอบประเมิน</label>  
                                         <InputText type="date" id="inputgroup" v-model="closeevalua" />
                                     </div>
-                                </div>
-
-
-                                 <!-- <div class="p-fluid formgrid grid"> 
-                                    <div class="field col-12 md:col-4">
-                                        <label for="dateStart_text" style="color: red;font-weight: 600;">วันที่ครบกำหนดบันทึกแบบ ป.01</label>  
-                                        <InputText type="date" id="inputgroup" v-model="dateStart" />
-                                    </div> 
-                                    <div class="field col-12 md:col-4">
-                                        <label for="dateEnd_text" style="color: red;font-weight: 600;" >วันที่ครบกำหนดบันทึกแบบ ป.03</label>  
-                                        <InputText type="date" id="inputgroup" v-model="dateEnd" />
-                                    </div>
-                                    <div class="field col-12 md:col-4">
-                                        <label for="announce_text" style="color: red;font-weight: 600;">วันที่ประกาศคะแนน</label>  
-                                        <InputText type="date" id="inputgroup" v-model="dateAnnounce" />
-                                    </div>
                                 </div> -->
 
- 
 
+                                
                                 <h5 class="mb-4 card-header">กำหนดสิทธิ์การประเมิน</h5>
                                 <div class="p-fluid formgrid grid"> 
                                     <div class="field col-12 md:col-4">

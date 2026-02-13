@@ -19,13 +19,18 @@ const allMenus = ref([
     {
         id: 'tor',
         label: 'แบบบันทึกข้อตกลง(TOR)ป.01-ป.03',
-        items: [{ label: 'แบบบันทึกข้อตกลง', icon: 'pi pi-fw pi-calendar', to: '/setting/coversheet' }]
+        items: [
+            { label: 'แบบบันทึกข้อตกลง', icon: 'pi pi-fw pi-calendar', to: '/setting/coversheet' },
+            { label: 'ประวัติการประเมิน', icon: 'pi pi-fw pi-clock', to: '/setting/history' }
+
+        ]
+        
     }, 
-    // {
-    //     id: 'history',
-    //     label: 'ประวัติการประเมิน',
-    //     items: [{ label: 'ประวัติการประเมิน', icon: 'pi pi-fw pi-clock', to: '/setting/history' }]
-    // },
+    {
+        id: 'history',
+        label: 'ประวัติการประเมิน',
+        items: [{ label: 'ประวัติการประเมิน', icon: 'pi pi-fw pi-clock', to: '/setting/history' }]
+    },
 
     // {
     //     id: 'torday',
