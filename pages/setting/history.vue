@@ -11,12 +11,18 @@
                         <p><b>คณะ / หน่วยงาน :</b> {{ user.user.name.SCOPES?.staffdepartmentname }}</p>   
                          
                     </div> 
-                </div>  
+                </div> 
+                <div v-if="loadingHistory" style="padding: 10px; color: #555;">
+                    กำลังโหลดประวัติ...
+                </div> 
                 <table class="table">
                     <thead> 
                         <tr style="height: 40px;background-color: blanchedalmond;">
-                            <th style="width: 80%;">รอบการประเมิน</th>  
-                            <th style="width: 20%;">รายละเอียด</th> 
+                            <th style="width: 45%;">รอบการประเมิน</th>  
+                            <th style="width: 15%;">ผลสัมฤทธิ์ของงาน</th>  
+                            <th style="width: 15%;">พฤติกรรมการปฏิบัติราชการ</th>   
+                            <th style="width: 15%;">ผลคะแนน</th>   
+                            <th style="width: 15%;">รายละเอียด</th> 
                         </tr>
                     </thead>
                     <tbody>  
@@ -24,11 +30,21 @@
                             <td class="text-left">   
                                 <strong>ปีงบประมาณ <span style="color: brown;">{{ Item.d_date }}</span> : <span style="color: blue;">{{ Item.d_evaluationround }}</span></strong>
                             </td> 
+                            <td class="text-center" style="color: blue;">
+                                <b>{{ Item.tb_tor?.achievement_score ?? '-' }}</b>
+                            </td>
+                            <td class="text-center" style="color: blue;">
+                                <b>{{ Item.tb_tor?.behavior ?? '-' }}</b>
+                            </td>
+                            <td class="text-center" style="color: blue;">
+                                <b>{{ Item.tb_tor?.sum_score ?? '-' }}</b>
+                            </td>
+                               
                             <td> 
                                 <div v-if="Item.countchk > 0">  
                                     <Button 
                                         label="รายละเอียด" 
-                                        severity="info"
+                                        severity="primary"
                                         class="mb-2 mr-2" 
                                         icon="pi pi-list" 
                                         @click="openDataEvalu(Item)" 
@@ -51,6 +67,8 @@
                                 </Button>
                             </td> -->
                         </tr> 
+
+
                         <!-- <tr v-for="(Item, index) in products" :key="index">
                             <td style="padding-left: 5px;width: 70%;text-align: left;">   
                                 <b style="color: blue;">{{ Item.prefixfullname }} {{ Item.namefully }} </b> 
@@ -104,10 +122,9 @@
                                     <p v-else> -->
                                     <p><strong>สังกัด:</strong> {{ user.user.name.SCOPES?.staffdepartmentname }} </p>
                                     <p><strong>ตำแหน่ง:</strong> {{ user.user.name.POSITIONNAME }} </p>
-                                    <strong>ระดับตำแหน่ง:</strong> {{ user.user?.name.POSITIONNAME === 'ผู้บริหาร' ? 'ชำนาญการพิเศษ' : user.user?.name.POSTYPENAME }} 
+                                    <p><strong>ระดับตำแหน่ง:</strong> {{ user.user?.name.POSITIONNAME === 'ผู้บริหาร' ? 'ชำนาญการพิเศษ' : user.user?.name.POSTYPENAME }} </p>
                                     <p><strong>ชื่อผู้ประเมิน:</strong> {{ assessorText }}</p> 
-                                    
-                                    
+                                     
                                      <!-- {{ staff_po }} -->
                                     <p><strong>ตำแหน่งผู้ประเมิน :</strong>{{ assessor_positionText }}</p> 
                                     <p><strong>รายละเอียดข้อตกลง ระหว่าง วันที่ :</strong> {{ tracking_date.d_evaluationround }} {{ tracking_date.d_date }}</p> 
@@ -344,7 +361,8 @@
                                                                 </td> 
                                                                 <td>
                                                                     <b v-if="row2.SCORE == '' ||  row2.SCORE == null " style="color: red;">0</b> 
-                                                                    <b v-if="row2.SCORE != 0  ||  row2.SCORE == null" >{{ row2.SCORE }}</b> 
+                                                                    <!-- <b v-if="row2.SCORE != 0  ||  row2.SCORE == null" >{{ row2.SCORE }}</b>  -->
+                                                                     <b v-if="row2.SCORE !== 0 && row2.SCORE !== null && row2.SCORE !== ''">{{ row2.SCORE }}</b>
                                                                 </td>
                                                             </tr> 
                                                         </tbody>
@@ -747,9 +765,11 @@ export default {
             tracking_fac: '',
             //tracking_facuty: null,
             
-
+             //บิว160269
+            loadingHistory: false,
             // ตารางรายชื่อ
             products: [],
+           
 
             // เพิ่มคะแนนประเมิน
             DialogAdd: false,
@@ -840,7 +860,8 @@ export default {
             assessorText: null,
             assessor_positionText: null,
             currentstaff: {},  
-            //datatable3: []
+            //datatable3: [] 
+            
         };
     },
     components: {
@@ -932,38 +953,73 @@ export default {
                 }
             }
         }, 
-        async showDataEvalu() { 
-            try { 
-                await axios.post(' http://127.0.0.1:8000/api/getDataDate', { 
-                    fac_id: this.facid_Main ,
-                    staff_id: this.staffid_Main
-                }).then((res) => {
-                    // console.log(res.data);
-                    this.products = res.data;
-                })
-                .catch((error) => {
-                    console.error('Error:', error);
-                }); 
+        // async showDataEvalu() { 
+        //     try { 
+        //         await axios.post(' http://127.0.0.1:8000/api/getDataDate', { 
+        //             fac_id: this.facid_Main ,
+        //             staff_id: this.staffid_Main
+        //         }).then((res) => {
+        //             // console.log(res.data);
+        //             this.products = res.data;
+        //         })
+        //         .catch((error) => {
+        //             console.error('Error:', error);
+        //         }); 
                 
-                // const res = await axios.get(' http://127.0.0.1:8000/api/showDataEvalu', {  
-                //     params: {
-                //         staff_id: this.staffid_Main,
-                //         fac_id: this.tracking_date.fac_id,
-                //         group_id: this.groupid_Main,
-                //         evalua: this.tracking_date.evalua,
-                //         p_year: this.tracking_date.d_date
-                //     }
-                // });
-                // this.products = res.data.filter(item => item.staffid == this.staffid_Main); 
-                // // this.products = res.data;
-                // // console.log(res.data);
+        //         // const res = await axios.get(' http://127.0.0.1:8000/api/showDataEvalu', {  
+        //         //     params: {
+        //         //         staff_id: this.staffid_Main,
+        //         //         fac_id: this.tracking_date.fac_id,
+        //         //         group_id: this.groupid_Main,
+        //         //         evalua: this.tracking_date.evalua,
+        //         //         p_year: this.tracking_date.d_date
+        //         //     }
+        //         // });
+        //         // this.products = res.data.filter(item => item.staffid == this.staffid_Main); 
+        //         // // this.products = res.data;
+        //         // // console.log(res.data);
 
-                // // ใช้ Promise.all เพื่อทำการเรียก cvb พร้อมกันหลายๆ รายการ
-                // //await Promise.all(res.data.map(item => this.cvb(item)));
+        //         // // ใช้ Promise.all เพื่อทำการเรียก cvb พร้อมกันหลายๆ รายการ
+        //         // //await Promise.all(res.data.map(item => this.cvb(item)));
+        //     } catch (error) {
+        //         console.error('Error fetching evaluation data:', error);
+        //     }
+        // },
+
+        async showDataEvalu() {
+            this.loadingHistory = true;   // ✅ เริ่มโหลด
+            try {
+                const res = await axios.post('http://127.0.0.1:8000/api/getDataDate', {
+                fac_id: this.facid_Main,
+                staff_id: this.staffid_Main
+                });
+
+                this.products = res.data;
+
+                // ✅ ดึงคะแนน tor ของแต่ละรอบ แล้วใส่เข้า Item.tb_tor
+                await Promise.all(
+                this.products.map(async (item) => {
+                    try {
+                    const r = await axios.post('http://127.0.0.1:8000/api/showdatator', {
+                        p_year: item.d_date,
+                        evalua: item.evalua,
+                        p_staffid: this.staffid_Main
+                    });
+
+                    item.tb_tor = r.data?.[0] ?? null;
+                    } catch (e) {
+                    item.tb_tor = null;
+                    }
+                })
+                );
+
             } catch (error) {
                 console.error('Error fetching evaluation data:', error);
+            } finally {
+                this.loadingHistory = false; // ✅ โหลดเสร็จ/พัง ก็ปิดโหลดเสมอ
             }
         },
+ 
         async cvb(item) {
             // console.log(this.tracking_date.evalua);
             try {
@@ -1072,12 +1128,20 @@ export default {
                 this.suggestions = null;
 
                 // ✅ 4) โหลดสมรรถนะ/PO
+                // await this.showdataPo(
+                // this.dataStaffid,
+                // this.facid_Main,
+                // this.tracking_date.d_date,
+                // this.tracking_date.evalua,
+                // row.posnameid
+                // );
+
                 await this.showdataPo(
-                this.dataStaffid,
-                this.facid_Main,
-                this.tracking_date.d_date,
-                this.tracking_date.evalua,
-                row.posnameid
+                    this.dataStaffid,
+                    this.facid_Main,
+                    this.tracking_date.d_date,
+                    this.tracking_date.evalua,
+                    this.postypenameid
                 );
 
                 // ✅ 5) โหลด ป01-ป03
@@ -1467,7 +1531,8 @@ export default {
                 .catch((error) => {
                     console.error('Error fetching data:', error);
                 });
-            await this.getjobSpecificCompetencies();
+            // await this.getjobSpecificCompetencies();
+            await this.getjobSpecificCompetencies(this.dataStaffid);
         }, 
         getjobSpecificCompetencies(dataStaffid) {
             //console.log(this.staffid_Main,this.dataPor);
@@ -1511,7 +1576,7 @@ export default {
                     console.error('Error fetching data:', error);
                 });
         },
-        showdataPo(staff_id, facid_Main, d_date, evalua, posnameid) {  
+       async showdataPo(staff_id, facid_Main, d_date, evalua, posnameid) {  
             // ตรวจสอบว่า currentstaff มีค่าหรือไม่
             if (!this.currentstaff || this.currentstaff.length === 0) {
                 console.error("Error: currentstaff is undefined or empty.");
@@ -1560,7 +1625,10 @@ export default {
             ]; 
 
             // this.showPostype(this.currentstaff[0]?.postypenameth, this.postypenameid); // แก้ไข ตัวป2
-            this.showPostype(this.currentstaff[0]?.postypenameth, posnameid);
+            // this.showPostype(this.currentstaff[0]?.postypenameth, posnameid);
+
+            const posId = posnameid ?? this.postypenameid;   // กัน undefined
+            await this.showPostype(this.currentstaff[0]?.postypenameth, posId);
 
             axios.post(' http://127.0.0.1:8000/api/showDataPo', {
                 staff_id: staff_id,
