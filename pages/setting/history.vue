@@ -30,7 +30,7 @@
                             <td class="text-left">   
                                 <strong>ปีงบประมาณ <span style="color: brown;">{{ Item.d_date }}</span> : <span style="color: blue;">{{ Item.d_evaluationround }}</span></strong>
                             </td> 
-                            <td class="text-center" style="color: blue;">
+                            <!-- <td class="text-center" style="color: blue;">
                                 <b>{{ Item.tb_tor?.achievement_score ?? '-' }}</b>
                             </td>
                             <td class="text-center" style="color: blue;">
@@ -38,8 +38,35 @@
                             </td>
                             <td class="text-center" style="color: blue;">
                                 <b>{{ Item.tb_tor?.sum_score ?? '-' }}</b>
+                            </td> -->
+
+                            <td class="text-center" style="color: blue;">
+                                <div v-if="isScoreAnnounced(Item)">
+                                    <b>{{ Item.tb_tor?.achievement_score ?? '-' }}</b>
+                                </div>
+                                <div v-else>
+                                    <span style="color: brown;">รอประกาศผลคะแนน</span>
+                                </div>
                             </td>
-                               
+
+                            <td class="text-center" style="color: blue;">
+                                <div v-if="isScoreAnnounced(Item)">
+                                    <b>{{ Item.tb_tor?.behavior ?? '-' }}</b>
+                                </div>
+                                <div v-else>
+                                    <span style="color: brown;">รอประกาศผลคะแนน</span>
+                                </div>
+                            </td>
+
+                            <td class="text-center" style="color: blue;">
+                                <div v-if="isScoreAnnounced(Item)">
+                                    <b>{{ Item.tb_tor?.sum_score ?? '-' }}</b>
+                                </div>
+                                <div v-else>
+                                    <span style="color: brown;">รอประกาศผลคะแนน</span>
+                                </div>
+                            </td>
+
                             <td> 
                                 <div v-if="Item.countchk > 0">  
                                     <Button 
@@ -184,15 +211,29 @@
                                                     <template v-for="(h, ind) in products_Tab2" :key="ind">
                                                         <tr>
                                                             <td style="text-align: left;" colspan="10">
-                                                                <b style="color: blue;">{{ h.id }}. {{ h.nameH }}</b> 
+                                                                <b style="color: blue;">{{ h.h_no }}. {{ h.nameH }}</b> 
                                                             </td> 
                                                             <td class="text-center" style="color: blue;"> <b>{{ h.p01_weight??0 }}%</b></td>
                                                             <td></td>
                                                         </tr> 
                                                         <tr v-for="(subP01, idx) in h.subP01sX" :key="idx" style="vertical-align: baseline;">
-                                                            <td style="text-align: left;">{{ subP01.p01_no }} {{ subP01.p01_subject }}</td>
+                                                            <!-- <td style="text-align: left;">{{ subP01.p01_no }} {{ subP01.p01_subject }}</td> -->
+                                                            <td style="text-align:left;">
+                                                                <template v-for="(ln, i) in parseActivityText(subP01.p01_subject).lines" :key="i">
+                                                                    <div v-if="ln.type === 'main'" style="font-weight:700; margin-bottom:4px;">
+                                                                    {{ ln.text }}
+                                                                    </div>
+                                                                    <div v-else class="subline">
+                                                                    <span>{{ ln.no }}</span>
+                                                                    <span>{{ ln.text }}</span>
+                                                                    </div>
+                                                                </template>
+                                                            </td> 
+
                                                             <td style="text-align: left;">
-                                                                <b>ตัวชี้วัดที่ {{ idx+1 }} {{ subP01.p01_subject }}</b>
+                                                                <!-- <b>ตัวชี้วัดที่ {{ idx+1 }} {{ subP01.p01_subject }}</b> -->
+                                                                <b>ตัวชี้วัดที่ {{ idx + 1 }} {{ getMainSubject(subP01.p01_subject) }}</b> 
+
                                                                 <p v-for="(subIitem, idI) in subP01.subITems" :key="idI" style="padding-left: 8px;margin-bottom: 5px;">
                                                                     <div v-if="subIitem.ind_no!=0" ><b>ระดับ {{ subIitem.ind_no }}</b> {{ subIitem.ind_Items }}</div>
                                                                     <div v-if="subIitem.ind_no==0" ><b>{{ subIitem.ind_Items }}</b></div>
@@ -266,9 +307,19 @@
                                                                 <b v-if="subP01.p01_target!=5"></b> 
                                                             </td>
                                                                 <!-- เพิ่มตารางช่องค่าคะแนน -->
-                                                            <td style=" vertical-align: middle;" class="text-center">{{ subP01.p01_score }}</td>
+                                                            <!-- <td style=" vertical-align: middle;" class="text-center">{{ subP01.p01_score }}</td> -->
+                                                            <td style="vertical-align: middle;" class="text-center">
+                                                                {{ isScoreAnnounced(tracking_date) ? (subP01.p01_score ?? 0) : 0 }}
+                                                            </td>
                                                             <td style=" vertical-align: middle;" class="text-center">{{ subP01.p01_weight }}%</td> 
-                                                            <td style=" vertical-align: middle;" class="text-center">{{ (subP01.p01_score * subP01.p01_weight / 100).toFixed(2) }}</td>
+                                                            <!-- <td style=" vertical-align: middle;" class="text-center">{{ (subP01.p01_score * subP01.p01_weight / 100).toFixed(2) }}</td> -->
+                                                             <td style="vertical-align: middle;" class="text-center">
+                                                                    {{
+                                                                        isScoreAnnounced(tracking_date)
+                                                                        ? ((Number(subP01.p01_score ?? 0) * Number(subP01.p01_weight ?? 0) / 100).toFixed(2))
+                                                                        : '0.00'
+                                                                    }}
+                                                            </td>
                                                         </tr>
                                                         </template>
                                                         <tr>
@@ -281,8 +332,12 @@
                                                             <td class="text-center" style="color: blue;">
                                                                 <b>{{ totalWeighttrack??0 }}%</b> <!-- แสดงผลรวม p01_weight -->
                                                             </td>
+                                                            <!-- แสดงผลรวมคะแนนที่คำนวณ -->
+                                                            <!-- <td class="text-center" style="color: blue;">
+                                                                <b>{{ WeightedScoreSumtrack??0 }}</b> 
+                                                            </td>  -->
                                                             <td class="text-center" style="color: blue;">
-                                                                <b>{{ WeightedScoreSumtrack??0 }}</b> <!-- แสดงผลรวมคะแนนที่คำนวณ -->
+                                                                <b>{{ isScoreAnnounced(tracking_date) ? (WeightedScoreSumtrack ?? 0) : 0 }}</b>
                                                             </td> 
                                                         </tr>
                                                         <tr>
@@ -298,16 +353,23 @@
                                                                 <b>{{ WeightedScoreSumX }}</b> <!-- แสดงผลรวม/จำนวนระดับเป้าหมาย -->
                                                             </td>
                                                             <td class="text-center" style="color: blue;  vertical-align: middle;" >
-                                                                <b style="display: block; text-align: right; color: blue; text-align: left;">{{ WeightedScoreSumtrack }}</b>
+                                                                <!-- <b style="display: block; text-align: right; color: blue; text-align: left;">{{ WeightedScoreSumtrack }}</b> -->
+                                                                <b style="display:block; text-align:right; color:blue; text-align:left;">
+                                                                    {{ isScoreAnnounced(tracking_date) ? (Number(WeightedScoreSumtrack ?? 0)).toFixed(2) : '0.00' }}
+                                                                </b>
                                                                 <hr style="border: 1px solid black; width: 60%; text-align: left;">
                                                                 <b style="display: block; text-align: right; color: blue; text-align: left;">{{5}}</b>
-                                                                <div style="text-align: right;">
+                                                                <!-- แสดงผลรวม/จำนวนระดับเป้าหมาย -->
+                                                                <!-- <div style="text-align: right;">
                                                                     <b>= {{ WeightedScoreSumXT }}</b>
-                                                                </div> <!-- แสดงผลรวม/จำนวนระดับเป้าหมาย -->
+                                                                </div>  -->
+                                                                <div style="text-align:right;">
+                                                                    <b>= {{ isScoreAnnounced(tracking_date) ? (Number(WeightedScoreSumXT ?? 0)).toFixed(2) : '0.00' }}</b>
+                                                                </div>
                                                             </td>
                                                         </tr>  
-                                                    </tbody>
-                                                </table>
+                                                </tbody>
+                                            </table>
                                             <hr>
                                             <div class="p-fluid formgrid grid">
                                                 <!-- ตาราง ก. สมรรถนะหลัก -->
@@ -330,9 +392,14 @@
                                                                     <b v-if="row1.selfAssessment == '' ||  row1.selfAssessment == null" style="color: red;">0</b> 
                                                                     <b v-if="row1.selfAssessment != 0 " style="color: blue" >{{ row1.selfAssessment }}</b> 
                                                                 </td> 
-                                                                <td>  
+                                                                <!-- <td>  
                                                                     <b v-if="row1.data_table1 == '' " style="color: red;">0</b> 
                                                                     <b v-if="row1.data_table1 != 0 "  >{{ row1.data_table1 }}</b> 
+                                                                </td> -->
+                                                                <td>
+                                                                    <b :style="{ color: scoreColor(row1.data_table1, isScoreAnnounced(tracking_date)) }">
+                                                                        {{ isScoreAnnounced(tracking_date) ? (Number(row1.data_table1 ?? 0)) : 0 }}
+                                                                    </b>
                                                                 </td>
                                                             </tr>
                                                         </tbody>
@@ -359,10 +426,14 @@
                                                                     <b v-if="row2.SCOREPERSON == '' ||  row2.SCOREPERSON == null " style="color: red;">0</b> 
                                                                     <b v-if="row2.SCOREPERSON != 0 " style="color: blue;">{{ row2.SCOREPERSON }}</b> 
                                                                 </td> 
-                                                                <td>
-                                                                    <b v-if="row2.SCORE == '' ||  row2.SCORE == null " style="color: red;">0</b> 
-                                                                    <!-- <b v-if="row2.SCORE != 0  ||  row2.SCORE == null" >{{ row2.SCORE }}</b>  -->
+                                                                <!-- <td>
+                                                                    <b v-if="row2.SCORE == '' ||  row2.SCORE == null " style="color: red;">0</b>  
                                                                      <b v-if="row2.SCORE !== 0 && row2.SCORE !== null && row2.SCORE !== ''">{{ row2.SCORE }}</b>
+                                                                </td> -->
+                                                                <td>
+                                                                    <b :style="{ color: scoreColor(row2.SCORE, isScoreAnnounced(tracking_date)) }">
+                                                                        {{ isScoreAnnounced(tracking_date) ? (Number(row2.SCORE ?? 0)) : 0 }}
+                                                                    </b>
                                                                 </td>
                                                             </tr> 
                                                         </tbody>
@@ -390,9 +461,14 @@
                                                                     <b v-if="row3.datatable3 == '' ||  row3.datatable3 == null" style="color: red;">0</b> 
                                                                     <b v-if="row3.datatable3 != 0 " style="color: blue" >{{ row3.datatable3 }}</b> 
                                                                 </td>
-                                                                <td>  
+                                                                <!-- <td>  
                                                                     <b v-if="row3.selfAssessment3 == '' " style="color: red;">0</b> 
                                                                     <b v-if="row3.selfAssessment3 != 0 " >{{ row3.selfAssessment3 }}</b> 
+                                                                </td> -->
+                                                                <td>
+                                                                    <b :style="{ color: scoreColor(row3.selfAssessment3, isScoreAnnounced(tracking_date)) }">
+                                                                        {{ isScoreAnnounced(tracking_date) ? (Number(row3.selfAssessment3 ?? 0)) : 0 }}
+                                                                    </b>
                                                                 </td>
                                                             </tr> 
                                                         </tbody>
@@ -416,68 +492,187 @@
                                                 <tbody>
                                                     <tr>
                                                         <td style=" vertical-align: middle;" class="text-left">จำนวนสมรรถนะหลัก /สมรรถนะเฉพาะตามลักษณะงานที่ปฏิบัติ /สมรรถนะทางการบริหาร ที่มีระดับสมรรถนะที่แสดงออก สูงกว่าหรือเท่ากับ ระดับสมรรถนะที่คาดหวัง X 3 คะแนน</td>
-                                                            <td class="text-center" style="color: blue;">
+                                                            <!-- <td class="text-center" style="color: blue;">
                                                                 <b>{{ totalcorecompetenciesX3 }}</b>  
+                                                            </td> -->
+                                                            <td class="text-center" style="color: blue;">
+                                                                <template v-if="isScoreAnnounced(tracking_date)">
+                                                                    <b :style="{ color: Number(totalcorecompetenciesX3) === 0 ? 'red' : 'blue' }">
+                                                                    {{ totalcorecompetenciesX3 ?? 0 }}
+                                                                    </b>
+                                                                </template>
+                                                                <template v-else>
+                                                                    <b style="color: blue;">0</b>
+                                                                </template>
                                                             </td>
                                                             <td class="text-center" style="color: blue;"><b>3</b></td>   
-                                                            <td class="text-center" style="color: blue;">
+                                                            <!-- <td class="text-center" style="color: blue;">
                                                                 <b>{{ totalScoreSumX3 }}</b>  
-                                                            </td>                                                    
+                                                            </td> -->
+                                                            <td class="text-center" style="color: blue;">
+                                                                <template v-if="isScoreAnnounced(tracking_date)">
+                                                                    <b :style="{ color: Number(totalScoreSumX3) === 0 ? 'red' : 'blue' }">
+                                                                    {{ totalScoreSumX3 ?? 0 }}
+                                                                    </b>
+                                                                </template>
+                                                                <template v-else>
+                                                                    <b style="color: blue;">0</b>
+                                                                </template>
+                                                            </td>
                                                     </tr>
                                                     <tr>
                                                         <td style=" vertical-align: middle;" class="text-left">จำนวนสมรรถนะหลัก /สมรรถนะเฉพาะตามลักษณะงานที่ปฏิบัติ /สมรรถนะทางการบริหาร ที่มีระดับสมรรถนะที่แสดงออก ต่ำกว่า ระดับสมรรถนะที่คาดหวัง 1 ระดับ X 2 คะแนน</td>
-                                                            <td class="text-center" style="color: blue;">
+                                                            <!-- <td class="text-center" style="color: blue;">
                                                                 <b>{{ totalcorecompetenciesX2 }}</b> 
-                                                            </td>
-                                                            <td class="text-center" style="color: blue;"><b>2</b></td> 
+                                                            </td> -->
                                                             <td class="text-center" style="color: blue;">
+                                                                <template v-if="isScoreAnnounced(tracking_date)">
+                                                                    <b :style="{ color: Number(totalcorecompetenciesX2) === 0 ? 'red' : 'blue' }">
+                                                                    {{ totalcorecompetenciesX2 ?? 0 }}
+                                                                    </b>
+                                                                </template>
+                                                                <template v-else>
+                                                                    <b style="color: blue;">0</b>
+                                                                </template>
+                                                            </td> 
+                                                            <td class="text-center" style="color: blue;"><b>2</b></td>  
+                                                            <!-- <td class="text-center" style="color: blue;">
                                                                 <b>{{ totalScoreSumX2 }}</b>  
+                                                            </td> -->
+                                                            <td class="text-center" style="color: blue;">
+                                                                <template v-if="isScoreAnnounced(tracking_date)">
+                                                                    <b :style="{ color: Number(totalScoreSumX2) === 0 ? 'red' : 'blue' }">
+                                                                    {{ totalScoreSumX2 ?? 0 }}
+                                                                    </b>
+                                                                </template>
+                                                                <template v-else>
+                                                                    <b style="color: blue;">0</b>
+                                                                </template>
                                                             </td>
                                                     </tr>
+
                                                     <tr>
                                                         <td style=" vertical-align: middle;" class="text-left">จำนวนสมรรถนะหลัก /สมรรถนะเฉพาะตามลักษณะงานที่ปฏิบัติ /สมรรถนะทางการบริหาร ที่มีระดับสมรรถนะที่แสดงออก ต่ำกว่า ระดับสมรรถนะที่คาดหวัง 2 ระดับ X 1 คะแนน</td>
-                                                            <td class="text-center" style="color: blue;">
+                                                            <!-- <td class="text-center" style="color: blue;">
                                                                 <b>{{ totalcorecompetenciesX1 }}</b> 
-                                                            </td> 
-                                                            <td class="text-center" style="color: blue;"><b>1</b></td> 
+                                                            </td>  -->
                                                             <td class="text-center" style="color: blue;">
+                                                                <template v-if="isScoreAnnounced(tracking_date)">
+                                                                    <b :style="{ color: Number(totalcorecompetenciesX1) === 0 ? 'red' : 'blue' }">
+                                                                    {{ totalcorecompetenciesX1 ?? 0 }}
+                                                                    </b>
+                                                                </template>
+                                                                <template v-else>
+                                                                    <b style="color: blue;">0</b>
+                                                                </template>
+                                                            </td>  
+                                                            <td class="text-center" style="color: blue;"><b>1</b></td> 
+
+                                                            <!-- <td class="text-center" style="color: blue;"> 
                                                                 <b>{{ totalScoreSumX1 }}</b> 
+                                                            </td>    -->
+                                                            <td class="text-center" style="color: blue;">
+                                                                <template v-if="isScoreAnnounced(tracking_date)">
+                                                                    <b :style="{ color: Number(totalScoreSumX1) === 0 ? 'red' : 'blue' }">
+                                                                    {{ totalScoreSumX1 ?? 0 }}
+                                                                    </b>
+                                                                </template>
+                                                                <template v-else>
+                                                                    <b style="color: blue;">0</b>
+                                                                </template>
                                                             </td>   
-                                                            
                                                     </tr>
                                                     <tr>
                                                         <td style=" vertical-align: middle;" class="text-left">จำนวนสมรรถนะหลัก /สมรรถนะเฉพาะตามลักษณะงานที่ปฏิบัติ /สมรรถนะทางการบริหาร ที่มีระดับสมรรถนะที่แสดงออก ต่ำกว่า ระดับสมรรถนะที่คาดหวัง 3 ระดับ X 0 คะแนน</td>
-                                                        <td class="text-center" style="color: blue;">
+                                                            <!-- <td class="text-center" style="color: blue;">
                                                                 <b>{{ totalcorecompetenciesX0 }}</b> 
-                                                            </td> 
-                                                            <td class="text-center" style="color: blue;"><b>0</b></td> 
+                                                            </td>  -->
                                                             <td class="text-center" style="color: blue;">
+                                                                <template v-if="isScoreAnnounced(tracking_date)">
+                                                                    <b :style="{ color: Number(totalcorecompetenciesX0) === 0 ? 'red' : 'blue' }">
+                                                                    {{ totalcorecompetenciesX0 ?? 0 }}
+                                                                    </b>
+                                                                </template>
+                                                                <template v-else>
+                                                                    <b style="color: blue;">0</b>
+                                                                </template>
+                                                            </td>   
+                                                            <td class="text-center" style="color: blue;"><b>0</b></td>  
+                                                            <!-- <td class="text-center" style="color: blue;">
                                                                 <b>{{ totalScoreSumX0 }}</b> 
+                                                            </td>    -->  
+                                                            <td class="text-center" style="color: blue;">
+                                                                <template v-if="isScoreAnnounced(tracking_date)">
+                                                                    <b :style="{ color: Number(totalScoreSumX0) === 0 ? 'red' : 'blue' }">
+                                                                    {{ totalScoreSumX0 ?? 0 }}
+                                                                    </b>
+                                                                </template>
+                                                                <template v-else>
+                                                                    <b style="color: blue;">0</b>
+                                                                </template>
                                                             </td>   
                                                     </tr>
                                                     <tr>
                                                         <td style="text-align: right" colspan="3">
                                                             <b style="color: blue;"> (8) ผลรวม</b>
                                                         </td>
-                                                            <td class="text-center" style="color: blue;"> 
+                                                            <!-- <td class="text-center" style="color: blue;"> 
                                                                 <b>{{ totalScoreSumX3+totalScoreSumX2+totalScoreSumX1 }}</b>  
-                                                            </td> 
+                                                            </td>  -->
+
+                                                            <td class="text-center" style="color: blue;">
+                                                                <template v-if="isScoreAnnounced(tracking_date)">
+                                                                    <b style="color: blue;">
+                                                                    {{ (Number(totalScoreSumX3) + Number(totalScoreSumX2) + Number(totalScoreSumX1)) ?? 0 }}
+                                                                    </b>
+                                                                </template>
+                                                                <template v-else>
+                                                                    <b style="color: blue;">0</b>
+                                                                </template>
+                                                            </td>
                                                     </tr>
                                                     <tr>
                                                     <td style="text-align: center; vertical-align: middle;" colspan="3">
                                                         <b style="color: blue;">(9) สรุปคะแนนส่วนพฤติกรรมการปฏิบัติราชการ   (สมรรถนะ) =	 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </b>
-                                                        <b style="color: blue;">  ผลรวมคะแนน ใน (8)</b>
-                                                        <b style="display: block; text-align: right; color: blue;">{{ totalScoreSumX3 + totalScoreSumX2+totalScoreSumX1 }}</b>   
+                                                        <b style="color: blue;">  ผลรวมคะแนน ใน (8)</b> 
+
+                                                        <!-- <b style="display: block; text-align: right; color: blue;">{{ totalScoreSumX3 + totalScoreSumX2+totalScoreSumX1 }}</b> -->
+                                                        <b style="display: block; text-align: right;">
+                                                            <template v-if="isScoreAnnounced(tracking_date)">
+                                                                <span style="color: blue;">
+                                                                {{ (Number(totalScoreSumX3) + Number(totalScoreSumX2) + Number(totalScoreSumX1)) ?? 0 }}
+                                                                </span>
+                                                            </template>
+                                                            <template v-else>
+                                                                <span style="color: blue;">0</span>
+                                                            </template>
+                                                        </b> 
                                                         <div style="display: flex; justify-content: flex-end;"> 
                                                             <hr style="border: 1px solid black; width: 70%;">
                                                         </div> 
                                                         <b style="display: block; text-align: right; color: blue;"> {{ calculateTotalCoreCompetenciesX() }} </b>
                                                         <!-- <b style="display: block; text-align: right; color: blue;"> {{ 33}} </b> -->
                                                         <b style="color: blue;">จำนวนสมรรถนะที่ใช้ในการประเมิน X 3 คะแนน</b>  
-                                                    </td> 
-                                                    <td class="text-center" style="color: blue;"> 
+                                                    </td>  
+
+                                                    <!-- <td class="text-center" style="color: blue;"> 
                                                          <b> = {{ ((totalScoreSumX3 + totalScoreSumX2+totalScoreSumX1) / calculateTotalCoreCompetenciesX()).toFixed(2) }}</b>   
-                                                    </td> 
+                                                    </td>  -->
+                                                    <td class="text-center" style="color: blue;">
+                                                        <template v-if="isScoreAnnounced(tracking_date)">
+                                                            <b style="color: blue;">
+                                                            = {{
+                                                                calculateTotalCoreCompetenciesX() > 0
+                                                                ? ((Number(totalScoreSumX3) + Number(totalScoreSumX2) + Number(totalScoreSumX1)) / Number(calculateTotalCoreCompetenciesX())).toFixed(2)
+                                                                : '0.00'
+                                                            }}
+                                                            </b>
+                                                        </template> 
+                                                        <template v-else>
+                                                            <b style="color: blue;">= 0.00</b>
+                                                        </template>
+                                                    </td>
+
                                                 </tr>  
                                                 </tbody>
                                                     <br>
@@ -537,60 +732,105 @@
                                                         <th rowspan="2">สรุปคะแนน (ก) X (ข)</th>
                                                     </tr>
                                                 </thead>
-                                                <tbody>  
-                                                    <template v-for="(Item, index) in products" :key="index"> 
-                                                    <tr v-if="dataStaffid==Item?.staffid">  
-                                                        <td>องค์ประกอบที่ 1 ผลสัมฤทธิ์ของงาน</td>
-                                                        <td class="text-center" style="color: blue;"> 
-                                                            <b>{{ Item?.tb_tor?.achievement_score || '-' }}</b> 
+                                                <tbody> 
+                                                    <tr>
+                                                        <td>องค์ประกอบที่ 1 ผลสัมฤทธิ์ของงาน</td> 
+                                                        <td class="text-center" style="color: blue;">
+                                                            <template v-if="tracking_date && isScoreAnnounced(tracking_date)">
+                                                                <b>{{ tracking_date?.tb_tor?.achievement_score ?? '-' }}</b>
+                                                            </template>
+                                                        <template v-else>
+                                                            <b style="color:brown;">รอประกาศผลคะแนน</b>
+                                                        </template>
                                                         </td> 
-                                                        <td class="text-center" style="color: blue;">  
-                                                            <b>{{ Item?.tb_tor?.persen?.split(':')[0] || '-' }}</b>
+                                                        <td class="text-center" style="color: blue;">
+                                                        <b>{{ tracking_date?.tb_tor?.persen ? tracking_date.tb_tor.persen.split(':')[0] : '-' }}</b>
                                                         </td> 
-                                                        <td class="text-center" style="color: blue;">  
-                                                            <b>{{ (Item?.tb_tor?.achievement_score * (parseFloat(Item?.tb_tor?.persen?.split(':')[0]) || 0)).toFixed(2) || '-' }}</b>  
-                                                        </td> 
+                                                        <td class="text-center" style="color: blue;">
+                                                        <template v-if="tracking_date && isScoreAnnounced(tracking_date)">
+                                                            <b>
+                                                            {{
+                                                                (
+                                                                Number(tracking_date?.tb_tor?.achievement_score ?? 0) *
+                                                                (Number(tracking_date?.tb_tor?.persen ? tracking_date.tb_tor.persen.split(':')[0] : 0) / 100)
+                                                                ).toFixed(2)
+                                                            }}
+                                                            </b>
+                                                        </template>
+                                                        <template v-else>
+                                                            <b style="color:brown;">รอประกาศผลคะแนน</b>
+                                                        </template>
+                                                        </td>
                                                     </tr> 
-                                                    <tr v-if="dataStaffid==Item?.staffid"> 
-                                                        <td>องค์ประกอบที่ 2 พฤติกรรมการปฏิบัติราชการ</td>
-                                                        <td class="text-center" style="color: blue;"> 
-                                                            <b>{{ Item?.tb_tor?.behavior || '-' }}</b>
-                                                        </td>  
-                                                        <td class="text-center" style="color: blue;">  
-                                                            <b>{{ Item?.tb_tor?.persen?.split(':')[1] || '-' }}</b>
+                                                    <tr>
+                                                        <td>องค์ประกอบที่ 2 พฤติกรรมการปฏิบัติราชการ</td> 
+                                                        <td class="text-center" style="color: blue;">
+                                                            <template v-if="tracking_date && isScoreAnnounced(tracking_date)">
+                                                                <b>{{ tracking_date?.tb_tor?.behavior ?? '-' }}</b>
+                                                            </template>
+                                                            <template v-else>
+                                                                <b style="color:brown;">รอประกาศผลคะแนน</b>
+                                                            </template>
                                                         </td> 
-                                                        <td class="text-center" style="color: blue;"> 
-                                                            <b>{{ ((Item?.tb_tor?.behavior * (parseFloat(Item?.tb_tor?.persen?.split(':')[1]) || 0)).toFixed(2)) || '-' }}</b>  
-                                                        </td>  
+                                                        <td class="text-center" style="color: blue;">
+                                                            <b>{{ tracking_date?.tb_tor?.persen ? tracking_date.tb_tor.persen.split(':')[1] : '-' }}</b>
+                                                        </td> 
+                                                        <td class="text-center" style="color: blue;">
+                                                        <template v-if="tracking_date && isScoreAnnounced(tracking_date)">
+                                                            <b>
+                                                            {{
+                                                                (
+                                                                Number(tracking_date?.tb_tor?.behavior ?? 0) *
+                                                                (Number(tracking_date?.tb_tor?.persen ? tracking_date.tb_tor.persen.split(':')[1] : 0) / 100)
+                                                                ).toFixed(2)
+                                                            }}
+                                                            </b>
+                                                        </template>
+                                                        <template v-else>
+                                                            <b style="color:brown;">รอประกาศผลคะแนน</b>
+                                                        </template>
+                                                        </td>
                                                     </tr>
-                                                    <tr v-if="dataStaffid==Item.staffid">
-                                                                <td>องค์ประกอบอื่นๆ (ถ้ามี)</td>
-                                                                <td></td>
-                                                                <td></td>
-                                                                <td></td>
-                                                            </tr>
-                                                            <tr v-if="dataStaffid==Item.staffid" style="font-weight: bold;">
-                                                                <td colspan="2" style="text-align: right;">รวม</td>
-                                                                <td class="text-center" style="color: blue;"> 
-                                                                    <b>{{ 100 }}%</b>  
-                                                                </td> 
-                                                                <td class="text-center" style="color: blue;">  
-                                                                    <b>{{ Item.tb_tor?Item.tb_tor.sum_score:'' }}</b>  
-                                                                </td> 
-                                                            </tr>
-                                                            </template>  
-                                                    </tbody>
-                                            </table>
-                                                <template v-for="(Item, index) in products" :key="index">
-                                                    <div v-if="dataStaffid == Item.staffid" class="employee-info">
-                                                        <h4>ระดับผลการประเมินที่ได้</h4>
-                                                            <p> <strong> [&nbsp;&nbsp;<b v-if="Item?.tb_tor?.sum_score >= 90">&#10003;</b>&nbsp;&nbsp;] ดีเด่น (90-100)</strong> </p>
-                                                            <p> <strong> [&nbsp;&nbsp; <b v-if="Item?.tb_tor?.sum_score >= 80 && Item?.tb_tor?.sum_score < 90">&#10003;</b>&nbsp;&nbsp;] ดีมาก (80-89)</strong></p>
-                                                            <p> <strong> [&nbsp;&nbsp; <b v-if="Item?.tb_tor?.sum_score >= 70 && Item?.tb_tor?.sum_score < 80">&#10003;</b> &nbsp;&nbsp;] ดี (70-79) </strong></p>
-                                                            <p> <strong> [&nbsp;&nbsp; <b v-if="Item?.tb_tor?.sum_score >= 60 && Item?.tb_tor?.sum_score < 70">&#10003;</b> &nbsp;&nbsp;] พอใช้ (60-69)</strong></p>
-                                                            <p> <strong> [&nbsp;&nbsp;  <b v-if="Item?.tb_tor?.sum_score < 60">&#10003;</b> &nbsp;&nbsp;] ต้องปรับปรุง (ต่ำกว่า 60) </strong> </p>
-                                                    </div>
+
+                                                    <tr>
+                                                        <td>องค์ประกอบอื่นๆ (ถ้ามี)</td>
+                                                        <td></td><td></td><td></td>
+                                                    </tr>
+
+                                                    <tr style="font-weight: bold;">
+                                                        <td colspan="2" style="text-align: right;">รวม</td> 
+                                                        <td class="text-center" style="color: blue;"><b>100%</b></td>
+ 
+                                                        <td class="text-center" style="color: blue;">
+                                                        <template v-if="tracking_date && isScoreAnnounced(tracking_date)">
+                                                            <b>{{ tracking_date?.tb_tor?.sum_score ?? '-' }}</b>
+                                                        </template>
+                                                        <template v-else>
+                                                            <b style="color:brown;">รอประกาศผลคะแนน</b>
+                                                        </template>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>  
+                                            <div class="employee-info" style="margin-top: 10px;">
+                                                <h4>ระดับผลการประเมินที่ได้</h4> 
+                                                <template v-if="tracking_date && isScoreAnnounced(tracking_date)">
+                                                    <p><strong>[&nbsp;&nbsp;<b v-if="(tracking_date?.tb_tor?.sum_score ?? 0) >= 90">&#10003;</b>&nbsp;&nbsp;] ดีเด่น (90-100)</strong></p>
+                                                    <p><strong>[&nbsp;&nbsp;<b v-if="(tracking_date?.tb_tor?.sum_score ?? 0) >= 80 && (tracking_date?.tb_tor?.sum_score ?? 0) < 90">&#10003;</b>&nbsp;&nbsp;] ดีมาก (80-89)</strong></p>
+                                                    <p><strong>[&nbsp;&nbsp;<b v-if="(tracking_date?.tb_tor?.sum_score ?? 0) >= 70 && (tracking_date?.tb_tor?.sum_score ?? 0) < 80">&#10003;</b>&nbsp;&nbsp;] ดี (70-79)</strong></p>
+                                                    <p><strong>[&nbsp;&nbsp;<b v-if="(tracking_date?.tb_tor?.sum_score ?? 0) >= 60 && (tracking_date?.tb_tor?.sum_score ?? 0) < 70">&#10003;</b>&nbsp;&nbsp;] พอใช้ (60-69)</strong></p>
+                                                    <p><strong>[&nbsp;&nbsp;<b v-if="(tracking_date?.tb_tor?.sum_score ?? 0) < 60">&#10003;</b>&nbsp;&nbsp;] ต้องปรับปรุง (ต่ำกว่า 60)</strong></p>
                                                 </template>
+
+                                                <template v-else>
+                                                     <p style="color:brown;"><b>รอประกาศผลคะแนน</b></p>
+                                                    <p><strong>[ ] ดีเด่น (90-100)</strong></p>
+                                                    <p><strong>[ ] ดีมาก (80-89)</strong></p>
+                                                    <p><strong>[ ] ดี (70-79)</strong></p>
+                                                    <p><strong>[ ] พอใช้ (60-69)</strong></p>
+                                                    <p><strong>[ ] ต้องปรับปรุง (ต่ำกว่า 60)</strong></p> 
+                                                </template>
+                                            </div>​    
                                             <h5 class="mb-4">ส่วนที่ 3 แผนพัฒนาการปฏิบัติราชการรายบุคคล</h5>
                                             <table border="1" cellspacing="0" cellpadding="5">
                                                 <thead>
@@ -606,15 +846,7 @@
                                                         <td style="text-align: left;">{{ Tab3T4?.p04_re1 || '-' }}</td>
                                                         <td style="text-align: left;">{{ Tab3T4?.p04_re2 || '-' }}</td>
                                                         <td style="text-align: left;">{{ Tab3T4?.p04_re3 || '-' }}</td> 
-                                                        <td style="text-align: left;">{{ Tab3T4.px04_re1 || '-' }}</td> 
-                                                        <!-- <td style="text-align: left;"> 
-                                                            <Textarea 
-                                                                class="p-inputtextarea p-inputtext p-component" 
-                                                                v-on:blur="AddDataXXR" 
-                                                                v-model="Tab3T4.px04_re1" 
-                                                                rows="4" 
-                                                                placeholder="ความคิดเห็นจากผู้บริหาร" />
-                                                        </td>  -->
+                                                        <td style="text-align: left;">{{ Tab3T4.px04_re1 || '-' }}</td>  
                                                     </tr> 
                                                 </tbody>
                                             </table> 
@@ -1035,83 +1267,77 @@ export default {
                 console.error('Error fetching data for staff:', error);
             }
         },
-        // XX One 
+     
+        //170269
+        // async openDataEvalu(row) {
+        //     try {
+        //         // ✅ 1) staff ของผู้ login
+        //         this.dataStaffid = this.staffid_Main;
 
-        // async openDataEvalu(data) { 
-        //     //console.log('data: ',data);
-        //     //console.log('data: ',data.d_evaluationround);
-        //     // console.log('assessorText: ',data.assessor);   
-        //      //console.log(this.products[0]);
-        //     this.dataStaffid = data.staffid; 
-        //       //await this.showDataEvalu(); 
-        //     this.tracking_date = this.products.find(p => p.staffid === data.staffid);
-        //     this.currentstaff = this.products.filter((product) => product.staffid === this.dataStaffid);
-        //     this.products_Tab1 = [];
-        //     this.p01_scores = [
-        //         { name: '0 คะแนน', code: 0 },
-        //         { name: '1 คะแนน', code: 1 },
-        //         { name: '2 คะแนน', code: 2 },
-        //         { name: '3 คะแนน', code: 3 },
-        //         { name: '4 คะแนน', code: 4 },
-        //         { name: '5 คะแนน', code: 5 }
-        //     ];
+        //         // ✅ 2) รอบที่คลิก (row มี d_date/evalua/fac_id อยู่แล้ว)
+        //         this.tracking_date = { ...row };
 
-        //     // ตั้งค่า coreCompetencies กลับไปเป็นค่าเริ่มต้น
-        //     this.coreCompetencies = [
-        //         { id: 1, activity: 'ก. 1 การมุ่งผลสัมฤทธิ์', indicator: '1', data_table1: '',selfAssessment:'' },
-        //         { id: 2, activity: 'ก. 2 การบริการที่ดี', indicator: '1', data_table1: '',selfAssessment:'' },
-        //         { id: 3, activity: 'ก. 3 การสั่งสมความเชี่ยวชาญในงานอาชีพ', indicator: '1', data_table1: '',selfAssessment:'' },
-        //         { id: 4, activity: 'ก. 4 การยึดมั่นในความถูกต้องชอบธรรมและจริยธรรม', indicator: '1', data_table1: '',selfAssessment:'' },
-        //         { id: 5, activity: 'ก. 5 การทำงานเป็นทีม', indicator: '1', data_table1: '',selfAssessment:'' }
-        //     ];
+        //         // ✅ 3) currentstaff ไม่ต้อง filter จาก products แล้ว (products ไม่มี staffid)
+        //         // ถ้าต้องใช้ currentstaff[0] ใน template ให้สร้างจาก session แทน
+        //         this.currentstaff = [{
+        //         prefixfullname: this.$nuxt?.$auth?.user?.name?.PREFIXFULLNAME || '',
+        //         staffname: this.$nuxt?.$auth?.user?.name?.STAFFNAME || '',
+        //         staffsurname: this.$nuxt?.$auth?.user?.name?.STAFFSURNAME || '',
+        //         posnameth: this.$nuxt?.$auth?.user?.name?.POSITIONNAME || '',
+        //         postypenameth: this.postypename || ''
+        //         }];
 
-        //     // ตั้งค่า jobSpecificCompetencies กลับไปเป็นค่าเริ่มต้น
-        //     this.jobSpecificCompetencies = [];
+        //         // reset tab data
+        //         this.products_Tab1 = [];
+        //         this.products_Tab2 = [];
+        //         this.products_Tab3T4 = [];
+        //         this.improvements = null;
+        //         this.suggestions = null;
 
-        //     this.improvements = null;
-        //     this.suggestions = null;
+        //         // ✅ 4) โหลดสมรรถนะ/PO
+        //         // await this.showdataPo(
+        //         // this.dataStaffid,
+        //         // this.facid_Main,
+        //         // this.tracking_date.d_date,
+        //         // this.tracking_date.evalua,
+        //         // row.posnameid
+        //         // );
 
-        //     this.showdataPo(data.staffid, this.facid_Main, this.tracking_date.d_date, this.tracking_date.evalua,data.posnameid);
+        //         await this.showdataPo(
+        //             this.dataStaffid,
+        //             this.facid_Main,
+        //             this.tracking_date.d_date,
+        //             this.tracking_date.evalua,
+        //             this.postypenameid
+        //         );
 
-        //     await axios.post(' http://127.0.0.1:8000/api/showDataP03New', {
-        //         staff_id: data.staffid,
-        //         fac_id: this.tracking_date.fac_id,
+        //         // ✅ 5) โหลด ป01-ป03
+        //         const res = await axios.post('http://127.0.0.1:8000/api/showDataP03New', {
+        //         staff_id: this.dataStaffid,
+        //         fac_id: this.tracking_date.fac_id ?? this.facid_Main,
         //         year_id: this.tracking_date.d_date,
         //         evalua: this.tracking_date.evalua
-        //     })
-        //     .then((res) => {
-        //          //console.log('openDataEvalu: ',res.data);
-        //         if (res.data && Array.isArray(res.data)) {
-        //             this.products_Tab1 = res.data;
-        //             this.products_Tab1.forEach((h) => {
-        //                 h.subP01sX.forEach((subP01) => {
-        //                     // ตรวจสอบว่าค่า p01_score นั้นถูกต้องหรือไม่
-        //                     const foundScore = this.p01_scores.find((score) => score.code === subP01.p01_score);
-        //                     if (foundScore) {
-        //                         subP01.p01_score = foundScore.code; // ใช้ค่าที่ถูกต้อง
-        //                     } else {
-        //                         subP01.p01_score = this.p01_scores[0].code; // ใช้ค่าเริ่มต้น "- ไม่ระบุ -"
-        //                     }
-        //                 });
-        //             });
-        //         }
-        //         this.DialogAdd = true; 
-        //     })
-        //     .catch((error) => {
-        //         console.error('Error:', error);
-        //     }); 
-        // },  
+        //         });
 
+        //         if (Array.isArray(res.data)) {
+        //         this.products_Tab1 = res.data;
+        //         }
+
+        //         this.DialogAdd = true;
+        //         this.activeIndex = 0;
+        //     } catch (error) {
+        //         console.error('openDataEvalu error:', error);
+        //     }
+        // },
         async openDataEvalu(row) {
             try {
-                // ✅ 1) staff ของผู้ login
+                // 1) staff ของผู้ login
                 this.dataStaffid = this.staffid_Main;
 
-                // ✅ 2) รอบที่คลิก (row มี d_date/evalua/fac_id อยู่แล้ว)
+                // 2) เก็บรอบที่คลิก
                 this.tracking_date = { ...row };
 
-                // ✅ 3) currentstaff ไม่ต้อง filter จาก products แล้ว (products ไม่มี staffid)
-                // ถ้าต้องใช้ currentstaff[0] ใน template ให้สร้างจาก session แทน
+                // 3) สร้าง currentstaff จาก session
                 this.currentstaff = [{
                 prefixfullname: this.$nuxt?.$auth?.user?.name?.PREFIXFULLNAME || '',
                 staffname: this.$nuxt?.$auth?.user?.name?.STAFFNAME || '',
@@ -1127,24 +1353,19 @@ export default {
                 this.improvements = null;
                 this.suggestions = null;
 
-                // ✅ 4) โหลดสมรรถนะ/PO
-                // await this.showdataPo(
-                // this.dataStaffid,
-                // this.facid_Main,
-                // this.tracking_date.d_date,
-                // this.tracking_date.evalua,
-                // row.posnameid
-                // );
+                // ✅ จุดแก้สำคัญ: ดึงชื่อผู้ประเมินของ "รอบที่คลิก" ทันที
+                await this.showdatator();
 
+                // โหลดสมรรถนะ/PO
                 await this.showdataPo(
-                    this.dataStaffid,
-                    this.facid_Main,
-                    this.tracking_date.d_date,
-                    this.tracking_date.evalua,
-                    this.postypenameid
+                this.dataStaffid,
+                this.facid_Main,
+                this.tracking_date.d_date,
+                this.tracking_date.evalua,
+                this.postypenameid
                 );
 
-                // ✅ 5) โหลด ป01-ป03
+                // โหลด ป01-ป03
                 const res = await axios.post('http://127.0.0.1:8000/api/showDataP03New', {
                 staff_id: this.dataStaffid,
                 fac_id: this.tracking_date.fac_id ?? this.facid_Main,
@@ -1493,24 +1714,51 @@ export default {
                 });
         },
         /*============= ผู้ประเมิน ==============*/
-        showdatator() {
-            (this.assessorText = null),
-                (this.assessor_positionText = null),
-                axios
-                    .post(' http://127.0.0.1:8000/api/showdatator', {
-                        p_year: this.tracking_date.d_date,
-                        evalua: this.tracking_date.evalua,
-                        p_staffid: this.dataStaffid
-                    })
-                    .then((res) => {
-                        //console.log('Response',res.data);
-                        this.assessorText = res.data[0].assessor;
-                        this.assessor_positionText = res.data[0].assessor_position;
-                    })
-                    .catch((error) => {
-                        console.error('Error fetching data:', error);
-                    });
+        // 170269
+
+        // showdatator() {
+        //     (this.assessorText = null),
+        //     (this.assessor_positionText = null),
+        //     axios
+        //         .post(' http://127.0.0.1:8000/api/showdatator', {
+        //             p_year: this.tracking_date.d_date,
+        //             evalua: this.tracking_date.evalua,
+        //             p_staffid: this.dataStaffid
+        //         })
+        //         .then((res) => {
+        //             //console.log('Response',res.data);
+        //             this.assessorText = res.data[0].assessor;
+        //             this.assessor_positionText = res.data[0].assessor_position;
+        //         })
+        //         .catch((error) => {
+        //             console.error('Error fetching data:', error);
+        //         });
+        // },
+        async showdatator() {
+            // reset ก่อนทุกครั้ง
+            this.assessorText = '-';
+            this.assessor_positionText = '-';
+
+            // กันกรณี tracking_date ยังไม่มีค่า
+            if (!this.tracking_date?.d_date || !this.tracking_date?.evalua) return;
+
+            try {
+                const res = await axios.post('http://127.0.0.1:8000/api/showdatator', {
+                p_year: this.tracking_date.d_date,
+                evalua: this.tracking_date.evalua,
+                p_staffid: this.dataStaffid
+                });
+
+                // กันกรณีไม่มีข้อมูลในรอบนั้น
+                if (Array.isArray(res.data) && res.data.length > 0) {
+                this.assessorText = res.data[0]?.assessor ?? '-';
+                this.assessor_positionText = res.data[0]?.assessor_position ?? '-';
+                }
+            } catch (error) {
+                console.error('Error fetching assessor:', error);
+            }
         },
+ 
         async showPostype(postypename,postypenameid) {
             //console.log('showPostype: ',postypename, postypenameid);
             //let postypenameText = postypename ? postypename : `ชำนาญการพิเศษ`;
@@ -1937,11 +2185,8 @@ export default {
                 console.error('❌ Error:', error);
             }); 
         },
-
-
+ 
         ///***********///
-
-
 
         async saveAssess() {
             try {
@@ -2002,7 +2247,85 @@ export default {
             const url = `   http://127.0.0.1:8000/report_tracking?${queryParams}`;
             window.open(url, '_blank');
  
-        },     
+        }, 
+        // isScoreAnnounced(item) {
+        //     const scoringDay = item?.d_scoringday;     // date จาก DB
+        //     if (!scoringDay) return false;
+
+        //     // ทำให้เทียบแบบ "เริ่มต้นวัน" (ไม่ติด timezone แปลกๆ)
+        //     const scoringDate = new Date(`${scoringDay}T00:00:00`);
+        //     const now = new Date();
+
+        //     return now >= scoringDate;
+        // },
+        isScoreAnnounced(row) {
+            if (!row?.d_scoringday) return false;
+            return new Date() >= new Date(row.d_scoringday);
+        }, 
+
+        scoreColor(score, announced) {
+            if (!announced) return 'red';          // ยังไม่ประกาศ -> เทา
+            const s = Number(score ?? 0);
+            return s === 0 ? 'red' : 'back';     // ประกาศแล้ว: 0 -> แดง, อื่นๆ -> น้ำเงิน
+        },  
+        selectedRound() {
+            if (!this.tracking_date?.d_date || !this.tracking_date?.evalua) return null;
+
+            // หา row ของรอบที่เลือกจาก products
+            return (
+            this.products.find(
+                (p) =>
+                String(p.d_date) === String(this.tracking_date.d_date) &&
+                String(p.evalua) === String(this.tracking_date.evalua)
+            ) || this.tracking_date
+            );
+        },
+
+        torSelected() {
+            return this.selectedRound?.tb_tor ?? null;
+        }, 
+        safeNumber(v) {
+            const n = Number(v);
+            return Number.isFinite(n) ? n : 0;
+        },
+
+        getMainSubject(text) {
+            if (!text) return '';
+            const lines = String(text).split(/\r?\n/).map(s => s.trim()).filter(Boolean);
+            // บรรทัดแรก = งานบุคคล
+            return lines[0] || '';
+        },
+
+        parseActivityText(text) {
+            const rows = String(text || '').split(/\r?\n/).map(s => s.trim()).filter(Boolean);
+            const lines = [];
+            if (!rows.length) return { lines };
+ 
+            lines.push({ type: 'main', text: rows[0] });
+ 
+            for (let i = 1; i < rows.length; i++) {
+                const r = rows[i]; 
+
+                let m = r.match(/^(\d+)\s*[\.\)]\s*(.*)$/);
+                if (m) {
+                lines.push({ type: 'sub', no: m[1] + '.', text: m[2] || '' });
+                continue;
+                }
+ 
+                m = r.match(/^[-•]\s*(.*)$/);
+                if (m) {
+                lines.push({ type: 'sub', no: '•', text: m[1] || '' });
+                continue;
+                }
+ 
+                lines.push({ type: 'sub', no: '', text: r });
+            }
+
+            return { lines };
+        },
+
+
+
     }, 
     
     filters: {
@@ -2243,5 +2566,11 @@ td:nth-child(3) {
 }
 .left-align {
     text-align: left;
+} 
+.subline{
+  display:flex;  
+  padding-left: 1px;
 }
+ 
+ 
 </style>

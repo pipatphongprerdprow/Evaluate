@@ -21,7 +21,7 @@ const allMenus = ref([
         label: 'แบบบันทึกข้อตกลง(TOR)ป.01-ป.03',
         items: [
             { label: 'แบบบันทึกข้อตกลง', icon: 'pi pi-fw pi-calendar', to: '/setting/coversheet' },
-            { label: 'ประวัติการประเมิน', icon: 'pi pi-fw pi-clock', to: '/setting/history' }
+            // { label: 'ประวัติการประเมิน', icon: 'pi pi-fw pi-clock', to: '/setting/history' }
 
         ]
         
@@ -115,7 +115,7 @@ const model = computed(() => {
             return allMenus.value.filter(menu => ['home', 'tor', 'manual','history','torday'].includes(menu.id));//ผู้ใช้งานทั่วไป
         case '2':
            // return allMenus.value.filter(menu => ['home', 'tor', 'executive','manual'].includes(menu.id)); //ฝ่ายบุคคล
-            return allMenus.value.filter(menu => ['home', 'tor', 'executive', 'hr', 'manual','Ad','torday'].includes(menu.id));//ฝ่ายบุคคล
+            return allMenus.value.filter(menu => ['home', 'tor', 'executive', 'hr', 'manual','Ad','torday','history'].includes(menu.id));//ฝ่ายบุคคล
         case '3':
             //return allMenus.value.filter(menu => ['home', 'tor', 'executive', 'hr', 'manual'].includes(menu.id));//หน หน่วยงาน
             return allMenus.value.filter(menu => ['home', 'tor', 'executive','manual','history'].includes(menu.id));//หน หน่วยงาน

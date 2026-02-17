@@ -23,17 +23,20 @@
                             @change="showdatator"
                         />
                     </div>
-                    <!-- เลือกรอบล่าสุดรอบเดียว -->
-                     <!-- <Dropdown
+                    <!-- เลือกรอบล่าสุดรอบเดียว --> 
+                     <!-- <div class="col md:col-6">  
+                        <label for="product_date"></label>  
+                        <Dropdown
                         id="product_date"
                         v-model="product_date"
                         :options="latestProductOnly"
                         autoFilterFocus
                         :optionLabel="(item) => `${item.d_evaluationround} ${item.d_date}`"
-                        placeholder="รอบการประเมิน (ล่าสุด)"
+                        placeholder="กรุณาเลือกรอบการประเมิน"
                         style="max-width: 500px;width: 100%;border: outset;"
                         @change="showdatator" 
-                    />  -->
+                        /> 
+                    </div> -->
                 </div> 
             </div>
         </div>  

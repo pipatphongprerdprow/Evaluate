@@ -6,220 +6,220 @@
     <small style="color: red; font-size: larger;">
         ** น้ำหนัก ความสำคัญ/ ความยากง่ายของงาน คือ {{ totalWeight }}% กรุณากรอกให้ครบ 100% เพื่อทำ แบบ ป.02 / ป03 / ป04 **
     </small>
-</div>
-  <div class="grid">
-    <div class="col-12 lg:col-12 xl:col-12">
-      <div class="card mb-0">
-        <div class="formgroup-inline mb-1">
-          <div class="col md:col-5">
-            <h3 class="mb-4 card-header">
-              <i class="pi pi-fw pi-folder-open" style="font-size: x-large;"></i>
-              แบบ ป01
-            </h3>
-          </div> 
-          <div class="col md:col-7">
-            <div v-if="currentDate < dataPor.d_recordingday">
-              <Button
-                icon="pi pi-search"
-                severity="help"
-                class="mb-2 mr-6"
-                label="เลือกข้อมูลแบบประเมิน ป.01"
-                @click="OpenDialogP01"
-              />
-              <Button
-                icon="pi pi-plus"
-                severity="info"
-                class="mb-2 mr-6"
-                label="เพิ่มข้อมูลแบบประเมิน"
-                @click="OpenDialogAdd"
-              /> 
-              <Button
-                icon="pi pi-copy"
-                severity="primary"
-                class="mb-2 mr-6"
-                label="คัดลอกข้อมูลแบบประเมิน"
-                @click="copyEvaluationData"
-              />
+    </div>
+      <div class="grid">
+        <div class="col-12 lg:col-12 xl:col-12">
+          <div class="card mb-0">
+            <div class="formgroup-inline mb-1">
+              <div class="col md:col-5">
+                <h3 class="mb-4 card-header">
+                  <i class="pi pi-fw pi-folder-open" style="font-size: x-large;"></i>
+                  แบบ ป01
+                </h3>
+              </div> 
+              <div class="col md:col-7">
+                <div v-if="currentDate < dataPor.d_recordingday">
+                  <Button
+                    icon="pi pi-search"
+                    severity="help"
+                    class="mb-2 mr-6"
+                    label="เลือกข้อมูลแบบประเมิน ป.01"
+                    @click="OpenDialogP01"
+                  />
+                  <Button
+                    icon="pi pi-plus"
+                    severity="info"
+                    class="mb-2 mr-6"
+                    label="เพิ่มข้อมูลแบบประเมิน"
+                    @click="OpenDialogAdd"
+                  /> 
+                  <Button
+                    icon="pi pi-copy"
+                    severity="primary"
+                    class="mb-2 mr-6"
+                    label="คัดลอกข้อมูลแบบประเมิน"
+                    @click="copyEvaluationData"
+                  />
+                </div>
+              </div>
             </div>
+
+            <table class="table">
+              <thead>
+                <tr>
+                  <th rowspan="2" style="width: 20%;">(1) <br /> กิจกรรม / โครงการ / งาน</th>
+                  <th rowspan="2" style="width: 24%;">
+                    (2) <br /> ตัวชี้วัด / เกณฑ์การประเมิน <br />
+                    (1.ถูกต้อง 2.ครบถ้วน <br /> 3.ตรงเวลา)
+                  </th>
+                  <th colspan="5" style="width: 15%;">(3) <br /> ระดับค่าเป้าหมาย</th>
+                  <th rowspan="2" style="width: 7%;">(4) <br /> ค่าคะแนน ที่ได้</th>
+                  <th rowspan="2" style="width: 10%;">(5) <br /> น้ำหนัก (ความสำคัญ/ <br /> ความยากง่ายของงาน)</th>
+                  <th rowspan="2" style="width: 10%;">(6) <br /> ค่าคะแนน <br />ถ่วงน้ำหนัก <br /> (4) X (5) 100</th>
+                  <th rowspan="2" style="width: 9%;"><br /> ตัวเลือก <br /></th>
+                </tr>
+                <tr>
+                  <th>1</th>
+                  <th>2</th>
+                  <th>3</th>
+                  <th>4</th>
+                  <th>5</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                <template v-for="(h, ind) in products_personX" :key="ind">
+                  <tr>
+                    <td style="text-align: left;" colspan="8">
+                      <b style="color: blue;">{{ h.h_no }}. {{ h.nameH }}</b>
+                    </td>
+                    <td class="text-center" style="color: blue;">
+                      <b>{{ h.p01_weight ?? 0 }}%</b>
+                    </td>
+                    <td></td>
+                    <td></td>
+                  </tr>
+
+                  <tr v-for="(subP01, idx) in h.subP01sX" :key="idx" style="vertical-align: baseline;">
+                    <!-- <td style="text-align: left;">
+                      {{ subP01.p01_no }} {{ subP01.p01_subject }}
+                    </td> -->
+
+                    <!-- <td style="text-align:left;">
+                      <template v-for="(ln, i) in parseActivityText(subP01.p01_subject).lines" :key="i">
+                        <div :style="{ paddingLeft: ln.indent + 'px' }">
+                          <b v-if="ln.type === 'main'">{{ ln.text }}</b>
+                          <span v-else>• {{ ln.text }}</span>
+                        </div>
+                      </template>
+                    </td> -->
+
+                  <td style="text-align:left;">
+                      <template v-for="(ln, i) in parseActivityText(subP01.p01_subject).lines" :key="i"> 
+                        <div v-if="ln.type === 'main'" style="font-weight:700; margin-bottom:4px;">
+                          {{ ln.text }}
+                        </div>  
+                        <div v-else class="subline">
+                          <span class="subno">{{ ln.no }}</span>
+                          <span class="subtext">{{ ln.text }}</span>
+                        </div> 
+                      </template>
+                    </td>
+    
+                    <td style="text-align: left;">
+                      <!-- <b>ตัวชี้วัดที่ {{ idx + 1 }} {{ subP01.p01_subject }}</b> -->
+                      <b>ตัวชี้วัดที่ {{ idx + 1 }} {{ getMainSubject(subP01.p01_subject) }}</b>
+
+                      <div
+                        v-for="(subIitem, idI) in subP01.subITems"
+                        :key="idI"
+                        style="padding-left: 8px; margin-bottom: 5px;"
+                      >
+                        <span v-if="subIitem.ind_no != 0">
+                          <b>ระดับ {{ subIitem.ind_no }}</b> {{ subIitem.ind_Items }}
+                        </span>
+                        <span v-else>
+                          <b>{{ subIitem.ind_Items }}</b>
+                        </span>
+                      </div>
+                    </td>
+
+                    <td style="vertical-align: top;" class="text-center">
+                      <b v-if="subP01.p01_target == 1">&#10003;</b>
+                    </td>
+                    <td style="vertical-align: top;" class="text-center">
+                      <b v-if="subP01.p01_target == 2">&#10003;</b>
+                    </td>
+                    <td style="vertical-align: top;" class="text-center">
+                      <b v-if="subP01.p01_target == 3">&#10003;</b>
+                    </td>
+                    <td style="vertical-align: top;" class="text-center">
+                      <b v-if="subP01.p01_target == 4">&#10003;</b>
+                    </td>
+                    <td style="vertical-align: top;" class="text-center">
+                      <b v-if="subP01.p01_target == 5">&#10003;</b>
+                    </td>
+
+                    <td style="vertical-align: top;" class="text-center">
+                      <div v-if="currentDate >= dataPor.d_scoringday">
+                        {{ subP01.p01_score }}
+                      </div>
+                      <div v-else>0</div>
+                    </td>
+
+                    <td style="vertical-align: top;" class="text-center">
+                      {{ safeNumber(subP01.p01_weight) }}%
+                    </td>
+
+                    <td style="vertical-align: top;" class="text-center">
+                      <div v-if="currentDate >= dataPor.d_scoringday">
+                        {{ ((safeNumber(subP01.p01_score) * safeNumber(subP01.p01_weight)) / 100).toFixed(2) }}
+                      </div>
+                      <div v-else>0.00</div>
+                    </td>
+                    <!-- middle ตรงกลาง -->
+                    <td style="vertical-align: top;" class="text-center">
+                      <div v-if="currentDate < dataPor.d_recordingday">
+                        <SplitButton
+                          label="เลือก"
+                          :model="itemsBtu(subP01)"
+                          severity="warning"
+                          class="mb-2 mr-2"
+                        />
+                      </div>
+                      <div v-else style="color: brown; font-weight: bold; text-align: center;">
+                        ครบกำหนดวันบันทึก ป.01
+                      </div>
+                    </td>
+                  </tr>
+                </template>
+
+                <tr>
+                  <td style="text-align: right" colspan="8">
+                    <b style="color: blue;">(7) ผลรวม</b>
+                  </td>
+                  <td class="text-center" style="color: blue;">
+                    <b>{{ totalWeight }}%</b>
+                  </td>
+                  <td class="text-center" style="color: blue;">
+                    <div v-if="currentDate >= dataPor.d_scoringday">
+                      <b>{{ totalCalculatedScore }}</b>
+                    </div>
+                    <div v-else><b>0</b></div>
+                  </td>
+                  <td></td>
+                </tr>
+
+                <tr>
+                  <td style="text-align: center; vertical-align: middle;" colspan="9">
+                    <b style="color: blue;">
+                      (8) สรุปคะแนนส่วนผลสัมฤทธิ์ของงาน =&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    </b>
+                    <b style="color: blue;">ผลรวมของค่าคะแนนถ่วงน้ำหนัก</b>
+
+                    <b style="display: block; text-align: right; color: blue;">
+                      {{ currentDate >= dataPor.d_scoringday ? totalCalculatedScore : 0 }}
+                    </b>
+
+                    <div style="display: flex; justify-content: flex-end;">
+                      <hr style="border: 1px solid black; width: 80%;" />
+                    </div>
+
+                    <b style="display: block; text-align: right; color: blue;">{{ 5 }}</b>
+                    <b style="color: blue;">จำนวนระดับค่าเป้าหมาย = 5</b>
+                  </td>
+
+                  <td class="text-center" style="color: blue; vertical-align: middle;">
+                    <div v-if="currentDate >= dataPor.d_scoringday">
+                      <b>= {{ WeightedScoreSum }}</b>
+                    </div>
+                  </td>
+                  <td></td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
-
-        <table class="table">
-          <thead>
-            <tr>
-              <th rowspan="2" style="width: 20%;">(1) <br /> กิจกรรม / โครงการ / งาน</th>
-              <th rowspan="2" style="width: 24%;">
-                (2) <br /> ตัวชี้วัด / เกณฑ์การประเมิน <br />
-                (1.ถูกต้อง 2.ครบถ้วน <br /> 3.ตรงเวลา)
-              </th>
-              <th colspan="5" style="width: 15%;">(3) <br /> ระดับค่าเป้าหมาย</th>
-              <th rowspan="2" style="width: 7%;">(4) <br /> ค่าคะแนน ที่ได้</th>
-              <th rowspan="2" style="width: 10%;">(5) <br /> น้ำหนัก (ความสำคัญ/ <br /> ความยากง่ายของงาน)</th>
-              <th rowspan="2" style="width: 10%;">(6) <br /> ค่าคะแนน <br />ถ่วงน้ำหนัก <br /> (4) X (5) 100</th>
-              <th rowspan="2" style="width: 9%;"><br /> ตัวเลือก <br /></th>
-            </tr>
-            <tr>
-              <th>1</th>
-              <th>2</th>
-              <th>3</th>
-              <th>4</th>
-              <th>5</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            <template v-for="(h, ind) in products_personX" :key="ind">
-              <tr>
-                <td style="text-align: left;" colspan="8">
-                  <b style="color: blue;">{{ h.h_no }}. {{ h.nameH }}</b>
-                </td>
-                <td class="text-center" style="color: blue;">
-                  <b>{{ h.p01_weight ?? 0 }}%</b>
-                </td>
-                <td></td>
-                <td></td>
-              </tr>
-
-              <tr v-for="(subP01, idx) in h.subP01sX" :key="idx" style="vertical-align: baseline;">
-                <!-- <td style="text-align: left;">
-                  {{ subP01.p01_no }} {{ subP01.p01_subject }}
-                </td> -->
-
-                <!-- <td style="text-align:left;">
-                  <template v-for="(ln, i) in parseActivityText(subP01.p01_subject).lines" :key="i">
-                    <div :style="{ paddingLeft: ln.indent + 'px' }">
-                      <b v-if="ln.type === 'main'">{{ ln.text }}</b>
-                      <span v-else>• {{ ln.text }}</span>
-                    </div>
-                  </template>
-                </td> -->
-
-               <td style="text-align:left;">
-                  <template v-for="(ln, i) in parseActivityText(subP01.p01_subject).lines" :key="i"> 
-                    <div v-if="ln.type === 'main'" style="font-weight:700; margin-bottom:4px;">
-                      {{ ln.text }}
-                    </div>  
-                    <div v-else class="subline">
-                      <span class="subno">{{ ln.no }}</span>
-                      <span class="subtext">{{ ln.text }}</span>
-                    </div> 
-                  </template>
-                </td>
- 
-                <td style="text-align: left;">
-                  <!-- <b>ตัวชี้วัดที่ {{ idx + 1 }} {{ subP01.p01_subject }}</b> -->
-                   <b>ตัวชี้วัดที่ {{ idx + 1 }} {{ getMainSubject(subP01.p01_subject) }}</b>
-
-                  <div
-                    v-for="(subIitem, idI) in subP01.subITems"
-                    :key="idI"
-                    style="padding-left: 8px; margin-bottom: 5px;"
-                  >
-                    <span v-if="subIitem.ind_no != 0">
-                      <b>ระดับ {{ subIitem.ind_no }}</b> {{ subIitem.ind_Items }}
-                    </span>
-                    <span v-else>
-                      <b>{{ subIitem.ind_Items }}</b>
-                    </span>
-                  </div>
-                </td>
-
-                <td style="vertical-align: top;" class="text-center">
-                  <b v-if="subP01.p01_target == 1">&#10003;</b>
-                </td>
-                <td style="vertical-align: top;" class="text-center">
-                  <b v-if="subP01.p01_target == 2">&#10003;</b>
-                </td>
-                <td style="vertical-align: top;" class="text-center">
-                  <b v-if="subP01.p01_target == 3">&#10003;</b>
-                </td>
-                <td style="vertical-align: top;" class="text-center">
-                  <b v-if="subP01.p01_target == 4">&#10003;</b>
-                </td>
-                <td style="vertical-align: top;" class="text-center">
-                  <b v-if="subP01.p01_target == 5">&#10003;</b>
-                </td>
-
-                <td style="vertical-align: top;" class="text-center">
-                  <div v-if="currentDate >= dataPor.d_scoringday">
-                    {{ subP01.p01_score }}
-                  </div>
-                  <div v-else>0</div>
-                </td>
-
-                <td style="vertical-align: top;" class="text-center">
-                  {{ safeNumber(subP01.p01_weight) }}%
-                </td>
-
-                <td style="vertical-align: top;" class="text-center">
-                  <div v-if="currentDate >= dataPor.d_scoringday">
-                    {{ ((safeNumber(subP01.p01_score) * safeNumber(subP01.p01_weight)) / 100).toFixed(2) }}
-                  </div>
-                  <div v-else>0.00</div>
-                </td>
-                 <!-- middle ตรงกลาง -->
-                <td style="vertical-align: top;" class="text-center">
-                  <div v-if="currentDate < dataPor.d_recordingday">
-                    <SplitButton
-                      label="เลือก"
-                      :model="itemsBtu(subP01)"
-                      severity="warning"
-                      class="mb-2 mr-2"
-                    />
-                  </div>
-                  <div v-else style="color: brown; font-weight: bold; text-align: center;">
-                    ครบกำหนดวันบันทึก ป.01
-                  </div>
-                </td>
-              </tr>
-            </template>
-
-            <tr>
-              <td style="text-align: right" colspan="8">
-                <b style="color: blue;">(7) ผลรวม</b>
-              </td>
-              <td class="text-center" style="color: blue;">
-                <b>{{ totalWeight }}%</b>
-              </td>
-              <td class="text-center" style="color: blue;">
-                <div v-if="currentDate >= dataPor.d_scoringday">
-                  <b>{{ totalCalculatedScore }}</b>
-                </div>
-                <div v-else><b>0</b></div>
-              </td>
-              <td></td>
-            </tr>
-
-            <tr>
-              <td style="text-align: center; vertical-align: middle;" colspan="9">
-                <b style="color: blue;">
-                  (8) สรุปคะแนนส่วนผลสัมฤทธิ์ของงาน =&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                </b>
-                <b style="color: blue;">ผลรวมของค่าคะแนนถ่วงน้ำหนัก</b>
-
-                <b style="display: block; text-align: right; color: blue;">
-                  {{ currentDate >= dataPor.d_scoringday ? totalCalculatedScore : 0 }}
-                </b>
-
-                <div style="display: flex; justify-content: flex-end;">
-                  <hr style="border: 1px solid black; width: 80%;" />
-                </div>
-
-                <b style="display: block; text-align: right; color: blue;">{{ 5 }}</b>
-                <b style="color: blue;">จำนวนระดับค่าเป้าหมาย = 5</b>
-              </td>
-
-              <td class="text-center" style="color: blue; vertical-align: middle;">
-                <div v-if="currentDate >= dataPor.d_scoringday">
-                  <b>= {{ WeightedScoreSum }}</b>
-                </div>
-              </td>
-              <td></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
 
     <!-- เลือกข้อมูลแบบประเมิน ป.01 -->
     <Dialog

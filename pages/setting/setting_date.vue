@@ -38,20 +38,7 @@
                                         <InputText type="date" id="inputgroup" v-model="dateAnnounce" />
                                     </div>
                                 </div>
-
-                                <!-- <div class="p-fluid formgrid grid"> 
-                                    <div class="field col-12 md:col-4">
-                                        <label for="openevalua_text" style="color: red;font-weight: 600;">วันที่เปิดรอบประเมิน</label>  
-                                        <InputText type="date" id="inputgroup" v-model="openevalua" />
-                                    </div> 
-                                    <div class="field col-12 md:col-4">
-                                        <label for="closeevalua_text" style="color: red;font-weight: 600;" >วันที่ปิดรอบประเมิน</label>  
-                                        <InputText type="date" id="inputgroup" v-model="closeevalua" />
-                                    </div>
-                                </div> -->
-
-
-                                
+ 
                                 <h5 class="mb-4 card-header">กำหนดสิทธิ์การประเมิน</h5>
                                 <div class="p-fluid formgrid grid"> 
                                     <div class="field col-12 md:col-4">
@@ -219,10 +206,6 @@
                                     </div> 
   
                                     <!-- สิ้นสุด -->
-
-
-
- 
  
                                 </div>  
                             </form>
@@ -655,8 +638,20 @@ export default {
                 this.DialogAdd = false;  
                 this.showDataSet(); 
             })
+            // .catch(error => {
+            //     console.error('Error:', error);
+            // });
             .catch(error => {
-                console.error('Error:', error);
+            if (error?.response?.status === 422) {
+                Swal.fire({
+                icon: "error",
+                title: "บันทึกไม่สำเร็จ",
+                text: error?.response?.data?.message || "พบข้อมูลซ้ำ",
+                position: "top-center",
+                });
+                return;
+            }
+            console.error("Error:", error);
             });
         }, 
         formatDateToThai(date) {
