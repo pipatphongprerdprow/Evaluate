@@ -68,7 +68,7 @@
                             </td>
 
                             <td> 
-                                <div v-if="Item.countchk > 0">  
+                                <!-- <div v-if="Item.countchk > 0">  
                                     <Button 
                                         label="รายละเอียด" 
                                         severity="primary"
@@ -77,6 +77,18 @@
                                         @click="openDataEvalu(Item)" 
                                         style="width: 130px;" 
                                     /> 
+                                </div> -->
+                                 <div v-if="Item.countchk > 0">  
+                                    <Button 
+                                        label="รายละเอียด" 
+                                        severity="primary"
+                                        class="mb-2 mr-2" 
+                                        icon="pi pi-list"
+                                        :loading="loadingDetailIndex === index"
+                                        :disabled="loadingDetail"
+                                        @click="openDataEvalu(Item, index)" 
+                                        style="width: 130px;" 
+                                    />
                                 </div>
                                 <div v-else>
                                     <p style="color: brown;">-ไม่มีข้อมูลการประเมิน-</p>
@@ -976,6 +988,10 @@ export default {
             groupid_Main: '',
             // Anurak
             dataTableDate: [],
+
+            // loadding
+            loadingDetail: false,
+            loadingDetailIndex: null,
  
             // ปีงบประมาณ
             dropdownItemYear: { name: 'ปีงบประมาณ 2568', code: 2568 },
@@ -1269,16 +1285,16 @@ export default {
         },
      
         //170269
+        
         // async openDataEvalu(row) {
         //     try {
-        //         // ✅ 1) staff ของผู้ login
+        //         // 1) staff ของผู้ login
         //         this.dataStaffid = this.staffid_Main;
 
-        //         // ✅ 2) รอบที่คลิก (row มี d_date/evalua/fac_id อยู่แล้ว)
+        //         // 2) เก็บรอบที่คลิก
         //         this.tracking_date = { ...row };
 
-        //         // ✅ 3) currentstaff ไม่ต้อง filter จาก products แล้ว (products ไม่มี staffid)
-        //         // ถ้าต้องใช้ currentstaff[0] ใน template ให้สร้างจาก session แทน
+        //         // 3) สร้าง currentstaff จาก session
         //         this.currentstaff = [{
         //         prefixfullname: this.$nuxt?.$auth?.user?.name?.PREFIXFULLNAME || '',
         //         staffname: this.$nuxt?.$auth?.user?.name?.STAFFNAME || '',
@@ -1294,24 +1310,19 @@ export default {
         //         this.improvements = null;
         //         this.suggestions = null;
 
-        //         // ✅ 4) โหลดสมรรถนะ/PO
-        //         // await this.showdataPo(
-        //         // this.dataStaffid,
-        //         // this.facid_Main,
-        //         // this.tracking_date.d_date,
-        //         // this.tracking_date.evalua,
-        //         // row.posnameid
-        //         // );
+        //         // ✅ จุดแก้สำคัญ: ดึงชื่อผู้ประเมินของ "รอบที่คลิก" ทันที
+        //         await this.showdatator();
 
+        //         // โหลดสมรรถนะ/PO
         //         await this.showdataPo(
-        //             this.dataStaffid,
-        //             this.facid_Main,
-        //             this.tracking_date.d_date,
-        //             this.tracking_date.evalua,
-        //             this.postypenameid
+        //         this.dataStaffid,
+        //         this.facid_Main,
+        //         this.tracking_date.d_date,
+        //         this.tracking_date.evalua,
+        //         this.postypenameid
         //         );
 
-        //         // ✅ 5) โหลด ป01-ป03
+        //         // โหลด ป01-ป03
         //         const res = await axios.post('http://127.0.0.1:8000/api/showDataP03New', {
         //         staff_id: this.dataStaffid,
         //         fac_id: this.tracking_date.fac_id ?? this.facid_Main,
@@ -1329,7 +1340,21 @@ export default {
         //         console.error('openDataEvalu error:', error);
         //     }
         // },
-        async openDataEvalu(row) {
+        async openDataEvalu(row, idx) {
+            this.loadingDetail = true;
+            this.loadingDetailIndex = idx;
+
+            // ✅ popup loading
+            Swal.fire({
+                title: 'กำลังโหลดข้อมูล',
+                text: 'กรุณารอสักครู่',
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                didOpen: () => Swal.showLoading()
+            });
+
+            let ok = false;
+
             try {
                 // 1) staff ของผู้ login
                 this.dataStaffid = this.staffid_Main;
@@ -1339,11 +1364,11 @@ export default {
 
                 // 3) สร้าง currentstaff จาก session
                 this.currentstaff = [{
-                prefixfullname: this.$nuxt?.$auth?.user?.name?.PREFIXFULLNAME || '',
-                staffname: this.$nuxt?.$auth?.user?.name?.STAFFNAME || '',
-                staffsurname: this.$nuxt?.$auth?.user?.name?.STAFFSURNAME || '',
-                posnameth: this.$nuxt?.$auth?.user?.name?.POSITIONNAME || '',
-                postypenameth: this.postypename || ''
+                    prefixfullname: this.$nuxt?.$auth?.user?.name?.PREFIXFULLNAME || '',
+                    staffname: this.$nuxt?.$auth?.user?.name?.STAFFNAME || '',
+                    staffsurname: this.$nuxt?.$auth?.user?.name?.STAFFSURNAME || '',
+                    posnameth: this.$nuxt?.$auth?.user?.name?.POSITIONNAME || '',
+                    postypenameth: this.postypename || ''
                 }];
 
                 // reset tab data
@@ -1353,34 +1378,48 @@ export default {
                 this.improvements = null;
                 this.suggestions = null;
 
-                // ✅ จุดแก้สำคัญ: ดึงชื่อผู้ประเมินของ "รอบที่คลิก" ทันที
+                // ✅ ดึงชื่อผู้ประเมินของรอบที่คลิก
                 await this.showdatator();
 
                 // โหลดสมรรถนะ/PO
                 await this.showdataPo(
-                this.dataStaffid,
-                this.facid_Main,
-                this.tracking_date.d_date,
-                this.tracking_date.evalua,
-                this.postypenameid
+                    this.dataStaffid,
+                    this.facid_Main,
+                    this.tracking_date.d_date,
+                    this.tracking_date.evalua,
+                    this.postypenameid
                 );
 
                 // โหลด ป01-ป03
                 const res = await axios.post('http://127.0.0.1:8000/api/showDataP03New', {
-                staff_id: this.dataStaffid,
-                fac_id: this.tracking_date.fac_id ?? this.facid_Main,
-                year_id: this.tracking_date.d_date,
-                evalua: this.tracking_date.evalua
+                    staff_id: this.dataStaffid,
+                    fac_id: this.tracking_date.fac_id ?? this.facid_Main,
+                    year_id: this.tracking_date.d_date,
+                    evalua: this.tracking_date.evalua
                 });
 
                 if (Array.isArray(res.data)) {
-                this.products_Tab1 = res.data;
+                    this.products_Tab1 = res.data;
                 }
 
                 this.DialogAdd = true;
                 this.activeIndex = 0;
+
+                ok = true;
             } catch (error) {
                 console.error('openDataEvalu error:', error);
+            } finally {
+                this.loadingDetail = false;
+                this.loadingDetailIndex = null;
+                Swal.close(); // ✅ ปิด loading เสมอ
+            }
+
+            if (!ok) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'เกิดข้อผิดพลาด',
+                    text: 'โหลดข้อมูลไม่สำเร็จ'
+                });
             }
         },
 

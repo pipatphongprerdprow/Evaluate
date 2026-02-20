@@ -14,7 +14,7 @@
                     <span class="text-blue-500">P</span>erformance&nbsp;
                     <span class="text-blue-500">A</span>ppraisal
                 </span>
-                 {{ user.user.name }}  
+                 <!-- {{ user.user.name }}   -->
                 <div class="mb-3 mt-3">
                   <img id="IMG_PICTURE" :src="`${profileImageUrl}${user.user?.name.STAFFID}.jpg`" alt="Profile Picture" style="border-radius: 70px;width: 200px;height: auto;" />   
                 </div>   

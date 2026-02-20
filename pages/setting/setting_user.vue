@@ -35,11 +35,11 @@
                                                 <li v-for="(li) in listshoeusername1" :key="li.id" @click="nameUserclick1(li)">{{li.staffid}} : {{li.namefully}}</li>
                                             </ul>
                                         </span>
-                                        <input type="text" v-model="text_namefullyuse1">
-                                        <input type="text" v-model="text_staffuse1">
-                                        <input type="text" v-model="text_positionuse1">
-                                        <input type="text" v-model="text_departmentnameuse1">
-                                        <input type="text" v-model="text_departmentiduse1">
+                                        <input type="hidden" v-model="text_namefullyuse1">
+                                        <input type="hidden" v-model="text_staffuse1">
+                                        <input type="hidden" v-model="text_positionuse1">
+                                        <input type="hidden" v-model="text_departmentnameuse1">
+                                        <input type="hidden" v-model="text_departmentiduse1">
                                     </div>
                                     <div class="field col-12 md:col-4">
                                         <label for="text_user2">คณะ/หน่วยงานที่ประเมิน</label>
@@ -71,7 +71,7 @@
                             </div>
                         </template>
                     </Column>
-                    <Column field="Tb_name" header="คณะ/หน่วยงาน" style="width: 25%; text-align: center;">
+                    <Column field="Tb_name" header="คณะ/หน่วยงานที่ประเมิน" style="width: 25%; text-align: center;">
                         <template #body="Item">
                             <div style="display: flex; justify-content: center; align-items: center;">
                                 <b>{{ Item.data.name_fac }}</b>
