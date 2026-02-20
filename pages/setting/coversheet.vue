@@ -36,7 +36,7 @@
                         style="max-width: 500px;width: 100%;border: outset;"
                         @change="showdatator" 
                         /> 
-                    </div> -->
+                    </div> --> 
                 </div> 
             </div>
         </div>  
@@ -153,11 +153,11 @@
                     </div>
                 </TabPanel>  
                 <!-- <TabPanel header="แบบ ป01" value="1">
-                    <Por01 :dataPor="product_date" />
-                </TabPanel>  -->
-                <TabPanel header="แบบ ป01" value="1">
                     <Por01 :dataPor="product_date" @weight-changed="onP01WeightChanged" />
-                </TabPanel>
+                </TabPanel> -->
+                <TabPanel header="แบบ ป01" value="1">
+                    <Por01 ref="p01Ref" :dataPor="product_date" @weight-changed="onP01WeightChanged" />
+                </TabPanel> 
                 <TabPanel header="แบบ ป02" value="2">
                     <Por02 :dataPor="product_date" :tab2Reload="por02key" />
                 </TabPanel> 
@@ -448,24 +448,50 @@ const user = await getSession();
                 })
                 .catch(error => { 
                 });
-            },   
+            },    
+            // onTabChange(event) {
+            //     // ต้องเลือกรอบก่อน
+            //     if (!this.product_date?.d_date) {
+            //         Swal.fire({
+            //         icon: 'warning',
+            //         title: 'แจ้งเตือน',
+            //         text: 'กรุณาเลือก รอบการประเมิน ก่อน !',
+            //         confirmButtonText: 'ตกลง'
+            //         });
 
-            // onTabChange(event) { 
-            //     if (this.product_date.d_date == null || this.product_date.d_date == undefined) {
-            //         Swal.fire('error', 'กรุณาเลือก รอบการประเมิน ก่อน !', 'error'); 
-            //     } else {
-            //         if (event.index == 2) {   
-            //             this.por02key++; 
-            //         } else if (event.index == 3) {   
-            //             this.por03key++; 
-            //         } else if (event.index == 4) {   
-            //             this.por04key++;  
-            //         } 
-            //         this.currenttap = event.index;
+            //         // ดึงกลับแท็บเดิม
+            //         this.activeIndex = this.currenttap ?? 0;
+            //         return;
             //     }
-            // }, 
+
+            //     // ถ้าจะไปแท็บ 2-4 แต่ weight ไม่ครบ/เกิน => กัน
+            //     if (event.index >= 2 && !this.isP01WeightOk) {
+            //         const w = Number(this.p01TotalWeight || 0);
+            //         const msg = w > 100
+            //         ? `คะแนนรวมน้ำหนัก = ${w}% เกิน 100% กรุณาปรับให้เท่ากับ 100%`
+            //         : `คะแนนรวมน้ำหนัก = ${w}% ยังไม่ครบ 100% กรุณาปรับให้เท่ากับ 100%`;
+
+            //         Swal.fire({
+            //         icon: 'warning',
+            //         title: 'ยังไปแท็บอื่นไม่ได้',
+            //         text: msg,
+            //         confirmButtonText: 'ตกลง'
+            //         });
+
+            //         this.activeIndex = 1;   // บังคับค้างที่ ป01
+            //         this.currenttap = 1;
+            //         return;
+            //     }
+
+            //     // ผ่านแล้วค่อยเปลี่ยน
+            //     this.activeIndex = event.index;
+            //     this.currenttap = event.index;
+
+            //     if (event.index == 2) this.por02key++;
+            //     else if (event.index == 3) this.por03key++;
+            //     else if (event.index == 4) this.por04key++;
+            // },
             onTabChange(event) {
-                // ต้องเลือกรอบก่อน
                 if (!this.product_date?.d_date) {
                     Swal.fire({
                     icon: 'warning',
@@ -473,13 +499,10 @@ const user = await getSession();
                     text: 'กรุณาเลือก รอบการประเมิน ก่อน !',
                     confirmButtonText: 'ตกลง'
                     });
-
-                    // ดึงกลับแท็บเดิม
                     this.activeIndex = this.currenttap ?? 0;
                     return;
                 }
 
-                // ถ้าจะไปแท็บ 2-4 แต่ weight ไม่ครบ/เกิน => กัน
                 if (event.index >= 2 && !this.isP01WeightOk) {
                     const w = Number(this.p01TotalWeight || 0);
                     const msg = w > 100
@@ -493,20 +516,26 @@ const user = await getSession();
                     confirmButtonText: 'ตกลง'
                     });
 
-                    this.activeIndex = 1;   // บังคับค้างที่ ป01
+                    this.activeIndex = 1;
                     this.currenttap = 1;
                     return;
                 }
 
-                // ผ่านแล้วค่อยเปลี่ยน
                 this.activeIndex = event.index;
                 this.currenttap = event.index;
 
                 if (event.index == 2) this.por02key++;
                 else if (event.index == 3) this.por03key++;
                 else if (event.index == 4) this.por04key++;
-            },
 
+                // ✅ สำคัญ: กลับมาป01 ให้โหลดใหม่เพื่ออัปเดตปุ่มลบทันที
+                if (event.index === 1) {
+                    this.$nextTick(() => {
+                    this.$refs.p01Ref?.showDataPerson?.();
+                    });
+                }
+            }, 
+            
             async printDataP01() { 
                 const { signIn, getSession, signOut } = await useAuth();
                 const user = await getSession();     

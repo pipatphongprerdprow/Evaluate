@@ -6,6 +6,7 @@
                     <div class="col md:col-6">
                         <h3 class="mb-4 card-header"><i class="pi pi-id-card" style="font-size: x-large;"></i> จัดการ สิทธิ์การเข้าใช้งาน</h3>
                     </div>
+                    <!-- {{ user.user.name }} -->
                     <br>
                     <div class="col md:col-16 text-right">
                         <Button icon="pi pi-plus" severity="info" class="mb-2 mr-2" label="เพิ่มสิทธิ์การใช้งาน" @click="OpenDialogAdd" />
@@ -34,14 +35,14 @@
                                                 <li v-for="(li) in listshoeusername1" :key="li.id" @click="nameUserclick1(li)">{{li.staffid}} : {{li.namefully}}</li>
                                             </ul>
                                         </span>
-                                        <input type="hidden" v-model="text_namefullyuse1">
-                                        <input type="hidden" v-model="text_staffuse1">
-                                        <input type="hidden" v-model="text_positionuse1">
-                                        <input type="hidden" v-model="text_departmentnameuse1">
-                                        <input type="hidden" v-model="text_departmentiduse1">
+                                        <input type="text" v-model="text_namefullyuse1">
+                                        <input type="text" v-model="text_staffuse1">
+                                        <input type="text" v-model="text_positionuse1">
+                                        <input type="text" v-model="text_departmentnameuse1">
+                                        <input type="text" v-model="text_departmentiduse1">
                                     </div>
                                     <div class="field col-12 md:col-4">
-                                        <label for="text_user2">คณะ/หน่วยงาน</label>
+                                        <label for="text_user2">คณะ/หน่วยงานที่ประเมิน</label>
                                         <InputGroup>
                                             <InputGroupAddon>
                                                 <i class="pi pi-building"></i>
@@ -118,6 +119,7 @@ export default {
             staffid_Main: '',
             facid_Main: '',
             groupid_Main: '01',
+            staffdepartmentname: '',
             products_date: [],
             // Dialog
             DialogAdd: false,
@@ -148,17 +150,18 @@ export default {
         const { signIn, getSession, signOut } = await useAuth()
         const user = await getSession();
 
-        const {STAFFID, SCOPES} = user.user.name
-        const {staffdepartment, groupid} = SCOPES // ไม่ได้ใช้ staffdepartmentname, groupname ใน setSession หรือ showDataSetUser
+        const {STAFFID, SCOPES} = user.user.name  
+        const {staffdepartment, groupid, staffdepartmentname} = SCOPES // ไม่ได้ใช้ staffdepartmentname, groupname ใน setSession หรือ showDataSetUser
 
-        await this.setSession(STAFFID,staffdepartment,groupid);
+        await this.setSession(STAFFID,staffdepartment,groupid, staffdepartmentname);
         await this.showDataSetUser(); // ไม่ต้องส่ง parameter เพราะฟังก์ชัน showDataSetUser ใน PHP ไม่ได้รับแล้ว
     },
     methods: {
-        setSession (staffid_Main,facid_Main,groupid_Main) {
+        setSession (staffid_Main,facid_Main,groupid_Main, staffdepartmentname) {
             this.staffid_Main = staffid_Main
             this.facid_Main = facid_Main
             this.groupid_Main = groupid_Main
+            this.staffdepartmentname = staffdepartmentname
         },
         showDataSetUser(){
             axios.post('http://127.0.0.1:8000/api/showDateSetUser', {
@@ -331,23 +334,31 @@ export default {
             this.text_staffuse1 = data.staffid;
             this.text_positionuse1 = data.posnameth;
             this.text_namefullyuse1 = data.namefully;
-            const subSrtDepar = data.departmentid.substring(4, 7); 
-            console.log('subSrtDepar:', subSrtDepar); // ตรวจสอบค่าที่ได้จากการตัดสตริง 
-            if (subSrtDepar === "927") {
-                console.log('Matched departmentid starting with 927');
-                
-                this.text_departmentnameuse1 = data.departmentname;
-                this.text_departmentiduse1 = data.departmentid;
-                this.text_departmentiduseid = data.departmentid+' : '+data.departmentname; 
-            } else {
-                console.log('Other facultyid',data.facultyid);
-                
-                this.text_departmentnameuse1 = data.facultyname;
-                this.text_departmentiduse1 = data.facultyid;
-                this.text_departmentiduseid = data.facultyid+' : '+data.facultyname; 
-            }
 
-            this.text_iduse1 = data.id; // *** เก็บ ID ของผู้ใช้ที่เลือกจากผลการค้นหา ***
+            console.log('Matched departmentid starting with 927',this.facid_Main,this.staffdepartmentname); // ตรวจสอบค่าที่ได้จาก user session
+
+                this.text_departmentnameuse1 = this.staffdepartmentname;
+                this.text_departmentiduse1 = this.facid_Main;
+                this.text_departmentiduseid = this.facid_Main+' : '+this.staffdepartmentname; 
+
+            // const subSrtDepar = data.departmentid.substring(4, 7); 
+            // console.log('subSrtDepar:', subSrtDepar); // ตรวจสอบค่าที่ได้จากการตัดสตริง 
+            // if (subSrtDepar === "927") {
+            //     console.log('Matched departmentid starting with 927');
+            //     console.log('Matched departmentid starting with 927'.user.user.staffdepartment);
+                
+            //     this.text_departmentnameuse1 = data.departmentname;
+            //     this.text_departmentiduse1 = data.departmentid;
+            //     this.text_departmentiduseid = data.departmentid+' : '+data.departmentname; 
+            // } else {
+            //     console.log('Other facultyid',data.facultyid);
+                
+            //     this.text_departmentnameuse1 = data.facultyname;
+            //     this.text_departmentiduse1 = data.facultyid;
+            //     this.text_departmentiduseid = data.facultyid+' : '+data.facultyname; 
+            // }
+
+            // this.text_iduse1 = data.id; // *** เก็บ ID ของผู้ใช้ที่เลือกจากผลการค้นหา ***
         },
     }
 

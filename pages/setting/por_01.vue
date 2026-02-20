@@ -11,13 +11,13 @@
         <div class="col-12 lg:col-12 xl:col-12">
           <div class="card mb-0">
             <div class="formgroup-inline mb-1">
-              <div class="col md:col-5">
+              <div class="col md:col-7">
                 <h3 class="mb-4 card-header">
                   <i class="pi pi-fw pi-folder-open" style="font-size: x-large;"></i>
                   แบบ ป01
                 </h3>
               </div> 
-              <div class="col md:col-7">
+              <div class="col md:col-5">
                 <div v-if="currentDate < dataPor.d_recordingday">
                   <Button
                     icon="pi pi-search"
@@ -33,13 +33,13 @@
                     label="เพิ่มข้อมูลแบบประเมิน"
                     @click="OpenDialogAdd"
                   /> 
-                  <Button
+                  <!-- <Button
                     icon="pi pi-copy"
                     severity="primary"
                     class="mb-2 mr-6"
                     label="คัดลอกข้อมูลแบบประเมิน"
                     @click="copyEvaluationData"
-                  />
+                  /> -->
                 </div>
               </div>
             </div>
@@ -834,20 +834,45 @@ export default {
       return Number.isFinite(n) ? n : 0;
     },
 
+    // itemsBtu(item) {
+    //   return [
+    //     {
+    //       label: "แก้ไขข้อมูล",
+    //       icon: "pi pi-refresh",
+    //       command: () => this.editDatax(item),
+    //     },
+    //     {
+    //       label: "ลบข้อมูล",
+    //       icon: "pi pi-times",
+    //       command: () => this.delDatax(item),
+    //     },
+    //   ];
+    // },
+
+
     itemsBtu(item) {
-      return [
+      //console.log('itemsBtu: ', item); 
+      const menu = [
         {
           label: "แก้ไขข้อมูล",
           icon: "pi pi-refresh",
           command: () => this.editDatax(item),
-        },
-        {
+        }
+      ];
+
+      // ถ้าไม่มี checkbox (หรือเท่ากับ 0) ถึงจะแสดงปุ่มลบ
+      if (!item.chcekbox || item.chcekbox == 0) {
+        menu.push({
           label: "ลบข้อมูล",
           icon: "pi pi-times",
           command: () => this.delDatax(item),
-        },
-      ];
+        }); 
+        
+      } 
+      return menu;
     },
+
+    
 
     setSession(staffid_Main, facid_Main, groupid_Main) {
       this.staffid_Main = staffid_Main;
