@@ -85,11 +85,34 @@
                             </div>
                         </template>
                     </Column>
-                    <Column field="options" header="ตัวเลือก" headerStyle="text-align: center;" bodyStyle="text-align: center;">
+                    <!-- <Column field="options" header="ตัวเลือก" headerStyle="text-align: center;" bodyStyle="text-align: center;">
                         <template #body="Item">
                             <div style="display: flex; justify-content: center; align-items: center; gap: 5px;">
                                 <Button icon="pi pi-pencil" severity="success" class="p-button-sm" @click="editData(Item.data)" />
                                 <Button icon="pi pi-trash" severity="danger" class="p-button-sm" @click="delData(Item.data)" />
+                            </div>
+                        </template>
+                    </Column> -->
+                    <Column field="options" header="ตัวเลือก" headerStyle="text-align: center;" bodyStyle="text-align: center;">
+                        <template #body="Item">
+                            <div style="display: flex; justify-content: center; align-items: center; gap: 5px;">
+                                
+                                <!-- แสดงปุ่มแก้ไข เฉพาะกรณีที่ไม่ใช่เจ้าหน้าที่บุคคล -->
+                                <Button 
+                                    v-if="Item.data.status_user !== 2"
+                                    icon="pi pi-pencil" 
+                                    severity="success" 
+                                    class="p-button-sm" 
+                                    @click="editData(Item.data)" 
+                                />
+
+                                <!-- ปุ่มลบ แสดงทุกกรณี -->
+                                <Button 
+                                    icon="pi pi-trash" 
+                                    severity="danger" 
+                                    class="p-button-sm" 
+                                    @click="delData(Item.data)" 
+                                />
                             </div>
                         </template>
                     </Column>

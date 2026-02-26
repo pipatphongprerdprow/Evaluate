@@ -149,6 +149,45 @@ import axios from 'axios';
 import Swal from 'sweetalert2' 
 import InputText from 'primevue/inputtext';
 
+//รอใส่230269 ประเมิน ค.
+const EXECUTIVE_ALLOWLIST = new Set([
+'160018',//นายจีรพันธ์ ภูครองเพชร
+'190015',//นางนงลักษณ์ พุ่มม่วง
+'130069',//นายขรรชัย กลิ่นผกา
+'110143',//นางวราลักษณ์ คุปต์บดินทร
+'190042',//นางฉวีวรรณ คืนสันเทียะ
+'110105',//นายจักริน เพชรสังหาร
+'1140016',//นางบงกชทิพย์ เกาะสมบัต
+'110407',//นายอานุภาพ งามสูงเนิน
+'110138',//นางฉันทลักษณ์ สาชำนาญ
+'120039',//นางสุชาราวตี มาบุญธรรม
+'110142',//นางสาวอุทัยรัตน์ แก้วกู่
+'120032',//นางวิรายา ภมรสมิต
+'1100017',//นางพัชรนันญ ศรีแก่นจันทร
+'190021',//นางศิโรวรรณ อินศร
+'5002279',//นางสาวอนงค์ภาณุช ปะนะทังถิรวิทย
+'140056',//นางฉวีวรรณ อรรคะเศรษฐัง
+'110146',//นายนิวัฒ พัฒนิบูลย
+'110108',//นางสาวดวงแข เนื่องอุดม
+'110144',//นายอุทัย หามนตร
+'110309',//นางมยุรี ผาผง
+'130076',//นางกมลลักษณ์ พักพิงผ่องศิร
+'140066',//นางอมรรัตน์ หลายโคตร
+'190032',//นางชนัญชิดา สุวรรณเลิศ
+'110148',//นางจุฑามาศ ภิญโญศร
+'180010',//นางสิรีวรรณ ตติยรัตน
+'140064',//นางพรทิพย์ พันธุมชัย
+'120043',//นางลัดดาภรณ์ เชื้อในเขา
+'5001661',//นางศรินทร์ยา เกียงขวา
+'5001685',//นางแจ่มจันทร์ หลูปรีชาเศรษฐ
+'310801',//นางสาวกนกวรรณ เชาว์น้อย
+'410402',//นายนพวิทย์ ศรีเวียงธนาธิป
+'314020',//นายไกรษร อุทัยแสง
+'5000094',//นายสวัสดิ์ วิชระโภชน
+'130102' //นางสาวพนมพร ปัจจวงษ
+  
+]);
+
 export default {
     props: {
         dataPor: {
@@ -437,20 +476,38 @@ export default {
         // โหลด master stf_compentency มา map ชื่อ → WORK_DATAIL
         this.loadCompetencyDescriptions();
     },  
+    // watch: {
+    //     tab2Reload(v) { 
+    //         this.showdataPo();
+    //         this.getjobSpecificCompetencies();
+    //     },  
+    //     dataPor: {
+    //         handler(newVal, oldVal) {
+    //             this.showdataPo();
+    //             this.getjobSpecificCompetencies();
+    //         },
+    //         deep: true 
+    //     },
+    // },
     watch: {
-        tab2Reload(v) { 
-            this.showdataPo();
-            this.getjobSpecificCompetencies();
-        },  
-        dataPor: {
-            handler(newVal, oldVal) {
-                this.showdataPo();
-                this.getjobSpecificCompetencies();
-            },
-            deep: true 
+        tab2Reload: {
+            async handler() {
+            await this.refreshP02();
+            }
         },
-    },
+        dataPor: {
+            async handler() {
+            await this.refreshP02();
+            },
+            deep: true
+        }
+    }, 
     methods: {  
+        async refreshP02() {
+            if (!this.dataPor?.d_date || !this.staffid_Main) return;
+            await this.showdataPo();                 // ✅ โหลดรายการ ข. ให้เสร็จก่อน
+            await this.getjobSpecificCompetencies(); // ✅ แล้วค่อยเติมคะแนน
+        }, 
         setSession (staffid_Main,facid_Main,groupid_Main,postypename,postypenameid,positionname) {
             this.staffid_Main = staffid_Main
             this.facid_Main = facid_Main
@@ -490,26 +547,49 @@ export default {
             } 
         },
 
-        getjobSpecificCompetencies(){
-            axios.post('   http://127.0.0.1:8000/api/showdataposp02', { 
+        //  getjobSpecificCompetencies(){
+        //     axios.post('   http://127.0.0.1:8000/api/showdataposp02', { 
+        //         p_year: this.dataPor.d_date,
+        //         evalua: this.dataPor.evalua,
+        //         p_staffid: this.staffid_Main
+        //     })
+        //     .then(res => {
+        //         for (let i = 0; i < this.jobSpecificCompetencies.length; i++) {
+        //             if (res.data[0] && res.data[0][`p${i+6}`] !== undefined) {
+        //                 this.jobSpecificCompetencies[i]['SCORE'] = res.data[0][`p${i+6}`];
+        //                 this.jobSpecificCompetencies[i]['SCOREPERSON'] = res.data[0][`pa_${i+6}`];
+        //             }
+        //         }
+        //         for (let i = 0; i < this.otherCompetencies.length; i++) {
+        //             if (res.data[0] && res.data[0][`px_${i+1}`] !== undefined) {
+        //                 this.otherCompetencies[i]['datatable3'] = res.data[0][`px_${i+1}`];
+        //                 this.otherCompetencies[i]['selfAssessment3'] = res.data[0][`pSE_${i+1}`]; 
+        //             }  
+        //         }
+        //     })
+        // },
+        async getjobSpecificCompetencies() {
+            const res = await axios.post('http://127.0.0.1:8000/api/showdataposp02', {
                 p_year: this.dataPor.d_date,
                 evalua: this.dataPor.evalua,
                 p_staffid: this.staffid_Main
-            })
-            .then(res => {
-                for (let i = 0; i < this.jobSpecificCompetencies.length; i++) {
-                    if (res.data[0] && res.data[0][`p${i+6}`] !== undefined) {
-                        this.jobSpecificCompetencies[i]['SCORE'] = res.data[0][`p${i+6}`];
-                        this.jobSpecificCompetencies[i]['SCOREPERSON'] = res.data[0][`pa_${i+6}`];
-                    }
-                }
-                for (let i = 0; i < this.otherCompetencies.length; i++) {
-                    if (res.data[0] && res.data[0][`px_${i+1}`] !== undefined) {
-                        this.otherCompetencies[i]['datatable3'] = res.data[0][`px_${i+1}`];
-                        this.otherCompetencies[i]['selfAssessment3'] = res.data[0][`pSE_${i+1}`]; 
-                    }  
-                }
-            })
+            });
+
+            const row = res.data?.[0] || {};
+
+            // ใส่คะแนนตาราง ข.
+            this.jobSpecificCompetencies = this.jobSpecificCompetencies.map((it, i) => ({
+                ...it,
+                SCORE: row[`p${i + 6}`] ?? it.SCORE ?? null,
+                SCOREPERSON: row[`pa_${i + 6}`] ?? it.SCOREPERSON ?? null
+            }));
+
+            // ใส่คะแนนตาราง ค.
+            this.otherCompetencies = this.otherCompetencies.map((it, i) => ({
+                ...it,
+                datatable3: row[`px_${i + 1}`] ?? it.datatable3 ?? '',
+                selfAssessment3: row[`pSE_${i + 1}`] ?? it.selfAssessment3 ?? ''
+            }));
         },
         
         //บิวแก้090269
@@ -593,7 +673,9 @@ export default {
         //     });
         // },
 
-        showdataPo() {
+        
+
+        async showdataPo() {
 
             // 🔹 เงื่อนไขระดับชำนาญการพิเศษ
             const isSpecialExpert = this.posadio === '128' || (this.postypenameid === '137' && this.positionname === 'ผู้บริหาร'); 
@@ -626,14 +708,22 @@ export default {
             this.jobSpecificCompetencies = [];
 
            
-            const Mapping = { '128': 1 };
-            const blacklist = ['110105', '110146', '160018']; // staffid ที่ไม่ให้ขึ้น ค.
+            // const Mapping = { '128': 1 };
+            // const blacklist = ['110105', '110146', '160018']; // staffid ที่ไม่ให้ขึ้น ค.
 
-            let executive = Mapping[this.posadio] || 0;
 
-            if (blacklist.includes(String(this.staffid_Main))) {
-                executive = 0;
-            }
+            // let executive = Mapping[this.posadio] || 0; 
+            // console.log('posadio:', executive); 
+            // if (blacklist.includes(String(this.staffid_Main))) {
+            //     executive = 0;
+            // }
+
+            //รอใส่230269
+            const staffId = String(this.staffid_Main).trim(); 
+            // ✅ ให้ขึ้น ค. เฉพาะคนใน allowlist
+            let executive = EXECUTIVE_ALLOWLIST.has(staffId) ? 1 : 0; 
+            console.log('staffId:', staffId, 'executive:', executive);
+
 
             this.otherCompetencies = [
                 { id: 12, activity: 'ค. 1 สภาวะผู้นำ', indicator3: executive, datatable3: '', selfAssessment3: '' },
@@ -643,9 +733,7 @@ export default {
                 { id: 16, activity: 'ค. 5 การสอนงานและการมอบหมายงาน', indicator3: executive, datatable3: '', selfAssessment3: '' }
             ];
  
-            this.showPostype(positionname, postypenameid);
-
-             
+        await this.showPostype(positionname, postypenameid); 
             axios.post('http://127.0.0.1:8000/api/showDataPo', {
                 staff_id: this.staffid_Main,
                 fac_id: this.facid_Main,
@@ -677,24 +765,36 @@ export default {
             });
         },
  
-        showPostype(postypename, postypenameid){
-            const postypetext = postypename;
-            axios.post('   http://127.0.0.1:8000/api/showdatapostypenameAdmin', {
-                postypename: postypetext,
-                postypenameid: postypenameid
-            })
-            .then(res => {
-                if (res.data.length > 0) { 
-                    this.jobSpecificCompetencies = res.data;
-                } 
-            })
-            .catch(error => {
-                console.error('Error fetching data:', error); 
+        // showPostype(postypename, postypenameid){
+        //     const postypetext = postypename;
+        //     axios.post('   http://127.0.0.1:8000/api/showdatapostypenameAdmin', {
+        //         postypename: postypetext,
+        //         postypenameid: postypenameid
+        //     })
+        //     .then(res => {
+        //         if (res.data.length > 0) { 
+        //             this.jobSpecificCompetencies = res.data;
+        //         } 
+        //     })
+        //     .catch(error => {
+        //         console.error('Error fetching data:', error); 
+        //     }); 
+        // },
+        async showPostype(postypename, postypenameid) {
+            const res = await axios.post('http://127.0.0.1:8000/api/showdatapostypenameAdmin', {
+                postypename,
+                postypenameid
             }); 
+            // เติม field กัน undefined ไว้ก่อน
+            this.jobSpecificCompetencies = (res.data || []).map(r => ({
+                ...r,
+                SCORE: r.SCORE ?? null,
+                SCOREPERSON: r.SCOREPERSON ?? null
+            }));
         },
 
         showdatator() {  
-            axios.post('   http://127.0.0.1:8000/api/showdatator', {
+            axios.post('http://127.0.0.1:8000/api/showdatator', {
                 p_year: this.dataPor.d_date,
                 evalua: this.dataPor.evalua,
                 p_staffid: this.staffid_Main
@@ -711,7 +811,8 @@ export default {
 
         async printDataP01() { 
             const { signIn, getSession, signOut } = await useAuth() 
-            const user = await getSession();   
+            const user = await getSession(); 
+            const staffId = String(this.staffid_Main).trim()  
             const form = {
                 staff_id: this.staffid_Main,
                 group_id: this.groupid_Main,
@@ -726,10 +827,13 @@ export default {
                 POSTYPENAME: user.user.name.POSTYPENAME, 
                 SCOPES: user.user.name.SCOPES.staffdepartmentname,
                 postypename: `ระดับ${this.postypename}`,
-                postypenameid: this.postypenameid
+                postypenameid: this.postypenameid,
+                executive: EXECUTIVE_ALLOWLIST.has(staffId) ? 1 : 0,
+                posadio: this.posadio, // (เผื่อ fallback ใน BE)
+
             } 
             const queryParams = new URLSearchParams(form).toString();
-            const url = `   http://127.0.0.1:8000/report_p02?${queryParams}`;
+            const url = `http://127.0.0.1:8000/report_p02?${queryParams}`;
             window.open(url, '_blank');
         },     
 

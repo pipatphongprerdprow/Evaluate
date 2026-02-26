@@ -3,10 +3,10 @@
         <div  class="col-12 lg:col-12 xl:col-12">
             <div class="card mb-0"> 
                 <div class="formgroup-inline mb-1">
-                    <div class="col md:col-9"> 
+                    <div class="col md:col-8"> 
                         <h3 class="mb-4 card-header"><i class="pi pi-clock" style="font-size: x-large;"></i> ประวิติการประเมิน</h3>    
                     </div> 
-                    <div class="col md:col-3"> 
+                    <div class="col md:col-4"> 
                         <p><b>ชื่อผู้รับการประเมิน :</b> {{ user.user.name.PREFIXFULLNAME }} {{ user.user.name.STAFFNAME }} {{ user.user.name.STAFFSURNAME }}</p>
                         <p><b>คณะ / หน่วยงาน :</b> {{ user.user.name.SCOPES?.staffdepartmentname }}</p>   
                          
@@ -78,7 +78,8 @@
                                         style="width: 130px;" 
                                     /> 
                                 </div> -->
-                                 <div v-if="Item.countchk > 0">  
+                                 <!-- <div v-if="Item.countchk > 0">   -->
+                                <div v-if="Number(Item.countchk ?? 0) > 0"> 
                                     <Button 
                                         label="รายละเอียด" 
                                         severity="primary"
@@ -233,7 +234,7 @@
                                                             <td style="text-align:left;">
                                                                 <template v-for="(ln, i) in parseActivityText(subP01.p01_subject).lines" :key="i">
                                                                     <div v-if="ln.type === 'main'" style="font-weight:700; margin-bottom:4px;">
-                                                                    {{ ln.text }}
+                                                                    {{ subP01.p01_no }}  {{ ln.text }}
                                                                     </div>
                                                                     <div v-else class="subline">
                                                                     <span>{{ ln.no }}</span>
@@ -257,8 +258,7 @@
                                                                     <em style="color: red;">{{ subP01.p01_detail }}</em>
                                                                 </p>
                                                             </td>  
-                                                            <td style="text-align: left;">
-                                                                <!-- วนลูปแสดงระดับ 1 ถึง 5 -->
+                                                            <td style="text-align: left;"> 
                                                                 <div v-for="level in [1, 2, 3, 4, 5]" :key="level">
                                                                     <div v-if="subP01.subITemP03ind.some(item => item.p03ind_no === level+'')">
                                                                         <b>ระดับ {{ level }}</b>
@@ -318,36 +318,36 @@
                                                                 <b v-if="subP01.p01_target==5">&#10003;</b> 
                                                                 <b v-if="subP01.p01_target!=5"></b> 
                                                             </td>
-                                                                <!-- เพิ่มตารางช่องค่าคะแนน -->
-                                                            <!-- <td style=" vertical-align: middle;" class="text-center">{{ subP01.p01_score }}</td> -->
-                                                            <td style="vertical-align: middle;" class="text-center">
+                                                                <!-- เพิ่มตารางช่องค่าคะแนน --> 
+                                                            <!-- <td style="vertical-align: middle;" class="text-center">
                                                                 {{ isScoreAnnounced(tracking_date) ? (subP01.p01_score ?? 0) : 0 }}
+                                                            </td> -->
+                                                            <td style="vertical-align: middle;" class="text-center">
+                                                                <span v-if="isScoreAnnounced(tracking_date)"> {{ subP01.p01_score ?? 0 }} </span>
+                                                                <span v-else style="color: brown;"> รอประกาศผลคะแนน </span>
                                                             </td>
-                                                            <td style=" vertical-align: middle;" class="text-center">{{ subP01.p01_weight }}%</td> 
-                                                            <!-- <td style=" vertical-align: middle;" class="text-center">{{ (subP01.p01_score * subP01.p01_weight / 100).toFixed(2) }}</td> -->
-                                                             <td style="vertical-align: middle;" class="text-center">
-                                                                    {{
-                                                                        isScoreAnnounced(tracking_date)
-                                                                        ? ((Number(subP01.p01_score ?? 0) * Number(subP01.p01_weight ?? 0) / 100).toFixed(2))
-                                                                        : '0.00'
-                                                                    }}
-                                                            </td>
+                                                            <td style=" vertical-align: middle;" class="text-center">{{ subP01.p01_weight }}%</td>  
+                                                             <!-- <td style="vertical-align: middle;" class="text-center">
+                                                                {{ isScoreAnnounced(tracking_date)  ? ((Number(subP01.p01_score ?? 0) * Number(subP01.p01_weight ?? 0) / 100).toFixed(2))  : '0.00'  }}
+                                                            </td> -->
+                                                            <td style="vertical-align: middle;" class="text-center">
+                                                                <span v-if="isScoreAnnounced(tracking_date)">
+                                                                    {{ (Number(subP01.p01_score ?? 0) * Number(subP01.p01_weight ?? 0) / 100 ).toFixed(2) }}</span> 
+                                                                <span v-else style="color: brown;"> รอประกาศผลคะแนน </span>
+                                                            </td> 
                                                         </tr>
                                                         </template>
                                                         <tr>
                                                             <td style="text-align: right" colspan="9">
                                                                 <b style="color: blue;">(7) ผลรวม</b> 
                                                             </td>
-                                                            <td class="text-center" style="color: blue;">
-                                                                <b>{{ totalscoretrack??0 }}</b> <!-- แสดงผลรวม p01_weight -->
+                                                            <td class="text-center" style="color: blue;"> 
+                                                                <b>{{ isScoreAnnounced(tracking_date) ? (totalscoretrack??0) : 0 }}</b> <!-- แสดงผลรวม p01_weight -->
                                                             </td>
                                                             <td class="text-center" style="color: blue;">
                                                                 <b>{{ totalWeighttrack??0 }}%</b> <!-- แสดงผลรวม p01_weight -->
                                                             </td>
-                                                            <!-- แสดงผลรวมคะแนนที่คำนวณ -->
-                                                            <!-- <td class="text-center" style="color: blue;">
-                                                                <b>{{ WeightedScoreSumtrack??0 }}</b> 
-                                                            </td>  -->
+                                                            <!-- แสดงผลรวมคะแนนที่คำนวณ --> 
                                                             <td class="text-center" style="color: blue;">
                                                                 <b>{{ isScoreAnnounced(tracking_date) ? (WeightedScoreSumtrack ?? 0) : 0 }}</b>
                                                             </td> 
@@ -371,10 +371,7 @@
                                                                 </b>
                                                                 <hr style="border: 1px solid black; width: 60%; text-align: left;">
                                                                 <b style="display: block; text-align: right; color: blue; text-align: left;">{{5}}</b>
-                                                                <!-- แสดงผลรวม/จำนวนระดับเป้าหมาย -->
-                                                                <!-- <div style="text-align: right;">
-                                                                    <b>= {{ WeightedScoreSumXT }}</b>
-                                                                </div>  -->
+                                                                <!-- แสดงผลรวม/จำนวนระดับเป้าหมาย --> 
                                                                 <div style="text-align:right;">
                                                                     <b>= {{ isScoreAnnounced(tracking_date) ? (Number(WeightedScoreSumXT ?? 0)).toFixed(2) : '0.00' }}</b>
                                                                 </div>
@@ -403,15 +400,15 @@
                                                                 <td>  
                                                                     <b v-if="row1.selfAssessment == '' ||  row1.selfAssessment == null" style="color: red;">0</b> 
                                                                     <b v-if="row1.selfAssessment != 0 " style="color: blue" >{{ row1.selfAssessment }}</b> 
-                                                                </td> 
-                                                                <!-- <td>  
-                                                                    <b v-if="row1.data_table1 == '' " style="color: red;">0</b> 
-                                                                    <b v-if="row1.data_table1 != 0 "  >{{ row1.data_table1 }}</b> 
-                                                                </td> -->
-                                                                <td>
+                                                                </td>  
+                                                                <!-- <td>
                                                                     <b :style="{ color: scoreColor(row1.data_table1, isScoreAnnounced(tracking_date)) }">
                                                                         {{ isScoreAnnounced(tracking_date) ? (Number(row1.data_table1 ?? 0)) : 0 }}
                                                                     </b>
+                                                                </td> --> 
+                                                                <td>
+                                                                    <b v-if="isScoreAnnounced(tracking_date)" :style="{ color: scoreColor(row1.data_table1, true) }"> {{ Number(row1.data_table1 ?? 0) }} </b> 
+                                                                    <b v-else style="color: brown;">  รอประกาศผลคะแนน </b>
                                                                 </td>
                                                             </tr>
                                                         </tbody>
@@ -443,9 +440,8 @@
                                                                      <b v-if="row2.SCORE !== 0 && row2.SCORE !== null && row2.SCORE !== ''">{{ row2.SCORE }}</b>
                                                                 </td> -->
                                                                 <td>
-                                                                    <b :style="{ color: scoreColor(row2.SCORE, isScoreAnnounced(tracking_date)) }">
-                                                                        {{ isScoreAnnounced(tracking_date) ? (Number(row2.SCORE ?? 0)) : 0 }}
-                                                                    </b>
+                                                                    <b v-if="isScoreAnnounced(tracking_date)" :style="{ color: scoreColor(row2.SCORE, true) }"> {{ Number(row2.SCORE ?? 0) }} </b> 
+                                                                    <b v-else style="color: brown;">  รอประกาศผลคะแนน </b>
                                                                 </td>
                                                             </tr> 
                                                         </tbody>
@@ -472,15 +468,15 @@
                                                                 <td>  
                                                                     <b v-if="row3.datatable3 == '' ||  row3.datatable3 == null" style="color: red;">0</b> 
                                                                     <b v-if="row3.datatable3 != 0 " style="color: blue" >{{ row3.datatable3 }}</b> 
-                                                                </td>
-                                                                <!-- <td>  
-                                                                    <b v-if="row3.selfAssessment3 == '' " style="color: red;">0</b> 
-                                                                    <b v-if="row3.selfAssessment3 != 0 " >{{ row3.selfAssessment3 }}</b> 
-                                                                </td> -->
-                                                                <td>
+                                                                </td> 
+                                                                <!-- <td>
                                                                     <b :style="{ color: scoreColor(row3.selfAssessment3, isScoreAnnounced(tracking_date)) }">
                                                                         {{ isScoreAnnounced(tracking_date) ? (Number(row3.selfAssessment3 ?? 0)) : 0 }}
                                                                     </b>
+                                                                </td>  -->
+                                                                <td>
+                                                                    <b v-if="isScoreAnnounced(tracking_date)" :style="{ color: scoreColor(row3.selfAssessment3, true) }"> {{ Number(row3.selfAssessment3 ?? 0) }} </b> 
+                                                                    <b v-else style="color: brown;">  รอประกาศผลคะแนน </b>
                                                                 </td>
                                                             </tr> 
                                                         </tbody>
@@ -966,6 +962,82 @@ import TabView from 'primevue/tabview';
 import TabPanel from 'primevue/tabpanel';
 import { LogarithmicScale } from 'chart.js';
 import InputNumber from 'primevue/inputnumber'; 
+
+const EXECUTIVE_ALLOWLIST = new Set([
+    '160018',//นายจีรพันธ์ ภูครองเพชร
+    '190015',//นางนงลักษณ์ พุ่มม่วง
+    '130069',//นายขรรชัย กลิ่นผกา
+    '110143',//นางวราลักษณ์ คุปต์บดินทร
+    '190042',//นางฉวีวรรณ คืนสันเทียะ
+    '110105',//นายจักริน เพชรสังหาร
+    '1140016',//นางบงกชทิพย์ เกาะสมบัต
+    '110407',//นายอานุภาพ งามสูงเนิน
+    '110138',//นางฉันทลักษณ์ สาชำนาญ
+    '120039',//นางสุชาราวตี มาบุญธรรม
+    '110142',//นางสาวอุทัยรัตน์ แก้วกู่
+    '120032',//นางวิรายา ภมรสมิต
+    '1100017',//นางพัชรนันญ ศรีแก่นจันทร
+    '190021',//นางศิโรวรรณ อินศร
+    '5002279',//นางสาวอนงค์ภาณุช ปะนะทังถิรวิทย
+    '140056',//นางฉวีวรรณ อรรคะเศรษฐัง
+    '110146',//นายนิวัฒ พัฒนิบูลย
+    '110108',//นางสาวดวงแข เนื่องอุดม
+    '110144',//นายอุทัย หามนตร
+    '110309',//นางมยุรี ผาผง
+    '130076',//นางกมลลักษณ์ พักพิงผ่องศิร
+    '140066',//นางอมรรัตน์ หลายโคตร
+    '190032',//นางชนัญชิดา สุวรรณเลิศ
+    '110148',//นางจุฑามาศ ภิญโญศร
+    '180010',//นางสิรีวรรณ ตติยรัตน
+    '140064',//นางพรทิพย์ พันธุมชัย
+    '120043',//นางลัดดาภรณ์ เชื้อในเขา
+    '5001661',//นางศรินทร์ยา เกียงขวา
+    '5001685',//นางแจ่มจันทร์ หลูปรีชาเศรษฐ
+    '310801',//นางสาวกนกวรรณ เชาว์น้อย
+    '410402',//นายนพวิทย์ ศรีเวียงธนาธิป
+    '314020',//นายไกรษร อุทัยแสง
+    '5000094',//นายสวัสดิ์ วิชระโภชน
+    '130102' //นางสาวพนมพร ปัจจวงษ
+    
+    ]);
+
+const EXECUTIVE_SCORE_ALLOWLIST = new Set([
+    '160018',//นายจีรพันธ์ ภูครองเพชร
+    '190015',//นางนงลักษณ์ พุ่มม่วง
+    '130069',//นายขรรชัย กลิ่นผกา
+    '110143',//นางวราลักษณ์ คุปต์บดินทร
+    '190042',//นางฉวีวรรณ คืนสันเทียะ
+    '110105',//นายจักริน เพชรสังหาร
+    '1140016',//นางบงกชทิพย์ เกาะสมบัต
+    '110407',//นายอานุภาพ งามสูงเนิน
+    '110138',//นางฉันทลักษณ์ สาชำนาญ
+    '120039',//นางสุชาราวตี มาบุญธรรม
+    '110142',//นางสาวอุทัยรัตน์ แก้วกู่
+    '120032',//นางวิรายา ภมรสมิต
+    '1100017',//นางพัชรนันญ ศรีแก่นจันทร
+    '190021',//นางศิโรวรรณ อินศร
+    '5002279',//นางสาวอนงค์ภาณุช ปะนะทังถิรวิทย
+    '140056',//นางฉวีวรรณ อรรคะเศรษฐัง
+    '110146',//นายนิวัฒ พัฒนิบูลย
+    '110108',//นางสาวดวงแข เนื่องอุดม
+    '110144',//นายอุทัย หามนตร
+    '110309',//นางมยุรี ผาผง
+    '130076',//นางกมลลักษณ์ พักพิงผ่องศิร
+    '140066',//นางอมรรัตน์ หลายโคตร
+    '190032',//นางชนัญชิดา สุวรรณเลิศ
+    '110148',//นางจุฑามาศ ภิญโญศร
+    '180010',//นางสิรีวรรณ ตติยรัตน
+    '140064',//นางพรทิพย์ พันธุมชัย
+    '120043',//นางลัดดาภรณ์ เชื้อในเขา
+    '5001661',//นางศรินทร์ยา เกียงขวา
+    '5001685',//นางแจ่มจันทร์ หลูปรีชาเศรษฐ
+    '310801',//นางสาวกนกวรรณ เชาว์น้อย
+    '410402',//นายนพวิทย์ ศรีเวียงธนาธิป
+    '314020',//นายไกรษร อุทัยแสง
+    '5000094',//นายสวัสดิ์ วิชระโภชน
+    '130102' //นางสาวพนมพร ปัจจวงษ
+]);
+
 export default {
     // props: {
     //     dataPor: {
@@ -1109,6 +1181,12 @@ export default {
             assessor_positionText: null,
             currentstaff: {},  
             //datatable3: [] 
+
+             //สมรรถนะ ค.
+            canScoreExecutive: false,
+            isTargetExecutive: false,
+            posadio: '',        // ✅ เพิ่มใหม่: ไว้เก็บ posadid ของผู้ถูกประเมิน
+            userSession: null, 
             
         };
     },
@@ -1121,6 +1199,7 @@ export default {
         const { signIn, getSession, signOut } = await useAuth();
         const user = await getSession();
         // console.log(user.user.name);
+        this.userSession = user;
         const { STAFFID, SCOPES } = user.user.name;
         const { staffdepartment, groupid, staffdepartmentname, groupname } = SCOPES;
         await this.setSession(STAFFID, staffdepartment, groupid, user.user.name.POSTYPENAME, user.user.name.POSITIONNAMEID);
@@ -1242,7 +1321,11 @@ export default {
                 staff_id: this.staffid_Main
                 });
 
-                this.products = res.data;
+                // this.products = res.data;
+                this.products = (res.data || []).map(r => ({
+                    ...r,
+                    countchk: Number(r.countchk ?? 0)  // ✅ เพิ่มใหม่: บังคับเป็นตัวเลข
+                }));
 
                 // ✅ ดึงคะแนน tor ของแต่ละรอบ แล้วใส่เข้า Item.tb_tor
                 await Promise.all(
@@ -1361,6 +1444,10 @@ export default {
 
                 // 2) เก็บรอบที่คลิก
                 this.tracking_date = { ...row };
+                // ✅ เพิ่มใหม่: ดึง posadio ของ “ผู้ถูกประเมิน” ก่อน
+                await this.getAadioPosition(this.dataStaffid);
+                const n = this.userSession?.user?.name || {};
+
 
                 // 3) สร้าง currentstaff จาก session
                 this.currentstaff = [{
@@ -1442,7 +1529,7 @@ export default {
                         Swal.fire({
                             position: 'top-end',
                             icon: 'success',
-                            title: 'ข้ลมูลผลการประเมินถูกบันทึกเสร็จสิ้น',
+                            title: 'ข้อมูลผลการประเมินถูกบันทึกเสร็จสิ้น',
                             showConfirmButton: false,
                             timer: 1000
                         });
@@ -1863,86 +1950,198 @@ export default {
                     console.error('Error fetching data:', error);
                 });
         },
-       async showdataPo(staff_id, facid_Main, d_date, evalua, posnameid) {  
-            // ตรวจสอบว่า currentstaff มีค่าหรือไม่
+    //    async showdataPo(staff_id, facid_Main, d_date, evalua, posnameid) {  
+    //         // ตรวจสอบว่า currentstaff มีค่าหรือไม่
+    //         if (!this.currentstaff || this.currentstaff.length === 0) {
+    //             console.error("Error: currentstaff is undefined or empty.");
+    //             return;
+    //         }
+
+    //         this.postypenameth = this.currentstaff[0]?.postypenameth  ?? (this.currentstaff[0]?.posnameth === 'ผู้บริหาร' ? 'ชำนาญการพิเศษ' : 'ปฏิบัติการ');
+
+    //     // console.log("postypenameth:", this.postypenameth);
+
+    //         let postypetext = `ระดับ${this.postypenameth}`;  
+
+    //         const levelMapping = {
+    //             'ระดับปฏิบัติการ': 1,
+    //             'ระดับปฏิบัติงาน': 1,
+    //             'ระดับชำนาญการ': 2,
+    //             'ระดับชำนาญงาน': 2,
+    //             'ระดับชำนาญการพิเศษ': 3,
+    //             'ระดับชำนาญงานพิเศษ': 3,
+    //             'อาจารย์': 3,
+    //             'ระดับเชี่ยวชาญ': 4,
+    //             'ระดับเชี่ยวชาญพิเศษ': 5
+    //         };
+    //         let xr = levelMapping[postypetext] || 0; 
+
+    //         this.coreCompetencies = [
+    //             { id: 1, activity: 'ก. 1 การมุ่งผลสัมฤทธิ์', indicator: xr, data_table1: '', selfAssessment: '' },
+    //             { id: 2, activity: 'ก. 2 การบริการที่ดี', indicator: xr, data_table1: '', selfAssessment: '' },
+    //             { id: 3, activity: 'ก. 3 การสั่งสมความเชี่ยวชาญในงานอาชีพ', indicator: xr, data_table1: '', selfAssessment: '' },
+    //             { id: 4, activity: 'ก. 4 การยึดมั่นในความถูกต้องชอบธรรมและจริยธรรม', indicator: xr, data_table1: '', selfAssessment: '' },
+    //             { id: 5, activity: 'ก. 5 การทำงานเป็นทีม', indicator: xr, data_table1: '', selfAssessment: '' }
+    //         ];  
+    //         this.jobSpecificCompetencies = [];
+
+    //         const Mapping = {
+    //             'ผู้บริหาร': 1
+    //         };  
+    //         let executive = Mapping[this.postypenameth, this.currentstaff[0]?.posnameth] || 0;
+
+    //         this.otherCompetencies = [
+    //             { id: 12, activity: 'ค. 1 สภาวะผู้นำ', indicator3: executive, datatable3: '', selfAssessment3: '' },
+    //             { id: 13, activity: 'ค. 2 วิสัยทัศน์', indicator3: executive, datatable3: '', selfAssessment3: '' },
+    //             { id: 14, activity: 'ค. 3 การวางกลยุทธ์ภาครัฐ', indicator3: executive, datatable3: '', selfAssessment3: '' },
+    //             { id: 15, activity: 'ค. 4 ศักยภาพเพื่อนำการปรับเปลี่ยน', indicator3: executive, datatable3: '', selfAssessment3: '' },
+    //             { id: 16, activity: 'ค. 5 การสอนงานและการมอบหมายงาน', indicator3: executive, datatable3: '', selfAssessment3: '' }
+    //         ]; 
+
+    //         // this.showPostype(this.currentstaff[0]?.postypenameth, this.postypenameid); // แก้ไข ตัวป2
+    //         // this.showPostype(this.currentstaff[0]?.postypenameth, posnameid);
+
+    //         const posId = posnameid ?? this.postypenameid;   // กัน undefined
+    //         await this.showPostype(this.currentstaff[0]?.postypenameth, posId);
+
+    //         axios.post(' http://127.0.0.1:8000/api/showDataPo', {
+    //             staff_id: staff_id,
+    //             fac_id: facid_Main,
+    //             year_id: d_date,
+    //             record: evalua,
+    //             postypename: postypetext
+    //         }).then(res => {     
+    //             if (res.data.length > 0) {
+    //                 const data = res.data[0]; 
+    //                 this.coreCompetencies = this.coreCompetencies.map(item => {
+    //                     if (data[`p${item.id}`] !== undefined) {
+    //                         return {
+    //                             ...item,
+    //                             data_table1: data[`p${item.id}`],
+    //                             selfAssessment: data[`pa_${item.id}`]
+    //                         };
+    //                     } 
+    //                     return item;
+    //                 });  
+    //                 //this.staff_po = data.staff_po;
+    //             } 
+    //         })
+    //         .catch(error => {
+    //             console.error('Error:', error);
+    //         });
+    //     }, 
+
+    async showdataPo(staff_id, facid_Main, d_date, evalua, posnameid) {
             if (!this.currentstaff || this.currentstaff.length === 0) {
                 console.error("Error: currentstaff is undefined or empty.");
                 return;
             }
 
-            this.postypenameth = this.currentstaff[0]?.postypenameth  ?? (this.currentstaff[0]?.posnameth === 'ผู้บริหาร' ? 'ชำนาญการพิเศษ' : 'ปฏิบัติการ');
+            // ===== 1) ตีความ "ผู้ถูกประเมินเป็นผู้บริหารไหม"
+            // posadio มาจาก await this.getAadioPosition(data.staffid) ใน openDataEvalu()
+            const targetId = String(staff_id).trim();
+            const posadioStr = String(this.posadio).trim();
 
-        // console.log("postypenameth:", this.postypenameth);
+            // ✅ ผู้ถูกประเมินเป็นผู้บริหาร: posadio=128 หรืออยู่ใน allowlist
+            this.isTargetExecutive = (posadioStr === '128') || EXECUTIVE_ALLOWLIST.has(targetId);
 
-            let postypetext = `ระดับ${this.postypenameth}`;  
+            // ===== 2) ตีความ "ผู้ประเมินมีสิทธิ์ให้คะแนน (6) ไหม"
+            const scorerId = String(this.staffid_Main).trim(); // คน login
+            this.canScoreExecutive = EXECUTIVE_SCORE_ALLOWLIST.has(scorerId);
+
+            // ระดับที่คาดหวังของ ค.(5)
+            const executiveExpected = this.isTargetExecutive ? 1 : 0;
+
+            // ===== 3) คำนวณระดับ ก.(1) ตามระดับตำแหน่ง
+            const isExecutiveRole =
+                this.normalizeLevelName(this.currentstaff[0]?.posnameth) === "ผู้บริหาร";
+
+            const isSpecialExpert =
+                (posadioStr === "128") || (String(posnameid).trim() === "137" && isExecutiveRole);
+
+            if (isSpecialExpert) {
+                this.postypenameth = "ชำนาญการพิเศษ";
+            } else {
+                this.postypenameth =
+                this.normalizeLevelName(this.currentstaff[0]?.postypenameth) || "ปฏิบัติการ";
+            }
+
+            const levelName = this.normalizeLevelName(this.postypenameth);
+            const postypetext = `ระดับ${levelName}`;
 
             const levelMapping = {
-                'ระดับปฏิบัติการ': 1,
-                'ระดับปฏิบัติงาน': 1,
-                'ระดับชำนาญการ': 2,
-                'ระดับชำนาญงาน': 2,
-                'ระดับชำนาญการพิเศษ': 3,
-                'ระดับชำนาญงานพิเศษ': 3,
-                'อาจารย์': 3,
-                'ระดับเชี่ยวชาญ': 4,
-                'ระดับเชี่ยวชาญพิเศษ': 5
+                "ระดับปฏิบัติการ": 1,
+                "ระดับปฏิบัติงาน": 1,
+                "ระดับชำนาญการ": 2,
+                "ระดับชำนาญงาน": 2,
+                "ระดับชำนาญการพิเศษ": 3,
+                "ระดับชำนาญงานพิเศษ": 3,
+                "อาจารย์": 3,
+                "ระดับเชี่ยวชาญ": 4,
+                "ระดับเชี่ยวชาญพิเศษ": 5
             };
-            let xr = levelMapping[postypetext] || 0; 
+            const xr = levelMapping[postypetext] ?? 0;
 
+            // ===== 4) ตั้งค่าเริ่มต้นตาราง
             this.coreCompetencies = [
-                { id: 1, activity: 'ก. 1 การมุ่งผลสัมฤทธิ์', indicator: xr, data_table1: '', selfAssessment: '' },
-                { id: 2, activity: 'ก. 2 การบริการที่ดี', indicator: xr, data_table1: '', selfAssessment: '' },
-                { id: 3, activity: 'ก. 3 การสั่งสมความเชี่ยวชาญในงานอาชีพ', indicator: xr, data_table1: '', selfAssessment: '' },
-                { id: 4, activity: 'ก. 4 การยึดมั่นในความถูกต้องชอบธรรมและจริยธรรม', indicator: xr, data_table1: '', selfAssessment: '' },
-                { id: 5, activity: 'ก. 5 การทำงานเป็นทีม', indicator: xr, data_table1: '', selfAssessment: '' }
-            ];  
+                { id: 1, activity: "ก. 1 การมุ่งผลสัมฤทธิ์", indicator: xr, data_table1: "", selfAssessment: "" },
+                { id: 2, activity: "ก. 2 การบริการที่ดี", indicator: xr, data_table1: "", selfAssessment: "" },
+                { id: 3, activity: "ก. 3 การสั่งสมความเชี่ยวชาญในงานอาชีพ", indicator: xr, data_table1: "", selfAssessment: "" },
+                { id: 4, activity: "ก. 4 การยึดมั่นในความถูกต้องชอบธรรมและจริยธรรม", indicator: xr, data_table1: "", selfAssessment: "" },
+                { id: 5, activity: "ก. 5 การทำงานเป็นทีม", indicator: xr, data_table1: "", selfAssessment: "" }
+            ];
+
             this.jobSpecificCompetencies = [];
 
-            const Mapping = {
-                'ผู้บริหาร': 1
-            };  
-            let executive = Mapping[this.postypenameth, this.currentstaff[0]?.posnameth] || 0;
-
             this.otherCompetencies = [
-                { id: 12, activity: 'ค. 1 สภาวะผู้นำ', indicator3: executive, datatable3: '', selfAssessment3: '' },
-                { id: 13, activity: 'ค. 2 วิสัยทัศน์', indicator3: executive, datatable3: '', selfAssessment3: '' },
-                { id: 14, activity: 'ค. 3 การวางกลยุทธ์ภาครัฐ', indicator3: executive, datatable3: '', selfAssessment3: '' },
-                { id: 15, activity: 'ค. 4 ศักยภาพเพื่อนำการปรับเปลี่ยน', indicator3: executive, datatable3: '', selfAssessment3: '' },
-                { id: 16, activity: 'ค. 5 การสอนงานและการมอบหมายงาน', indicator3: executive, datatable3: '', selfAssessment3: '' }
-            ]; 
+                { id: 12, activity: "ค. 1 สภาวะผู้นำ", indicator3: executiveExpected, datatable3: "", selfAssessment3: "" },
+                { id: 13, activity: "ค. 2 วิสัยทัศน์", indicator3: executiveExpected, datatable3: "", selfAssessment3: "" },
+                { id: 14, activity: "ค. 3 การวางกลยุทธ์ภาครัฐ", indicator3: executiveExpected, datatable3: "", selfAssessment3: "" },
+                { id: 15, activity: "ค. 4 ศักยภาพเพื่อนำการปรับเปลี่ยน", indicator3: executiveExpected, datatable3: "", selfAssessment3: "" },
+                { id: 16, activity: "ค. 5 การสอนงานและการมอบหมายงาน", indicator3: executiveExpected, datatable3: "", selfAssessment3: "" }
+            ];
 
-            // this.showPostype(this.currentstaff[0]?.postypenameth, this.postypenameid); // แก้ไข ตัวป2
-            // this.showPostype(this.currentstaff[0]?.postypenameth, posnameid);
+            // โหลด ข.
+            await this.showPostype(levelName, posnameid);
 
-            const posId = posnameid ?? this.postypenameid;   // กัน undefined
-            await this.showPostype(this.currentstaff[0]?.postypenameth, posId);
-
-            axios.post(' http://127.0.0.1:8000/api/showDataPo', {
+            // โหลดคะแนนเดิม ก.
+            try {
+                const res = await axios.post("http://127.0.0.1:8000/api/showDataPo", {
                 staff_id: staff_id,
                 fac_id: facid_Main,
                 year_id: d_date,
                 record: evalua,
                 postypename: postypetext
-            }).then(res => {     
-                if (res.data.length > 0) {
-                    const data = res.data[0]; 
-                    this.coreCompetencies = this.coreCompetencies.map(item => {
-                        if (data[`p${item.id}`] !== undefined) {
-                            return {
-                                ...item,
-                                data_table1: data[`p${item.id}`],
-                                selfAssessment: data[`pa_${item.id}`]
-                            };
-                        } 
-                        return item;
-                    });  
-                    //this.staff_po = data.staff_po;
-                } 
-            })
-            .catch(error => {
-                console.error('Error:', error);
+                });
+
+                if (Array.isArray(res.data) && res.data.length > 0) {
+                const data = res.data[0];
+                this.coreCompetencies = this.coreCompetencies.map((item) => {
+                    const keyScore = `p${item.id}`;
+                    const keySelf = `pa_${item.id}`;
+                    if (data[keyScore] !== undefined) {
+                    return {
+                        ...item,
+                        data_table1: data[keyScore] ?? 0,
+                        selfAssessment: data[keySelf] ?? 0
+                    };
+                    }
+                    return item;
+                });
+                }
+            } catch (error) {
+                console.error("Error:", error);
+            }
+
+            // ✅ debug สำคัญ (เปิด console แล้วดู)
+            console.log("[EXEC DEBUG]", {
+                targetId,
+                posadio: this.posadio,
+                isTargetExecutive: this.isTargetExecutive,
+                scorerId,
+                canScoreExecutive: this.canScoreExecutive
             });
-        }, 
+        },
  
         //29/10/67
         saveScore() {
@@ -2245,7 +2444,7 @@ export default {
                 Swal.fire({
                     position: 'top-end',
                     icon: 'success',
-                    title: 'ข้ลมูลผลการประเมินถูกบันทึกเสร็จสิ้น',
+                    title: 'ข้อมูลผลการประเมินถูกบันทึกเสร็จสิ้น',
                     showConfirmButton: false,
                     timer: 1000
                 });
@@ -2362,6 +2561,25 @@ export default {
 
             return { lines };
         },
+        normalizeLevelName(v) {
+            if (!v) return '';
+            return String(v).trim().replace(/^ระดับ\s*/,'');
+        },
+
+        async getAadioPosition(staffId) {
+            try {
+                const res = await axios.get('http://127.0.0.1:8000/api/getDataAdio', {
+                params: { staffid: staffId }
+                });
+                this.posadio = String(res.data?.[0]?.posadid ?? '').trim();
+            } catch (e) {
+                this.posadio = '';
+                console.error('getAadioPosition error', e);
+            }
+         },
+
+
+
 
 
 

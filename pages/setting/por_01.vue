@@ -11,13 +11,13 @@
         <div class="col-12 lg:col-12 xl:col-12">
           <div class="card mb-0">
             <div class="formgroup-inline mb-1">
-              <div class="col md:col-7">
+              <div class="col md:col-6">
                 <h3 class="mb-4 card-header">
                   <i class="pi pi-fw pi-folder-open" style="font-size: x-large;"></i>
                   แบบ ป01
                 </h3>
               </div> 
-              <div class="col md:col-5">
+              <div class="col md:col-6">
                 <div v-if="currentDate < dataPor.d_recordingday">
                   <Button
                     icon="pi pi-search"
@@ -95,9 +95,10 @@
                     </td> -->
 
                   <td style="text-align:left;">
+                    
                       <template v-for="(ln, i) in parseActivityText(subP01.p01_subject).lines" :key="i"> 
                         <div v-if="ln.type === 'main'" style="font-weight:700; margin-bottom:4px;">
-                          {{ ln.text }}
+                          {{ subP01.p01_no }}. {{ ln.text }}
                         </div>  
                         <div v-else class="subline">
                           <span class="subno">{{ ln.no }}</span>

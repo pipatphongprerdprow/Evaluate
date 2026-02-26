@@ -4,7 +4,7 @@
             <div class="col md:col-12 text-right">
                 <Button label="Export" icon="pi pi-file-word" class="mr-2 mb-2 " @click="printDataP03"></Button>
             </div>   
-              <!-- {{ user }} -->​  
+              <!-- {{ user }} -->
             <div class="card mb-0">
                 <div class="formgroup-inline mb-1">
                     <div class="col md:col-9">
@@ -45,10 +45,27 @@
                                 </td>
                             </tr>
                             <tr v-for="(subP01, idx) in h.subP01sX" :key="idx" style="vertical-align: baseline;">
-                                <td style="text-align: left;">{{ subP01.p01_no }} {{ subP01.p01_subject }}</td>
+                                <!-- <td style="text-align: left;">{{ subP01.p01_no }} {{ subP01.p01_subject }}</td> -->
+
+                                <td class="activity-cell">
+                                    <template v-for="(ln, i) in parseActivityText(subP01.p01_subject).lines" :key="i">
+                                        <!-- หัวข้อหลัก (บรรทัดแรก) -->
+                                        <div v-if="ln.type === 'main'" class="main-title">
+                                            {{ subP01.p01_no }} {{ ln.text }}
+                                        </div>
+
+                                        <!-- ข้อย่อย -->
+                                        <div v-else class="sub-item">
+                                            <span class="subno" v-if="ln.no">{{ ln.no }}</span>
+                                            <span class="subtext">{{ ln.text }}</span>
+                                        </div>
+                                    </template>
+                                </td>
+
  
                                 <td style="text-align: left;">
-                                    <b>ตัวชี้วัดที่ {{ idx + 1 }} {{ subP01.p01_subject }}</b> 
+                                    <!-- <b>ตัวชี้วัดที่ {{ idx + 1 }} {{ subP01.p01_subject }}</b>  -->
+                                     <b>ตัวชี้วัดที่ {{ idx + 1 }} {{ getMainSubject(subP01.p01_subject) }}</b>
                                     <div  v-for="(subItem, idI) in subP01.subITems" :key="idI" style="padding-left: 8px; margin-bottom: 5px;" >
                                         <template v-if="subItem.ind_no != 0"> <b>ระดับ {{ subItem.ind_no }}</b> {{ subItem.ind_Items }} </template>
                                         <template v-else> <b>{{ subItem.ind_Items }}</b> </template>
@@ -256,9 +273,9 @@
                                         <b v-if="row3.datatable3 == '' ||  row3.datatable3 == null" style="color: red;">-</b> 
                                         <b v-if="row3.datatable3 != 0 " style="color: blue" >{{ row3.datatable3 }}</b> 
                                     </td> -->
-                                    <td> 
-                                        <!-- <template v-if="posadio === '128'"> -->
-                                            <!-- <template v-if="posadio === '128' && String(staffid_Main) !== '110105'"></template> -->
+
+
+                                    <!-- <td>  
                                         <template v-if="posadio === '128' && !['110105', '110146','160018'].includes(String(staffid_Main))">
                                             <InputNumber 
                                                 v-model.number="row3.datatable3" 
@@ -269,6 +286,25 @@
                                                 :disabled="currentDate > dataPor.d_enddate"
                                             />
                                         </template>
+                                        <template v-else>
+                                            <b><span style="color: red;">-</span></b>
+                                        </template>  
+                                    </td> -->
+
+                                    <td>
+                                        <template v-if="canScoreExecutive">
+                                            <InputNumber 
+                                                v-model.number="row3.datatable3" 
+                                                type="text" 
+                                                placeholder="0" 
+                                                autocomplete="off" 
+                                                :min="0"
+                                                :max="5"
+                                                showButtons
+                                                :disabled="currentDate > dataPor.d_enddate"
+                                            />
+                                        </template>
+
                                         <template v-else>
                                             <b><span style="color: red;">-</span></b>
                                         </template>
@@ -595,6 +631,82 @@
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
 import Swal from 'sweetalert2'
+
+const EXECUTIVE_ALLOWLIST = new Set([
+    '160018',//นายจีรพันธ์ ภูครองเพชร
+    '190015',//นางนงลักษณ์ พุ่มม่วง
+    '130069',//นายขรรชัย กลิ่นผกา
+    '110143',//นางวราลักษณ์ คุปต์บดินทร
+    '190042',//นางฉวีวรรณ คืนสันเทียะ
+    '110105',//นายจักริน เพชรสังหาร
+    '1140016',//นางบงกชทิพย์ เกาะสมบัต
+    '110407',//นายอานุภาพ งามสูงเนิน
+    '110138',//นางฉันทลักษณ์ สาชำนาญ
+    '120039',//นางสุชาราวตี มาบุญธรรม
+    '110142',//นางสาวอุทัยรัตน์ แก้วกู่
+    '120032',//นางวิรายา ภมรสมิต
+    '1100017',//นางพัชรนันญ ศรีแก่นจันทร
+    '190021',//นางศิโรวรรณ อินศร
+    '5002279',//นางสาวอนงค์ภาณุช ปะนะทังถิรวิทย
+    '140056',//นางฉวีวรรณ อรรคะเศรษฐัง
+    '110146',//นายนิวัฒ พัฒนิบูลย
+    '110108',//นางสาวดวงแข เนื่องอุดม
+    '110144',//นายอุทัย หามนตร
+    '110309',//นางมยุรี ผาผง
+    '130076',//นางกมลลักษณ์ พักพิงผ่องศิร
+    '140066',//นางอมรรัตน์ หลายโคตร
+    '190032',//นางชนัญชิดา สุวรรณเลิศ
+    '110148',//นางจุฑามาศ ภิญโญศร
+    '180010',//นางสิรีวรรณ ตติยรัตน
+    '140064',//นางพรทิพย์ พันธุมชัย
+    '120043',//นางลัดดาภรณ์ เชื้อในเขา
+    '5001661',//นางศรินทร์ยา เกียงขวา
+    '5001685',//นางแจ่มจันทร์ หลูปรีชาเศรษฐ
+    '310801',//นางสาวกนกวรรณ เชาว์น้อย
+    '410402',//นายนพวิทย์ ศรีเวียงธนาธิป
+    '314020',//นายไกรษร อุทัยแสง
+    '5000094',//นายสวัสดิ์ วิชระโภชน
+    '130102' //นางสาวพนมพร ปัจจวงษ
+    
+    ]);
+
+const EXECUTIVE_SCORE_ALLOWLIST = new Set([
+    '160018',//นายจีรพันธ์ ภูครองเพชร
+    '190015',//นางนงลักษณ์ พุ่มม่วง
+    '130069',//นายขรรชัย กลิ่นผกา
+    '110143',//นางวราลักษณ์ คุปต์บดินทร
+    '190042',//นางฉวีวรรณ คืนสันเทียะ
+    '110105',//นายจักริน เพชรสังหาร
+    '1140016',//นางบงกชทิพย์ เกาะสมบัต
+    '110407',//นายอานุภาพ งามสูงเนิน
+    '110138',//นางฉันทลักษณ์ สาชำนาญ
+    '120039',//นางสุชาราวตี มาบุญธรรม
+    '110142',//นางสาวอุทัยรัตน์ แก้วกู่
+    '120032',//นางวิรายา ภมรสมิต
+    '1100017',//นางพัชรนันญ ศรีแก่นจันทร
+    '190021',//นางศิโรวรรณ อินศร
+    '5002279',//นางสาวอนงค์ภาณุช ปะนะทังถิรวิทย
+    '140056',//นางฉวีวรรณ อรรคะเศรษฐัง
+    '110146',//นายนิวัฒ พัฒนิบูลย
+    '110108',//นางสาวดวงแข เนื่องอุดม
+    '110144',//นายอุทัย หามนตร
+    '110309',//นางมยุรี ผาผง
+    '130076',//นางกมลลักษณ์ พักพิงผ่องศิร
+    '140066',//นางอมรรัตน์ หลายโคตร
+    '190032',//นางชนัญชิดา สุวรรณเลิศ
+    '110148',//นางจุฑามาศ ภิญโญศร
+    '180010',//นางสิรีวรรณ ตติยรัตน
+    '140064',//นางพรทิพย์ พันธุมชัย
+    '120043',//นางลัดดาภรณ์ เชื้อในเขา
+    '5001661',//นางศรินทร์ยา เกียงขวา
+    '5001685',//นางแจ่มจันทร์ หลูปรีชาเศรษฐ
+    '310801',//นางสาวกนกวรรณ เชาว์น้อย
+    '410402',//นายนพวิทย์ ศรีเวียงธนาธิป
+    '314020',//นายไกรษร อุทัยแสง
+    '5000094',//นายสวัสดิ์ วิชระโภชน
+    '130102' //นางสาวพนมพร ปัจจวงษ
+]);
+    
  
 
 
@@ -617,6 +729,8 @@ import InputText from 'primevue/inputtext';
                 facid_Main: null,
                 groupid_Main: null, 
                 currentDate: new Date().toISOString().split('T')[0], 
+
+                canScoreExecutive: false,
     /*=========== แก้ไขสมรรถนะ =============*/     
                 DialogEditP04: false,
                 editP04_id: null,
@@ -1024,9 +1138,9 @@ import InputText from 'primevue/inputtext';
                 // console.log("por03 tab3Reload",v);
                 this.showDataP03(); 
                   // ✅ เพิ่ม 3 บรรทัดนี้
-    this.showdataPo();
-    this.getjobSpecificCompetencies();
-    this.showAssess();
+                this.showdataPo();
+                this.getjobSpecificCompetencies();
+                this.showAssess();
             }, 
             // เฝ้าดูการเปลี่ยนแปลงของ dataPor
             dataPor: {
@@ -1696,12 +1810,21 @@ import InputText from 'primevue/inputtext';
                 ];
 
                 this.jobSpecificCompetencies = []; 
-                const Mapping = { '128': 1 };
-                let executive = Mapping[this.posadio] || 0;
 
-                if (blacklist.includes(String(this.staffid_Main))) {
-                    executive = 0;
-                }
+                // const Mapping = { '128': 1 };
+                // let executive = Mapping[this.posadio] || 0;
+
+                // if (blacklist.includes(String(this.staffid_Main))) {
+                //     executive = 0;
+                // }
+
+
+                  //  ให้ขึ้น ค. เฉพาะคนใน allowlist
+                 const staffId = String(this.staffid_Main).trim();  
+                let executive = EXECUTIVE_ALLOWLIST.has(staffId) ? 1 : 0; 
+                this.canScoreExecutive = EXECUTIVE_SCORE_ALLOWLIST.has(staffId);
+                //console.log('staffId:', staffId, 'executive:', executive);
+
 
                 this.otherCompetencies = [
                     { id: 12, activity: 'ค. 1 สภาวะผู้นำ', indicator3: executive, datatable3: '', selfAssessment3: '' },
@@ -1719,16 +1842,45 @@ import InputText from 'primevue/inputtext';
                     record: this.dataPor.evalua,
                     postypename: postypetext
                 })
+                // .then(res => {     
+                //     if(res.data.length > 0){
+                //         const data = res.data[0]; 
+
+                //         this.coreCompetencies = this.coreCompetencies.map(item => {
+                //             if (data[`p${item.id}`] !== undefined) {
+                //                 return {
+                //                     ...item,
+                //                     data_table1: data[`p${item.id}`],
+                //                     selfAssessment: data[`pa_${item.id}`]
+                //                 };
+                //             }
+                //             return item;
+                //         });
+                //     } 
+                // })
                 .then(res => {     
                     if(res.data.length > 0){
                         const data = res.data[0]; 
 
+                        // ✅ ก.
                         this.coreCompetencies = this.coreCompetencies.map(item => {
                             if (data[`p${item.id}`] !== undefined) {
                                 return {
                                     ...item,
                                     data_table1: data[`p${item.id}`],
                                     selfAssessment: data[`pa_${item.id}`]
+                                };
+                            }
+                            return item;
+                        });
+
+                        // ✅ ค.  <<<<<< อันนี้คุณยังไม่มี
+                        this.otherCompetencies = this.otherCompetencies.map(item => {
+                            if (data[`p${item.id}`] !== undefined) {
+                                return {
+                                    ...item,
+                                    datatable3: data[`p${item.id}`],
+                                    selfAssessment3: data[`pa_${item.id}`]
                                 };
                             }
                             return item;
@@ -1894,7 +2046,7 @@ import InputText from 'primevue/inputtext';
                     Swal.fire({
                         position: 'top-end',
                         icon: 'success',
-                        title: 'ข้ลมูลผลการประเมินถูกบันทึกเสร็จสิ้น',
+                        title: 'ข้อมูลผลการประเมินถูกบันทึกเสร็จสิ้น',
                         showConfirmButton: false,
                         timer: 1000
                     });
@@ -1994,29 +2146,65 @@ import InputText from 'primevue/inputtext';
                     console.error('Error:', error);
                 }); 
             }, 
+            // async printDataP03() { 
+            //     const { signIn, getSession, signOut } = await useAuth()
+            //     const user = await getSession();     
+            //     const form = {
+            //         staff_id: this.staffid_Main,
+            //         group_id: this.groupid_Main,
+            //         fac_id: this.dataPor.fac_id,
+            //         year_id: this.dataPor.d_date,
+            //         evalua: this.dataPor.evalua,
+            //         PREFIXFULLNAME:user.user.name.PREFIXFULLNAME,
+            //         STAFFNAME :user.user.name.STAFFNAME,
+            //         STAFFSURNAME:user.user.name.STAFFSURNAME,
+            //         POSITIONNAME:user.user.name.POSITIONNAME,
+            //         GROUPTYPENAME:user.user.name.GROUPTYPENAME,
+            //         POSTYPENAME:user.user.name.POSTYPENAME, 
+            //         SCOPES:user.user.name.SCOPES.staffdepartmentname,
+            //         postypename: `ระดับ${this.postypename}`   
+            //     } 
+            //     const queryParams = new URLSearchParams(form).toString();
+            //     // console.log(queryParams); 
+            //     const url = `   http://127.0.0.1:8000/report_p03?${queryParams}`;
+            //     window.open(url, '_blank'); 
+            // },  
             async printDataP03() { 
-                const { signIn, getSession, signOut } = await useAuth()
-                const user = await getSession();     
+                const { getSession } = await useAuth();
+                const user = await getSession();
+
+                // ✅ ให้แน่ใจว่า posadio ถูกโหลดแล้วก่อน export
+                await this.getAadioPosition(this.staffid_Main);
+
+                const staffId = String(this.staffid_Main).trim();
+                const executive = EXECUTIVE_ALLOWLIST.has(staffId) ? 1 : 0;
+
                 const form = {
                     staff_id: this.staffid_Main,
                     group_id: this.groupid_Main,
                     fac_id: this.dataPor.fac_id,
                     year_id: this.dataPor.d_date,
                     evalua: this.dataPor.evalua,
-                    PREFIXFULLNAME:user.user.name.PREFIXFULLNAME,
-                    STAFFNAME :user.user.name.STAFFNAME,
-                    STAFFSURNAME:user.user.name.STAFFSURNAME,
-                    POSITIONNAME:user.user.name.POSITIONNAME,
-                    GROUPTYPENAME:user.user.name.GROUPTYPENAME,
-                    POSTYPENAME:user.user.name.POSTYPENAME, 
-                    SCOPES:user.user.name.SCOPES.staffdepartmentname,
-                    postypename: `ระดับ${this.postypename}`   
-                } 
+
+                    PREFIXFULLNAME: user.user.name.PREFIXFULLNAME,
+                    STAFFNAME: user.user.name.STAFFNAME,
+                    STAFFSURNAME: user.user.name.STAFFSURNAME,
+                    POSITIONNAME: user.user.name.POSITIONNAME,
+                    GROUPTYPENAME: user.user.name.GROUPTYPENAME,
+                    POSTYPENAME: user.user.name.POSTYPENAME,
+                    SCOPES: user.user.name.SCOPES.staffdepartmentname,
+
+                    postypename: `ระดับ${this.postypename}`,
+
+                    // ✅ เพิ่ม 2 ตัวนี้
+                    posadio: String(this.posadio ?? ''),
+                    executive: String(executive),
+                };
+
                 const queryParams = new URLSearchParams(form).toString();
-                // console.log(queryParams); 
-                const url = `   http://127.0.0.1:8000/report_p03?${queryParams}`;
-                window.open(url, '_blank'); 
-            },  
+                const url = `http://127.0.0.1:8000/report_p03?${queryParams}`;
+                window.open(url, "_blank");
+            },
             
             
              // แก้ไขตัวชี้วัด / เกณฑ์การประเมิน
@@ -2273,6 +2461,43 @@ import InputText from 'primevue/inputtext';
                     });
                 });
             }, 
+            parseActivityText(raw) {
+                const text = String(raw || "").trim();
+                if (!text) return { mainTitle: "", lines: [] };
+
+                const rows = text
+                    .split(/\r?\n/)
+                    .map(r => r.trim())
+                    .filter(Boolean);
+
+                const cleanMain = (s) =>
+                    s.replace(/^(\d+\.)\s*/, "")     // ตัด "1. "
+                    .replace(/^[-•]\s*/, "")        // ตัด bullet
+                    .trim();
+
+                const mainTitle = cleanMain(rows[0]);
+
+                const lines = rows.map((r, idx) => {
+                    if (idx === 0) return { type: "main", text: cleanMain(r) };
+
+                    let s = r.replace(/^[-•]\s*/, "").trim();
+                    const m = s.match(/^(\d+(?:\.\d+)*\.)\s*(.*)$/);
+
+                    return {
+                    type: "sub",
+                    no: m ? m[1] : "",
+                    text: (m ? (m[2] || "") : s).trim(),
+                    };
+                });
+
+                return { mainTitle, lines };
+                },
+
+                getMainSubject(raw) {
+                return this.parseActivityText(raw).mainTitle || "";
+            },
+
+
         },
     } 
      
@@ -2383,5 +2608,16 @@ import InputText from 'primevue/inputtext';
     .p-button {
         margin: 10px 0;
     }
-  
+    .activity-cell{
+        text-align: left !important;
+        vertical-align: top;
+        white-space: normal;
+        line-height: 1.6;
+     } 
+    /* หัวข้อหลัก */
+    .main-title{
+        font-weight: 700;
+        margin-bottom: 4px;
+    }
+ 
     </style>

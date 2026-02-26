@@ -1065,7 +1065,7 @@ export default {
                         Swal.fire({
                             position: 'top-end',
                             icon: 'success',
-                            title: 'ข้ลมูลผลการประเมินถูกบันทึกเสร็จสิ้น',
+                            title: 'ข้อมูลผลการประเมินถูกบันทึกเสร็จสิ้น',
                             showConfirmButton: false,
                             timer: 1000
                         });
@@ -1911,7 +1911,7 @@ export default {
                 Swal.fire({
                     position: 'top-end',
                     icon: 'success',
-                    title: 'ข้ลมูลผลการประเมินถูกบันทึกเสร็จสิ้น',
+                    title: 'ข้อมูลผลการประเมินถูกบันทึกเสร็จสิ้น',
                     showConfirmButton: false,
                     timer: 1000
                 });
