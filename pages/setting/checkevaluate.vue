@@ -23,8 +23,8 @@
                         <Dropdown v-model="tracking_date" :options="tracking_dates" :optionLabel="(item) => `${item.facuties} ${item.d_evaluationround} ${item.d_date}`" placeholder="กรุณาเลือกรอบการประเมิน" style=" max-width: 500px; width: 100%"></Dropdown> 
                     </div> 
                     <div class="col md:col-1" >  
-                        <Button class="mb-2 mr-2" icon="pi pi-search" @click="xxr" /> &nbsp; &nbsp; &nbsp; &nbsp;   
-                        <!-- <Button label="Export" icon="pi pi-file-word" class="mr-2 mb-2 " @click="printDatatracking"></Button> -->
+                        <!-- <Button class="mb-2 mr-2" icon="pi pi-search" @click="xxr" /> &nbsp; &nbsp; &nbsp; &nbsp;    -->
+                         <Button class="mb-2 mr-2" icon="pi pi-search" @click="xxr" :loading="loadingSearch" :disabled="loadingSearch || loadingDetail || loadingTab" /> 
                     </div> 
                 </div>  
                 <table class="table">
@@ -44,14 +44,24 @@
                             <td class="text-center" style="color: blue;"><b>{{ Item.posnameth ? Item.posnameth: '' }} </b></td>  
                             <td style="text-align: center;width: 10%;">  
                                 <div v-if="Item.tb_tor">
-                                    <Button 
+                                    <!-- <Button 
                                         label="รายละเอียด" 
                                         severity="info"
                                         class="mb-2 mr-2" 
                                         icon="pi pi-list" 
                                         @click="openDataEvalu(Item)" 
                                         style="width: 130px;" 
-                                    />  
+                                    />   -->
+                                    <Button
+                                        label="รายละเอียด"
+                                        severity="info"
+                                        class="mb-2 mr-2"
+                                        icon="pi pi-list"
+                                        @click="openDataEvalu(Item)"
+                                        style="width: 130px;"
+                                        :loading="loadingDetail && loadingStaffId === Item.staffid"
+                                        :disabled="loadingSearch || loadingTab || (loadingDetail && loadingStaffId !== Item.staffid)"
+                                    />
                                 </div> 
                                 <div v-else>
                                     <p style="color: brown;">-รอข้อมูลการประเมิน-</p>
@@ -742,6 +752,12 @@ import TabView from 'primevue/tabview';
 import TabPanel from 'primevue/tabpanel';
 import { LogarithmicScale } from 'chart.js';
 import InputNumber from 'primevue/inputnumber'; 
+
+const FORCE_EXPECTED_LEVEL = new Map([
+  ['180010', 3],   //  ฟิกคนนี้ให้เป็นระดับ 3 นางสิรีวรรณ ตติยรัตน
+  ['160018', 3],   //  ฟิกคนนี้ให้เป็นระดับ 3 นายจีรพันธ์ ภูครองเพชร
+   
+]);
 export default {
     // props: {
     //     dataPor: {
@@ -762,6 +778,14 @@ export default {
             staffid_Main: '',
             facid_Main: '',
             groupid_Main: '',
+
+            //โหลดข้อมูล
+            loadingSearch: false,
+            loadingDetail: false,
+            loadingStaffId: null,
+            loadingTab: false,
+
+
             // ปีงบประมาณ
             dropdownItemYear: { name: 'ปีงบประมาณ 2568', code: 2568 },
             dropdownItemsYear: [
@@ -907,38 +931,47 @@ export default {
                     console.error('Error:', error);
                 });
         },
-        // ตารางรายชื่อ
+        // ตารางรายชื่อ 
         // xxr() {
-        //     if (this.tracking_date.evalua === undefined) {
+        //     if (this.tracking_date?.evalua === undefined) {
         //         Swal.fire({
         //             title: 'แจ้งเตือนจากระบบ!',
         //             text: 'กรุณาเลือก รอบประเมิน ก่อน!',
         //             icon: 'error'
         //         });
-        //     } else {
-        //         this.showDataEvalu();
+        //     } else { 
+        //         if (Array.isArray(this.dataList)) {   
+        //             this.filteredData = this.dataList.filter(item => item.stftypename !== "ลูกจ้างชั่วคราว" && item.stftypename !== "พนักงานราชการ");  
+        //             this.showDataEvalu();
+        //         } else {
+        //             console.error("dataList is not an array:", this.dataList);
+        //         }
         //     }
-        // },
-        xxr() {
+        // }, 
+
+        async xxr() {
             if (this.tracking_date?.evalua === undefined) {
-                Swal.fire({
-                    title: 'แจ้งเตือนจากระบบ!',
-                    text: 'กรุณาเลือก รอบประเมิน ก่อน!',
-                    icon: 'error'
-                });
-            } else {
-                // เช็คว่า dataList เป็น array หรือไม่
-                if (Array.isArray(this.dataList)) {  
-                    // กรองข้อมูลที่ไม่ใช่ "ลูกจ้างชั่วคราว"
-                    // this.filteredData = this.dataList.filter(item => item.stftypename !== "ลูกจ้างชั่วคราว");
-                    this.filteredData = this.dataList.filter(item => item.stftypename !== "ลูกจ้างชั่วคราว" && item.stftypename !== "พนักงานราชการ"); 
-                    // เรียกใช้ฟังก์ชัน showDataEvalu()
-                    this.showDataEvalu();
-                } else {
-                    console.error("dataList is not an array:", this.dataList);
-                }
+                Swal.fire({ title: 'แจ้งเตือนจากระบบ!', text: 'กรุณาเลือก รอบประเมิน ก่อน!', icon: 'error' });
+                return;
             }
-        }, 
+
+            this.loadingSearch = true;
+
+            await this.withLoading('กรุณารอสักครู่', async () => {
+                // (ของเดิมคุณ) filter ได้ตามเดิม
+                if (Array.isArray(this.dataList)) {
+                this.filteredData = this.dataList.filter(
+                    item => item.stftypename !== "ลูกจ้างชั่วคราว" && item.stftypename !== "พนักงานราชการ"
+                );
+                }
+
+                await this.showDataEvalu();   // ✅ รอให้โหลดเสร็จ
+            });
+
+            this.loadingSearch = false;
+        },
+
+
         async showDataEvalu() {
             try { 
                 const res = await axios.get('   http://127.0.0.1:8000/api/showDataEvalu', {  
@@ -975,77 +1008,116 @@ export default {
             }
         },
         // XX One
+        // async openDataEvalu(data) {  
+        //     if (this.tracking_date.d_date === undefined) {
+        //         Swal.fire('แจ้งเตือนจากระบบ', 'กรุณาเลือกรอบประเมิน', 'error');
+        //     } else {
+        //         this.dataStaffid = data.staffid;
+        //         this.printStaffData = data; 
+
+        //         await this.showDataEvalu();
+        //         await this.showdatator();
+
+        //         this.currentstaff = this.products.filter((product) => product.staffid === this.dataStaffid);
+        //         this.products_Tab1 = [];
+        //         this.p01_scores = [
+        //             { name: '0 คะแนน', code: 0 },
+        //             { name: '1 คะแนน', code: 1 },
+        //             { name: '2 คะแนน', code: 2 },
+        //             { name: '3 คะแนน', code: 3 },
+        //             { name: '4 คะแนน', code: 4 },
+        //             { name: '5 คะแนน', code: 5 }
+        //         ]; 
+
+        //         this.coreCompetencies = [
+        //             { id: 1, activity: 'ก. 1 การมุ่งผลสัมฤทธิ์', indicator: '1', data_table1: '',selfAssessment:'' },
+        //             { id: 2, activity: 'ก. 2 การบริการที่ดี', indicator: '1', data_table1: '',selfAssessment:'' },
+        //             { id: 3, activity: 'ก. 3 การสั่งสมความเชี่ยวชาญในงานอาชีพ', indicator: '1', data_table1: '',selfAssessment:'' },
+        //             { id: 4, activity: 'ก. 4 การยึดมั่นในความถูกต้องชอบธรรมและจริยธรรม', indicator: '1', data_table1: '',selfAssessment:'' },
+        //             { id: 5, activity: 'ก. 5 การทำงานเป็นทีม', indicator: '1', data_table1: '',selfAssessment:'' }
+        //         ];
+ 
+        //         this.jobSpecificCompetencies = [];
+
+        //         this.improvements = null;
+        //         this.suggestions = null;
+
+        //         this.showdataPo(data.staffid, this.facid_Main, this.tracking_date.d_date, this.tracking_date.evalua,data.posnameid);
+
+        //         await axios.post('   http://127.0.0.1:8000/api/showDataP03New', {
+        //             staff_id: data.staffid,
+        //             fac_id: this.tracking_date.fac_id,
+        //             year_id: this.tracking_date.d_date,
+        //             evalua: this.tracking_date.evalua
+        //         })
+        //         .then((res) => {
+        //             // console.log('openDataEvalu: ',res.data);
+        //             if (res.data && Array.isArray(res.data)) {
+        //                 this.products_Tab1 = res.data;
+        //                 this.products_Tab1.forEach((h) => {
+        //                     h.subP01sX.forEach((subP01) => {
+        //                         // ตรวจสอบว่าค่า p01_score นั้นถูกต้องหรือไม่
+        //                         const foundScore = this.p01_scores.find((score) => score.code === subP01.p01_score);
+        //                         if (foundScore) {
+        //                             subP01.p01_score = foundScore.code; // ใช้ค่าที่ถูกต้อง
+        //                         } else {
+        //                             subP01.p01_score = this.p01_scores[0].code; // ใช้ค่าเริ่มต้น "- ไม่ระบุ -"
+        //                         }
+        //                     });
+        //                 });
+        //             }
+        //             this.DialogAdd = true; 
+        //         })
+        //         .catch((error) => {
+        //             console.error('Error:', error);
+        //         });
+        //     }
+        // },   
+        
         async openDataEvalu(data) {
-            
-            // console.log('posnameid: ',data.posnameid);
-            // console.log('staffid: ',data.staffid);
-            
-            if (this.tracking_date.d_date === undefined) {
+            if (this.tracking_date?.d_date === undefined) {
                 Swal.fire('แจ้งเตือนจากระบบ', 'กรุณาเลือกรอบประเมิน', 'error');
-            } else {
+                return;
+            }
+
+            this.loadingDetail = true;
+            this.loadingStaffId = data.staffid;
+
+            await this.withLoading('กรุณารอสักครู่', async () => {
+                this.activeIndex = 0;     // ✅ รีเซ็ตกลับแท็บแรกทุกครั้ง (กันค้างแท็บเก่า)
                 this.dataStaffid = data.staffid;
-                this.printStaffData = data; 
+                this.printStaffData = data;
 
                 await this.showDataEvalu();
                 await this.showdatator();
 
-                this.currentstaff = this.products.filter((product) => product.staffid === this.dataStaffid);
+                this.currentstaff = this.products.filter(p => p.staffid === this.dataStaffid);
+
+                // ของเดิมคุณ (reset ค่า)
                 this.products_Tab1 = [];
-                this.p01_scores = [
-                    { name: '0 คะแนน', code: 0 },
-                    { name: '1 คะแนน', code: 1 },
-                    { name: '2 คะแนน', code: 2 },
-                    { name: '3 คะแนน', code: 3 },
-                    { name: '4 คะแนน', code: 4 },
-                    { name: '5 คะแนน', code: 5 }
-                ];
-
-                // ตั้งค่า coreCompetencies กลับไปเป็นค่าเริ่มต้น
-                this.coreCompetencies = [
-                    { id: 1, activity: 'ก. 1 การมุ่งผลสัมฤทธิ์', indicator: '1', data_table1: '',selfAssessment:'' },
-                    { id: 2, activity: 'ก. 2 การบริการที่ดี', indicator: '1', data_table1: '',selfAssessment:'' },
-                    { id: 3, activity: 'ก. 3 การสั่งสมความเชี่ยวชาญในงานอาชีพ', indicator: '1', data_table1: '',selfAssessment:'' },
-                    { id: 4, activity: 'ก. 4 การยึดมั่นในความถูกต้องชอบธรรมและจริยธรรม', indicator: '1', data_table1: '',selfAssessment:'' },
-                    { id: 5, activity: 'ก. 5 การทำงานเป็นทีม', indicator: '1', data_table1: '',selfAssessment:'' }
-                ];
-
-                // ตั้งค่า jobSpecificCompetencies กลับไปเป็นค่าเริ่มต้น
                 this.jobSpecificCompetencies = [];
-
                 this.improvements = null;
                 this.suggestions = null;
 
-                this.showdataPo(data.staffid, this.facid_Main, this.tracking_date.d_date, this.tracking_date.evalua,data.posnameid);
+                await this.showdataPo(data.staffid, this.facid_Main, this.tracking_date.d_date, this.tracking_date.evalua, data.posnameid);
 
-                await axios.post('   http://127.0.0.1:8000/api/showDataP03New', {
-                    staff_id: data.staffid,
-                    fac_id: this.tracking_date.fac_id,
-                    year_id: this.tracking_date.d_date,
-                    evalua: this.tracking_date.evalua
-                })
-                .then((res) => {
-                    // console.log('openDataEvalu: ',res.data);
-                    if (res.data && Array.isArray(res.data)) {
-                        this.products_Tab1 = res.data;
-                        this.products_Tab1.forEach((h) => {
-                            h.subP01sX.forEach((subP01) => {
-                                // ตรวจสอบว่าค่า p01_score นั้นถูกต้องหรือไม่
-                                const foundScore = this.p01_scores.find((score) => score.code === subP01.p01_score);
-                                if (foundScore) {
-                                    subP01.p01_score = foundScore.code; // ใช้ค่าที่ถูกต้อง
-                                } else {
-                                    subP01.p01_score = this.p01_scores[0].code; // ใช้ค่าเริ่มต้น "- ไม่ระบุ -"
-                                }
-                            });
-                        });
-                    }
-                    this.DialogAdd = true; 
-                })
-                .catch((error) => {
-                    console.error('Error:', error);
+                const res = await axios.post('http://127.0.0.1:8000/api/showDataP03New', {
+                staff_id: data.staffid,
+                fac_id: this.tracking_date.fac_id,
+                year_id: this.tracking_date.d_date,
+                evalua: this.tracking_date.evalua
                 });
-            }
-        },     
+
+                if (res.data && Array.isArray(res.data)) {
+                this.products_Tab1 = res.data;
+                }
+
+                this.DialogAdd = true;
+            });
+
+            this.loadingDetail = false;
+            this.loadingStaffId = null;
+        },
         async saveEvaTab1(subP01) {
             if (subP01.p01_score === 0) {
                 Swal.fire('แจ้งเตือน', 'กรุณาเลือกคะแนน !', 'error');
@@ -1457,22 +1529,110 @@ export default {
                     console.error('Error fetching data:', error);
                 });
         },
-        showdataPo(staff_id, facid_Main, d_date, evalua, posnameid) {  
-            // ตรวจสอบว่า currentstaff มีค่าหรือไม่
+
+
+        // showdataPo(staff_id, facid_Main, d_date, evalua, posnameid) {  
+        //     // ตรวจสอบว่า currentstaff มีค่าหรือไม่
+        //     if (!this.currentstaff || this.currentstaff.length === 0) {
+        //         console.error("Error: currentstaff is undefined or empty.");
+        //         return;
+        //     }
+
+        //     this.postypenameth = this.currentstaff[0]?.postypenameth  ?? (this.currentstaff[0]?.posnameth === 'ผู้บริหาร' ? 'ชำนาญการพิเศษ' : 'ปฏิบัติการ');
+
+        //  //console.log("postypenameth:", this.postypenameth);
+
+        //     let postypetext = `ระดับ${this.postypenameth}`;   
+        //     // let postypetext = this.positionname === 'ผู้บริหาร' ? `ระดับชำนาญการพิเศษ` : `ระดับ${this.postypename}`;
+        //     // let postypenameid = this.positionname === 'ผู้บริหาร' ? 90 : this.postypenameid;
+        //     // let positionname = this.positionname === 'ผู้บริหาร' ? `ระดับชำนาญการพิเศษ` : `ระดับ${this.postypename}`;
+
+
+        //     const levelMapping = {
+        //         'ระดับปฏิบัติการ': 1,
+        //         'ระดับปฏิบัติงาน': 1,
+        //         'ระดับชำนาญการ': 2,
+        //         'ระดับชำนาญงาน': 2,
+        //         'ระดับชำนาญการพิเศษ': 3,
+        //         'ระดับชำนาญงานพิเศษ': 3,
+        //         'อาจารย์': 3,
+        //         'ระดับเชี่ยวชาญ': 4,
+        //         'ระดับเชี่ยวชาญพิเศษ': 5
+        //     };
+        //     let xr = levelMapping[postypetext] || 0; 
+
+        //     this.coreCompetencies = [
+        //         { id: 1, activity: 'ก. 1 การมุ่งผลสัมฤทธิ์', indicator: xr, data_table1: '', selfAssessment: '' },
+        //         { id: 2, activity: 'ก. 2 การบริการที่ดี', indicator: xr, data_table1: '', selfAssessment: '' },
+        //         { id: 3, activity: 'ก. 3 การสั่งสมความเชี่ยวชาญในงานอาชีพ', indicator: xr, data_table1: '', selfAssessment: '' },
+        //         { id: 4, activity: 'ก. 4 การยึดมั่นในความถูกต้องชอบธรรมและจริยธรรม', indicator: xr, data_table1: '', selfAssessment: '' },
+        //         { id: 5, activity: 'ก. 5 การทำงานเป็นทีม', indicator: xr, data_table1: '', selfAssessment: '' }
+        //     ];  
+        //     this.jobSpecificCompetencies = [];
+
+        //     const Mapping = {
+        //         'ผู้บริหาร': 1
+        //     };  
+        //     let executive = Mapping[this.postypenameth, this.currentstaff[0]?.posnameth] || 0;
+
+        //     this.otherCompetencies = [
+        //         { id: 12, activity: 'ค. 1 สภาวะผู้นำ', indicator3: executive, datatable3: '', selfAssessment3: '' },
+        //         { id: 13, activity: 'ค. 2 วิสัยทัศน์', indicator3: executive, datatable3: '', selfAssessment3: '' },
+        //         { id: 14, activity: 'ค. 3 การวางกลยุทธ์ภาครัฐ', indicator3: executive, datatable3: '', selfAssessment3: '' },
+        //         { id: 15, activity: 'ค. 4 ศักยภาพเพื่อนำการปรับเปลี่ยน', indicator3: executive, datatable3: '', selfAssessment3: '' },
+        //         { id: 16, activity: 'ค. 5 การสอนงานและการมอบหมายงาน', indicator3: executive, datatable3: '', selfAssessment3: '' }
+        //     ]; 
+
+        //     // this.showPostype(this.currentstaff[0]?.postypenameth, this.postypenameid); // แก้ไข ตัวป2
+        //     this.showPostype(this.currentstaff[0]?.postypenameth, posnameid);
+
+        //     axios.post(' http://127.0.0.1:8000/api/showDataPo', {
+        //         staff_id: staff_id,
+        //         fac_id: facid_Main,
+        //         year_id: d_date,
+        //         record: evalua,
+        //         postypename: postypetext
+        //     }).then(res => {     
+        //         if (res.data.length > 0) {
+        //             const data = res.data[0]; 
+        //             this.coreCompetencies = this.coreCompetencies.map(item => {
+        //                 if (data[`p${item.id}`] !== undefined) {
+        //                     return {
+        //                         ...item,
+        //                         data_table1: data[`p${item.id}`],
+        //                         selfAssessment: data[`pa_${item.id}`]
+        //                     };
+        //                 } 
+        //                 return item;
+        //             });  
+        //             //this.staff_po = data.staff_po;
+        //         } 
+        //     })
+        //     .catch(error => {
+        //         console.error('Error:', error);
+        //     });
+        // }, 
+        showdataPo(staff_id, facid_Main, d_date, evalua, posnameid) {
             if (!this.currentstaff || this.currentstaff.length === 0) {
                 console.error("Error: currentstaff is undefined or empty.");
                 return;
             }
 
-            this.postypenameth = this.currentstaff[0]?.postypenameth  ?? (this.currentstaff[0]?.posnameth === 'ผู้บริหาร' ? 'ชำนาญการพิเศษ' : 'ปฏิบัติการ');
+            // ✅ ทำให้ postypenameth เป็นชื่อระดับแบบสะอาด (ไม่มีคำว่า "ระดับ")
+            let rawLevel = this.currentstaff[0]?.postypenameth
+                ?? (this.currentstaff[0]?.posnameth === 'ผู้บริหาร' ? 'ชำนาญการพิเศษ' : 'ปฏิบัติการ');
 
-         //console.log("postypenameth:", this.postypenameth);
+            let cleanLevel = this.normalizeLevelName(rawLevel);
+            if (!cleanLevel) cleanLevel = 'ปฏิบัติการ';
 
-            let postypetext = `ระดับ${this.postypenameth}`;   
-            // let postypetext = this.positionname === 'ผู้บริหาร' ? `ระดับชำนาญการพิเศษ` : `ระดับ${this.postypename}`;
-            // let postypenameid = this.positionname === 'ผู้บริหาร' ? 90 : this.postypenameid;
-            // let positionname = this.positionname === 'ผู้บริหาร' ? `ระดับชำนาญการพิเศษ` : `ระดับ${this.postypename}`;
+            // ✅ ฟิก staffid ถ้ามีใน Map (บังคับให้ใช้ระดับ 3)
+            const forced = this.getForcedExpectedLevel(staff_id);
+            if (forced !== null) {
+                cleanLevel = 'ชำนาญการพิเศษ'; // ให้ชื่อระดับสอดคล้องกับ 3
+            }
 
+            this.postypenameth = cleanLevel;                // เก็บแบบไม่ติดคำว่า "ระดับ"
+            let postypetext = `ระดับ${cleanLevel}`;         // ใช้ตอน map + ส่ง API
 
             const levelMapping = {
                 'ระดับปฏิบัติการ': 1,
@@ -1485,21 +1645,26 @@ export default {
                 'ระดับเชี่ยวชาญ': 4,
                 'ระดับเชี่ยวชาญพิเศษ': 5
             };
-            let xr = levelMapping[postypetext] || 0; 
 
+            let xr = levelMapping[postypetext] ?? 0;
+
+            // ✅ ถ้าฟิก staffid ให้ override ค่า xr เลย (ชัวร์สุด)
+            if (forced !== null) {
+                xr = forced; // เช่น 3
+                postypetext = 'ระดับชำนาญการพิเศษ';
+            }
+
+            // ตั้งค่าตาราง ก.
             this.coreCompetencies = [
                 { id: 1, activity: 'ก. 1 การมุ่งผลสัมฤทธิ์', indicator: xr, data_table1: '', selfAssessment: '' },
                 { id: 2, activity: 'ก. 2 การบริการที่ดี', indicator: xr, data_table1: '', selfAssessment: '' },
                 { id: 3, activity: 'ก. 3 การสั่งสมความเชี่ยวชาญในงานอาชีพ', indicator: xr, data_table1: '', selfAssessment: '' },
                 { id: 4, activity: 'ก. 4 การยึดมั่นในความถูกต้องชอบธรรมและจริยธรรม', indicator: xr, data_table1: '', selfAssessment: '' },
                 { id: 5, activity: 'ก. 5 การทำงานเป็นทีม', indicator: xr, data_table1: '', selfAssessment: '' }
-            ];  
-            this.jobSpecificCompetencies = [];
+            ];
 
-            const Mapping = {
-                'ผู้บริหาร': 1
-            };  
-            let executive = Mapping[this.postypenameth, this.currentstaff[0]?.posnameth] || 0;
+            // ✅ แก้ bug เดิม: Mapping[this.postypenameth, this.currentstaff[0]?.posnameth]
+            const executive = (this.currentstaff[0]?.posnameth === 'ผู้บริหาร') ? 1 : 0;
 
             this.otherCompetencies = [
                 { id: 12, activity: 'ค. 1 สภาวะผู้นำ', indicator3: executive, datatable3: '', selfAssessment3: '' },
@@ -1507,37 +1672,36 @@ export default {
                 { id: 14, activity: 'ค. 3 การวางกลยุทธ์ภาครัฐ', indicator3: executive, datatable3: '', selfAssessment3: '' },
                 { id: 15, activity: 'ค. 4 ศักยภาพเพื่อนำการปรับเปลี่ยน', indicator3: executive, datatable3: '', selfAssessment3: '' },
                 { id: 16, activity: 'ค. 5 การสอนงานและการมอบหมายงาน', indicator3: executive, datatable3: '', selfAssessment3: '' }
-            ]; 
+            ];
 
-            // this.showPostype(this.currentstaff[0]?.postypenameth, this.postypenameid); // แก้ไข ตัวป2
-            this.showPostype(this.currentstaff[0]?.postypenameth, posnameid);
+            // โหลด ข. (สมรรถนะเฉพาะ)
+            this.showPostype(this.postypenameth, posnameid);
 
-            axios.post(' http://127.0.0.1:8000/api/showDataPo', {
+            // โหลดคะแนนเดิมจาก API
+            axios.post('http://127.0.0.1:8000/api/showDataPo', {
                 staff_id: staff_id,
                 fac_id: facid_Main,
                 year_id: d_date,
                 record: evalua,
                 postypename: postypetext
-            }).then(res => {     
+            }).then(res => {
                 if (res.data.length > 0) {
-                    const data = res.data[0]; 
-                    this.coreCompetencies = this.coreCompetencies.map(item => {
-                        if (data[`p${item.id}`] !== undefined) {
-                            return {
-                                ...item,
-                                data_table1: data[`p${item.id}`],
-                                selfAssessment: data[`pa_${item.id}`]
-                            };
-                        } 
-                        return item;
-                    });  
-                    //this.staff_po = data.staff_po;
-                } 
-            })
-            .catch(error => {
+                const data = res.data[0];
+                this.coreCompetencies = this.coreCompetencies.map(item => {
+                    if (data[`p${item.id}`] !== undefined) {
+                    return {
+                        ...item,
+                        data_table1: data[`p${item.id}`],
+                        selfAssessment: data[`pa_${item.id}`]
+                    };
+                    }
+                    return item;
+                });
+                }
+            }).catch(error => {
                 console.error('Error:', error);
             });
-        }, 
+        },
 
         //110269
         normalizeActivityRaw(raw) {
@@ -1887,12 +2051,7 @@ export default {
                 console.error('❌ Error:', error);
             }); 
         },
-
-
-        ///***********///
-
-
-
+  
         async saveAssess() {
             try {
                 const response = await axios.post('   http://127.0.0.1:8000/api/savedataAssess', { 
@@ -2131,7 +2290,34 @@ export default {
             // console.log(queryParams); 
             const url = `   http://127.0.0.1:8000/report_p04?${queryParams}`;
             window.open(url, '_blank'); 
-        },     
+        },  
+        async withLoading(msg, fn) {
+            Swal.fire({
+                title: 'กำลังโหลดข้อมูล',
+                text: msg || 'กรุณารอสักครู่',
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                didOpen: () => Swal.showLoading()
+            });
+
+            try {
+                return await fn();
+            } finally {
+                Swal.close();
+            }
+        },
+        normalizeLevelName(v) {
+            return String(v ?? '').trim().replace(/^ระดับ\s*/,''); // ตัดคำว่า "ระดับ" ออก
+        },
+
+        getForcedExpectedLevel(staffId) {
+            const id = String(staffId ?? '').trim();
+            return FORCE_EXPECTED_LEVEL.get(id) ?? null;
+        },
+
+
+        
+        
 
     }, 
     
