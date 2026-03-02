@@ -11,13 +11,13 @@
         <div class="col-12 lg:col-12 xl:col-12">
           <div class="card mb-0">
             <div class="formgroup-inline mb-1">
-              <div class="col md:col-5">
+              <div class="col md:col-6">
                 <h3 class="mb-4 card-header">
                   <i class="pi pi-fw pi-folder-open" style="font-size: x-large;"></i>
                   แบบ ป01
                 </h3>
               </div> 
-              <div class="col md:col-7">
+              <div class="col md:col-6">
                 <div v-if="currentDate < dataPor.d_recordingday">
                   <Button
                     icon="pi pi-search"
@@ -33,13 +33,13 @@
                     label="เพิ่มข้อมูลแบบประเมิน"
                     @click="OpenDialogAdd"
                   /> 
-                  <Button
+                  <!-- <Button
                     icon="pi pi-copy"
                     severity="primary"
                     class="mb-2 mr-6"
                     label="คัดลอกข้อมูลแบบประเมิน"
                     @click="copyEvaluationData"
-                  />
+                  /> -->
                 </div>
               </div>
             </div>
@@ -752,7 +752,7 @@ export default {
       },
       immediate: true,
     }, 
-    
+
     //020369
     // selectedEvalRound: {
     //   handler(val) {
