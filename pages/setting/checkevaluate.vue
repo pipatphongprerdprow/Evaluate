@@ -175,15 +175,14 @@
                                                             <td class="text-center" style="color: blue;"> <b>{{ h.p01_weight??0 }}%</b></td>
                                                             <td></td>
                                                         </tr>  
-
-                                                        
+ 
                                                         <tr v-for="(subP01, idx) in h.subP01sX" :key="idx" style="vertical-align: baseline;">
                                                             <!-- <td style="text-align: left;">{{ subP01.p01_no }} {{ subP01.p01_subject }}</td> --> 
                                                             <td style="text-align:left;">
                                                                 <template v-for="(ln, i) in parseActivityText(subP01.p01_subject).lines" :key="i">
                                                                     <div v-if="ln.type === 'main'" style="font-weight:700; margin-bottom:4px;">
                                                                     <!-- {{ subP01.p01_no }} {{ ln.text }} -->
-                                                                    {{ stripLeadingNo(ln.text) }}
+                                                                       {{ subP01.p01_no }} {{ stripLeadingNo(ln.text) }} 
                                                                     </div>
                                                                     <div v-else class="subline">
                                                                         <span class="subno">{{ ln.no }}</span>

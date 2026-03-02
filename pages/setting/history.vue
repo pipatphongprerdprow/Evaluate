@@ -19,8 +19,10 @@
                     <thead> 
                         <tr style="height: 40px;background-color: blanchedalmond;">
                             <th style="width: 45%;">รอบการประเมิน</th>  
-                            <th style="width: 15%;">ผลสัมฤทธิ์ของงาน</th>  
-                            <th style="width: 15%;">พฤติกรรมการปฏิบัติราชการ</th>   
+                            <!-- <th style="width: 15%;">ผลสัมฤทธิ์ของงาน</th>   -->
+                            <th style="width: 15%;">ผลรวมสัดส่วน <br>70 หรือ 50</th>   
+                            <!-- <th style="width: 15%;">พฤติกรรมการปฏิบัติราชการ</th>    -->
+                            <th style="width: 15%;">ผลรวมสัดส่วน <br>30 หรือ 50</th>   
                             <th style="width: 15%;">ผลคะแนน</th>   
                             <th style="width: 15%;">รายละเอียด</th> 
                         </tr>
@@ -30,17 +32,8 @@
                             <td class="text-left">   
                                 <strong>ปีงบประมาณ <span style="color: brown;">{{ Item.d_date }}</span> : <span style="color: blue;">{{ Item.d_evaluationround }}</span></strong>
                             </td> 
-                            <!-- <td class="text-center" style="color: blue;">
-                                <b>{{ Item.tb_tor?.achievement_score ?? '-' }}</b>
-                            </td>
-                            <td class="text-center" style="color: blue;">
-                                <b>{{ Item.tb_tor?.behavior ?? '-' }}</b>
-                            </td>
-                            <td class="text-center" style="color: blue;">
-                                <b>{{ Item.tb_tor?.sum_score ?? '-' }}</b>
-                            </td> -->
 
-                            <td class="text-center" style="color: blue;">
+                            <!-- <td class="text-center" style="color: blue;">
                                 <div v-if="isScoreAnnounced(Item)">
                                     <b>{{ Item.tb_tor?.achievement_score ?? '-' }}</b>
                                 </div>
@@ -56,7 +49,29 @@
                                 <div v-else>
                                     <span style="color: brown;">รอประกาศผลคะแนน</span>
                                 </div>
+                            </td> -->
+
+                            <td class="text-center" style="color: blue;">
+                                <div v-if="isScoreAnnounced(Item)">
+                                    <b>{{ calcAchievementSum(Item) }}</b>
+                                </div>
+                                <div v-else>
+                                    <span style="color: brown;">รอประกาศผลคะแนน</span>
+                                </div>
+                                </td>
+
+
+                                <td class="text-center" style="color: blue;">
+                                <div v-if="isScoreAnnounced(Item)">
+                                    <b>{{ calcBehaviorSum(Item) }}</b>
+                                </div>
+                                <div v-else>
+                                    <span style="color: brown;">รอประกาศผลคะแนน</span>
+                                </div>
                             </td>
+
+
+
 
                             <td class="text-center" style="color: blue;">
                                 <div v-if="isScoreAnnounced(Item)">
@@ -679,8 +694,7 @@
                                                         <template v-else>
                                                             <b style="color: blue;">= 0.00</b>
                                                         </template>
-                                                    </td>
-
+                                                    </td> 
                                                 </tr>  
                                                 </tbody>
                                                     <br>
@@ -940,7 +954,7 @@
                             </TabPanel> 
                             </TabView>
                         <template #footer>
-                            <Button label="ตกลง" severity="secondary" class="mb-2 mr-2" @click="DialogAdd = false " />
+                            <Button label="ตกลง" severity="info" class="mb-2 mr-2" @click="DialogAdd = false " />
                         </template>
                     </Dialog>
                 </div>
@@ -2609,11 +2623,49 @@ export default {
                 this.posadio = '';
                 console.error('getAadioPosition error', e);
             }
-         },
+        },
 
          getForcedExpectedLevel(staffId) {
             const id = String(staffId ?? '').trim(); 
             return FORCE_EXPECTED_LEVEL_3.has(id) ? 3 : null;
+        },
+
+        parsePersen(persen) {
+            const [a, b] = String(persen || '0:0')
+                .split(':')
+                .map(v => parseFloat(v) || 0);
+            return { wAch: a, wBeh: b };
+        },
+
+            // ช่วยตัดสินใจว่า "70" ต้องใช้เป็น 70 หรือ 0.7 (กันข้อมูลคนละรูปแบบ)
+        weightMul(weight, score) {
+            const w = Number(weight) || 0;
+            const s = Number(score) || 0;
+            if (w <= 1) return w;          // เช่น 0.7
+            if (s > 0 && s <= 1) return w; // score เป็น 0.xx -> คูณ 70 ได้เลย (จะได้ 62.30)
+            return w / 100;                // score เป็น 0-5 หรือ 0-100 -> ใช้ 70% (0.7)
+        },
+
+        calcAchievementSum(item) {
+            const persen = item?.tb_tor?.persen;
+            if (!persen) return '-';
+
+            const ach = this.safeNumber(item?.tb_tor?.achievement_score);
+            const { wAch } = this.parsePersen(persen);
+            const mul = this.weightMul(wAch, ach);
+
+            return (ach * mul).toFixed(2);
+        },
+
+        calcBehaviorSum(item) {
+            const persen = item?.tb_tor?.persen;
+            if (!persen) return '-';
+
+            const beh = this.safeNumber(item?.tb_tor?.behavior);
+            const { wBeh } = this.parsePersen(persen);
+            const mul = this.weightMul(wBeh, beh);
+
+            return (beh * mul).toFixed(2);
         },
  
     }, 
@@ -2623,8 +2675,7 @@ export default {
             if (!value) return '';
             return value.split(':')[0];
         } 
-    }
-
+    } 
 }
 </script>
 

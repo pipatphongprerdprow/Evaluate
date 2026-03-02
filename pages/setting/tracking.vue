@@ -360,6 +360,7 @@
                                                                     <template v-else>
                                                                         <b><span style="color: red;">-</span></b>
                                                                     </template> -->
+                                                                    
                                                                    <template v-if="isTargetExecutive && canScoreExecutive">
                                                                         <InputNumber 
                                                                             v-model.number="row3.selfAssessment3"
@@ -1078,7 +1079,7 @@
 
                         </TabView>
                         <template #footer>
-                            <Button label="ตกลง" severity="secondary" class="mb-2 mr-2" @click="DialogAdd = false " />
+                            <Button label="ตกลง" severity="info" class="mb-2 mr-2" @click="DialogAdd = false " />
                         </template>
                     </Dialog>
                     <Dialog
@@ -1113,6 +1114,7 @@ import TabPanel from 'primevue/tabpanel';
 // import InputNumber from 'primevue/inputnumber'; 
 // import ProgressSpinner from 'primevue/progressspinner'
 
+//แสดง 1 ค.
 const EXECUTIVE_ALLOWLIST = new Set([
     '160018',//นายจีรพันธ์ ภูครองเพชร
     '190015',//นางนงลักษณ์ พุ่มม่วง
@@ -1151,6 +1153,7 @@ const EXECUTIVE_ALLOWLIST = new Set([
     
     ]);
 
+    //ประเมิน ค.
 const EXECUTIVE_SCORE_ALLOWLIST = new Set([
     '160018',//นายจีรพันธ์ ภูครองเพชร
     '190015',//นางนงลักษณ์ พุ่มม่วง
@@ -1185,7 +1188,12 @@ const EXECUTIVE_SCORE_ALLOWLIST = new Set([
     '410402',//นายนพวิทย์ ศรีเวียงธนาธิป
     '314020',//นายไกรษร อุทัยแสง
     '5000094',//นายสวัสดิ์ วิชระโภชน
-    '130102' //นางสาวพนมพร ปัจจวงษ
+    '130102', //นางสาวพนมพร ปัจจวงษ
+    //รายชื่อคนที่ประเมิน ค.
+    '5001951', //จินดาพร จำรัสเลิศลักษณ์
+    '5000224', //จารุณีย์ นิมิตศิริวัฒน์
+
+
 ]);
     
 export default {
@@ -2616,13 +2624,13 @@ export default {
             }
 
             // ✅ debug สำคัญ (เปิด console แล้วดู)
-            console.log("[EXEC DEBUG]", {
-                targetId,
-                posadio: this.posadio,
-                isTargetExecutive: this.isTargetExecutive,
-                scorerId,
-                canScoreExecutive: this.canScoreExecutive
-            });
+            // console.log("[EXEC DEBUG]", {
+            //     targetId,
+            //     posadio: this.posadio,
+            //     isTargetExecutive: this.isTargetExecutive,
+            //     scorerId,
+            //     canScoreExecutive: this.canScoreExecutive
+            // });
         },
  
         //29/10/67

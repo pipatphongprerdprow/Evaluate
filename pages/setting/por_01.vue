@@ -11,13 +11,13 @@
         <div class="col-12 lg:col-12 xl:col-12">
           <div class="card mb-0">
             <div class="formgroup-inline mb-1">
-              <div class="col md:col-6">
+              <div class="col md:col-5">
                 <h3 class="mb-4 card-header">
                   <i class="pi pi-fw pi-folder-open" style="font-size: x-large;"></i>
                   แบบ ป01
                 </h3>
               </div> 
-              <div class="col md:col-6">
+              <div class="col md:col-7">
                 <div v-if="currentDate < dataPor.d_recordingday">
                   <Button
                     icon="pi pi-search"
@@ -33,13 +33,13 @@
                     label="เพิ่มข้อมูลแบบประเมิน"
                     @click="OpenDialogAdd"
                   /> 
-                  <!-- <Button
+                  <Button
                     icon="pi pi-copy"
                     severity="primary"
                     class="mb-2 mr-6"
                     label="คัดลอกข้อมูลแบบประเมิน"
                     @click="copyEvaluationData"
-                  /> -->
+                  />
                 </div>
               </div>
             </div>
@@ -466,7 +466,7 @@
           </div> 
           <div class="col-12 md:col-4">
             <label class="copy-dd-label">เลือกรอบประเมินที่ต้องการคัดลอก</label>
-            <Dropdown v-model="selectedEvalRound" :options="evalRoundOptions" optionLabel="label" placeholder="เลือกรอบ" class="w-full" :showClear="true" :disabled="loadingRounds" />
+            <Dropdown v-model="selectedEvalRound" :options="evalRoundOptions" optionLabel="label" placeholder="เลือกรอบการประเมิน" class="w-full" :showClear="true" :disabled="loadingRounds || loadingCopyItems" />
           </div>
         </div> 
         <!-- โหลดรอบ -->
@@ -520,7 +520,8 @@
                     </td> 
                     <td colspan="6" style="text-align:left">
                       <span style="font-weight:600;">ย้ายไปอยู่ใต้ (ปีปัจจุบัน):</span>
-                      <Dropdown v-model="mapH[h.h_id]" :options="targetHOptions" optionLabel="nameH" optionValue="id" placeholder="เลือก nameH ปลายทาง" class="w-full" :showClear="true" />
+                      <!-- <Dropdown v-model="mapH[h.h_id]" :options="targetHOptions" optionLabel="nameH" optionValue="id" placeholder="เลือก ประเภทภาระงาน ปลายทาง" class="w-full" :showClear="true" /> --> 
+                        <Dropdown v-model="mapH[h.h_id]" :options="targetHOptions" optionLabel="nameH" optionValue="id" placeholder="เลือก ประเภทภาระงาน ปลายทาง" class="w-full" :showClear="true" />
                     </td>
                   </tr>
 
@@ -570,10 +571,10 @@
             </table> 
             <div class="grid mt-2 align-items-center">
               <div class="col-12 md:col-6">
-                <div style="display:flex; gap:.75rem; align-items:center;">
+                <!-- <div style="display:flex; gap:.75rem; align-items:center;">
                   <Checkbox v-model="overwriteCopy" :binary="true" />
                   <span>ทับข้อมูลปลายทางก่อนคัดลอก</span>
-                </div>
+                </div> -->
               </div>
 
               <!-- <div class="col-12 md:col-6">
@@ -588,7 +589,7 @@
       </div> 
       <template #footer>
         <div class="copy-footer">
-          <Button label="บันทึก" icon="pi pi-check" class="p-button-success" :disabled=" !selectedEvalRound || loadingRounds || loadingCopyItems || checkboxValueCopy.length === 0 || !selectedTargetH "  @click="confirmCopyEvaluation" />
+          <Button label="บันทึก" icon="pi pi-check" class="p-button-success" :disabled="!selectedEvalRound || loadingRounds || loadingCopyItems || checkboxValueCopy.length === 0 || missingMapCopy"  @click="confirmCopyEvaluation" />
           <Button label="ยกเลิก" icon="pi pi-times" severity="danger" @click="cancelDialogcopy" />
         </div>
       </template>
@@ -673,7 +674,7 @@ export default {
       checkboxValueCopy: [],       // p_id ที่เลือกคัดลอก
       selectAllCopy: false,
       loadingCopyItems: false,
-      overwriteCopy: true,  
+      // overwriteCopy: true,  
 
       //  nameH ของปี/รอบปัจจุบัน (ปลายทาง)
       targetHOptions: [],
@@ -751,16 +752,43 @@ export default {
       },
       immediate: true,
     }, 
+    
+    //020369
+    // selectedEvalRound: {
+    //   handler(val) {
+    //     if (!val) {
+    //       this.products_personCopy = [];
+    //       this.checkboxValueCopy = [];
+    //       this.selectAllCopy = false;
+    //       return;
+    //     }
+    //     this.loadCopyItems();
+    //   },
+    //   deep: true,
+    // },
 
     selectedEvalRound: {
-      handler(val) {
+      async handler(val) {
         if (!val) {
           this.products_personCopy = [];
           this.checkboxValueCopy = [];
           this.selectAllCopy = false;
           return;
         }
-        this.loadCopyItems();
+
+        Swal.fire({
+          title: "กำลังโหลดข้อมูล",
+          text: "กรุณารอสักครู่...",
+          allowOutsideClick: false,
+          allowEscapeKey: false,
+          didOpen: () => Swal.showLoading(),
+        });
+
+        try {
+          await this.loadCopyItems();
+        } finally {
+          Swal.close();
+        }
       },
       deep: true,
     },
@@ -825,6 +853,13 @@ export default {
         };
       });
     },
+    missingMapCopy() { 
+      return (this.products_personCopy || [])
+        .filter(h => (h.subP01s || []).some(p => this.checkboxValueCopy.includes(p.p_id)))
+        .some(h => !this.mapH[h.h_id]);
+    },
+
+
 
 
   },
@@ -1272,34 +1307,122 @@ export default {
     },
 
     // เปิด Dialog + โหลดรอบที่สามารถคัดลอกได้
-    copyEvaluationData() {
+    // copyEvaluationData() {
+    //   this.DialogCopy = true;
+    //   this.selectedEvalRound = null;
+    //   this.loadingRounds = true;
+
+    //   this.loadTargetHOptions();
+
+    //   axios
+    //     .post("http://127.0.0.1:8000/api/getEvalRoundsForCopy", {
+    //       staff_id: this.staffid_Main,      // แนะนำส่งไปด้วย จะได้ดึงเฉพาะของคนนี้
+    //       fac_id: this.dataPor.fac_id,
+    //       year_id: this.dataPor.d_date,     // ปลายทาง
+    //       evalua: this.dataPor.evalua,      // ปลายทาง
+    //     })
+    //     .then((res) => {
+    //       this.evalRounds = Array.isArray(res.data) ? res.data : [];
+    //     })
+    //     .catch((error) => {
+    //       console.error("getEvalRoundsForCopy error:", error);
+    //       Swal.fire("ผิดพลาด", "ไม่สามารถโหลดข้อมูลปี/รอบประเมินได้", "error");
+    //       this.evalRounds = [];
+    //     })
+    //     .finally(() => {
+    //       this.loadingRounds = false;
+    //     });
+    // },
+
+    async copyEvaluationData() {
       this.DialogCopy = true;
       this.selectedEvalRound = null;
       this.loadingRounds = true;
 
-      this.loadTargetHOptions();
+      // ✅ สำคัญ: โหลดประเภทภาระงานปลายทางก่อน (ให้ mapH auto ได้)
+      await this.loadTargetHOptions();
 
-      axios
-        .post("http://127.0.0.1:8000/api/getEvalRoundsForCopy", {
-          staff_id: this.staffid_Main,      // แนะนำส่งไปด้วย จะได้ดึงเฉพาะของคนนี้
+      try {
+        const res = await axios.post("http://127.0.0.1:8000/api/getEvalRoundsForCopy", {
+          staff_id: this.staffid_Main,
           fac_id: this.dataPor.fac_id,
-          year_id: this.dataPor.d_date,     // ปลายทาง
-          evalua: this.dataPor.evalua,      // ปลายทาง
-        })
-        .then((res) => {
-          this.evalRounds = Array.isArray(res.data) ? res.data : [];
-        })
-        .catch((error) => {
-          console.error("getEvalRoundsForCopy error:", error);
-          Swal.fire("ผิดพลาด", "ไม่สามารถโหลดข้อมูลปี/รอบประเมินได้", "error");
-          this.evalRounds = [];
-        })
-        .finally(() => {
-          this.loadingRounds = false;
+          year_id: this.dataPor.d_date,
+          evalua: this.dataPor.evalua,
         });
+
+        this.evalRounds = Array.isArray(res.data) ? res.data : [];
+      } catch (error) {
+        console.error("getEvalRoundsForCopy error:", error);
+        Swal.fire("ผิดพลาด", "ไม่สามารถโหลดข้อมูลปี/รอบประเมินได้", "error");
+        this.evalRounds = [];
+      } finally {
+        this.loadingRounds = false;
+      }
     },
 
     // ยืนยันคัดลอก
+    // async confirmCopyEvaluation() {
+    //   if (!this.selectedEvalRound) {
+    //     Swal.fire("ยังไม่ได้เลือก", "กรุณาเลือกปี/รอบต้นทาง", "warning");
+    //     return;
+    //   }
+    //   if (!this.checkboxValueCopy || this.checkboxValueCopy.length === 0) {
+    //     Swal.fire("ยังไม่ได้เลือกข้อ", "กรุณาเลือกข้อที่จะคัดลอกอย่างน้อย 1 ข้อ", "warning");
+    //     return;
+    //   }
+
+    //   const fromYear = this.selectedEvalRound.year;
+    //   const fromEvalua = this.selectedEvalRound.evalua;
+    //   const toYear = this.dataPor.d_date;
+    //   const toEvalua = this.dataPor.evalua;
+
+    //   if (String(fromYear) === String(toYear) && String(fromEvalua) === String(toEvalua)) {
+    //     Swal.fire("เลือกซ้ำ", "คุณเลือกปี/รอบเดียวกับปลายทาง กรุณาเลือกต้นทางใหม่", "warning");
+    //     return;
+    //   }
+
+    //   // const missingMap = (this.products_personCopy || [])
+    //   //   .filter(h => (h.subP01s || []).some(p => this.checkboxValueCopy.includes(p.p_id)))
+    //   //   .some(h => !this.mapH[h.h_id]);
+    //   const missingMap = (this.products_personCopy || [])
+    //     .filter(h => (h.subP01s || []).some(p => this.checkboxValueCopy.includes(p.p_id)))
+    //     .some(h => !this.mapH[h.id]);
+
+    //   if (missingMap) {
+    //     Swal.fire("ยังไม่เลือก ประเภทภาระงาน ปลายทาง", "กรุณาเลือก ประเภทภาระงาน ปลายทางให้ครบทุกกลุ่ม", "warning");
+    //     return;
+    //   }
+
+
+
+    //   try {
+    //     await axios.post("http://127.0.0.1:8000/api/copySelectedP01Items", {
+    //       staff_id: this.staffid_Main,
+    //       fac_id: this.dataPor.fac_id,
+    //       from_year: fromYear,
+    //       from_evalua: fromEvalua,
+    //       to_year: toYear,
+    //       to_evalua: toEvalua,
+    //       selected_pids: this.checkboxValueCopy,
+    //       // overwrite: this.overwriteCopy,
+    //       target_h_id: this.selectedTargetH, 
+    //       mapH: this.mapH, 
+    //     });
+
+    //     this.DialogCopy = false;
+    //     await this.showDataPerson();
+
+    //     Swal.fire({
+    //       icon: "success",
+    //       title: "คัดลอกสำเร็จ!",
+    //       text: `คัดลอกจาก ปี ${fromYear} รอบที่ ${fromEvalua} → ปี ${toYear} รอบที่ ${toEvalua}`,
+    //     });
+    //   } catch (e) {
+    //     console.error(e);
+    //     Swal.fire("ผิดพลาด", "ไม่สามารถคัดลอกข้อมูลได้", "error");
+    //   }
+    // },
+
     async confirmCopyEvaluation() {
       if (!this.selectedEvalRound) {
         Swal.fire("ยังไม่ได้เลือก", "กรุณาเลือกปี/รอบต้นทาง", "warning");
@@ -1320,19 +1443,18 @@ export default {
         return;
       }
 
+      // ✅ ต้องเลือกปลายทางให้ครบเฉพาะกลุ่มที่มีข้อถูกเลือก
       const missingMap = (this.products_personCopy || [])
         .filter(h => (h.subP01s || []).some(p => this.checkboxValueCopy.includes(p.p_id)))
         .some(h => !this.mapH[h.h_id]);
 
       if (missingMap) {
-        Swal.fire("ยังไม่เลือก nameH ปลายทาง", "กรุณาเลือก nameH ปลายทางให้ครบทุกกลุ่ม", "warning");
+        Swal.fire("ยังไม่เลือก ประเภทภาระงาน ปลายทาง", "กรุณาเลือกให้ครบทุกกลุ่ม", "warning");
         return;
       }
 
-
-
       try {
-        await axios.post("http://127.0.0.1:8000/api/copySelectedP01Items", {
+        const r = await axios.post("http://127.0.0.1:8000/api/copySelectedP01Items", {
           staff_id: this.staffid_Main,
           fac_id: this.dataPor.fac_id,
           from_year: fromYear,
@@ -1340,9 +1462,8 @@ export default {
           to_year: toYear,
           to_evalua: toEvalua,
           selected_pids: this.checkboxValueCopy,
-          overwrite: this.overwriteCopy,
-          target_h_id: this.selectedTargetH, 
-          mapH: this.mapH, 
+          overwrite: false,
+          mapH: this.mapH, // ✅ ตัวหลัก
         });
 
         this.DialogCopy = false;
@@ -1351,7 +1472,7 @@ export default {
         Swal.fire({
           icon: "success",
           title: "คัดลอกสำเร็จ!",
-          text: `คัดลอกจาก ปี ${fromYear} รอบที่ ${fromEvalua} → ปี ${toYear} รอบที่ ${toEvalua}`,
+          text: `คัดลอกจาก ปี ${fromYear} รอบที่ ${fromEvalua} → ปี ${toYear} รอบที่ ${toEvalua} (inserted: ${r.data?.inserted ?? "-"})`,
         });
       } catch (e) {
         console.error(e);
@@ -1366,11 +1487,54 @@ export default {
       this.selectedEvalRound = null;
     },
 
+    // async loadCopyItems() {
+    //   this.loadingCopyItems = true;
+    //   this.products_personCopy = [];
+    //   this.checkboxValueCopy = [];
+    //   this.selectAllCopy = false; 
+    //   try {
+    //     const res = await axios.post("http://127.0.0.1:8000/api/getP01ItemsForCopy", {
+    //       staff_id: this.staffid_Main,
+    //       fac_id: this.dataPor.fac_id,
+    //       from_year: this.selectedEvalRound.year,
+    //       from_evalua: this.selectedEvalRound.evalua,
+    //     });
+
+    //     this.products_personCopy = Array.isArray(res.data) ? res.data : [];
+
+    //     // this.mapH = {};
+    //     //   (this.products_personCopy || []).forEach((h, idx) => { 
+    //     //     if (this.selectedTargetH) {
+    //     //       this.mapH[h.h_id] = this.selectedTargetH;
+    //     //       return;
+    //     //     } 
+    //     //     const t = this.targetHOptions[idx];
+    //     //     if (t) this.mapH[h.h_id] = t.id;
+    //     // });
+    //     this.mapH = {};
+    //       (this.products_personCopy || []).forEach((h, idx) => { 
+    //         if (this.selectedTargetH) {
+    //           this.mapH[h.id] = this.selectedTargetH;
+    //           return;
+    //         }
+    //         const t = this.targetHOptions[idx];
+    //         if (t) this.mapH[h.id] = t.id;
+    //     }); 
+
+    //   } catch (e) {
+    //     console.error(e);
+    //     Swal.fire("ผิดพลาด", "โหลดข้อมูลต้นทางไม่สำเร็จ", "error");
+    //   } finally {
+    //     this.loadingCopyItems = false;
+    //   }
+    // },
+
     async loadCopyItems() {
       this.loadingCopyItems = true;
       this.products_personCopy = [];
       this.checkboxValueCopy = [];
-      this.selectAllCopy = false; 
+      this.selectAllCopy = false;
+
       try {
         const res = await axios.post("http://127.0.0.1:8000/api/getP01ItemsForCopy", {
           staff_id: this.staffid_Main,
@@ -1381,14 +1545,15 @@ export default {
 
         this.products_personCopy = Array.isArray(res.data) ? res.data : [];
 
+        // ✅ สร้าง mapH ใหม่: key = h.h_id  (header ต้นทาง) / value = id header ปลายทาง
         this.mapH = {};
-          (this.products_personCopy || []).forEach((h, idx) => { 
-            if (this.selectedTargetH) {
-              this.mapH[h.h_id] = this.selectedTargetH;
-              return;
-            } 
-            const t = this.targetHOptions[idx];
-            if (t) this.mapH[h.h_id] = t.id;
+
+        (this.products_personCopy || []).forEach(h => {
+          // auto map โดยพยายาม match nameH ก่อน ถ้าไม่เจอให้ใช้ตัวแรก
+          const match = (this.targetHOptions || []).find(t => String(t.nameH) === String(h.nameH));
+          const fallback = (this.targetHOptions || [])[0];
+
+          this.mapH[h.h_id] = (match?.id ?? fallback?.id ?? null);
         });
 
       } catch (e) {
@@ -1398,6 +1563,9 @@ export default {
         this.loadingCopyItems = false;
       }
     },
+
+
+
     toggleSelectAllCopy() {
       if (!this.products_personCopy) return;
 
