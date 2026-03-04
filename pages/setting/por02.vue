@@ -672,9 +672,7 @@ export default {
         //         console.error('Error:', error);
         //     });
         // },
-
-        
-
+ 
         async showdataPo() {
 
             // 🔹 เงื่อนไขระดับชำนาญการพิเศษ

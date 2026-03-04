@@ -75,7 +75,7 @@
                 <p class="text-600 text-center mb-4">กรุณาเข้าสู่ระบบเพื่อใช้งานระบบประเมินผลการปฏิบัติงาน</p>
                 <Button 
                     @click="signIn('erpauth')" 
-                    label="เข้าสู่ระบบด้วย รหัส สลีปเงินเดือน" 
+                    label="เข้าสู่ระบบด้วย รหัส สลิปเงินเดือน" 
                     icon="pi pi-sign-in" 
                     class="p-button-lg"
                     style="background: linear-gradient(90deg, #2196F3, #21CBF3); border: none;"
