@@ -12,8 +12,7 @@
                     <!-- เลือกหลายรอบ -->
                     <div class="col md:col-6">  
                         <label for="product_date"></label>  
-                        <!-- ถ้า ผอ ยกเลิกรักษาการให้เปิดตัวนี้ -->
-                        <!-- <Dropdown
+                        <Dropdown
                             id="product_date" 
                             v-model="product_date" 
                             :options="products_date"
@@ -22,20 +21,8 @@
                             placeholder="กรุณาเลือกรอบการประเมิน" 
                             style="max-width: 500px;width: 100%;border: outset;" 
                             @change="showdatator"
-                        /> -->
-
-                        <Dropdown
-                            id="product_date"
-                            v-model="product_date"
-                            :options="products_date"
-                            optionLabel="label"
-                            placeholder="กรุณาเลือกรอบการประเมิน"
-                            style="max-width: 500px;width: 100%;border: outset;"
-                            @change="showdatator"
-                        /> 
+                        />
                     </div>
-
-                    
                     <!-- เลือกรอบล่าสุดรอบเดียว --> 
                      <!-- <div class="col md:col-6">  
                         <label for="product_date"></label>  
@@ -97,6 +84,16 @@
                                     style="width: 300px;"
                                 /> -->
 
+                                <!-- <AutoComplete
+                                    v-model="assessor"
+                                    :suggestions="staffSuggestions"
+                                    optionLabel="displayName"
+                                    placeholder="ชื่อผู้ประเมิน"
+                                    forceSelection
+                                    dropdown
+                                    @complete="searchStaff"
+                                    style="width: 300px;"
+                                /> -->
                                 <AutoComplete
                                     v-model="assessor"
                                     :suggestions="staffSuggestions"
@@ -106,11 +103,13 @@
                                     dropdown
                                     @complete="searchStaff"
                                     style="width: 300px;"
-                                />
+                                    :disabled="isTorSaved"
+                                /> 
                             </p> 
                             <p>
                                 <strong>ตำแหน่งผู้ประเมิน :</strong>
-                                <InputText type="text" placeholder="ตำแหน่งผู้ประเมิน" v-model="assessor_position" style="width: 265px;" />
+                                <!-- <InputText type="text" placeholder="ตำแหน่งผู้ประเมิน" v-model="assessor_position" style="width: 265px;" /> -->
+                                <InputText type="text"  placeholder="ตำแหน่งผู้ประเมิน" v-model="assessor_position" style="width: 265px;" :disabled="isTorSaved" />
                             </p>  
                             <!-- <p>
                                 <strong>รายละเอียดข้อตกลง ระหว่าง วันที่ : </strong>
@@ -139,17 +138,26 @@
                                 optionLabel="name"
                                 optionValue="value"
                                 placeholder="เลือกสัดส่วน"
+                                :disabled="isTorSaved"
                             /> 
                         </div> 
                         <br> 
                         <div class="ml-4 mr-4" style="text-align: center;">
-                            <Button
+                            <!-- <Button
                                 icon="pi pi-save"
                                 severity="primary"
                                 class="mb-2 mr-2"
                                 label="บันทึกแบบข้อตกลงภาระงาน"
                                 @click="saveDatator"
-                            />  
+                            />   -->
+                            <Button
+                                icon="pi pi-save"
+                                severity="primary"
+                                class="mb-2 mr-2"
+                                :label="isTorSaved ? 'บันทึกแล้ว' : 'บันทึกแบบข้อตกลงภาระงาน'"
+                                :disabled="isTorSaved || isSaving || !product_date?.d_date"
+                                @click="saveDatator"
+                            />
                         </div>    
                         <div class="explanation">
                             <h4>คำชี้แจง</h4>
@@ -230,6 +238,10 @@ const user = await getSession();
                 groupid_Main: '01',   
                 dataP01: {},
                 p01TotalWeight: 0,
+
+                //แก้บันทึกแบบข้อตกลงไม่ให้บันทึกซ้า
+                isTorSaved: false,
+                isSaving: false,
 
                 user: {
                     user: {
@@ -341,20 +353,20 @@ const user = await getSession();
                     staffdepartment: this.facid_Main
                 };
             },
-            // เลือกหลายรอบการประเมิน ถ้า ผอ ยกเลิกรักษาการให้เปิดตัวนี้
-            // showDataSet() {
-            //     axios.post('http://127.0.0.1:8000/api/showDateSet', {
-            //         staff_id: this.staffid_Main,
-            //         fac_id: this.facid_Main,
-            //         group_id: this.groupid_Main 
-            //     })
-            //     .then((res) => {
-            //         this.products_date = res.data;
-            //     })
-            //     .catch((error) => {
-            //         console.error('Error:', error);
-            //     });
-            // },  
+            // เลือกหลายรอบการประเมิน
+            showDataSet() {
+                axios.post('http://127.0.0.1:8000/api/showDateSet', {
+                    staff_id: this.staffid_Main,
+                    fac_id: this.facid_Main,
+                    group_id: this.groupid_Main 
+                })
+                .then((res) => {
+                    this.products_date = res.data;
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                });
+            }, 
 
             //เลือกรอบล่าสุด
             // showDataSet() {
@@ -380,103 +392,194 @@ const user = await getSession();
             //     });
             // }, 
 
-            //กรณีรักษาการ 2 คณะ
-            showDataSet() {
-                axios.post('http://127.0.0.1:8000/api/showDateSet', {
-                    staff_id: this.staffid_Main,
-                    fac_id: this.facid_Main,
-                    group_id: this.groupid_Main
-                })
-                .then((res) => {
-                    this.products_date = res.data || [];   // ✅ ใช้ label จาก backend
-                })
-                .catch((error) => {
-                    console.error('showDateSet error:', error);
-                    this.products_date = [];
-                });
-            },
- 
+
+            // saveDatator() {
+            //     if (this.product_date.d_date == null || this.product_date.d_date == undefined) {
+            //         Swal.fire('error', 'กรุณาเลือก รอบการประเมิน ก่อน', 'error'); 
+            //     } else {
+            //         if (!this.assessor) {
+            //             Swal.fire('error', 'กรุณากรอกชื่อผู้ประเมินให้ครบถ้วน', 'error');
+            //         } else if (!this.assessor_position) {
+            //             Swal.fire('error', 'กรุณากรอกชื่อและตำแหน่งผู้ประเมินให้ครบถ้วน', 'error');
+            //         } else if (this.dropdownProportion == null || this.dropdownProportion == undefined) {
+            //             Swal.fire('error', 'กรุณาเลือก สัดส่วน', 'error');
+            //         } else { 
+            //             const assessorName =
+            //                 // this.assessor && typeof this.assessor === 'object'
+            //                 //     ? this.assessor.namefully
+            //                 //     : this.assessor;
+            //                  this.assessor && typeof this.assessor === 'object'
+            //                     ? (this.assessor.displayName || this.assessor.namefully)
+            //                     : (this.assessor || '');
+
+            //             const formData = {
+            //                 p_year: this.product_date.d_date,
+            //                 evalua: this.product_date.evalua,
+            //                 p_staffid: this.staffid_Main,
+            //                 staffid_name: this.staffid_name,
+            //                 pos_id: this.pos_id,
+            //                 postype_id: this.postype_id,
+            //                 fac_id: this.facid_Main,
+            //                 // dropdownProportion: this.dropdownProportion.value, 
+            //                 dropdownProportion: this.dropdownProportion, 
+            //                 assessor: assessorName, 
+            //                 assessor_position: this.assessor_position,
+            //                 record_evalua: this.displayEvaluationPeriod,
+
+            //             }; 
+
+            //             axios.post('http://127.0.0.1:8000/api/saveDatator', formData)
+            //                 .then(response => { 
+            //                     this.DialogScore = false; 
+            //                     Swal.fire({
+            //                         position: 'top-end',
+            //                         icon: 'success',
+            //                         title: 'บันทึกข้อตกลงภาระงานเรียบร้อย',
+            //                         showConfirmButton: false,
+            //                         timer: 1500
+            //                     });
+            //                 })
+            //                 .catch(error => {
+            //                     console.error('Error saving data:', error);
+            //                     Swal.fire('error', 'การบันทึกข้อมูลล้มเหลว', 'error');
+            //                 });  
+            //         }   
+            //     } 
+            // },
             saveDatator() {
+                if (this.isTorSaved) {
+                    Swal.fire('แจ้งเตือน', 'รอบประเมินนี้เคยบันทึกข้อมูลแล้ว ไม่สามารถบันทึกซ้ำได้', 'warning');
+                    return;
+                }
+
                 if (this.product_date.d_date == null || this.product_date.d_date == undefined) {
                     Swal.fire('error', 'กรุณาเลือก รอบการประเมิน ก่อน', 'error'); 
-                } else {
-                    if (!this.assessor) {
-                        Swal.fire('error', 'กรุณากรอกชื่อผู้ประเมินให้ครบถ้วน', 'error');
-                    } else if (!this.assessor_position) {
-                        Swal.fire('error', 'กรุณากรอกชื่อและตำแหน่งผู้ประเมินให้ครบถ้วน', 'error');
-                    } else if (this.dropdownProportion == null || this.dropdownProportion == undefined) {
-                        Swal.fire('error', 'กรุณาเลือก สัดส่วน', 'error');
-                    } else { 
-                        const assessorName =
-                            // this.assessor && typeof this.assessor === 'object'
-                            //     ? this.assessor.namefully
-                            //     : this.assessor;
-                             this.assessor && typeof this.assessor === 'object'
-                                ? (this.assessor.displayName || this.assessor.namefully)
-                                : (this.assessor || '');
+                    return;
+                }
 
-                        const formData = {
-                            p_year: this.product_date.d_date,
-                            evalua: this.product_date.evalua,
-                            p_staffid: this.staffid_Main,
-                            staffid_name: this.staffid_name,
-                            pos_id: this.pos_id,
-                            postype_id: this.postype_id,
-                            fac_id: this.facid_Main,
-                            // dropdownProportion: this.dropdownProportion.value, 
-                            dropdownProportion: this.dropdownProportion, 
-                            assessor: assessorName, 
-                            assessor_position: this.assessor_position,
-                            record_evalua: this.displayEvaluationPeriod,
+                if (!this.assessor) {
+                    Swal.fire('error', 'กรุณากรอกชื่อผู้ประเมินให้ครบถ้วน', 'error');
+                    return;
+                }
 
-                        }; 
+                if (!this.assessor_position) {
+                    Swal.fire('error', 'กรุณากรอกชื่อและตำแหน่งผู้ประเมินให้ครบถ้วน', 'error');
+                    return;
+                }
 
-                        axios.post('http://127.0.0.1:8000/api/saveDatator', formData)
-                            .then(response => { 
-                                this.DialogScore = false; 
-                                Swal.fire({
-                                    position: 'top-end',
-                                    icon: 'success',
-                                    title: 'บันทึกข้อตกลงภาระงานเรียบร้อย',
-                                    showConfirmButton: false,
-                                    timer: 1500
-                                });
-                            })
-                            .catch(error => {
-                                console.error('Error saving data:', error);
-                                Swal.fire('error', 'การบันทึกข้อมูลล้มเหลว', 'error');
-                            });  
-                    }   
-                } 
+                if (this.dropdownProportion == null || this.dropdownProportion == undefined) {
+                    Swal.fire('error', 'กรุณาเลือก สัดส่วน', 'error');
+                    return;
+                }
+
+                const assessorName =
+                    this.assessor && typeof this.assessor === 'object'
+                        ? (this.assessor.displayName || this.assessor.namefully)
+                        : (this.assessor || '');
+
+                const formData = {
+                    p_year: this.product_date.d_date,
+                    evalua: this.product_date.evalua,
+                    p_staffid: this.staffid_Main,
+                    staffid_name: this.staffid_name,
+                    pos_id: this.pos_id,
+                    postype_id: this.postype_id,
+                    fac_id: this.facid_Main,
+                    dropdownProportion: this.dropdownProportion,
+                    assessor: assessorName,
+                    assessor_position: this.assessor_position,
+                    record_evalua: this.displayEvaluationPeriod,
+                };
+
+                this.isSaving = true;
+
+                axios.post('http://127.0.0.1:8000/api/saveDatator', formData)
+                    .then(response => {
+                        this.isTorSaved = true; // บันทึกเสร็จแล้ว ห้ามกดซ้ำ
+
+                        Swal.fire({
+                            position: 'top-end',
+                            icon: 'success',
+                            title: 'บันทึกข้อตกลงภาระงานเรียบร้อย',
+                            showConfirmButton: false,
+                            timer: 1500
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Error saving data:', error);
+                        Swal.fire('error', 'การบันทึกข้อมูลล้มเหลว', 'error');
+                    })
+                    .finally(() => {
+                        this.isSaving = false;
+                    });
             },
 
-            showdatator() { 
+            // showdatator() { 
+            //     axios.post('http://127.0.0.1:8000/api/showdatator', {
+            //         p_year: this.product_date.d_date,
+            //         evalua: this.product_date.evalua,
+            //         p_staffid: this.staffid_Main
+            //     })
+            //     .then(response => {
+            //         const dataSet = response.data[0] || {};
+
+            //         // this.assessor = dataSet.assessor || null;    
+            //         const nameFromDb = dataSet.assessor || '';
+            //             this.assessor = nameFromDb
+            //             ? { displayName: nameFromDb, namefully: nameFromDb }
+            //             : null;
+
+            //          this.assessor_position = dataSet.assessor_position || null;
+                    
+
+            //         this.assessor_position = dataSet.assessor_position || null; 
+
+            //         // const persen = this.dropdownProportions.filter(f => f.value == dataSet.persen);
+            //         // this.dropdownProportion = persen.length > 0 ? persen[0] : null;  
+            //         this.dropdownProportion = dataSet.persen || null;  // ควรเป็น "50:50" หรือ "70:30"
+            //     })
+            //     .catch(error => { 
+            //     });
+            // },   
+            showdatator() {
+                // reset ก่อนทุกครั้งที่เปลี่ยนรอบ
+                this.isTorSaved = false;
+                this.assessor = null;
+                this.assessor_position = null;
+                this.dropdownProportion = null;
+
                 axios.post('http://127.0.0.1:8000/api/showdatator', {
                     p_year: this.product_date.d_date,
                     evalua: this.product_date.evalua,
                     p_staffid: this.staffid_Main
                 })
                 .then(response => {
-                    const dataSet = response.data[0] || {};
+                    const rows = response.data || [];
+                    const dataSet = rows[0] || {};
 
-                    // this.assessor = dataSet.assessor || null;    
+                    // ถ้ามีข้อมูล แปลว่าเคยบันทึกแล้ว
+                    this.isTorSaved = rows.length > 0;
+
                     const nameFromDb = dataSet.assessor || '';
-                        this.assessor = nameFromDb
+                    this.assessor = nameFromDb
                         ? { displayName: nameFromDb, namefully: nameFromDb }
                         : null;
 
-                     this.assessor_position = dataSet.assessor_position || null;
-                    
-
-                    this.assessor_position = dataSet.assessor_position || null; 
-
-                    // const persen = this.dropdownProportions.filter(f => f.value == dataSet.persen);
-                    // this.dropdownProportion = persen.length > 0 ? persen[0] : null;  
-                    this.dropdownProportion = dataSet.persen || null;  // ควรเป็น "50:50" หรือ "70:30"
+                    this.assessor_position = dataSet.assessor_position || null;
+                    this.dropdownProportion = dataSet.persen || null;
                 })
-                .catch(error => { 
+                .catch(error => {
+                    this.isTorSaved = false;
+                    this.assessor = null;
+                    this.assessor_position = null;
+                    this.dropdownProportion = null;
+                    console.error(error);
                 });
-            },    
+            },
+                        
+            
+
+
             // onTabChange(event) {
             //     // ต้องเลือกรอบก่อน
             //     if (!this.product_date?.d_date) {
