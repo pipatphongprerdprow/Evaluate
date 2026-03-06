@@ -1212,6 +1212,12 @@ export default {
             // ปีงบประมาณ
             dropdownItemYear: { name: 'ปีงบประมาณ 2568', code: 2568 },
             dropdownItemsYear: [
+                { name: 'ปีงบประมาณ 2575', code: 2575 }, 
+                { name: 'ปีงบประมาณ 2574', code: 2574 },
+                { name: 'ปีงบประมาณ 2572', code: 2572 },
+                { name: 'ปีงบประมาณ 2572', code: 2572 },
+                { name: 'ปีงบประมาณ 2571', code: 2571 },
+                { name: 'ปีงบประมาณ 2570', code: 2570 }, 
                 { name: 'ปีงบประมาณ 2569', code: 2569 },
                 { name: 'ปีงบประมาณ 2568', code: 2568 },
                 { name: 'ปีงบประมาณ 2567', code: 2567 },
@@ -1692,6 +1698,7 @@ export default {
                 await this.showDataEvalu()
             })
         },
+        
 
         async showDataEvalu() {
             try { 

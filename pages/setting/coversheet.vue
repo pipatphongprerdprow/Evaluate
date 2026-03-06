@@ -12,7 +12,8 @@
                     <!-- เลือกหลายรอบ -->
                     <div class="col md:col-6">  
                         <label for="product_date"></label>  
-                        <Dropdown
+                        <!-- ถ้า ผอ ยกเลิกรักษาการให้เปิดตัวนี้ -->
+                        <!-- <Dropdown
                             id="product_date" 
                             v-model="product_date" 
                             :options="products_date"
@@ -21,8 +22,20 @@
                             placeholder="กรุณาเลือกรอบการประเมิน" 
                             style="max-width: 500px;width: 100%;border: outset;" 
                             @change="showdatator"
-                        />
+                        /> -->
+
+                        <Dropdown
+                            id="product_date"
+                            v-model="product_date"
+                            :options="products_date"
+                            optionLabel="label"
+                            placeholder="กรุณาเลือกรอบการประเมิน"
+                            style="max-width: 500px;width: 100%;border: outset;"
+                            @change="showdatator"
+                        /> 
                     </div>
+
+                    
                     <!-- เลือกรอบล่าสุดรอบเดียว --> 
                      <!-- <div class="col md:col-6">  
                         <label for="product_date"></label>  
@@ -328,20 +341,20 @@ const user = await getSession();
                     staffdepartment: this.facid_Main
                 };
             },
-            // เลือกหลายรอบการประเมิน
-            showDataSet() {
-                axios.post('http://127.0.0.1:8000/api/showDateSet', {
-                    staff_id: this.staffid_Main,
-                    fac_id: this.facid_Main,
-                    group_id: this.groupid_Main 
-                })
-                .then((res) => {
-                    this.products_date = res.data;
-                })
-                .catch((error) => {
-                    console.error('Error:', error);
-                });
-            }, 
+            // เลือกหลายรอบการประเมิน ถ้า ผอ ยกเลิกรักษาการให้เปิดตัวนี้
+            // showDataSet() {
+            //     axios.post('http://127.0.0.1:8000/api/showDateSet', {
+            //         staff_id: this.staffid_Main,
+            //         fac_id: this.facid_Main,
+            //         group_id: this.groupid_Main 
+            //     })
+            //     .then((res) => {
+            //         this.products_date = res.data;
+            //     })
+            //     .catch((error) => {
+            //         console.error('Error:', error);
+            //     });
+            // },  
 
             //เลือกรอบล่าสุด
             // showDataSet() {
@@ -367,7 +380,22 @@ const user = await getSession();
             //     });
             // }, 
 
-
+            //กรณีรักษาการ 2 คณะ
+            showDataSet() {
+                axios.post('http://127.0.0.1:8000/api/showDateSet', {
+                    staff_id: this.staffid_Main,
+                    fac_id: this.facid_Main,
+                    group_id: this.groupid_Main
+                })
+                .then((res) => {
+                    this.products_date = res.data || [];   // ✅ ใช้ label จาก backend
+                })
+                .catch((error) => {
+                    console.error('showDateSet error:', error);
+                    this.products_date = [];
+                });
+            },
+ 
             saveDatator() {
                 if (this.product_date.d_date == null || this.product_date.d_date == undefined) {
                     Swal.fire('error', 'กรุณาเลือก รอบการประเมิน ก่อน', 'error'); 
