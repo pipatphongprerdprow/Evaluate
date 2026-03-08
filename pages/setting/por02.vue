@@ -36,11 +36,16 @@
                             <td>  
                                 <b v-if="row1.selfAssessment == '' ||  row1.selfAssessment == null" style="color: red;">0</b> 
                                 <b v-if="row1.selfAssessment != 0 " style="color: blue" >{{ row1.selfAssessment }}</b> 
-                            </td>
-                            <td>  
+                            </td> 
+                            <!-- <td>  
                                 <b v-if="row1.data_table1 == '' " style="color: red;">0</b> 
                                 <b v-if="row1.data_table1 != 0 " >{{ row1.data_table1 }}</b> 
-                            </td>
+                            </td> -->
+                            <td>
+                                <b :style="{ color: getScoreColor(row1.data_table1, dataPor.d_scoringday) }">
+                                    {{ getScoreDisplay(row1.data_table1, dataPor.d_scoringday) }}
+                                </b>
+                            </td>  
                         </tr>
                     </tbody>
                 </table>
@@ -71,10 +76,15 @@
                                 <b v-if="row2.SCOREPERSON == '' || row2.SCOREPERSON == null" style="color: red;">0</b> 
                                 <b v-if="row2.SCOREPERSON != 0 " style="color: blue;" >{{ row2.SCOREPERSON }}</b> 
                             </td>
-                            <td> 
+                            <!-- <td> 
                                 <b v-if="row2.SCORE == null || row2.SCORE == '' " style="color: red;">0</b> 
                                 <b v-if="row2.SCORE != 0 " >{{ row2.SCORE }}</b> 
-                            </td> 
+                            </td>  -->
+                            <td>
+                                <b :style="{ color: getScoreColor(row2.SCORE, row2.d_scoringday || dataPor.d_scoringday) }">
+                                    {{ getScoreDisplay(row2.SCORE, row2.d_scoringday || dataPor.d_scoringday) }}
+                                </b>
+                            </td>
                         </tr>
                     </tbody>
                 </table>
@@ -107,9 +117,14 @@
                                 <b v-if="row3.datatable3 == '' ||  row3.datatable3 == null" style="color: red;">-</b> 
                                 <b v-if="row3.datatable3 != 0 " style="color: blue" >{{ row3.datatable3 }}</b> 
                             </td>
-                            <td>  
+                            <!-- <td>  
                                 <b v-if="row3.selfAssessment3 == '' ||  row3.selfAssessment3 == null" style="color: red;">-</b>  
                                 <b v-if="row3.selfAssessment3 != 0 " >{{ row3.selfAssessment3 }}</b> 
+                            </td> -->
+                            <td>
+                                <b :style="{ color: getDashScoreColor(row3.selfAssessment3, dataPor.d_scoringday) }">
+                                    {{ getDashScoreDisplay(row3.selfAssessment3, dataPor.d_scoringday) }}
+                                </b>
                             </td>
                         </tr> 
                     </tbody>
@@ -883,7 +898,65 @@ export default {
             const parts = activityText.trim().split(/\s+/);
             if (parts.length <= 2) return activityText.trim();
             return parts.slice(2).join(' ');
-        }
+        },
+        toDateOnly(dateValue) {
+            if (!dateValue) return null;
+            return new Date(`${dateValue}T00:00:00`);
+        },
+
+        isBeforeScoringDay(scoringDay) {
+            if (!scoringDay) return false;
+
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            const scoringDate = this.toDateOnly(scoringDay);
+            if (!scoringDate || isNaN(scoringDate.getTime())) return false;
+
+            return today < scoringDate;
+        },
+
+        getScoreDisplay(score, scoringDay) { 
+            if (this.isBeforeScoringDay(scoringDay)) {
+                return 0;
+            } 
+            if (score === null || score === '' || Number(score) === 0) {
+                return 0;
+            }
+
+            return score;
+        },
+
+        getScoreColor(score, scoringDay) { 
+            if (this.isBeforeScoringDay(scoringDay)) {
+                return 'red';
+            } 
+            if (score === null || score === '' || Number(score) === 0) {
+                return 'red';
+            } 
+            return 'black';
+        }, 
+
+        // ค.กำหนดวันแสดงคะแนน
+        getDashScoreDisplay(score, scoringDay) { 
+            if (this.isBeforeScoringDay(scoringDay)) {
+                return '-';
+            } 
+            if (score === null || score === '' || Number(score) === 0) {
+                return '-';
+            } 
+            return score;
+        },
+
+        getDashScoreColor(score, scoringDay) { 
+            if (this.isBeforeScoringDay(scoringDay)) {
+                return 'red';
+            } 
+            if (score === null || score === '' || Number(score) === 0) {
+                return 'red';
+            } 
+            return 'black';
+        },
     }  
 }
 </script>
