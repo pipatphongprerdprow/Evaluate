@@ -923,7 +923,7 @@ export default {
                     group_id: this.groupid_Main
                 })
                 .then((res) => {
-                     console.log(res.data);
+                     //console.log(res.data);
                     this.tracking_dates = res.data;
                 })
                 .catch((error) => {

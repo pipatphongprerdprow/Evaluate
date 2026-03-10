@@ -10,7 +10,7 @@
                         <small style="color: red;font-size: larger;">* กรุณาเลือกรอบประเมิน เพื่อทำแบบประเมิน</small>
                     </div>  
                     <!-- เลือกหลายรอบ -->
-                    <div class="col md:col-6">  
+                    <!-- <div class="col md:col-6">  
                         <label for="product_date"></label>  
                         <Dropdown
                             id="product_date" 
@@ -22,9 +22,9 @@
                             style="max-width: 500px;width: 100%;border: outset;" 
                             @change="showdatator"
                         />
-                    </div>
+                    </div> -->
                     <!-- เลือกรอบล่าสุดรอบเดียว --> 
-                     <!-- <div class="col md:col-6">  
+                     <div class="col md:col-6">  
                         <label for="product_date"></label>  
                         <Dropdown
                         id="product_date"
@@ -36,7 +36,7 @@
                         style="max-width: 500px;width: 100%;border: outset;"
                         @change="showdatator" 
                         /> 
-                    </div> --> 
+                    </div> 
                 </div> 
             </div>
         </div>  
@@ -302,12 +302,15 @@ const user = await getSession();
                 const sorted = [...this.products_date].sort(
                     (a, b) => new Date(b.d_date) - new Date(a.d_date)
                 );
-                return [sorted[0]];
+                // return [sorted[0]];
+                 return sorted.slice(0, 2); 
             },
+
             isP01WeightOk() {
                 const w = Number(this.p01TotalWeight || 0);
                 return Math.abs(w - 100) < 0.01;
             }, 
+
             displayEvaluationPeriod() { 
                 const rawRound = String(this.product_date?.d_evaluationround ?? '');
                 const rawDate  = this.product_date?.d_date ?? ''; 
