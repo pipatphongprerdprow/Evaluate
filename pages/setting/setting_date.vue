@@ -38,7 +38,34 @@
                                         <InputText type="date" id="inputgroup" v-model="dateAnnounce" />
                                     </div>
                                 </div>
- 
+                                <!-- <div class="field col-12 md:col-4">
+                                    <label>สถานะรอบประเมิน :</label> 
+                                    <InputSwitch v-model="status_round" /> 
+                                    <span v-if="status_round" style="color:green"> เปิดรอบ </span>
+                                    <span v-else style="color:red"> ปิดรอบ </span>
+                                </div>  -->
+
+                                <div class="field col-12 md:col-4">
+                                    <div class="status-box"> 
+                                        <div class="status-title">
+                                            <i class="pi pi-power-off"></i>
+                                            สถานะรอบประเมิน
+                                        </div>
+                                        <div class="status-control">
+                                            <InputSwitch v-model="status_round"/>
+                                            <Tag 
+                                                v-if="status_round"
+                                                severity="success"
+                                                value="เปิดใช้งาน"
+                                            /> 
+                                            <Tag 
+                                                v-else
+                                                severity="secondary"
+                                                value="ปิดใช้งาน"
+                                            /> 
+                                        </div>​
+                                    </div>
+                                </div> 
                                 <h5 class="mb-4 card-header">กำหนดสิทธิ์การประเมิน</h5>
                                 <div class="p-fluid formgrid grid"> 
                                     <div class="field col-12 md:col-4">
@@ -267,6 +294,15 @@
                             </div>
                         </template>
                     </Column>
+                     <Column header="สถานะรอบ" style="width:10%;text-align:center;">
+                        <template #body="Item">
+
+                            <Tag v-if="Item.data.status_round==1" severity="success" value="เปิด"/>
+
+                            <Tag v-else severity="danger" value="ปิด"/>
+
+                        </template>
+                    </Column>
                     <Column field="Tb_balance" header="จัดการแบบประเมิน" style="width: 10%; text-align: center;">
                         <template #body="Item"> 
                             <div style="display: flex; justify-content: center; align-items: center;">
@@ -308,6 +344,7 @@ export default {
             staffid_Main: '',
             facid_Main: '',
             groupid_Main: '01',
+            status_round:false,
             products_date: [],  
             // Dialog
             DialogAdd: false, 
@@ -439,7 +476,9 @@ export default {
         editData(data){ 
             //console.log(data); 
             this.DialogAdd = true;  
-            this.text_edt = data.id;
+            this.text_edt = data.id; 
+            
+            this.status_round = data.status_round == 1 ? true : false;
             
             const year_ob = this.dropdownItemsYear.filter(f=>f.code==data.d_date)
             this.dropdownItemYear = year_ob.length > 0 ? year_ob[0] : null;   
@@ -590,6 +629,7 @@ export default {
                 staff_id: this.staffid_Main,
                 fac_id: this.facid_Main,
                 group_id: this.groupid_Main,
+                status_round: this.status_round ? 1 : 0,
                 text_edt: this.text_edt,
                 year: this.dropdownItemYear,
                 evalua: this.dropdownItemEvalua,
@@ -1258,6 +1298,28 @@ th, td {
     border: 1px solid rgb(206, 203, 203);
     text-align: center;
 }
+
+.status-box{
+    background:#f8fafc;
+    border:1px solid #e5e7eb;
+    border-radius:10px;
+    padding:12px 16px;
+}
+
+.status-title{
+    font-weight:600;
+    margin-bottom:8px;
+    display:flex;
+    align-items:center;
+    gap:6px;
+}
+
+.status-control{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+ 
 #country-list{float:left;list-style:none;margin-top:-3px;padding:0;width:25%;position: absolute; z-index:9999 !important;}
 #country-list li{padding: 10px; background: #f0f0f0; border-bottom: #bbb9b9 1px solid;}
 #country-list li:hover{background:#ece3d2;cursor: pointer;}

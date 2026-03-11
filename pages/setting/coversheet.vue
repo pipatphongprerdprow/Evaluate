@@ -296,14 +296,25 @@ const user = await getSession();
         }, 
         
         computed: {
-            latestProductOnly() {
-                if (!this.products_date || this.products_date.length === 0) return [];
+            // latestProductOnly() {
+            //     if (!this.products_date || this.products_date.length === 0) return [];
                 
-                const sorted = [...this.products_date].sort(
-                    (a, b) => new Date(b.d_date) - new Date(a.d_date)
-                );
-                // return [sorted[0]];
-                 return sorted.slice(0, 2); 
+            //     const sorted = [...this.products_date].sort(
+            //         (a, b) => new Date(b.d_date) - new Date(a.d_date)
+            //     );
+            //     // return [sorted[0]];
+            //      return sorted.slice(0, 2); 
+            // },
+
+            latestProductOnly() { 
+                if (!this.products_date || this.products_date.length === 0) {
+                    return [];
+                }
+
+                // แสดงเฉพาะรอบที่เปิด
+                const result = this.products_date.filter(item => item.status_round == 1);
+
+                return result.sort((a, b) => new Date(b.d_date) - new Date(a.d_date));
             },
 
             isP01WeightOk() {
