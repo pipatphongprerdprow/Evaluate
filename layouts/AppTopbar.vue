@@ -82,7 +82,7 @@ const isOutsideClicked = (event) => {
 <template>
     <div class="layout-topbar">
         <router-link to="/" class="layout-topbar-logo">
-            <img src="~/assets/layout/images/MSU_PA.3.jpg" alt="logo" style="width: 330px; height: auto;" />
+            <img src="~/assets/layout/images/MSU_PA.4.jpg" alt="logo" style="width: 300px; height: auto;" />
             <!-- <img src="~/assets/layout/images/evalua_MSU.jpg" alt="logo" style="width: 300px; height: auto;" /> -->
              
             <!-- <img src="~/assets/layout/images/kongkang.jpg" alt="logo" />

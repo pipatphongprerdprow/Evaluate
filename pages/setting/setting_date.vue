@@ -63,7 +63,7 @@
                                                 severity="secondary"
                                                 value="ปิดใช้งาน"
                                             /> 
-                                        </div>​
+                                        </div>
                                     </div>
                                 </div> 
                                 <h5 class="mb-4 card-header">กำหนดสิทธิ์การประเมิน</h5>
@@ -344,7 +344,7 @@ export default {
             staffid_Main: '',
             facid_Main: '',
             groupid_Main: '01',
-            status_round:false,
+            status_round:true,
             products_date: [],  
             // Dialog
             DialogAdd: false, 
@@ -578,9 +578,7 @@ export default {
             }
             this.text_staff9 = data.leader9; 
             this.text_position9 = data.leader_position9;
-            this.text_namefully9 = data.leader_name9; 
-
- 
+            this.text_namefully9 = data.leader_name9;  
         },
         delData(data){ 
             Swal.fire({
@@ -613,6 +611,7 @@ export default {
         OpenDialogAdd(){
             this.DialogAdd = true; 
             this.text_edt = null;
+            this.status_round = true; 
             this.dropdownItemYear = null; 
             this.dropdownItemEvalua = null;
             this.dateStart = null;
@@ -663,9 +662,8 @@ export default {
                 text_namefully8: this.text_namefully8, 
                 text_staff9: this.text_staff9,
                 text_position9: this.text_position9,
-                text_namefully9: this.text_namefully9,
-
- 
+                text_namefully9: this.text_namefully9, 
+                
             }).then(res => {     
                  //console.log(res.data); 
                 Swal.fire({
