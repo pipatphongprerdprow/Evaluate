@@ -398,10 +398,17 @@
                                                         <tbody>
                                                             <tr v-for="(row3, index) in otherCompetencies" :key="index">
                                                                 <td style="text-align: left;">{{ row3.activity }}</td> 
-                                                                <td> 
+                                                                <!-- <td> 
                                                                     <b v-if="row3.indicator3 == '' ||  row3.indicator3 == null" style="color: red;">0</b>
                                                                     <span v-if="row3.indicator3 != 0">{{ row3.indicator3 }}</span>  
-                                                                </td>
+                                                                </td> -->
+                                                                <td>
+                                                                     <span v-if="isExecutive" style="color: grey;">1</span>
+                                                                    <template v-else>
+                                                                        <b v-if="row3.indicator3 == '' || row3.indicator3 == null" style="color: red;">0</b>
+                                                                        <span v-if="row3.indicator3 != 0">{{ row3.indicator3 }}</span>
+                                                                    </template> 
+                                                                </td> 
                                                                 <td>  
                                                                     <b v-if="row3.datatable3 == '' ||  row3.datatable3 == null" style="color: red;">0</b> 
                                                                     <b v-if="row3.datatable3 != 0 " style="color: blue" >{{ row3.datatable3 }}</b> 
@@ -757,8 +764,6 @@ const FORCE_EXPECTED_LEVEL = new Map([
   ['160018', 3],   //  ฟิกคนนี้ให้เป็นระดับ 3 นายจีรพันธ์ ภูครองเพชร
    
 ]);
-
-//1 ประเมิน ค. ผบห
 const EXECUTIVE_ALLOWLIST = new Set([
     '160018',//นายจีรพันธ์ ภูครองเพชร
     '190015',//นางนงลักษณ์ พุ่มม่วง
@@ -794,8 +799,8 @@ const EXECUTIVE_ALLOWLIST = new Set([
     '314020',//นายไกรษร อุทัยแสง
     '5000094',//นายสวัสดิ์ วิชระโภชน
     '130102' //นางสาวพนมพร ปัจจวงษ
-  
-]);
+    
+    ]);
 export default {
     // props: {
     //     dataPor: {
@@ -1568,27 +1573,23 @@ export default {
                 });
         },
 
-        // แก้160369
-        // showdataPo(staff_id, facid_Main, d_date, evalua, posnameid) {
+
+        // showdataPo(staff_id, facid_Main, d_date, evalua, posnameid) {  
+        //     // ตรวจสอบว่า currentstaff มีค่าหรือไม่
         //     if (!this.currentstaff || this.currentstaff.length === 0) {
         //         console.error("Error: currentstaff is undefined or empty.");
         //         return;
         //     }
 
-        //     // ✅ ทำให้ postypenameth เป็นชื่อระดับแบบสะอาด (ไม่มีคำว่า "ระดับ")
-        //     let rawLevel = this.currentstaff[0]?.postypenameth
-        //         ?? (this.currentstaff[0]?.posnameth === 'ผู้บริหาร' ? 'ชำนาญการพิเศษ' : 'ปฏิบัติการ');
+        //     this.postypenameth = this.currentstaff[0]?.postypenameth  ?? (this.currentstaff[0]?.posnameth === 'ผู้บริหาร' ? 'ชำนาญการพิเศษ' : 'ปฏิบัติการ');
 
-        //     let cleanLevel = this.normalizeLevelName(rawLevel);
-        //     if (!cleanLevel) cleanLevel = 'ปฏิบัติการ';
+        //  //console.log("postypenameth:", this.postypenameth);
 
-        //     // ✅ ฟิก staffid ถ้ามีใน Map (บังคับให้ใช้ระดับ 3)
-        //     const forced = this.getForcedExpectedLevel(staff_id);
-        //     if (forced !== null) {
-        //         cleanLevel = 'ชำนาญการพิเศษ'; // ให้ชื่อระดับสอดคล้องกับ 3
-        //     } 
-        //     this.postypenameth = cleanLevel;                // เก็บแบบไม่ติดคำว่า "ระดับ"
-        //     let postypetext = `ระดับ${cleanLevel}`;         // ใช้ตอน map + ส่ง API
+        //     let postypetext = `ระดับ${this.postypenameth}`;   
+        //     // let postypetext = this.positionname === 'ผู้บริหาร' ? `ระดับชำนาญการพิเศษ` : `ระดับ${this.postypename}`;
+        //     // let postypenameid = this.positionname === 'ผู้บริหาร' ? 90 : this.postypenameid;
+        //     // let positionname = this.positionname === 'ผู้บริหาร' ? `ระดับชำนาญการพิเศษ` : `ระดับ${this.postypename}`;
+
 
         //     const levelMapping = {
         //         'ระดับปฏิบัติการ': 1,
@@ -1601,26 +1602,21 @@ export default {
         //         'ระดับเชี่ยวชาญ': 4,
         //         'ระดับเชี่ยวชาญพิเศษ': 5
         //     };
+        //     let xr = levelMapping[postypetext] || 0; 
 
-        //     let xr = levelMapping[postypetext] ?? 0;
-
-        //     // ✅ ถ้าฟิก staffid ให้ override ค่า xr เลย (ชัวร์สุด)
-        //     if (forced !== null) {
-        //         xr = forced; // เช่น 3
-        //         postypetext = 'ระดับชำนาญการพิเศษ';
-        //     }
-
-        //     // ตั้งค่าตาราง ก.
         //     this.coreCompetencies = [
         //         { id: 1, activity: 'ก. 1 การมุ่งผลสัมฤทธิ์', indicator: xr, data_table1: '', selfAssessment: '' },
         //         { id: 2, activity: 'ก. 2 การบริการที่ดี', indicator: xr, data_table1: '', selfAssessment: '' },
         //         { id: 3, activity: 'ก. 3 การสั่งสมความเชี่ยวชาญในงานอาชีพ', indicator: xr, data_table1: '', selfAssessment: '' },
         //         { id: 4, activity: 'ก. 4 การยึดมั่นในความถูกต้องชอบธรรมและจริยธรรม', indicator: xr, data_table1: '', selfAssessment: '' },
         //         { id: 5, activity: 'ก. 5 การทำงานเป็นทีม', indicator: xr, data_table1: '', selfAssessment: '' }
-        //     ];
+        //     ];  
+        //     this.jobSpecificCompetencies = [];
 
-        //     // ✅ แก้ bug เดิม: Mapping[this.postypenameth, this.currentstaff[0]?.posnameth]
-        //     const executive = (this.currentstaff[0]?.posnameth === 'ผู้บริหาร') ? 1 : 0;
+        //     const Mapping = {
+        //         'ผู้บริหาร': 1
+        //     };  
+        //     let executive = Mapping[this.postypenameth, this.currentstaff[0]?.posnameth] || 0;
 
         //     this.otherCompetencies = [
         //         { id: 12, activity: 'ค. 1 สภาวะผู้นำ', indicator3: executive, datatable3: '', selfAssessment3: '' },
@@ -1628,84 +1624,59 @@ export default {
         //         { id: 14, activity: 'ค. 3 การวางกลยุทธ์ภาครัฐ', indicator3: executive, datatable3: '', selfAssessment3: '' },
         //         { id: 15, activity: 'ค. 4 ศักยภาพเพื่อนำการปรับเปลี่ยน', indicator3: executive, datatable3: '', selfAssessment3: '' },
         //         { id: 16, activity: 'ค. 5 การสอนงานและการมอบหมายงาน', indicator3: executive, datatable3: '', selfAssessment3: '' }
-        //     ];
+        //     ]; 
 
-        //     // โหลด ข. (สมรรถนะเฉพาะ)
-        //     this.showPostype(this.postypenameth, posnameid);
+        //     // this.showPostype(this.currentstaff[0]?.postypenameth, this.postypenameid); // แก้ไข ตัวป2
+        //     this.showPostype(this.currentstaff[0]?.postypenameth, posnameid);
 
-        //     // โหลดคะแนนเดิมจาก API
-        //     axios.post('http://127.0.0.1:8000/api/showDataPo', {
+        //     axios.post(' http://127.0.0.1:8000/api/showDataPo', {
         //         staff_id: staff_id,
         //         fac_id: facid_Main,
         //         year_id: d_date,
         //         record: evalua,
         //         postypename: postypetext
-        //     }).then(res => {
+        //     }).then(res => {     
         //         if (res.data.length > 0) {
-        //         const data = res.data[0];
-        //         this.coreCompetencies = this.coreCompetencies.map(item => {
-        //             if (data[`p${item.id}`] !== undefined) {
-        //             return {
-        //                 ...item,
-        //                 data_table1: data[`p${item.id}`],
-        //                 selfAssessment: data[`pa_${item.id}`]
-        //             };
-        //             }
-        //             return item;
-        //         });
-        //         }
-        //     }).catch(error => {
+        //             const data = res.data[0]; 
+        //             this.coreCompetencies = this.coreCompetencies.map(item => {
+        //                 if (data[`p${item.id}`] !== undefined) {
+        //                     return {
+        //                         ...item,
+        //                         data_table1: data[`p${item.id}`],
+        //                         selfAssessment: data[`pa_${item.id}`]
+        //                     };
+        //                 } 
+        //                 return item;
+        //             });  
+        //             //this.staff_po = data.staff_po;
+        //         } 
+        //     })
+        //     .catch(error => {
         //         console.error('Error:', error);
         //     });
-        // },
-
+        // }, 
         showdataPo(staff_id, facid_Main, d_date, evalua, posnameid) {
-
             if (!this.currentstaff || this.currentstaff.length === 0) {
                 console.error("Error: currentstaff is undefined or empty.");
                 return;
             }
 
-            // ===============================
-            // เตรียมตัวแปรสำหรับตรวจผู้บริหาร
-            // ===============================
-            const posadioStr = String(posnameid ?? '');
-            const targetId = String(staff_id ?? '');
-
-            this.isTargetExecutive =
-                (posadioStr === '128') || EXECUTIVE_ALLOWLIST.has(targetId);
-
-            const executive = this.isTargetExecutive ? 1 : 0;
-
-            // ===============================
-            // ทำให้ postypenameth เป็นชื่อระดับแบบสะอาด
-            // ===============================
-            let rawLevel =
-                this.currentstaff[0]?.postypenameth ??
-                (this.currentstaff[0]?.posnameth === 'ผู้บริหาร'
-                    ? 'ชำนาญการพิเศษ'
-                    : 'ปฏิบัติการ');
+            // ✅ ทำให้ postypenameth เป็นชื่อระดับแบบสะอาด (ไม่มีคำว่า "ระดับ")
+            let rawLevel = this.currentstaff[0]?.postypenameth
+                ?? (this.currentstaff[0]?.posnameth === 'ผู้บริหาร' ? 'ชำนาญการพิเศษ' : 'ปฏิบัติการ');
 
             let cleanLevel = this.normalizeLevelName(rawLevel);
-
             if (!cleanLevel) cleanLevel = 'ปฏิบัติการ';
 
-            // ===============================
-            // ตรวจสอบ staff ที่ต้อง fix ระดับ
-            // ===============================
+            // ✅ ฟิก staffid ถ้ามีใน Map (บังคับให้ใช้ระดับ 3)
             const forced = this.getForcedExpectedLevel(staff_id);
-
             if (forced !== null) {
-                cleanLevel = 'ชำนาญการพิเศษ';
+                cleanLevel = 'ชำนาญการพิเศษ'; // ให้ชื่อระดับสอดคล้องกับ 3
             }
 
-            this.postypenameth = cleanLevel;
+            this.postypenameth = cleanLevel;                // เก็บแบบไม่ติดคำว่า "ระดับ"
+            let postypetext = `ระดับ${cleanLevel}`;         // ใช้ตอน map + ส่ง API
 
-            let postypetext = `ระดับ${cleanLevel}`;
-
-            // ===============================
-            // Mapping ระดับ
-            // ===============================
             const levelMapping = {
                 'ระดับปฏิบัติการ': 1,
                 'ระดับปฏิบัติงาน': 1,
@@ -1720,15 +1691,13 @@ export default {
 
             let xr = levelMapping[postypetext] ?? 0;
 
-            // override ถ้ามี forced
+            // ✅ ถ้าฟิก staffid ให้ override ค่า xr เลย (ชัวร์สุด)
             if (forced !== null) {
-                xr = forced;
+                xr = forced; // เช่น 3
                 postypetext = 'ระดับชำนาญการพิเศษ';
             }
 
-            // ===============================
-            // ตาราง ก.
-            // ===============================
+            // ตั้งค่าตาราง ก.
             this.coreCompetencies = [
                 { id: 1, activity: 'ก. 1 การมุ่งผลสัมฤทธิ์', indicator: xr, data_table1: '', selfAssessment: '' },
                 { id: 2, activity: 'ก. 2 การบริการที่ดี', indicator: xr, data_table1: '', selfAssessment: '' },
@@ -1737,9 +1706,9 @@ export default {
                 { id: 5, activity: 'ก. 5 การทำงานเป็นทีม', indicator: xr, data_table1: '', selfAssessment: '' }
             ];
 
-            // ===============================
-            // ตาราง ค. (ผู้บริหาร)
-            // ===============================
+            // ✅ แก้ bug เดิม: Mapping[this.postypenameth, this.currentstaff[0]?.posnameth]
+            const executive = (this.currentstaff[0]?.posnameth === 'ผู้บริหาร') ? 1 : 0;
+
             this.otherCompetencies = [
                 { id: 12, activity: 'ค. 1 สภาวะผู้นำ', indicator3: executive, datatable3: '', selfAssessment3: '' },
                 { id: 13, activity: 'ค. 2 วิสัยทัศน์', indicator3: executive, datatable3: '', selfAssessment3: '' },
@@ -1748,52 +1717,34 @@ export default {
                 { id: 16, activity: 'ค. 5 การสอนงานและการมอบหมายงาน', indicator3: executive, datatable3: '', selfAssessment3: '' }
             ];
 
-            // ===============================
-            // โหลด ข. สมรรถนะเฉพาะ
-            // ===============================
+            // โหลด ข. (สมรรถนะเฉพาะ)
             this.showPostype(this.postypenameth, posnameid);
 
-            // ===============================
-            // โหลดข้อมูลเดิมจาก API
-            // ===============================
+            // โหลดคะแนนเดิมจาก API
             axios.post('http://127.0.0.1:8000/api/showDataPo', {
                 staff_id: staff_id,
                 fac_id: facid_Main,
                 year_id: d_date,
                 record: evalua,
                 postypename: postypetext
-            })
-            .then(res => {
-
+            }).then(res => {
                 if (res.data.length > 0) {
-
-                    const data = res.data[0];
-
-                    this.coreCompetencies = this.coreCompetencies.map(item => {
-
-                        if (data[`p${item.id}`] !== undefined) {
-                            return {
-                                ...item,
-                                data_table1: data[`p${item.id}`],
-                                selfAssessment: data[`pa_${item.id}`]
-                            };
-                        }
-
-                        return item;
-
-                    });
-
+                const data = res.data[0];
+                this.coreCompetencies = this.coreCompetencies.map(item => {
+                    if (data[`p${item.id}`] !== undefined) {
+                    return {
+                        ...item,
+                        data_table1: data[`p${item.id}`],
+                        selfAssessment: data[`pa_${item.id}`]
+                    };
+                    }
+                    return item;
+                });
                 }
-
-            })
-            .catch(error => {
+            }).catch(error => {
                 console.error('Error:', error);
             });
-
         },
-
-
-
 
         //110269
         normalizeActivityRaw(raw) {
@@ -2405,6 +2356,9 @@ export default {
         getForcedExpectedLevel(staffId) {
             const id = String(staffId ?? '').trim();
             return FORCE_EXPECTED_LEVEL.get(id) ?? null;
+        },
+        isExecutive() {
+            return EXECUTIVE_ALLOWLIST.has(this.staff);
         },
 
 
