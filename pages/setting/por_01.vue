@@ -1,6 +1,7 @@
 <template>
   <div class="col md:col-12 text-right"> 
     <Button label="Export" icon="pi pi-file-word" class="mr-2 mb-2" @click="printDataP01" />
+    <Button label="TestExport" icon="pi pi-file-word" class="mr-2 mb-2" @click="printData" />
   </div> 
   <div class="col md:col-12 text-left" v-if="totalWeight < 100">
     <small style="color: red; font-size: larger;">
@@ -11,13 +12,13 @@
         <div class="col-12 lg:col-12 xl:col-12">
           <div class="card mb-0">
             <div class="formgroup-inline mb-1">
-              <div class="col md:col-6">
+              <div class="col md:col-4">
                 <h3 class="mb-4 card-header">
                   <i class="pi pi-fw pi-folder-open" style="font-size: x-large;"></i>
                   แบบ ป01
                 </h3>
               </div> 
-              <div class="col md:col-6">
+              <div class="col md:col-8">
                 <div v-if="currentDate < dataPor.d_recordingday">
                   <Button
                     icon="pi pi-search"
@@ -33,13 +34,13 @@
                     label="เพิ่มข้อมูลแบบประเมิน"
                     @click="OpenDialogAdd"
                   /> 
-                  <!-- <Button
+                  <Button
                     icon="pi pi-copy"
                     severity="primary"
                     class="mb-2 mr-6"
                     label="คัดลอกข้อมูลแบบประเมิน"
                     @click="copyEvaluationData"
-                  /> -->
+                  />
                 </div>
               </div>
             </div>
@@ -935,6 +936,36 @@ export default {
           });
         })
         .catch((error) => console.error("Error:", error));
+    },
+
+    async printData() {
+      const { getSession } = await useAuth();
+      const user = await getSession(); 
+      try {
+        const response = await axios.post("http://127.0.0.1:8000/api/exportPdf_Test", {
+          staff_id: this.staffid_Main,
+          group_id: this.groupid_Main,
+          fac_id: this.dataPor.fac_id,
+          year_id: this.dataPor.d_date,
+          evalua: this.dataPor.evalua,
+          PREFIXFULLNAME: user.user.name.PREFIXFULLNAME,
+          STAFFNAME: user.user.name.STAFFNAME,
+          STAFFSURNAME: user.user.name.STAFFSURNAME,
+          POSITIONNAME: user.user.name.POSITIONNAME,
+          GROUPTYPENAME: user.user.name.GROUPTYPENAME,
+          POSTYPENAME: user.user.name.POSTYPENAME,
+          SCOPES: user.user.name.SCOPES.staffdepartmentname,
+          },
+      {
+        responseType: 'blob' // 🔥 สำคัญ 
+        });
+
+        console.log('response: ',response.data); 
+        const url = window.URL.createObjectURL(response.data); 
+        window.open(url, '_blank');  
+      } catch (error) {
+        console.error("Error:", error);
+      } 
     },
 
     async printDataP01() {
