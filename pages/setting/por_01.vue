@@ -1,7 +1,7 @@
 <template>
   <div class="col md:col-12 text-right"> 
+    <!-- <Button label="Export" icon="pi pi-file-word" class="mr-2 mb-2" @click="printDataP01" /> --> 
     <Button label="Export" icon="pi pi-file-word" class="mr-2 mb-2" @click="printDataP01" />
-    <Button label="TestExport" icon="pi pi-file-word" class="mr-2 mb-2" @click="printData" />
   </div> 
   <div class="col md:col-12 text-left" v-if="totalWeight < 100">
     <small style="color: red; font-size: larger;">
@@ -938,11 +938,11 @@ export default {
         .catch((error) => console.error("Error:", error));
     },
 
-    async printData() {
+    async printDataP01() {
       const { getSession } = await useAuth();
       const user = await getSession(); 
       try {
-        const response = await axios.post("http://127.0.0.1:8000/api/exportPdf_Test", {
+        const response = await axios.post("http://127.0.0.1:8000/api/exportPdf_P01", {
           staff_id: this.staffid_Main,
           group_id: this.groupid_Main,
           fac_id: this.dataPor.fac_id,
@@ -968,29 +968,31 @@ export default {
       } 
     },
 
-    async printDataP01() {
-      const { getSession } = await useAuth();
-      const user = await getSession();
+    //Export word (เดิม)
 
-      const form = {
-        staff_id: this.staffid_Main,
-        group_id: this.groupid_Main,
-        fac_id: this.dataPor.fac_id,
-        year_id: this.dataPor.d_date,
-        evalua: this.dataPor.evalua,
-        PREFIXFULLNAME: user.user.name.PREFIXFULLNAME,
-        STAFFNAME: user.user.name.STAFFNAME,
-        STAFFSURNAME: user.user.name.STAFFSURNAME,
-        POSITIONNAME: user.user.name.POSITIONNAME,
-        GROUPTYPENAME: user.user.name.GROUPTYPENAME,
-        POSTYPENAME: user.user.name.POSTYPENAME,
-        SCOPES: user.user.name.SCOPES.staffdepartmentname,
-      };
+    // async printDataP01() {
+    //   const { getSession } = await useAuth();
+    //   const user = await getSession();
 
-      const queryParams = new URLSearchParams(form).toString();
-      const url = `http://127.0.0.1:8000/report_p01?${queryParams}`;
-      window.open(url, "_blank");
-    },
+    //   const form = {
+    //     staff_id: this.staffid_Main,
+    //     group_id: this.groupid_Main,
+    //     fac_id: this.dataPor.fac_id,
+    //     year_id: this.dataPor.d_date,
+    //     evalua: this.dataPor.evalua,
+    //     PREFIXFULLNAME: user.user.name.PREFIXFULLNAME,
+    //     STAFFNAME: user.user.name.STAFFNAME,
+    //     STAFFSURNAME: user.user.name.STAFFSURNAME,
+    //     POSITIONNAME: user.user.name.POSITIONNAME,
+    //     GROUPTYPENAME: user.user.name.GROUPTYPENAME,
+    //     POSTYPENAME: user.user.name.POSTYPENAME,
+    //     SCOPES: user.user.name.SCOPES.staffdepartmentname,
+    //   };
+
+    //   const queryParams = new URLSearchParams(form).toString();
+    //   const url = `http://127.0.0.1:8000/report_p01?${queryParams}`;
+    //   window.open(url, "_blank");
+    // },
 
     OpenDialogP01() {
       axios
