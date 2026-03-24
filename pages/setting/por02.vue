@@ -1,6 +1,7 @@
 <template>
     <div class="col md:col-12 text-right">
-        <Button label="Export" icon="pi pi-file-word" class="mr-2 mb-2 " @click="printDataP01"></Button>
+        <!-- <Button label="Export" icon="pi pi-file-word" class="mr-2 mb-2 " @click="printDataP01"></Button> -->
+        <Button label="Export" icon="pi pi-file-word" class="mr-2 mb-2" @click="printDataP02" />
     </div> 
     <div class="card">
         <h3 class="mb-4" style="text-align: left;">
@@ -491,19 +492,7 @@ export default {
         // โหลด master stf_compentency มา map ชื่อ → WORK_DATAIL
         this.loadCompetencyDescriptions();
     },  
-    // watch: {
-    //     tab2Reload(v) { 
-    //         this.showdataPo();
-    //         this.getjobSpecificCompetencies();
-    //     },  
-    //     dataPor: {
-    //         handler(newVal, oldVal) {
-    //             this.showdataPo();
-    //             this.getjobSpecificCompetencies();
-    //         },
-    //         deep: true 
-    //     },
-    // },
+  
     watch: {
         tab2Reload: {
             async handler() {
@@ -562,27 +551,7 @@ export default {
             } 
         },
 
-        //  getjobSpecificCompetencies(){
-        //     axios.post('   http://127.0.0.1:8000/api/showdataposp02', { 
-        //         p_year: this.dataPor.d_date,
-        //         evalua: this.dataPor.evalua,
-        //         p_staffid: this.staffid_Main
-        //     })
-        //     .then(res => {
-        //         for (let i = 0; i < this.jobSpecificCompetencies.length; i++) {
-        //             if (res.data[0] && res.data[0][`p${i+6}`] !== undefined) {
-        //                 this.jobSpecificCompetencies[i]['SCORE'] = res.data[0][`p${i+6}`];
-        //                 this.jobSpecificCompetencies[i]['SCOREPERSON'] = res.data[0][`pa_${i+6}`];
-        //             }
-        //         }
-        //         for (let i = 0; i < this.otherCompetencies.length; i++) {
-        //             if (res.data[0] && res.data[0][`px_${i+1}`] !== undefined) {
-        //                 this.otherCompetencies[i]['datatable3'] = res.data[0][`px_${i+1}`];
-        //                 this.otherCompetencies[i]['selfAssessment3'] = res.data[0][`pSE_${i+1}`]; 
-        //             }  
-        //         }
-        //     })
-        // },
+        
         async getjobSpecificCompetencies() {
             const res = await axios.post('http://127.0.0.1:8000/api/showdataposp02', {
                 p_year: this.dataPor.d_date,
@@ -606,88 +575,7 @@ export default {
                 selfAssessment3: row[`pSE_${i + 1}`] ?? it.selfAssessment3 ?? ''
             }));
         },
-        
-        //บิวแก้090269
-        // showdataPo(){   
-        //     //  let postypetext = ['128'].includes(this.posadio) ? `ระดับชำนาญการพิเศษ` : `ระดับ${this.postypename}`;
-        //     //  let postypenameid = ['128'].includes(this.posadio) ? 90 : this.postypenameid;
-        //     //  let positionname = ['128'].includes(this.posadio) ? `ระดับชำนาญการพิเศษ` : `ระดับ${this.postypename}`; 
-             
-        //     let postypetext = this.posadio === '128' ? `ระดับชำนาญการพิเศษ` : `ระดับ${this.postypename}`; 
-        //     let postypenameid = this.posadio === '128' ? 90 : this.postypenameid;
-        //     let positionname = this.posadio === '128' ? `ระดับชำนาญการพิเศษ` : `ระดับ${this.postypename}`;  
-    
-        //     // console.log(postypenameid, 'postypenameid');
-
-        //     const levelMapping = {
-        //         'ระดับปฏิบัติการ': 1,
-        //         'ระดับปฏิบัติงาน': 1, 
-        //         'ระดับชำนาญการ': 2,
-        //         'ระดับชำนาญงาน': 2,
-        //         'ระดับชำนาญการพิเศษ': 3,
-        //         'ระดับชำนาญงานพิเศษ': 3,
-        //         'อาจารย์': 3,
-        //         'ระดับเชี่ยวชาญ': 4,
-        //         'ระดับเชี่ยวชาญพิเศษ': 5
-        //     };
-  
-        //     let personnel = levelMapping[postypetext] || 0;
-
-        //     this.coreCompetencies = [
-        //         { id: 1, activity: 'ก. 1 การมุ่งผลสัมฤทธิ์', indicator: personnel, data_table1: '', selfAssessment: '' },
-        //         { id: 2, activity: 'ก. 2 การบริการที่ดี', indicator: personnel, data_table1: '', selfAssessment: '' },
-        //         { id: 3, activity: 'ก. 3 การสั่งสมความเชี่ยวชาญในงานอาชีพ', indicator: personnel, data_table1: '', selfAssessment: '' },
-        //         { id: 4, activity: 'ก. 4 การยึดมั่นในความถูกต้องชอบธรรมและจริยธรรม', indicator: personnel, data_table1: '', selfAssessment: '' },
-        //         { id: 5, activity: 'ก. 5 การทำงานเป็นทีม', indicator: personnel, data_table1: '', selfAssessment: '' }
-        //     ];
-             
-        //     this.jobSpecificCompetencies = [];  
-
-        //     const Mapping = { '128': 1 };   
-        //     const blacklist = ['110105', '110146', '160018',];  //ต้องการให้ผู้บริหารไม่ขึ้นเลข1 ค. ให้ใส่staffid
-        //     let executive = Mapping[this.posadio] || 0;
-        //     if (blacklist.includes(String(this.staffid_Main))) {
-        //         executive = 0;
-        //     }
-
-        //     this.otherCompetencies = [
-        //         { id: 12, activity: 'ค. 1 สภาวะผู้นำ', indicator3: executive, datatable3: '', selfAssessment3: '' },
-        //         { id: 13, activity: 'ค. 2 วิสัยทัศน์', indicator3: executive, datatable3: '', selfAssessment3: '' },
-        //         { id: 14, activity: 'ค. 3 การวางกลยุทธ์ภาครัฐ', indicator3: executive, datatable3: '', selfAssessment3: '' },
-        //         { id: 15, activity: 'ค. 4 ศักยภาพเพื่อนำการปรับเปลี่ยน', indicator3: executive, datatable3: '', selfAssessment3: '' },
-        //         { id: 16, activity: 'ค. 5 การสอนงานและการมอบหมายงาน', indicator3: executive, datatable3: '', selfAssessment3: '' }
-        //     ];
-  
-        //     this.showPostype(positionname, postypenameid);
-  
-        //     axios.post('   http://127.0.0.1:8000/api/showDataPo',{
-        //         staff_id: this.staffid_Main,
-        //         fac_id: this.facid_Main,
-        //         year_id: this.dataPor.d_date,
-        //         record: this.dataPor.evalua,
-        //         postypename: postypetext
-        //         }).then(res => {     
-        //         if (res.data.length > 0) {
-        //             const data = res.data[0]; 
-        //             this.coreCompetencies = this.coreCompetencies.map(item => {
-        //                 if (data[`p${item.id}`] !== undefined) {
-        //                     return {
-        //                         ...item,
-        //                         data_table1: data[`p${item.id}`],
-        //                         selfAssessment: data[`pa_${item.id}`]
-        //                     };
-        //                 }
-        //                 return item;
-        //             });  
-        //             this.improvements = data.improvements ?? '- ไม่มีข้อมูล -';
-        //             this.suggestions = data.suggestions ?? '- ไม่มีข้อมูล -'; 
-        //         } 
-        //     })
-        //     .catch(error => {
-        //         console.error('Error:', error);
-        //     });
-        // },
- 
+       
         async showdataPo() {
 
             // 🔹 เงื่อนไขระดับชำนาญการพิเศษ
@@ -778,21 +666,6 @@ export default {
             });
         },
  
-        // showPostype(postypename, postypenameid){
-        //     const postypetext = postypename;
-        //     axios.post('   http://127.0.0.1:8000/api/showdatapostypenameAdmin', {
-        //         postypename: postypetext,
-        //         postypenameid: postypenameid
-        //     })
-        //     .then(res => {
-        //         if (res.data.length > 0) { 
-        //             this.jobSpecificCompetencies = res.data;
-        //         } 
-        //     })
-        //     .catch(error => {
-        //         console.error('Error fetching data:', error); 
-        //     }); 
-        // },
         async showPostype(postypename, postypenameid) {
             const res = await axios.post('http://127.0.0.1:8000/api/showdatapostypenameAdmin', {
                 postypename,
@@ -822,33 +695,95 @@ export default {
             });
         },
 
-        async printDataP01() { 
-            const { signIn, getSession, signOut } = await useAuth() 
-            const user = await getSession(); 
-            const staffId = String(this.staffid_Main).trim()  
-            const form = {
-                staff_id: this.staffid_Main,
-                group_id: this.groupid_Main,
-                fac_id: this.dataPor.fac_id,
-                year_id: this.dataPor.d_date,
-                evalua: this.dataPor.evalua,
-                PREFIXFULLNAME: user.user.name.PREFIXFULLNAME,
-                STAFFNAME: user.user.name.STAFFNAME,
-                STAFFSURNAME: user.user.name.STAFFSURNAME,
-                POSITIONNAME: user.user.name.POSITIONNAME,
-                GROUPTYPENAME: user.user.name.GROUPTYPENAME,
-                POSTYPENAME: user.user.name.POSTYPENAME, 
-                SCOPES: user.user.name.SCOPES.staffdepartmentname,
-                postypename: `ระดับ${this.postypename}`,
-                postypenameid: this.postypenameid,
-                executive: EXECUTIVE_ALLOWLIST.has(staffId) ? 1 : 0,
-                posadio: this.posadio, // (เผื่อ fallback ใน BE)
+        // async printDataP01() { 
+        //     const { signIn, getSession, signOut } = await useAuth() 
+        //     const user = await getSession(); 
+        //     const staffId = String(this.staffid_Main).trim()  
+        //     const form = {
+        //         staff_id: this.staffid_Main,
+        //         group_id: this.groupid_Main,
+        //         fac_id: this.dataPor.fac_id,
+        //         year_id: this.dataPor.d_date,
+        //         evalua: this.dataPor.evalua,
+        //         PREFIXFULLNAME: user.user.name.PREFIXFULLNAME,
+        //         STAFFNAME: user.user.name.STAFFNAME,
+        //         STAFFSURNAME: user.user.name.STAFFSURNAME,
+        //         POSITIONNAME: user.user.name.POSITIONNAME,
+        //         GROUPTYPENAME: user.user.name.GROUPTYPENAME,
+        //         POSTYPENAME: user.user.name.POSTYPENAME, 
+        //         SCOPES: user.user.name.SCOPES.staffdepartmentname,
+        //         postypename: `ระดับ${this.postypename}`,
+        //         postypenameid: this.postypenameid,
+        //         executive: EXECUTIVE_ALLOWLIST.has(staffId) ? 1 : 0,
+        //         posadio: this.posadio, // (เผื่อ fallback ใน BE)
 
+        //     } 
+        //     const queryParams = new URLSearchParams(form).toString();
+        //     const url = `http://127.0.0.1:8000/report_p02?${queryParams}`;
+        //     window.open(url, '_blank');
+        // },  
+
+        async printDataP02() {
+            const { getSession } = await useAuth();
+            const user = await getSession(); 
+            const staffId = String(this.staffid_Main).trim();
+
+            // เช็ค d_date จาก dataPor เหมือนฟังก์ชันที่ทำได้
+            if (!this.dataPor?.d_date) {
+                Swal.fire('แจ้งเตือน', 'กรุณาเลือกรอบการประเมินก่อน Export', 'warning');
+                return;
+            }
+
+            try {
+                Swal.fire({ 
+                    title: 'กำลังสร้างไฟล์ PDF...', 
+                    allowOutsideClick: false, 
+                    didOpen: () => { Swal.showLoading(); } 
+                });
+
+                const payload = {
+                    staff_id: this.staffid_Main,
+                    group_id: this.groupid_Main,
+                    fac_id: this.dataPor.fac_id, // ใช้ dataPor
+                    year_id: this.dataPor.d_date, // ใช้ dataPor
+                    evalua: this.dataPor.evalua,   // ใช้ dataPor
+                    
+                    PREFIXFULLNAME: user.user.name.PREFIXFULLNAME,
+                    STAFFNAME: user.user.name.STAFFNAME,
+                    STAFFSURNAME: user.user.name.STAFFSURNAME,
+                    POSITIONNAME: user.user.name.POSITIONNAME,
+                    GROUPTYPENAME: user.user.name.GROUPTYPENAME,
+                    POSTYPENAME: user.user.name.POSTYPENAME,
+                    SCOPES: user.user.name.SCOPES.staffdepartmentname,
+                    
+                    // ส่งค่าเพิ่มตามแบบ p01 ที่คุณทำได้
+                    postypename: `ระดับ${this.postypename}`,
+                    postypenameid: this.postypenameid,
+                    executive: (typeof EXECUTIVE_ALLOWLIST !== 'undefined' && EXECUTIVE_ALLOWLIST.has(staffId)) ? 1 : 0,
+                    posadio: this.posadio,
+                    
+                    persen: this.dropdownProportion,
+                    period_text: this.displayEvaluationPeriod,
+                };
+
+                const response = await axios.post("http://127.0.0.1:8000/api/exportPdf_P02", payload, {
+                    responseType: 'blob' 
+                });
+
+                Swal.close();
+
+                const blob = new Blob([response.data], { type: 'application/pdf' });
+                const url = window.URL.createObjectURL(blob);
+                window.open(url, '_blank');
+                
+                setTimeout(() => window.URL.revokeObjectURL(url), 100);
+
+            } catch (error) {
+                Swal.close();
+                console.error("Error exporting PDF:", error);
+                Swal.fire('เกิดข้อผิดพลาด', 'ไม่สามารถสร้างไฟล์ PDF ได้', 'error');
             } 
-            const queryParams = new URLSearchParams(form).toString();
-            const url = `http://127.0.0.1:8000/report_p02?${queryParams}`;
-            window.open(url, '_blank');
-        },     
+        },
 
         // เมื่อคลิกชื่อสมรรถนะ ให้เปิด Dialog
         openCompetencyDialog(type, row, index = null) {

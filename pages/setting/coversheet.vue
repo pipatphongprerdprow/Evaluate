@@ -8,22 +8,7 @@
                             <i class="" style="font-size: x-large"></i> สังกัด: {{ user.user.name.SCOPES?.staffdepartmentname }} 
                         </h5>  
                         <small style="color: red;font-size: larger;">* กรุณาเลือกรอบประเมิน เพื่อทำแบบประเมิน</small>
-                    </div>  
-                    <!-- เลือกหลายรอบ -->
-                    <!-- <div class="col md:col-6">  
-                        <label for="product_date"></label>  
-                        <Dropdown
-                            id="product_date" 
-                            v-model="product_date" 
-                            :options="products_date"
-                            autoFilterFocus
-                            :optionLabel="(item) => `${item.d_evaluationround} ${item.d_date}`"
-                            placeholder="กรุณาเลือกรอบการประเมิน" 
-                            style="max-width: 500px;width: 100%;border: outset;" 
-                            @change="showdatator"
-                        />
-                    </div> -->
-                    <!-- เลือกรอบล่าสุดรอบเดียว --> 
+                    </div>    
                      <div class="col md:col-6">  
                         <label for="product_date"></label>  
                         <Dropdown
@@ -51,7 +36,8 @@
             <TabView :activeIndex="activeIndex" @tabChange="onTabChange" :class="{ 'lock-next-tabs': !isP01WeightOk }" >
                 <TabPanel header="แบบ ใบปะหน้า" value="0">
                     <div class="col md:col-12 text-right">
-                        <Button label="Export" icon="pi pi-file-word" class="mr-2 mb-2" @click="printDataP01" />
+                        <!-- <Button label="Export" icon="pi pi-file-word" class="mr-2 mb-2" @click="printDataP01" /> -->
+                         <Button label="Export" icon="pi pi-file-word" class="mr-2 mb-2" @click="printDatacoverpage" />
                     </div> 
 
                     <div v-if="user.user" class="card"> 
@@ -71,29 +57,8 @@
                             <p><strong>ระดับตำแหน่ง:</strong> {{ user.user?.name.POSITIONNAME === 'ผู้บริหาร' ? 'ชำนาญการพิเศษ' : user.user?.name.POSTYPENAME }}</p> 
                             <!-- <p><strong>ชื่อผู้ประเมิน:</strong> <InputText type="text" placeholder="ชื่อผู้ประเมิน"  v-model="assessor" style="width: 300px;"/></p>  --> 
  
-                            <p>
+                            <!-- <p>
                                 <strong>ชื่อผู้ประเมิน:</strong>
-                                <!-- <AutoComplete
-                                    v-model="assessor"
-                                    :suggestions="staffSuggestions"
-                                    optionLabel="namefully"
-                                    placeholder="ชื่อผู้ประเมิน"
-                                    forceSelection
-                                    dropdown
-                                    @complete="searchStaff"
-                                    style="width: 300px;"
-                                /> -->
-
-                                <!-- <AutoComplete
-                                    v-model="assessor"
-                                    :suggestions="staffSuggestions"
-                                    optionLabel="displayName"
-                                    placeholder="ชื่อผู้ประเมิน"
-                                    forceSelection
-                                    dropdown
-                                    @complete="searchStaff"
-                                    style="width: 300px;"
-                                /> -->
                                 <AutoComplete
                                     v-model="assessor"
                                     :suggestions="staffSuggestions"
@@ -105,32 +70,44 @@
                                     style="width: 300px;"
                                     :disabled="isTorSaved"
                                 /> 
+                            </p>  -->
+                            <p>
+                                <strong>ชื่อผู้ประเมิน:</strong>
+                                <AutoComplete
+                                    v-model="assessor"
+                                    :suggestions="staffSuggestions"
+                                    optionLabel="displayName"
+                                    placeholder="ชื่อผู้ประเมิน"
+                                    forceSelection
+                                    dropdown
+                                    @complete="searchStaff"
+                                    style="width: 300px;"
+                                    :disabled="shouldDisableInput" 
+                                /> 
                             </p> 
+                            <!-- <p>
+                                <strong>ตำแหน่งผู้ประเมิน :</strong> 
+                                <InputText type="text"  placeholder="ตำแหน่งผู้ประเมิน" v-model="assessor_position" style="width: 265px;" :disabled="isTorSaved" />
+                            </p>   -->
                             <p>
                                 <strong>ตำแหน่งผู้ประเมิน :</strong>
-                                <!-- <InputText type="text" placeholder="ตำแหน่งผู้ประเมิน" v-model="assessor_position" style="width: 265px;" /> -->
-                                <InputText type="text"  placeholder="ตำแหน่งผู้ประเมิน" v-model="assessor_position" style="width: 265px;" :disabled="isTorSaved" />
-                            </p>  
-                            <!-- <p>
-                                <strong>รายละเอียดข้อตกลง ระหว่าง วันที่ : </strong>
-                                {{ product_date.d_evaluationround }} {{ product_date.d_date }}
-                            </p> -->
-
+                                <InputText 
+                                    type="text"  
+                                    placeholder="ตำแหน่งผู้ประเมิน" 
+                                    v-model="assessor_position" 
+                                    style="width: 265px;" 
+                                    :disabled="shouldDisableInput" 
+                                />
+                            </p> 
                             <p>
                                 <strong>รายละเอียดข้อตกลง ระหว่าง วันที่ : </strong>
                                     {{ displayEvaluationPeriod }}
                             </p> 
                         </div> 
-                        <br> 
-                        <div class="ml-4 mr-4" style="text-align: center;">
-                            <label for="dropdownProportion"><b>สัดส่วน :</b></label>
-                            <!-- <Dropdown
-                                id="dropdownProportions"
-                                v-model="dropdownProportion"
-                                :options="dropdownProportions"
-                                optionLabel="name"
-                                placeholder="เลือกสัดส่วน"
-                            /> -->
+                        <br>
+                        
+                        <!-- <div class="ml-4 mr-4" style="text-align: center;">
+                            <label for="dropdownProportion"><b>สัดส่วน :</b></label> 
                             <Dropdown
                                 id="dropdownProportions"
                                 v-model="dropdownProportion"
@@ -140,16 +117,21 @@
                                 placeholder="เลือกสัดส่วน"
                                 :disabled="isTorSaved"
                             /> 
+                        </div>  -->
+                        <div class="ml-4 mr-4" style="text-align: center;">
+                            <label for="dropdownProportion"><b>สัดส่วน :</b></label> 
+                            <Dropdown
+                                id="dropdownProportions"
+                                v-model="dropdownProportion"
+                                :options="dropdownProportions"
+                                optionLabel="name"
+                                optionValue="value"
+                                placeholder="เลือกสัดส่วน"
+                                :disabled="shouldDisableInput"
+                            /> 
                         </div> 
                         <br> 
-                        <div class="ml-4 mr-4" style="text-align: center;">
-                            <!-- <Button
-                                icon="pi pi-save"
-                                severity="primary"
-                                class="mb-2 mr-2"
-                                label="บันทึกแบบข้อตกลงภาระงาน"
-                                @click="saveDatator"
-                            />   -->
+                        <!-- <div class="ml-4 mr-4" style="text-align: center;"> 
                             <Button
                                 icon="pi pi-save"
                                 severity="primary"
@@ -158,7 +140,18 @@
                                 :disabled="isTorSaved || isSaving || !product_date?.d_date"
                                 @click="saveDatator"
                             />
-                        </div>    
+                        </div>     -->
+                        <div class="ml-4 mr-4" style="text-align: center; margin-top: 1rem;"> 
+                            <Button
+                                icon="pi pi-save"
+                                severity="primary"
+                                class="mb-2 mr-2"
+                                :label="isExpired ? 'หมดเขตการบันทึก' : (isTorSaved ? 'บันทึกแล้ว' : 'บันทึกแบบข้อตกลงภาระงาน')"
+                                :disabled="shouldDisableInput || isSaving || !product_date?.d_date"
+                                @click="saveDatator"
+                            />
+                            <br />
+                        </div>
                         <div class="explanation">
                             <h4>คำชี้แจง</h4>
                             <p>
@@ -295,16 +288,7 @@ const user = await getSession();
             await this.showDataSet(STAFFID, staffdepartment, groupid);
         }, 
         
-        computed: {
-            // latestProductOnly() {
-            //     if (!this.products_date || this.products_date.length === 0) return [];
-                
-            //     const sorted = [...this.products_date].sort(
-            //         (a, b) => new Date(b.d_date) - new Date(a.d_date)
-            //     );
-            //     // return [sorted[0]];
-            //      return sorted.slice(0, 2); 
-            // },
+        computed: { 
 
             latestProductOnly() { 
                 if (!this.products_date || this.products_date.length === 0) {
@@ -345,7 +329,23 @@ const user = await getSession();
                 const range = map[roundNo];
                 if (!range) return `${roundText}${yearText ? ` ${yearText}` : ''}`.trim(); 
                 return `${roundText} ${range}${yearText ? ` ${yearText}` : ''}`.trim();
-            }, 
+            },
+
+            isExpired() {
+                if (!this.product_date || !this.product_date.d_enddate) return false;
+                const endDate = new Date(this.product_date.d_enddate);
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                return today > endDate;
+            },
+
+            // แก้ไขตรงนี้:
+            shouldDisableInput() {
+                // ถ้าหมดเวลาแล้ว (isExpired) ให้ล็อคแน่นอน
+                // แต่ถ้ายังไม่หมดเวลา ให้เปิดให้กรอกได้เสมอ (ไม่ต้องเอา isTorSaved มาเกี่ยว)
+                return this.isExpired; 
+            },
+
         },
 
         methods: { 
@@ -381,90 +381,11 @@ const user = await getSession();
                     console.error('Error:', error);
                 });
             }, 
-
-            //เลือกรอบล่าสุด
-            // showDataSet() {
-            //     axios.post('http://127.0.0.1:8000/api/showDateSet', {
-            //         staff_id: this.staffid_Main,
-            //         fac_id: this.facid_Main,
-            //         group_id: this.groupid_Main
-            //     })
-            //     .then((res) => {
-            //         this.products_date = res.data || [];
-
-            //         if (this.products_date.length > 0) {
-            //         const latest = [...this.products_date].sort(
-            //             (a, b) => new Date(b.d_date) - new Date(a.d_date)
-            //         )[0];
-
-            //         this.product_date = latest;     // set ให้ v-model
-            //         this.showdatator();             // โหลด TOR ตามรอบล่าสุด
-            //         }
-            //     })
-            //     .catch((error) => {
-            //         console.error('Error:', error);
-            //     });
-            // }, 
-
-
-            // saveDatator() {
-            //     if (this.product_date.d_date == null || this.product_date.d_date == undefined) {
-            //         Swal.fire('error', 'กรุณาเลือก รอบการประเมิน ก่อน', 'error'); 
-            //     } else {
-            //         if (!this.assessor) {
-            //             Swal.fire('error', 'กรุณากรอกชื่อผู้ประเมินให้ครบถ้วน', 'error');
-            //         } else if (!this.assessor_position) {
-            //             Swal.fire('error', 'กรุณากรอกชื่อและตำแหน่งผู้ประเมินให้ครบถ้วน', 'error');
-            //         } else if (this.dropdownProportion == null || this.dropdownProportion == undefined) {
-            //             Swal.fire('error', 'กรุณาเลือก สัดส่วน', 'error');
-            //         } else { 
-            //             const assessorName =
-            //                 // this.assessor && typeof this.assessor === 'object'
-            //                 //     ? this.assessor.namefully
-            //                 //     : this.assessor;
-            //                  this.assessor && typeof this.assessor === 'object'
-            //                     ? (this.assessor.displayName || this.assessor.namefully)
-            //                     : (this.assessor || '');
-
-            //             const formData = {
-            //                 p_year: this.product_date.d_date,
-            //                 evalua: this.product_date.evalua,
-            //                 p_staffid: this.staffid_Main,
-            //                 staffid_name: this.staffid_name,
-            //                 pos_id: this.pos_id,
-            //                 postype_id: this.postype_id,
-            //                 fac_id: this.facid_Main,
-            //                 // dropdownProportion: this.dropdownProportion.value, 
-            //                 dropdownProportion: this.dropdownProportion, 
-            //                 assessor: assessorName, 
-            //                 assessor_position: this.assessor_position,
-            //                 record_evalua: this.displayEvaluationPeriod,
-
-            //             }; 
-
-            //             axios.post('http://127.0.0.1:8000/api/saveDatator', formData)
-            //                 .then(response => { 
-            //                     this.DialogScore = false; 
-            //                     Swal.fire({
-            //                         position: 'top-end',
-            //                         icon: 'success',
-            //                         title: 'บันทึกข้อตกลงภาระงานเรียบร้อย',
-            //                         showConfirmButton: false,
-            //                         timer: 1500
-            //                     });
-            //                 })
-            //                 .catch(error => {
-            //                     console.error('Error saving data:', error);
-            //                     Swal.fire('error', 'การบันทึกข้อมูลล้มเหลว', 'error');
-            //                 });  
-            //         }   
-            //     } 
-            // },
             saveDatator() {
-                if (this.isTorSaved) {
-                    Swal.fire('แจ้งเตือน', 'รอบประเมินนี้เคยบันทึกข้อมูลแล้ว ไม่สามารถบันทึกซ้ำได้', 'warning');
-                    return;
-                }
+                // if (this.isTorSaved) {
+                //     Swal.fire('แจ้งเตือน', 'รอบประเมินนี้เคยบันทึกข้อมูลแล้ว ไม่สามารถบันทึกซ้ำได้', 'warning');
+                //     return;
+                // }
 
                 if (this.product_date.d_date == null || this.product_date.d_date == undefined) {
                     Swal.fire('error', 'กรุณาเลือก รอบการประเมิน ก่อน', 'error'); 
@@ -509,7 +430,7 @@ const user = await getSession();
 
                 axios.post('http://127.0.0.1:8000/api/saveDatator', formData)
                     .then(response => {
-                        this.isTorSaved = true; // บันทึกเสร็จแล้ว ห้ามกดซ้ำ
+                        // this.isTorSaved = true; // บันทึกเสร็จแล้ว ห้ามกดซ้ำ
 
                         Swal.fire({
                             position: 'top-end',
@@ -526,38 +447,10 @@ const user = await getSession();
                     .finally(() => {
                         this.isSaving = false;
                     });
-            },
-
-            // showdatator() { 
-            //     axios.post('http://127.0.0.1:8000/api/showdatator', {
-            //         p_year: this.product_date.d_date,
-            //         evalua: this.product_date.evalua,
-            //         p_staffid: this.staffid_Main
-            //     })
-            //     .then(response => {
-            //         const dataSet = response.data[0] || {};
-
-            //         // this.assessor = dataSet.assessor || null;    
-            //         const nameFromDb = dataSet.assessor || '';
-            //             this.assessor = nameFromDb
-            //             ? { displayName: nameFromDb, namefully: nameFromDb }
-            //             : null;
-
-            //          this.assessor_position = dataSet.assessor_position || null;
-                    
-
-            //         this.assessor_position = dataSet.assessor_position || null; 
-
-            //         // const persen = this.dropdownProportions.filter(f => f.value == dataSet.persen);
-            //         // this.dropdownProportion = persen.length > 0 ? persen[0] : null;  
-            //         this.dropdownProportion = dataSet.persen || null;  // ควรเป็น "50:50" หรือ "70:30"
-            //     })
-            //     .catch(error => { 
-            //     });
-            // },   
+            },  
             showdatator() {
                 // reset ก่อนทุกครั้งที่เปลี่ยนรอบ
-                this.isTorSaved = false;
+                //this.isTorSaved = false;
                 this.assessor = null;
                 this.assessor_position = null;
                 this.dropdownProportion = null;
@@ -572,7 +465,7 @@ const user = await getSession();
                     const dataSet = rows[0] || {};
 
                     // ถ้ามีข้อมูล แปลว่าเคยบันทึกแล้ว
-                    this.isTorSaved = rows.length > 0;
+                    //this.isTorSaved = rows.length > 0;
 
                     const nameFromDb = dataSet.assessor || '';
                     this.assessor = nameFromDb
@@ -583,59 +476,14 @@ const user = await getSession();
                     this.dropdownProportion = dataSet.persen || null;
                 })
                 .catch(error => {
-                    this.isTorSaved = false;
+                    //this.isTorSaved = false;
                     this.assessor = null;
                     this.assessor_position = null;
                     this.dropdownProportion = null;
                     console.error(error);
                 });
             },
-                        
-            
-
-
-            // onTabChange(event) {
-            //     // ต้องเลือกรอบก่อน
-            //     if (!this.product_date?.d_date) {
-            //         Swal.fire({
-            //         icon: 'warning',
-            //         title: 'แจ้งเตือน',
-            //         text: 'กรุณาเลือก รอบการประเมิน ก่อน !',
-            //         confirmButtonText: 'ตกลง'
-            //         });
-
-            //         // ดึงกลับแท็บเดิม
-            //         this.activeIndex = this.currenttap ?? 0;
-            //         return;
-            //     }
-
-            //     // ถ้าจะไปแท็บ 2-4 แต่ weight ไม่ครบ/เกิน => กัน
-            //     if (event.index >= 2 && !this.isP01WeightOk) {
-            //         const w = Number(this.p01TotalWeight || 0);
-            //         const msg = w > 100
-            //         ? `คะแนนรวมน้ำหนัก = ${w}% เกิน 100% กรุณาปรับให้เท่ากับ 100%`
-            //         : `คะแนนรวมน้ำหนัก = ${w}% ยังไม่ครบ 100% กรุณาปรับให้เท่ากับ 100%`;
-
-            //         Swal.fire({
-            //         icon: 'warning',
-            //         title: 'ยังไปแท็บอื่นไม่ได้',
-            //         text: msg,
-            //         confirmButtonText: 'ตกลง'
-            //         });
-
-            //         this.activeIndex = 1;   // บังคับค้างที่ ป01
-            //         this.currenttap = 1;
-            //         return;
-            //     }
-
-            //     // ผ่านแล้วค่อยเปลี่ยน
-            //     this.activeIndex = event.index;
-            //     this.currenttap = event.index;
-
-            //     if (event.index == 2) this.por02key++;
-            //     else if (event.index == 3) this.por03key++;
-            //     else if (event.index == 4) this.por04key++;
-            // },
+        
             onTabChange(event) {
                 if (!this.product_date?.d_date) {
                     Swal.fire({
@@ -681,54 +529,88 @@ const user = await getSession();
                 }
             }, 
             
-            async printDataP01() { 
-                const { signIn, getSession, signOut } = await useAuth();
-                const user = await getSession();     
+            // async printDataP01() { 
+            //     const { signIn, getSession, signOut } = await useAuth();
+            //     const user = await getSession();     
 
-                const form = {
-                    staff_id: this.staffid_Main,
-                    group_id: this.groupid_Main,
-                    fac_id: this.facid_Main,
-                    year_id: this.product_date.d_date,
-                    evalua: this.product_date.evalua,
+            //     const form = {
+            //         staff_id: this.staffid_Main,
+            //         group_id: this.groupid_Main,
+            //         fac_id: this.facid_Main,
+            //         year_id: this.product_date.d_date,
+            //         evalua: this.product_date.evalua,
 
-                    period_text: this.displayEvaluationPeriod,
-                    persen: this.dropdownProportion,    
+            //         period_text: this.displayEvaluationPeriod,
+            //         persen: this.dropdownProportion,    
 
-                    PREFIXFULLNAME: user.user.name.PREFIXFULLNAME,
-                    STAFFNAME: user.user.name.STAFFNAME,
-                    STAFFSURNAME: user.user.name.STAFFSURNAME,
-                    POSITIONNAME: user.user.name.POSITIONNAME,
-                    GROUPTYPENAME: user.user.name.GROUPTYPENAME,
-                    POSTYPENAME: user.user.name.POSTYPENAME, 
-                    SCOPES: user.user.name.SCOPES.staffdepartmentname 
-                };
+            //         PREFIXFULLNAME: user.user.name.PREFIXFULLNAME,
+            //         STAFFNAME: user.user.name.STAFFNAME,
+            //         STAFFSURNAME: user.user.name.STAFFSURNAME,
+            //         POSITIONNAME: user.user.name.POSITIONNAME,
+            //         GROUPTYPENAME: user.user.name.GROUPTYPENAME,
+            //         POSTYPENAME: user.user.name.POSTYPENAME, 
+            //         SCOPES: user.user.name.SCOPES.staffdepartmentname 
+            //     };
 
-                const queryParams = new URLSearchParams(form).toString();
-                const url = `http://127.0.0.1:8000/printReportCoverpage?${queryParams}`;
-                window.location.href = url;
-            },  
-
-            // searchStaff(event) {
-            //     const query = (event.query || '').trim();
-
-            //     if (!query || query.length < 2) {
-            //         this.staffSuggestions = [];
-            //         return;
-            //     }
-
-            //     axios.get('http://127.0.0.1:8000/api/searchDataStaff', {
-            //         params: {
-            //             staffid: query    
-            //         }
-            //     })
-            //     .then((res) => { 
-            //         this.staffSuggestions = res.data || []; 
-            //     })
-            //     .catch((error) => {
-            //         this.staffSuggestions = [];
-            //     });
+            //     const queryParams = new URLSearchParams(form).toString();
+            //     const url = `http://127.0.0.1:8000/printReportCoverpage?${queryParams}`;
+            //     window.location.href = url;
             // }, 
+
+            async printDatacoverpage() {
+                const { getSession } = await useAuth();
+                const user = await getSession(); 
+
+                // ตรวจสอบก่อนว่าเลือกรอบการประเมินหรือยัง
+                if (!this.product_date?.d_date) {
+                    Swal.fire('แจ้งเตือน', 'กรุณาเลือกรอบการประเมินก่อน Export', 'warning');
+                    return;
+                }
+
+                try {
+                    // แสดง Loading สักครู่
+                    Swal.fire({ title: 'กำลังสร้างไฟล์ PDF...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
+
+                    const response = await axios.post("http://127.0.0.1:8000/api/exportPdf_coverpage", {
+                        // ส่งค่า ID ต่างๆ ที่ Backend ต้องการ
+                        staff_id: this.staffid_Main,
+                        group_id: this.groupid_Main,
+                        fac_id: this.facid_Main, // แก้จาก this.dataPor เป็น this.facid_Main
+                        year_id: this.product_date.d_date,
+                        evalua: this.product_date.evalua,
+                        
+                        // ข้อมูลสำหรับแสดงผลในหน้าใบปะหน้า
+                        PREFIXFULLNAME: user.user.name.PREFIXFULLNAME,
+                        STAFFNAME: user.user.name.STAFFNAME,
+                        STAFFSURNAME: user.user.name.STAFFSURNAME,
+                        POSITIONNAME: user.user.name.POSITIONNAME,
+                        GROUPTYPENAME: user.user.name.GROUPTYPENAME,
+                        POSTYPENAME: user.user.name.POSTYPENAME,
+                        SCOPES: user.user.name.SCOPES.staffdepartmentname,
+                        
+                        // ข้อมูลเพิ่มเติมที่แสดงในใบปะหน้า (สัดส่วน และ รอบวันที่)
+                        persen: this.dropdownProportion,
+                        period_text: this.displayEvaluationPeriod,
+                    }, {
+                        responseType: 'blob' // สำคัญมากสำหรับการรับไฟล์ PDF
+                    });
+
+                    Swal.close();
+
+                    // สร้าง URL สำหรับเปิด PDF ใน Tab ใหม่
+                    const blob = new Blob([response.data], { type: 'application/pdf' });
+                    const url = window.URL.createObjectURL(blob);
+                    window.open(url, '_blank');
+                    
+                    // ล้างหน่วยความจำ
+                    setTimeout(() => window.URL.revokeObjectURL(url), 100);
+
+                } catch (error) {
+                    Swal.close();
+                    console.error("Error exporting PDF:", error);
+                    Swal.fire('เกิดข้อผิดพลาด', 'ไม่สามารถสร้างไฟล์ PDF ได้', 'error');
+                } 
+            },
 
             searchStaff(event) {
                 const query = (event.query || '').trim();
