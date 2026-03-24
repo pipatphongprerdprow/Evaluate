@@ -2,7 +2,8 @@
     <div class="grid">
         <div class="col-12 lg:col-12 xl:col-12">
             <div class="col md:col-12 text-right">
-                <Button label="Export" icon="pi pi-file-word" class="mr-2 mb-2 " @click="printDataP03"></Button>
+                <!-- <Button label="Export" icon="pi pi-file-word" class="mr-2 mb-2 " @click="printDataP03"></Button> -->
+                <Button label="TestExport" icon="pi pi-file-word" class="mr-2 mb-2" @click="printDataP03" />
             </div>   
               <!-- {{ user }} -->
             <div class="card mb-0">
@@ -2401,47 +2402,54 @@ import InputText from 'primevue/inputtext';
                 .catch((error) => {
                     console.error('Error:', error);
                 }); 
-            }, 
+            },
+
             // async printDataP03() { 
-            //     const { signIn, getSession, signOut } = await useAuth()
-            //     const user = await getSession();     
+            //     const { getSession } = await useAuth();
+            //     const user = await getSession();
+
+            //     // ✅ ให้แน่ใจว่า posadio ถูกโหลดแล้วก่อน export
+            //     await this.getAadioPosition(this.staffid_Main);
+
+            //     const staffId = String(this.staffid_Main).trim();
+            //     const executive = EXECUTIVE_ALLOWLIST.has(staffId) ? 1 : 0;
+
             //     const form = {
             //         staff_id: this.staffid_Main,
             //         group_id: this.groupid_Main,
             //         fac_id: this.dataPor.fac_id,
             //         year_id: this.dataPor.d_date,
             //         evalua: this.dataPor.evalua,
-            //         PREFIXFULLNAME:user.user.name.PREFIXFULLNAME,
-            //         STAFFNAME :user.user.name.STAFFNAME,
-            //         STAFFSURNAME:user.user.name.STAFFSURNAME,
-            //         POSITIONNAME:user.user.name.POSITIONNAME,
-            //         GROUPTYPENAME:user.user.name.GROUPTYPENAME,
-            //         POSTYPENAME:user.user.name.POSTYPENAME, 
-            //         SCOPES:user.user.name.SCOPES.staffdepartmentname,
-            //         postypename: `ระดับ${this.postypename}`   
-            //     } 
+
+            //         PREFIXFULLNAME: user.user.name.PREFIXFULLNAME,
+            //         STAFFNAME: user.user.name.STAFFNAME,
+            //         STAFFSURNAME: user.user.name.STAFFSURNAME,
+            //         POSITIONNAME: user.user.name.POSITIONNAME,
+            //         GROUPTYPENAME: user.user.name.GROUPTYPENAME,
+            //         POSTYPENAME: user.user.name.POSTYPENAME,
+            //         SCOPES: user.user.name.SCOPES.staffdepartmentname,
+
+            //         postypename: `ระดับ${this.postypename}`,
+
+            //         // ✅ เพิ่ม 2 ตัวนี้
+            //         posadio: String(this.posadio ?? ''),
+            //         executive: String(executive),
+            //     };
+
             //     const queryParams = new URLSearchParams(form).toString();
-            //     // console.log(queryParams); 
-            //     const url = `   http://127.0.0.1:8000/report_p03?${queryParams}`;
-            //     window.open(url, '_blank'); 
-            // },  
-            async printDataP03() { 
+            //     const url = `http://127.0.0.1:8000/report_p03?${queryParams}`;
+            //     window.open(url, "_blank");
+            // },
+            async printDataP03() {
                 const { getSession } = await useAuth();
-                const user = await getSession();
-
-                // ✅ ให้แน่ใจว่า posadio ถูกโหลดแล้วก่อน export
-                await this.getAadioPosition(this.staffid_Main);
-
-                const staffId = String(this.staffid_Main).trim();
-                const executive = EXECUTIVE_ALLOWLIST.has(staffId) ? 1 : 0;
-
-                const form = {
+                const user = await getSession(); 
+                try {
+                    const response = await axios.post("http://127.0.0.1:8000/api/exportPdf_P03", {
                     staff_id: this.staffid_Main,
                     group_id: this.groupid_Main,
                     fac_id: this.dataPor.fac_id,
                     year_id: this.dataPor.d_date,
                     evalua: this.dataPor.evalua,
-
                     PREFIXFULLNAME: user.user.name.PREFIXFULLNAME,
                     STAFFNAME: user.user.name.STAFFNAME,
                     STAFFSURNAME: user.user.name.STAFFSURNAME,
@@ -2449,20 +2457,19 @@ import InputText from 'primevue/inputtext';
                     GROUPTYPENAME: user.user.name.GROUPTYPENAME,
                     POSTYPENAME: user.user.name.POSTYPENAME,
                     SCOPES: user.user.name.SCOPES.staffdepartmentname,
+                    },
+                {
+                    responseType: 'blob' // 🔥 สำคัญ 
+                    });
 
-                    postypename: `ระดับ${this.postypename}`,
-
-                    // ✅ เพิ่ม 2 ตัวนี้
-                    posadio: String(this.posadio ?? ''),
-                    executive: String(executive),
-                };
-
-                const queryParams = new URLSearchParams(form).toString();
-                const url = `http://127.0.0.1:8000/report_p03?${queryParams}`;
-                window.open(url, "_blank");
+                    console.log('response: ',response.data); 
+                    const url = window.URL.createObjectURL(response.data); 
+                    window.open(url, '_blank');  
+                } catch (error) {
+                    console.error("Error:", error);
+                } 
             },
-            
-            
+             
              // แก้ไขตัวชี้วัด / เกณฑ์การประเมิน
             EditRegislickP03(data){
                 //console.log(data);
