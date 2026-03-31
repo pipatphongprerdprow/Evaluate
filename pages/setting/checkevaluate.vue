@@ -86,7 +86,8 @@
 
                             <TabPanel header="แบบใบปะหน้า"> 
                                     <div class="col md:col-12 text-right">
-                                        <Button label="Export_ใบปะหน้า" icon="pi pi-file-word" class="mr-2 mb-2 " @click="printDatacoversheet"></Button>
+                                        <!-- <Button label="Export_ใบปะหน้า" icon="pi pi-file-word" class="mr-2 mb-2 " @click="printDatacoversheet"></Button> -->
+                                        <Button label="Export_ใบปะหน้า" icon="pi pi-file-pdf" class="mr-2 mb-2 " @click="printDatacoversheetpdf"></Button>
                                     </div> 
                                     <div class="card">
                                         <h3 class="mb-4" style="text-align: right;">
@@ -139,9 +140,12 @@
                             <!-- Tab 2 -->
                             <TabPanel header="รายงาน ป.01 - ป.03" >
                                  <div class="col-12 text-right">
-                                    <Button label="Export_ป.01" icon="pi pi-file-word" class="mr-2 mb-2" @click="printDataP01" />
-                                    <Button label="Export_ป.02" icon="pi pi-file-word" class="mr-2 mb-2" @click="printDataP02" />
-                                    <Button label="Export_ป.03" icon="pi pi-file-word" class="mr-2 mb-2" @click="printDataP03" />
+                                    <!-- <Button label="Export_ป.01" icon="pi pi-file-word" class="mr-2 mb-2" @click="printDataP01" /> -->
+                                     <!-- <Button label="Export_ป.02" icon="pi pi-file-word" class="mr-2 mb-2" @click="printDataP02" /> -->
+                                      <!-- <Button label="Export_ป.03" icon="pi pi-file-word" class="mr-2 mb-2" @click="printDataP03" /> -->
+                                    <Button label="Export_ป.01" icon="pi pi-file-pdf" class="mr-2 mb-2" @click="printDataP01pdf" /> 
+                                    <Button label="Export_ป.02" icon="pi pi-file-pdf" class="mr-2 mb-2" @click="printDataP02pdf" /> 
+                                    <Button label="Export_ป.03" icon="pi pi-file-pdf" class="mr-2 mb-2" @click="printDataP03pdf" />
                                 </div>
                                 <div class="grid">
                                     <div class="col-12 lg:col-12 xl:col-12">
@@ -515,7 +519,8 @@
                             <!-- Tab 4 --> 
                             <TabPanel header="รายงาน ป.04">
                                 <div class="col md:col-12 text-right">
-                                    <Button label="Export_ป.04" icon="pi pi-file-word" class="mr-2 mb-2 " @click="printDataP04"></Button>
+                                    <!-- <Button label="Export_ป.04" icon="pi pi-file-word" class="mr-2 mb-2 " @click="printDataP04"></Button> -->
+                                    <Button label="Export_ป.04" icon="pi pi-file-word" class="mr-2 mb-2 " @click="printDataP04pdf"></Button>
                                 </div> 
                                 <div class="card">
                                     <h4 style="text-align: left">แบบสรุปการประเมินผล</h4>
@@ -2177,212 +2182,388 @@ export default {
                     timer: 1000
                 });
             }
-        },    
-        async printDatacoversheet() { 
-            // console.log('printStaffData: ',this.printStaffData);
-            
-            const { signIn, getSession, signOut } = await useAuth()
-            const user = await getSession();     
-            // const form = {
-            //     // staff_id: this.staffid_Main, // รหัสพันงาน
-            //     group_id: this.groupid_Main, // กลุ่ม?
-            //     fac_id: this.facid_Main, // คณะ
-            //     year_id: this.tracking_date.d_date, // ปี
-            //     evalua: this.tracking_date.evalua , // รอบ
-            //     PREFIXFULLNAME:user.user.name.PREFIXFULLNAME, // คำนำนาย
-            //     STAFFNAME :user.user.name.STAFFNAME, // ชื่อ
-            //     STAFFSURNAME:user.user.name.STAFFSURNAME, // สกุล
-            //     POSITIONNAME:user.user.name.POSITIONNAME, // ตำแหน่ง
-            //     GROUPTYPENAME:user.user.name.GROUPTYPENAME, // พนักงาน
-            //     POSTYPENAME:user.user.name.POSTYPENAME, // ปฏิบัติการ
-            //     SCOPES:user.user.name.SCOPES.staffdepartmentname // สังกัด
-            // }
-            const form = {
-                staff_id: this.printStaffData.staffid, // รหัสพันงาน
-                group_id: this.groupid_Main, // กลุ่ม
-                fac_id: this.facid_Main, // คณะ
-                year_id: this.tracking_date.d_date, // ปี
-                evalua: this.tracking_date.evalua , // รอบ
-                PREFIXFULLNAME: this.printStaffData.prefixfullname, // คำนำนาย
-                STAFFNAME : this.printStaffData.staffname, // ชื่อ
-                STAFFSURNAME: this.printStaffData.staffsurname, // สกุล
-                POSITIONNAME: this.printStaffData.posnameth, // ตำแหน่ง
-                GROUPTYPENAME: this.printStaffData.stftypename, // พนักงาน
-                POSTYPENAME: this.printStaffData.postypenameth, // ปฏิบัติการ
-                SCOPES: this.printStaffData.departmentname // สังกัด
-            }
-            // console.log('form: ',form);
+        },  
 
-            const queryParams = new URLSearchParams(form).toString();
-            // console.log(queryParams); 
-            const url = `    http://127.0.0.1:8000/printReportCoverpage?${queryParams}`;
-            window.location.href = url;
+        //print word ใบปะหน้า
+        // async printDatacoversheet() { 
+        //     // console.log('printStaffData: ',this.printStaffData); 
+        //     const { signIn, getSession, signOut } = await useAuth()
+        //     const user = await getSession();     
+        //     const form = {
+        //         staff_id: this.printStaffData.staffid, // รหัสพันงาน
+        //         group_id: this.groupid_Main, // กลุ่ม
+        //         fac_id: this.facid_Main, // คณะ
+        //         year_id: this.tracking_date.d_date, // ปี
+        //         evalua: this.tracking_date.evalua , // รอบ
+        //         PREFIXFULLNAME: this.printStaffData.prefixfullname, // คำนำนาย
+        //         STAFFNAME : this.printStaffData.staffname, // ชื่อ
+        //         STAFFSURNAME: this.printStaffData.staffsurname, // สกุล
+        //         POSITIONNAME: this.printStaffData.posnameth, // ตำแหน่ง
+        //         GROUPTYPENAME: this.printStaffData.stftypename, // พนักงาน
+        //         POSTYPENAME: this.printStaffData.postypenameth, // ปฏิบัติการ
+        //         SCOPES: this.printStaffData.departmentname // สังกัด
+        //     }
+        //     // console.log('form: ',form); 
+        //     const queryParams = new URLSearchParams(form).toString();
+        //     // console.log(queryParams); 
+        //     const url = `    http://127.0.0.1:8000/printReportCoverpage?${queryParams}`;
+        //     window.location.href = url;
  
-        },   
-        async printDataP01() {  
-            const { signIn, getSession, signOut } = await useAuth()
-            const user = await getSession(); 
-            // console.log(user.user.name);   
-            // const form = {
-            //     staff_id: this.staffid_Main,
-            //     group_id: this.groupid_Main,
-            //     fac_id: this.tracking_date.fac_id,
-            //     year_id: this.tracking_date.d_date,
-            //     evalua: this.tracking_date.evalua,
-            //     PREFIXFULLNAME:user.user.name.PREFIXFULLNAME,
-            //     STAFFNAME :user.user.name.STAFFNAME,
-            //     STAFFSURNAME:user.user.name.STAFFSURNAME,
-            //     POSITIONNAME:user.user.name.POSITIONNAME,
-            //     GROUPTYPENAME:user.user.name.GROUPTYPENAME,
-            //     POSTYPENAME:user.user.name.POSTYPENAME, 
-            //     SCOPES:user.user.name.SCOPES.staffdepartmentname
-            // }
-              const form = {
-                staff_id: this.printStaffData.staffid, // รหัสพันงาน
-                group_id: this.groupid_Main, // กลุ่ม
-                fac_id: this.facid_Main, // คณะ
-                year_id: this.tracking_date.d_date, // ปี
-                evalua: this.tracking_date.evalua , // รอบ
-                PREFIXFULLNAME: this.printStaffData.prefixfullname, // คำนำนาย
-                STAFFNAME : this.printStaffData.staffname, // ชื่อ
-                STAFFSURNAME: this.printStaffData.staffsurname, // สกุล
-                POSITIONNAME: this.printStaffData.posnameth, // ตำแหน่ง
-                GROUPTYPENAME: this.printStaffData.stftypename, // พนักงาน
-                POSTYPENAME: this.printStaffData.postypenameth, // ปฏิบัติการ
-                SCOPES: this.printStaffData.departmentname // สังกัด
-            }
-            
-            const queryParams = new URLSearchParams(form).toString();
-            // console.log(queryParams); 
-            const url = `    http://127.0.0.1:8000/report_p01?${queryParams}`;
-            window.open(url, '_blank');
- 
+        // },  
+
+        async printDatacoversheetpdf() {
+            const { getSession } = await useAuth();
+            const user = await getSession();  
+            try {
+                // แสดง Loading สักครู่
+                Swal.fire({ title: 'กำลังสร้างไฟล์ PDF...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
+
+                const response = await axios.post("http://127.0.0.1:8000/api/exportPdf_coverpage", {
+                    staff_id: this.printStaffData.staffid,
+                    group_id: this.groupid_Main,
+                    fac_id: this.facid_Main,
+                    year_id: this.tracking_date.d_date,
+                    evalua: this.tracking_date.evalua,
+
+                    PREFIXFULLNAME: this.printStaffData.prefixfullname,
+                    STAFFNAME : this.printStaffData.staffname,
+                    STAFFSURNAME: this.printStaffData.staffsurname,
+                    POSITIONNAME: this.printStaffData.posnameth,
+                    GROUPTYPENAME: this.printStaffData.stftypename,
+                    POSTYPENAME: this.printStaffData.postypenameth,
+                    SCOPES: this.printStaffData.departmentname, 
+                    persen: this.persen,
+                    period_text: this.period_text
+                }, {
+                    responseType: 'blob'
+                });
+
+                Swal.close();
+
+                // สร้าง URL สำหรับเปิด PDF ใน Tab ใหม่
+                const blob = new Blob([response.data], { type: 'application/pdf' });
+                const url = window.URL.createObjectURL(blob);
+                window.open(url, '_blank');
+                
+                // ล้างหน่วยความจำ
+                setTimeout(() => window.URL.revokeObjectURL(url), 100);
+
+            } catch (error) {
+                Swal.close();
+                console.error("Error exporting PDF:", error);
+                Swal.fire('เกิดข้อผิดพลาด', 'ไม่สามารถสร้างไฟล์ PDF ได้', 'error');
+            } 
         },
-        async printDataP02() { 
-            const { signIn, getSession, signOut } = await useAuth() 
-            const user = await getSession();   
-            // const form = {
-            //     staff_id: this.staffid_Main,
-            //     group_id: this.groupid_Main,
-            //     fac_id: this.tracking_date.fac_id,
-            //     year_id: this.tracking_date.d_date,
-            //     evalua: this.tracking_date.evalua,
-            //     PREFIXFULLNAME:user.user.name.PREFIXFULLNAME,
-            //     STAFFNAME :user.user.name.STAFFNAME,
-            //     STAFFSURNAME:user.user.name.STAFFSURNAME,
-            //     POSITIONNAME:user.user.name.POSITIONNAME,
-            //     GROUPTYPENAME:user.user.name.GROUPTYPENAME,
-            //     POSTYPENAME:user.user.name.POSTYPENAME, 
-            //     SCOPES:user.user.name.SCOPES.staffdepartmentname,
-            //     postypename: `ระดับ${this.postypename}`,
-            //     postypenameid: this.postypenameid
-            // } 
-              const form = {
-                staff_id: this.printStaffData.staffid, // รหัสพันงาน
-                group_id: this.groupid_Main, // กลุ่ม
-                fac_id: this.facid_Main, // คณะ
-                year_id: this.tracking_date.d_date, // ปี
-                evalua: this.tracking_date.evalua , // รอบ
-                PREFIXFULLNAME: this.printStaffData.prefixfullname, // คำนำหน้า
-                STAFFNAME : this.printStaffData.staffname, // ชื่อ
-                STAFFSURNAME: this.printStaffData.staffsurname, // สกุล
-                POSITIONNAME: this.printStaffData.posnameth, // ตำแหน่ง
-                GROUPTYPENAME: this.printStaffData.stftypename, // พนักงาน
-                POSTYPENAME: this.printStaffData.postypenameth, // ปฏิบัติการ
-                SCOPES: this.printStaffData.departmentname, // สังกัด
-                postypename: `ระดับ${this.printStaffData.postypenameth}`, // ระดับ
-                postypenameid: this.printStaffData.posnameth === 'ผู้บริหาร' ? 90 : this.printStaffData.posnameid
-                // postypename: `ระดับ${this.postypename}`, // ระดับ
-                // postypenameid: this.postypenameid 
-            }
-
-            console.log('printStaffData: ',this.printStaffData);
-            console.log('form: ',form);
-
-            const queryParams = new URLSearchParams(form).toString();
-            // console.log(queryParams); 
-            const url = `   http://127.0.0.1:8000/report_p02?${queryParams}`;
-            window.open(url, '_blank');
+        
+         //print word ป.01
+        // async printDataP01() {  
+        //     const { signIn, getSession, signOut } = await useAuth()
+        //     const user = await getSession(); 
+        //     // console.log(user.user.name);  
+        //       const form = {
+        //         staff_id: this.printStaffData.staffid, // รหัสพันงาน
+        //         group_id: this.groupid_Main, // กลุ่ม
+        //         fac_id: this.facid_Main, // คณะ
+        //         year_id: this.tracking_date.d_date, // ปี
+        //         evalua: this.tracking_date.evalua , // รอบ
+        //         PREFIXFULLNAME: this.printStaffData.prefixfullname, // คำนำนาย
+        //         STAFFNAME : this.printStaffData.staffname, // ชื่อ
+        //         STAFFSURNAME: this.printStaffData.staffsurname, // สกุล
+        //         POSITIONNAME: this.printStaffData.posnameth, // ตำแหน่ง
+        //         GROUPTYPENAME: this.printStaffData.stftypename, // พนักงาน
+        //         POSTYPENAME: this.printStaffData.postypenameth, // ปฏิบัติการ
+        //         SCOPES: this.printStaffData.departmentname // สังกัด
+        //     }
+            
+        //     const queryParams = new URLSearchParams(form).toString();
+        //     // console.log(queryParams); 
+        //     const url = `    http://127.0.0.1:8000/report_p01?${queryParams}`;
+        //     window.open(url, '_blank'); 
+        // },
  
-        },  
-        async printDataP03() { 
-                const { signIn, getSession, signOut } = await useAuth()
-                const user = await getSession();     
-                // const form = {
-                //     staff_id: this.staffid_Main,
-                //     group_id: this.groupid_Main,
-                //     fac_id: this.tracking_date.fac_id,
-                //     year_id: this.tracking_date.d_date,
-                //     evalua: this.tracking_date.evalua,
-                //     PREFIXFULLNAME:user.user.name.PREFIXFULLNAME,
-                //     STAFFNAME :user.user.name.STAFFNAME,
-                //     STAFFSURNAME:user.user.name.STAFFSURNAME,
-                //     POSITIONNAME:user.user.name.POSITIONNAME,
-                //     GROUPTYPENAME:user.user.name.GROUPTYPENAME,
-                //     POSTYPENAME:user.user.name.POSTYPENAME, 
-                //     SCOPES:user.user.name.SCOPES.staffdepartmentname,
-                //     postypename: `ระดับ${this.postypename}`   
-                // } 
-                 const form = {
+        async printDataP01pdf() {
+            const { getSession } = await useAuth();
+            const user = await getSession();  
+            try {
+                // แสดง Loading สักครู่
+                Swal.fire({ title: 'กำลังสร้างไฟล์ PDF...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
+
+                const response = await axios.post("http://127.0.0.1:8000/api/exportPdf_P01", {
                     staff_id: this.printStaffData.staffid, // รหัสพันงาน
                     group_id: this.groupid_Main, // กลุ่ม
                     fac_id: this.facid_Main, // คณะ
                     year_id: this.tracking_date.d_date, // ปี
                     evalua: this.tracking_date.evalua , // รอบ
-                    PREFIXFULLNAME: this.printStaffData.prefixfullname, // คำนำหน้า
+                    PREFIXFULLNAME: this.printStaffData.prefixfullname, // คำนำนาย
                     STAFFNAME : this.printStaffData.staffname, // ชื่อ
                     STAFFSURNAME: this.printStaffData.staffsurname, // สกุล
                     POSITIONNAME: this.printStaffData.posnameth, // ตำแหน่ง
                     GROUPTYPENAME: this.printStaffData.stftypename, // พนักงาน
                     POSTYPENAME: this.printStaffData.postypenameth, // ปฏิบัติการ
-                    SCOPES: this.printStaffData.departmentname, // สังกัด
+                    SCOPES: this.printStaffData.departmentname,// สังกัด
+
+                    persen: this.persen,
+                    period_text: this.period_text
+                }, {
+                    responseType: 'blob'
+                });
+
+                Swal.close();
+
+                // สร้าง URL สำหรับเปิด PDF ใน Tab ใหม่
+                const blob = new Blob([response.data], { type: 'application/pdf' });
+                const url = window.URL.createObjectURL(blob);
+                window.open(url, '_blank');
+                
+                // ล้างหน่วยความจำ
+                setTimeout(() => window.URL.revokeObjectURL(url), 100);
+
+            } catch (error) {
+                Swal.close();
+                console.error("Error exporting PDF:", error);
+                Swal.fire('เกิดข้อผิดพลาด', 'ไม่สามารถสร้างไฟล์ PDF ได้', 'error');
+            } 
+        },
+
+        //print word ป.02 
+        // async printDataP02() {
+        //     const { signIn, getSession, signOut } = await useAuth() 
+        //     const user = await getSession();   
+        //     // const form = {
+        //     //     staff_id: this.staffid_Main,
+        //     //     group_id: this.groupid_Main,
+        //     //     fac_id: this.tracking_date.fac_id,
+        //     //     year_id: this.tracking_date.d_date,
+        //     //     evalua: this.tracking_date.evalua,
+        //     //     PREFIXFULLNAME:user.user.name.PREFIXFULLNAME,
+        //     //     STAFFNAME :user.user.name.STAFFNAME,
+        //     //     STAFFSURNAME:user.user.name.STAFFSURNAME,
+        //     //     POSITIONNAME:user.user.name.POSITIONNAME,
+        //     //     GROUPTYPENAME:user.user.name.GROUPTYPENAME,
+        //     //     POSTYPENAME:user.user.name.POSTYPENAME, 
+        //     //     SCOPES:user.user.name.SCOPES.staffdepartmentname,
+        //     //     postypename: `ระดับ${this.postypename}`,
+        //     //     postypenameid: this.postypenameid
+        //     // } 
+        //       const form = {
+        //         staff_id: this.printStaffData.staffid, // รหัสพันงาน
+        //         group_id: this.groupid_Main, // กลุ่ม
+        //         fac_id: this.facid_Main, // คณะ
+        //         year_id: this.tracking_date.d_date, // ปี
+        //         evalua: this.tracking_date.evalua , // รอบ
+        //         PREFIXFULLNAME: this.printStaffData.prefixfullname, // คำนำหน้า
+        //         STAFFNAME : this.printStaffData.staffname, // ชื่อ
+        //         STAFFSURNAME: this.printStaffData.staffsurname, // สกุล
+        //         POSITIONNAME: this.printStaffData.posnameth, // ตำแหน่ง
+        //         GROUPTYPENAME: this.printStaffData.stftypename, // พนักงาน
+        //         POSTYPENAME: this.printStaffData.postypenameth, // ปฏิบัติการ
+        //         SCOPES: this.printStaffData.departmentname, // สังกัด
+        //         postypename: `ระดับ${this.printStaffData.postypenameth}`, // ระดับ
+        //         postypenameid: this.printStaffData.posnameth === 'ผู้บริหาร' ? 90 : this.printStaffData.posnameid
+        //         // postypename: `ระดับ${this.postypename}`, // ระดับ
+        //         // postypenameid: this.postypenameid 
+        //     }
+
+        //     console.log('printStaffData: ',this.printStaffData);
+        //     console.log('form: ',form);
+
+        //     const queryParams = new URLSearchParams(form).toString();
+        //     // console.log(queryParams); 
+        //     const url = `   http://127.0.0.1:8000/report_p02?${queryParams}`;
+        //     window.open(url, '_blank');
+ 
+        // }, 
+
+        async printDataP02pdf() {
+            const { getSession } = await useAuth();
+            const user = await getSession();  
+            try {
+                // แสดง Loading สักครู่
+                Swal.fire({ title: 'กำลังสร้างไฟล์ PDF...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
+
+                const response = await axios.post("http://127.0.0.1:8000/api/exportPdf_P02", {
+                    staff_id: this.printStaffData.staffid, // รหัสพันงาน
+                    group_id: this.groupid_Main, // กลุ่ม
+                    fac_id: this.facid_Main, // คณะ
+                    year_id: this.tracking_date.d_date, // ปี
+                    evalua: this.tracking_date.evalua , // รอบ
+                    PREFIXFULLNAME: this.printStaffData.prefixfullname, // คำนำนาย
+                    STAFFNAME : this.printStaffData.staffname, // ชื่อ
+                    STAFFSURNAME: this.printStaffData.staffsurname, // สกุล
+                    POSITIONNAME: this.printStaffData.posnameth, // ตำแหน่ง
+                    GROUPTYPENAME: this.printStaffData.stftypename, // พนักงาน
+                    POSTYPENAME: this.printStaffData.postypenameth, // ปฏิบัติการ
+                    SCOPES: this.printStaffData.departmentname,// สังกัด
+                    // ส่งค่าเพิ่มตามแบบ p01 ที่คุณทำได้
+                    postypename: `ระดับ${this.printStaffData.postypenameth}`,
+                    postypenameid: this.printStaffData.posnameth === 'ผู้บริหาร' ? 90 : this.printStaffData.posnameid,
+                    executive: ( typeof EXECUTIVE_ALLOWLIST !== 'undefined' && EXECUTIVE_ALLOWLIST.has(this.printStaffData.staffid) ) ? 1 : 0,
+                    posadio: this.posadio, 
+                    persen: this.persen,
+                    period_text: this.period_text
+                }, {
+                    responseType: 'blob'
+                }); 
+
+                Swal.close();
+
+                // สร้าง URL สำหรับเปิด PDF ใน Tab ใหม่
+                const blob = new Blob([response.data], { type: 'application/pdf' });
+                const url = window.URL.createObjectURL(blob);
+                window.open(url, '_blank');
+                
+                // ล้างหน่วยความจำ
+                setTimeout(() => window.URL.revokeObjectURL(url), 100);
+
+            } catch (error) {
+                Swal.close();
+                console.error("Error exporting PDF:", error);
+                Swal.fire('เกิดข้อผิดพลาด', 'ไม่สามารถสร้างไฟล์ PDF ได้', 'error');
+            } 
+        },
+
+        //print word ป.03 
+        // async printDataP03() { 
+        //         const { signIn, getSession, signOut } = await useAuth()
+        //         const user = await getSession();      
+        //          const form = {
+        //             staff_id: this.printStaffData.staffid, // รหัสพันงาน
+        //             group_id: this.groupid_Main, // กลุ่ม
+        //             fac_id: this.facid_Main, // คณะ
+        //             year_id: this.tracking_date.d_date, // ปี
+        //             evalua: this.tracking_date.evalua , // รอบ
+        //             PREFIXFULLNAME: this.printStaffData.prefixfullname, // คำนำหน้า
+        //             STAFFNAME : this.printStaffData.staffname, // ชื่อ
+        //             STAFFSURNAME: this.printStaffData.staffsurname, // สกุล
+        //             POSITIONNAME: this.printStaffData.posnameth, // ตำแหน่ง
+        //             GROUPTYPENAME: this.printStaffData.stftypename, // พนักงาน
+        //             POSTYPENAME: this.printStaffData.postypenameth, // ปฏิบัติการ
+        //             SCOPES: this.printStaffData.departmentname, // สังกัด
+        //             postypename: `ระดับ${this.printStaffData.postypenameth}`, // ระดับ
+        //             postypenameid: this.printStaffData.posnameth === 'ผู้บริหาร' ? 90 : this.printStaffData.posnameid
+        //         }
+
+        //         const queryParams = new URLSearchParams(form).toString();
+        //         // console.log(queryParams); 
+        //         const url = `   http://127.0.0.1:8000/report_p03?${queryParams}`;
+        //         window.open(url, '_blank'); 
+        // }, 
+ 
+        async printDataP03pdf() {
+            const { getSession } = await useAuth();
+            const user = await getSession();  
+            try {
+                // แสดง Loading สักครู่
+                Swal.fire({ title: 'กำลังสร้างไฟล์ PDF...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
+
+                const response = await axios.post("http://127.0.0.1:8000/api/exportPdf_P03", {
+                    staff_id: this.printStaffData.staffid, // รหัสพันงาน
+                    group_id: this.groupid_Main, // กลุ่ม
+                    fac_id: this.facid_Main, // คณะ
+                    year_id: this.tracking_date.d_date, // ปี
+                    evalua: this.tracking_date.evalua , // รอบ
+                    PREFIXFULLNAME: this.printStaffData.prefixfullname, // คำนำนาย
+                    STAFFNAME : this.printStaffData.staffname, // ชื่อ
+                    STAFFSURNAME: this.printStaffData.staffsurname, // สกุล
+                    POSITIONNAME: this.printStaffData.posnameth, // ตำแหน่ง
+                    GROUPTYPENAME: this.printStaffData.stftypename, // พนักงาน
+                    POSTYPENAME: this.printStaffData.postypenameth, // ปฏิบัติการ
+                    SCOPES: this.printStaffData.departmentname,// สังกัด
                     postypename: `ระดับ${this.printStaffData.postypenameth}`, // ระดับ
-                    postypenameid: this.printStaffData.posnameth === 'ผู้บริหาร' ? 90 : this.printStaffData.posnameid
-                }
+                    postypenameid: this.printStaffData.posnameth === 'ผู้บริหาร' ? 90 : this.printStaffData.posnameid,
 
-                const queryParams = new URLSearchParams(form).toString();
-                // console.log(queryParams); 
-                const url = `   http://127.0.0.1:8000/report_p03?${queryParams}`;
-                window.open(url, '_blank'); 
-        }, 
-        async printDataP04() {  
-            const { signIn, getSession, signOut } = await useAuth()
-            const user = await getSession()   
-            // const form = {
-            //     staff_id: this.staffid_Main,
-            //     group_id: this.groupid_Main,
-            //     fac_id: this.tracking_date.fac_id,
-            //     year_id: this.tracking_date.d_date,
-            //     evalua: this.tracking_date.evalua ,
-            //     PREFIXFULLNAME:user.user.name.PREFIXFULLNAME,
-            //     STAFFNAME :user.user.name.STAFFNAME,
-            //     STAFFSURNAME:user.user.name.STAFFSURNAME,
-            //     POSITIONNAME:user.user.name.POSITIONNAME,
-            //     GROUPTYPENAME:user.user.name.GROUPTYPENAME,
-            //     POSTYPENAME:user.user.name.POSTYPENAME, 
-            //     SCOPES:user.user.name.SCOPES.staffdepartmentname     
-            // } 
+                    persen: this.persen,
+                    period_text: this.period_text
+                }, {
+                    responseType: 'blob'
+                });
 
-            const form = {
+                Swal.close();
+
+                // สร้าง URL สำหรับเปิด PDF ใน Tab ใหม่
+                const blob = new Blob([response.data], { type: 'application/pdf' });
+                const url = window.URL.createObjectURL(blob);
+                window.open(url, '_blank');
+                
+                // ล้างหน่วยความจำ
+                setTimeout(() => window.URL.revokeObjectURL(url), 100);
+
+            } catch (error) {
+                Swal.close();
+                console.error("Error exporting PDF:", error);
+                Swal.fire('เกิดข้อผิดพลาด', 'ไม่สามารถสร้างไฟล์ PDF ได้', 'error');
+            } 
+        },
+
+        //print word ป.04  
+        // async printDataP04() {  
+        //     const { signIn, getSession, signOut } = await useAuth()
+        //     const user = await getSession()    
+        //     const form = {
+        //             staff_id: this.printStaffData.staffid, // รหัสพันงาน
+        //             group_id: this.groupid_Main, // กลุ่ม
+        //             fac_id: this.facid_Main, // คณะ
+        //             year_id: this.tracking_date.d_date, // ปี
+        //             evalua: this.tracking_date.evalua , // รอบ
+        //             PREFIXFULLNAME: this.printStaffData.prefixfullname, // คำนำหน้า
+        //             STAFFNAME : this.printStaffData.staffname, // ชื่อ
+        //             STAFFSURNAME: this.printStaffData.staffsurname, // สกุล
+        //             POSITIONNAME: this.printStaffData.posnameth, // ตำแหน่ง
+        //             GROUPTYPENAME: this.printStaffData.stftypename, // พนักงาน
+        //             POSTYPENAME: this.printStaffData.postypenameth, // ปฏิบัติการ
+        //             SCOPES: this.printStaffData.departmentname, // สังกัด 
+        //         }
+
+        //     const queryParams = new URLSearchParams(form).toString();
+        //     // console.log(queryParams); 
+        //     const url = `   http://127.0.0.1:8000/report_p04?${queryParams}`;
+        //     window.open(url, '_blank'); 
+        // },  
+
+        async printDataP04pdf() {
+            const { getSession } = await useAuth();
+            const user = await getSession();  
+            try {
+                // แสดง Loading สักครู่
+                Swal.fire({ title: 'กำลังสร้างไฟล์ PDF...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
+
+                const response = await axios.post("http://127.0.0.1:8000/api/exportPdf_P04", {
                     staff_id: this.printStaffData.staffid, // รหัสพันงาน
                     group_id: this.groupid_Main, // กลุ่ม
                     fac_id: this.facid_Main, // คณะ
                     year_id: this.tracking_date.d_date, // ปี
                     evalua: this.tracking_date.evalua , // รอบ
-                    PREFIXFULLNAME: this.printStaffData.prefixfullname, // คำนำหน้า
+                    PREFIXFULLNAME: this.printStaffData.prefixfullname, // คำนำนาย
                     STAFFNAME : this.printStaffData.staffname, // ชื่อ
                     STAFFSURNAME: this.printStaffData.staffsurname, // สกุล
                     POSITIONNAME: this.printStaffData.posnameth, // ตำแหน่ง
                     GROUPTYPENAME: this.printStaffData.stftypename, // พนักงาน
                     POSTYPENAME: this.printStaffData.postypenameth, // ปฏิบัติการ
-                    SCOPES: this.printStaffData.departmentname, // สังกัด 
-                }
+                    SCOPES: this.printStaffData.departmentname,// สังกัด 
+                    persen: this.persen,
+                    period_text: this.period_text
+                }, {
+                    responseType: 'blob'
+                });
 
-            const queryParams = new URLSearchParams(form).toString();
-            // console.log(queryParams); 
-            const url = `   http://127.0.0.1:8000/report_p04?${queryParams}`;
-            window.open(url, '_blank'); 
-        },  
+                Swal.close();
+
+                // สร้าง URL สำหรับเปิด PDF ใน Tab ใหม่
+                const blob = new Blob([response.data], { type: 'application/pdf' });
+                const url = window.URL.createObjectURL(blob);
+                window.open(url, '_blank');
+                
+                // ล้างหน่วยความจำ
+                setTimeout(() => window.URL.revokeObjectURL(url), 100);
+
+            } catch (error) {
+                Swal.close();
+                console.error("Error exporting PDF:", error);
+                Swal.fire('เกิดข้อผิดพลาด', 'ไม่สามารถสร้างไฟล์ PDF ได้', 'error');
+            } 
+        }, 
+
+
         async withLoading(msg, fn) {
             Swal.fire({
                 title: 'กำลังโหลดข้อมูล',
@@ -2405,12 +2586,7 @@ export default {
         getForcedExpectedLevel(staffId) {
             const id = String(staffId ?? '').trim();
             return FORCE_EXPECTED_LEVEL.get(id) ?? null;
-        },
-
-
-        
-        
-
+        },  
     }, 
     
     filters: {
@@ -2424,231 +2600,231 @@ export default {
 </script>
 
 <style scoped>
-label {
-    font-size: medium;
-    font-weight: 500;
-}
-.card-header {
-    text-align: left;  
-    margin: 0;  
-    padding: 0;  
-}
-body {
-    font-family: 'Prompt', Arial, sans-serif;
-    background-color: #f5f5f5;
-    margin: 0;
-    padding: 0;
-}
-.container {
-    width: 95%;
-    margin: 0 auto;
-    padding: 20px;
-    background-color: #fff;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(2, 2, 2, 0.1);
-}
-h3 {
-    text-align: center;
-    margin-bottom: 20px;
-}
-table {
-    width: 100%;
-    table-layout: fixed;
-    border-collapse: collapse;
-    background-color: #fff;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    margin-bottom: 20px;
-}
-th,
-td {
-    border: 1px solid #ddd;
-    padding: 8px; /* Reduced padding */
-    text-align: center;
-    font-size: 14px; /* Smaller font size */
-}
-th {
-    background-color: #ffffff;
-}
-th,
-td:first-child {
-    width: 35%; /* Adjusted width for first column */
-}
-td:nth-child(2),
-td:nth-child(3) {
-    width: 32.5%; /* Adjusted width for other columns */
-}
-.add-row-form {
-    margin: 5px 0; /* Reduced margin */
-    font-size: 14px; /* Smaller font size for form */
-}
-.add-button,
-.save-button,
-.cancel-button {
-    margin: 3px; /* Smaller margin */
-    padding: 6px 12px; /* Smaller padding */
-    font-size: 12px; /* Smaller font size for buttons */
-}
-.form-container {
-    padding: 8px; /* Reduced padding */
-    border: 1px solid #ddd;
-    background-color: #f0f0f0;
-    border-radius: 4px;
-    font-size: 14px; /* Smaller font size */
-}
-.edit-icon,
-.delete-icon {
-    margin: 0 8px; /* Smaller margin */
-    cursor: pointer;
-    font-size: 16px; /* Slightly larger font size */
-}
-.edit-icon {
-    color: #ffc107;
-}
-.delete-icon {
-    color: #dc3545;
-}
-th {
-    background-color: #e5e5e3;
-    color: rgb(9, 8, 8);
-}
-.bordered-box {
-    border: 1px solid rgb(179, 177, 177);
-    padding: 20px;
-    margin-top: 20px;
-}
-/* P01 */
-label {
-    font-size: medium;
-    font-weight: 500;
-}
-.card-header {
-    text-align: left; 
-    margin: 0; 
-    padding: 0;  
-}
-.table {
-    width: 100%;
-    border-collapse: collapse;
-}
-.table th,
-.table td {
-    border: 1px solid #ddd;
-    padding: 8px;
-    text-align: center;
-}
-.table th {
-    background-color: #edf2bb;
-    font-weight: bold;
-}
-.table td {
-    vertical-align: top;
-}
-.button-container {
-    text-align: center;  
-}
-.custom-textarea {
-    width: 100%;  
-    height: 100px;  
-    padding: 10px;  
-    border-radius: 5px;  
-    border: 1px solid #ccc;  
-    font-size: 1rem;  
-    resize: none;  
-}
-body {
-    font-family: 'Prompt', Arial, sans-serif;
-    background-color: #f5f5f5;
-    margin: 0;
-    padding: 0;
-}
-.container {
-    width: 95%;
-    margin: 0 auto;
-    padding: 20px;
-    background-color: #fff;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-}
-h3 {
-    text-align: center;
-    margin-bottom: 20px;
-}
-table {
-    width: 100%;
-    table-layout: fixed;
-    border-collapse: collapse;
-    background-color: #fff;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    margin-bottom: 20px;
-}
-th,
-td {
-    border: 1px solid #ddd;
-    padding: 8px; /* Reduced padding */
-    text-align: center;
-    font-size: 14px; /* Smaller font size */
-}
-th {
-    background-color: #ffffff;
-}
-th,
-td:first-child {
-    width: 35%; /* Adjusted width for first column */
-}
-td:nth-child(2),
-td:nth-child(3) {
-    width: 32.5%; /* Adjusted width for other columns */
-}
-.add-row-form {
-    margin: 5px 0; /* Reduced margin */
-    font-size: 14px; /* Smaller font size for form */
-}
-.add-button,
-.save-button,
-.cancel-button {
-    margin: 3px; /* Smaller margin */
-    padding: 6px 12px; /* Smaller padding */
-    font-size: 12px; /* Smaller font size for buttons */
-}
-.form-container {
-    padding: 8px; /* Reduced padding */
-    border: 1px solid #ddd;
-    background-color: #f0f0f0;
-    border-radius: 4px;
-    font-size: 14px; /* Smaller font size */
-}
-.edit-icon,
-.delete-icon {
-    margin: 0 8px; /* Smaller margin */
-    cursor: pointer;
-    font-size: 16px; /* Slightly larger font size */
-}
-.edit-icon {
-    color: #ffc107;
-}
-.delete-icon {
-    color: #dc3545;
-}
-.styled-table {
-    width: 100%;
-    border-collapse: collapse;
-}
+    label {
+        font-size: medium;
+        font-weight: 500;
+    }
+    .card-header {
+        text-align: left;  
+        margin: 0;  
+        padding: 0;  
+    }
+    body {
+        font-family: 'Prompt', Arial, sans-serif;
+        background-color: #f5f5f5;
+        margin: 0;
+        padding: 0;
+    }
+    .container {
+        width: 95%;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(2, 2, 2, 0.1);
+    }
+    h3 {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+    table {
+        width: 100%;
+        table-layout: fixed;
+        border-collapse: collapse;
+        background-color: #fff;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+    }
+    th,
+    td {
+        border: 1px solid #ddd;
+        padding: 8px; /* Reduced padding */
+        text-align: center;
+        font-size: 14px; /* Smaller font size */
+    }
+    th {
+        background-color: #ffffff;
+    }
+    th,
+    td:first-child {
+        width: 35%; /* Adjusted width for first column */
+    }
+    td:nth-child(2),
+    td:nth-child(3) {
+        width: 32.5%; /* Adjusted width for other columns */
+    }
+    .add-row-form {
+        margin: 5px 0; /* Reduced margin */
+        font-size: 14px; /* Smaller font size for form */
+    }
+    .add-button,
+    .save-button,
+    .cancel-button {
+        margin: 3px; /* Smaller margin */
+        padding: 6px 12px; /* Smaller padding */
+        font-size: 12px; /* Smaller font size for buttons */
+    }
+    .form-container {
+        padding: 8px; /* Reduced padding */
+        border: 1px solid #ddd;
+        background-color: #f0f0f0;
+        border-radius: 4px;
+        font-size: 14px; /* Smaller font size */
+    }
+    .edit-icon,
+    .delete-icon {
+        margin: 0 8px; /* Smaller margin */
+        cursor: pointer;
+        font-size: 16px; /* Slightly larger font size */
+    }
+    .edit-icon {
+        color: #ffc107;
+    }
+    .delete-icon {
+        color: #dc3545;
+    }
+    th {
+        background-color: #e5e5e3;
+        color: rgb(9, 8, 8);
+    }
+    .bordered-box {
+        border: 1px solid rgb(179, 177, 177);
+        padding: 20px;
+        margin-top: 20px;
+    }
+    /* P01 */
+    label {
+        font-size: medium;
+        font-weight: 500;
+    }
+    .card-header {
+        text-align: left; 
+        margin: 0; 
+        padding: 0;  
+    }
+    .table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    .table th,
+    .table td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: center;
+    }
+    .table th {
+        background-color: #edf2bb;
+        font-weight: bold;
+    }
+    .table td {
+        vertical-align: top;
+    }
+    .button-container {
+        text-align: center;  
+    }
+    .custom-textarea {
+        width: 100%;  
+        height: 100px;  
+        padding: 10px;  
+        border-radius: 5px;  
+        border: 1px solid #ccc;  
+        font-size: 1rem;  
+        resize: none;  
+    }
+    body {
+        font-family: 'Prompt', Arial, sans-serif;
+        background-color: #f5f5f5;
+        margin: 0;
+        padding: 0;
+    }
+    .container {
+        width: 95%;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    h3 {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+    table {
+        width: 100%;
+        table-layout: fixed;
+        border-collapse: collapse;
+        background-color: #fff;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+    }
+    th,
+    td {
+        border: 1px solid #ddd;
+        padding: 8px; /* Reduced padding */
+        text-align: center;
+        font-size: 14px; /* Smaller font size */
+    }
+    th {
+        background-color: #ffffff;
+    }
+    th,
+    td:first-child {
+        width: 35%; /* Adjusted width for first column */
+    }
+    td:nth-child(2),
+    td:nth-child(3) {
+        width: 32.5%; /* Adjusted width for other columns */
+    }
+    .add-row-form {
+        margin: 5px 0; /* Reduced margin */
+        font-size: 14px; /* Smaller font size for form */
+    }
+    .add-button,
+    .save-button,
+    .cancel-button {
+        margin: 3px; /* Smaller margin */
+        padding: 6px 12px; /* Smaller padding */
+        font-size: 12px; /* Smaller font size for buttons */
+    }
+    .form-container {
+        padding: 8px; /* Reduced padding */
+        border: 1px solid #ddd;
+        background-color: #f0f0f0;
+        border-radius: 4px;
+        font-size: 14px; /* Smaller font size */
+    }
+    .edit-icon,
+    .delete-icon {
+        margin: 0 8px; /* Smaller margin */
+        cursor: pointer;
+        font-size: 16px; /* Slightly larger font size */
+    }
+    .edit-icon {
+        color: #ffc107;
+    }
+    .delete-icon {
+        color: #dc3545;
+    }
+    .styled-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
 
-.styled-table thead tr {
-    background-color: #f2f2f2;
-}
+    .styled-table thead tr {
+        background-color: #f2f2f2;
+    }
 
-.styled-table th,
-.styled-table td {
-    padding: 8px;
-    text-align: center;
-    border: 1px solid #ddd;
-}
+    .styled-table th,
+    .styled-table td {
+        padding: 8px;
+        text-align: center;
+        border: 1px solid #ddd;
+    }
 
-.styled-table td b {
-    word-break: break-word;
-}
-.left-align {
-    text-align: left;
-}
+    .styled-table td b {
+        word-break: break-word;
+    }
+    .left-align {
+        text-align: left;
+    }
 </style>
