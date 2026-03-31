@@ -1,7 +1,7 @@
 <template>
     <div class="col md:col-12 text-right">
         <!-- <Button label="Export" icon="pi pi-file-word" class="mr-2 mb-2 " @click="printDataP01"></Button> -->
-        <Button label="Export" icon="pi pi-file-word" class="mr-2 mb-2" @click="printDataP02" />
+        <Button label="Export" icon="pi pi-file-pdf" class="mr-2 mb-2" @click="printDataP02" />
     </div> 
     <div class="card">
         <h3 class="mb-4" style="text-align: left;">

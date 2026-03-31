@@ -37,7 +37,7 @@
                 <TabPanel header="แบบ ใบปะหน้า" value="0">
                     <div class="col md:col-12 text-right">
                         <!-- <Button label="Export" icon="pi pi-file-word" class="mr-2 mb-2" @click="printDataP01" /> -->
-                         <Button label="Export" icon="pi pi-file-word" class="mr-2 mb-2" @click="printDatacoverpage" />
+                         <Button label="Export" icon="pi pi-file-pdf" class="mr-2 mb-2" @click="printDatacoverpage" />
                     </div> 
 
                     <div v-if="user.user" class="card"> 

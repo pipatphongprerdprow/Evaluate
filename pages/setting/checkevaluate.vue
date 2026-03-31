@@ -729,7 +729,7 @@
                             </TabPanel> 
                             </TabView>
                         <template #footer>
-                            <Button label="ตกลง" severity="secondary" class="mb-2 mr-2" @click="DialogAdd = false " />
+                            <Button label="ตกลง" severity="info" class="mb-2 mr-2" @click="DialogAdd = false " />
                         </template>
                     </Dialog>
                 </div>

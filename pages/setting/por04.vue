@@ -1,6 +1,7 @@
 <template>
     <div class="col md:col-12 text-right">
-            <Button label="Export" icon="pi pi-file-word" class="mr-2 mb-2 " @click="printDataP04"></Button>
+            <!-- <Button label="Export" icon="pi pi-file-word" class="mr-2 mb-2 " @click="printDataP04"></Button> -->
+            <Button label="Export" icon="pi pi-file-pdf" class="mr-2 mb-2 " @click="printDataP04X"></Button>
         </div> 
     <div v-if="user.user" class="card">
         <h4 style="text-align: left">แบบสรุปการประเมินผล</h4>
@@ -570,30 +571,60 @@ export default {
                 console.error('Error:', error);
             });
         }, 
-        async printDataP04() {  
-            const { signIn, getSession, signOut } = await useAuth()
-            const user = await getSession()   
-            const form = {
-                staff_id: this.staffid_Main,
-                group_id: this.groupid_Main,
-                fac_id: this.dataPor.fac_id,
-                year_id: this.dataPor.d_date,
-                evalua: this.dataPor.evalua ,
-                period_text: this.evaluationPeriodText, 
-                PREFIXFULLNAME:user.user.name.PREFIXFULLNAME,
-                STAFFNAME :user.user.name.STAFFNAME,
-                STAFFSURNAME:user.user.name.STAFFSURNAME,
-                POSITIONNAME:user.user.name.POSITIONNAME,
-                GROUPTYPENAME:user.user.name.GROUPTYPENAME,
-                POSTYPENAME:user.user.name.POSTYPENAME, 
-                SCOPES:user.user.name.SCOPES.staffdepartmentname  
+        // async printDataP04() {  
+        //     const { signIn, getSession, signOut } = await useAuth()
+        //     const user = await getSession()   
+        //     const form = {
+        //         staff_id: this.staffid_Main,
+        //         group_id: this.groupid_Main,
+        //         fac_id: this.dataPor.fac_id,
+        //         year_id: this.dataPor.d_date,
+        //         evalua: this.dataPor.evalua ,
+        //         period_text: this.evaluationPeriodText, 
+        //         PREFIXFULLNAME:user.user.name.PREFIXFULLNAME,
+        //         STAFFNAME :user.user.name.STAFFNAME,
+        //         STAFFSURNAME:user.user.name.STAFFSURNAME,
+        //         POSITIONNAME:user.user.name.POSITIONNAME,
+        //         GROUPTYPENAME:user.user.name.GROUPTYPENAME,
+        //         POSTYPENAME:user.user.name.POSTYPENAME, 
+        //         SCOPES:user.user.name.SCOPES.staffdepartmentname  
                 
+        //     } 
+        //     const queryParams = new URLSearchParams(form).toString();
+        //     // console.log(queryParams); 
+        //     const url = `   http://127.0.0.1:8000/report_p04?${queryParams}`;
+        //     window.open(url, '_blank'); 
+        // },  
+
+        async printDataP04X() {
+            const { getSession } = await useAuth();
+            const user = await getSession(); 
+            try {
+                const response = await axios.post("http://127.0.0.1:8000/api/exportPdf_P04", {
+                    staff_id: this.staffid_Main,
+                    group_id: this.groupid_Main,
+                    fac_id: this.dataPor.fac_id,
+                    year_id: this.dataPor.d_date,
+                    evalua: this.dataPor.evalua,
+                    period_text: this.evaluationPeriodText, 
+                    // ข้อมูลส่วนตัว
+                    PREFIXFULLNAME: user.user.name.PREFIXFULLNAME,
+                    STAFFNAME: user.user.name.STAFFNAME,
+                    STAFFSURNAME: user.user.name.STAFFSURNAME,
+                    POSITIONNAME: user.user.name.POSITIONNAME,
+                    GROUPTYPENAME: user.user.name.GROUPTYPENAME,
+                    POSTYPENAME: user.user.name.POSTYPENAME, 
+                    SCOPES: user.user.name.SCOPES.staffdepartmentname,
+                    // ส่ง ID ตำแหน่งเพื่อไป Query สมรรถนะกลุ่ม ข.
+                    postypenameid: user.user.name.POSTYPENAMEID || '' 
+                }, { responseType: 'blob' });
+
+                const url = window.URL.createObjectURL(response.data); 
+                window.open(url, '_blank');  
+            } catch (error) {
+                console.error("Error:", error);
             } 
-            const queryParams = new URLSearchParams(form).toString();
-            // console.log(queryParams); 
-            const url = `   http://127.0.0.1:8000/report_p04?${queryParams}`;
-            window.open(url, '_blank'); 
-        },            
+        },        
     }
 } 
 

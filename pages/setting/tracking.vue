@@ -24,7 +24,8 @@
                         <Dropdown v-model="tracking_date" :options="tracking_dates" :optionLabel="(item) => `${item.facuties} ${item.d_evaluationround} ${item.d_date}`" placeholder="กรุณาเลือกรอบการประเมิน" style=" max-width: 500px; width: 100%"></Dropdown> 
                     </div> 
                         <Button class="mb-2 mr-2" icon="pi pi-search" :disabled="loading || !tracking_date" @click="xxr" /> &nbsp;&nbsp;&nbsp;&nbsp;
-                        <Button label="Export" icon="pi pi-file-word" class="mr-2 mb-2" :disabled="loading" @click="printDatatracking" />
+                        <!-- <Button label="Export" icon="pi pi-file-word" class="mr-2 mb-2" :disabled="loading" @click="printDatatracking" /> -->
+                        <Button label="Export" icon="pi pi-file-pdf" class="mr-2 mb-2" :disabled="loading" @click="printDatatrackingpdf" />
                     </div>  
                     <div v-if="loading" class="loading-wrap">
                         <ProgressSpinner style="width:60px;height:60px" strokeWidth="6" />
@@ -2960,32 +2961,69 @@ export default {
                 });
             }
         },  
-        async printDatatracking() { 
-            const { signIn, getSession, signOut } = await useAuth() 
-            const user = await getSession();   
+
+        // async printDatatracking() { 
+        //     const { signIn, getSession, signOut } = await useAuth() 
+        //     const user = await getSession();   
+        //     const form = {
+        //         staff_id: this.staffid_Main,
+        //         group_id: this.groupid_Main,
+        //         fac_id: this.tracking_date.fac_id,
+        //         year_id: this.tracking_date.d_date,
+        //         evalua: this.tracking_date.evalua,
+        //         PREFIXFULLNAME:user.user.name.PREFIXFULLNAME,
+        //         STAFFNAME :user.user.name.STAFFNAME,
+        //         STAFFSURNAME:user.user.name.STAFFSURNAME,
+        //         POSITIONNAME:user.user.name.POSITIONNAME,
+        //         GROUPTYPENAME:user.user.name.GROUPTYPENAME,
+        //         POSTYPENAME:user.user.name.POSTYPENAME, 
+        //         SCOPES:user.user.name.SCOPES.staffdepartmentname,
+        //         postypename: `ระดับ${this.postypename}`,
+        //         postypenameid: this.postypenameid,
+        //         stftypename: this.stftypename,
+        //     } 
+        //     const queryParams = new URLSearchParams(form).toString();
+        //     // console.log(queryParams); 
+        //     const url = `http://127.0.0.1:8000/report_tracking?${queryParams}`;
+        //     window.open(url, '_blank');
+
+        // }, 
+ 
+         async printDatatrackingpdf() {
+            const { getSession } = await useAuth();
+            const user = await getSession(); 
+            
+            // รวมข้อมูลเป็น Object เดียวตามที่คุณต้องการ
             const form = {
                 staff_id: this.staffid_Main,
                 group_id: this.groupid_Main,
                 fac_id: this.tracking_date.fac_id,
                 year_id: this.tracking_date.d_date,
                 evalua: this.tracking_date.evalua,
-                PREFIXFULLNAME:user.user.name.PREFIXFULLNAME,
-                STAFFNAME :user.user.name.STAFFNAME,
-                STAFFSURNAME:user.user.name.STAFFSURNAME,
-                POSITIONNAME:user.user.name.POSITIONNAME,
-                GROUPTYPENAME:user.user.name.GROUPTYPENAME,
-                POSTYPENAME:user.user.name.POSTYPENAME, 
-                SCOPES:user.user.name.SCOPES.staffdepartmentname,
+                PREFIXFULLNAME: user.user.name.PREFIXFULLNAME,
+                STAFFNAME: user.user.name.STAFFNAME,
+                STAFFSURNAME: user.user.name.STAFFSURNAME,
+                POSITIONNAME: user.user.name.POSITIONNAME,
+                GROUPTYPENAME: user.user.name.GROUPTYPENAME,
+                POSTYPENAME: user.user.name.POSTYPENAME, 
+                SCOPES: user.user.name.SCOPES.staffdepartmentname,
                 postypename: `ระดับ${this.postypename}`,
                 postypenameid: this.postypenameid,
                 stftypename: this.stftypename,
-            } 
-            const queryParams = new URLSearchParams(form).toString();
-            // console.log(queryParams); 
-            const url = `http://127.0.0.1:8000/report_tracking?${queryParams}`;
-            window.open(url, '_blank');
+            };
 
+            try {
+                const response = await axios.post("http://127.0.0.1:8000/api/exportPdf_Tracking", form, { 
+                    responseType: 'blob' 
+                });
+
+                const url = window.URL.createObjectURL(response.data); 
+                window.open(url, '_blank');  
+            } catch (error) {
+                console.error("Error:", error);
+            } 
         },
+
         
         //110269
         normalizeActivityRaw(raw) {
