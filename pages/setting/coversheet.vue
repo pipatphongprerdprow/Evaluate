@@ -54,9 +54,9 @@
                             <p><strong>ผู้ปฏิบัติงาน:</strong> {{ user.user.name.PREFIXFULLNAME }} {{ user.user.name.STAFFNAME }} {{ user.user.name.STAFFSURNAME }}</p>
                             <p><strong>สังกัด:</strong> {{ user.user.name.SCOPES?.staffdepartmentname }}</p>
                             <p><strong>ตำแหน่ง:</strong> {{ user.user.name.POSITIONNAME }}</p>
-                            <p><strong>ระดับตำแหน่ง:</strong> {{ user.user?.name.POSITIONNAME === 'ผู้บริหาร' ? 'ชำนาญการพิเศษ' : user.user?.name.POSTYPENAME }}</p> 
-                            <!-- <p><strong>ชื่อผู้ประเมิน:</strong> <InputText type="text" placeholder="ชื่อผู้ประเมิน"  v-model="assessor" style="width: 300px;"/></p>  --> 
- 
+                            <!-- <p><strong>ระดับตำแหน่ง:</strong> {{ user.user?.name.POSITIONNAME === 'ผู้บริหาร' ? 'ชำนาญการพิเศษ' : user.user?.name.POSTYPENAME }}</p>  -->
+                            <p><strong>ระดับตำแหน่ง:</strong> {{ [160018, '', ''].includes(user.user?.name.STAFFID) ? 'ผู้อำนวยการกอง' : (user.user?.name.POSITIONNAME === 'ผู้บริหาร' ? 'ชำนาญการพิเศษ' : user.user?.name.POSTYPENAME) }}</p> 
+
                             <!-- <p>
                                 <strong>ชื่อผู้ประเมิน:</strong>
                                 <AutoComplete
