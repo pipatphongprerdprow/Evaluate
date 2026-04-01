@@ -14,7 +14,7 @@
                     <span class="text-blue-500">P</span>erformance&nbsp;
                     <span class="text-blue-500">A</span>ppraisal
                 </span>
-                 <!-- {{ user.user.name }}   -->
+                 {{ user.user.name }}  
                 <div class="mb-3 mt-3">
                   <img id="IMG_PICTURE" :src="`${profileImageUrl}${user.user?.name.STAFFID}.jpg`" alt="Profile Picture" style="border-radius: 70px;width: 200px;height: auto;" />   
                 </div>   
@@ -47,7 +47,13 @@
                     </span> 
                     <span class="ml-4 flex flex-column" style="flex: 1;">
                         <span class="text-900 lg:text-xl font-medium mb-0 block">ระดับตำแหน่ง</span>
-                        <span class="text-600 lg:text-xl">{{ user.user?.name.POSITIONNAME === 'ผู้บริหาร' ? 'ชำนาญการพิเศษ' : user.user?.name.POSTYPENAME }}</span>
+                        <!-- <span class="text-600 lg:text-xl">{{ user.user?.name.POSITIONNAME === 'ผู้บริหาร' ? 'ชำนาญการพิเศษ' : user.user?.name.POSTYPENAME }}</span> -->
+                         <span class="text-600 lg:text-xl">
+                            {{ 
+        user.user?.name.STAFFID === 160018 ? 'ผู้บริหาร' : 
+        (user.user?.name.POSITIONNAME === 'ผู้บริหาร' ? 'ชำนาญการพิเศษ' : user.user?.name.POSTYPENAME) 
+    }}
+                        </span>
                     </span>  
 
                     <span class="flex justify-content-center align-items-center border-round" 
