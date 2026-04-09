@@ -2441,43 +2441,98 @@ import InputText from 'primevue/inputtext';
             //     window.open(url, "_blank");
             // },
 
+            // async printDataP03X() {
+            //     const { getSession } = await useAuth();
+            //     const user = await getSession(); 
+            //     const staffId = String(this.staffid_Main).trim();
+
+            //     try {
+            //         const payload = {
+            //             staff_id: this.staffid_Main,
+            //             group_id: this.groupid_Main,
+            //             fac_id: this.dataPor.fac_id,
+            //             year_id: this.dataPor.d_date,
+            //             evalua: this.dataPor.evalua,
+                        
+            //             // ✅ ส่งค่าให้ครบเหมือน ป.02
+            //             posadio: this.posadio, 
+            //             postypenameid: this.postypenameid,
+            //             postypename: `ระดับ${this.postypename}`, // ส่งไปเพื่อทำ Level Mapping ใน Blade
+                        
+            //             PREFIXFULLNAME: user.user.name.PREFIXFULLNAME,
+            //             STAFFNAME: user.user.name.STAFFNAME,
+            //             STAFFSURNAME: user.user.name.STAFFSURNAME,
+            //             POSITIONNAME: user.user.name.POSITIONNAME,
+            //             POSTYPENAME: user.user.name.POSTYPENAME,
+            //             SCOPES: user.user.name.SCOPES.staffdepartmentname,
+            //         };
+
+            //         const response = await axios.post("http://127.0.0.1:8000/api/exportPdf_P03", payload, {
+            //             responseType: 'blob' 
+            //         });
+
+            //         const url = window.URL.createObjectURL(response.data); 
+            //         window.open(url, '_blank');  
+            //     } catch (error) {
+            //         console.error("Error:", error);
+            //     } 
+            // },
+
             async printDataP03X() {
                 const { getSession } = await useAuth();
                 const user = await getSession(); 
-                const staffId = String(this.staffid_Main).trim();
-
-                try {
-                    const payload = {
-                        staff_id: this.staffid_Main,
-                        group_id: this.groupid_Main,
-                        fac_id: this.dataPor.fac_id,
-                        year_id: this.dataPor.d_date,
-                        evalua: this.dataPor.evalua,
-                        
-                        // ✅ ส่งค่าให้ครบเหมือน ป.02
-                        posadio: this.posadio, 
-                        postypenameid: this.postypenameid,
-                        postypename: `ระดับ${this.postypename}`, // ส่งไปเพื่อทำ Level Mapping ใน Blade
-                        
-                        PREFIXFULLNAME: user.user.name.PREFIXFULLNAME,
-                        STAFFNAME: user.user.name.STAFFNAME,
-                        STAFFSURNAME: user.user.name.STAFFSURNAME,
-                        POSITIONNAME: user.user.name.POSITIONNAME,
-                        POSTYPENAME: user.user.name.POSTYPENAME,
-                        SCOPES: user.user.name.SCOPES.staffdepartmentname,
-                    };
-
-                    const response = await axios.post("http://127.0.0.1:8000/api/exportPdf_P03", payload, {
-                        responseType: 'blob' 
+ 
+                try {  
+                    Swal.fire({
+                    title: 'กำลังสร้างไฟล์ PDF...',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
                     });
 
-                    const url = window.URL.createObjectURL(response.data); 
-                    window.open(url, '_blank');  
-                } catch (error) {
-                    console.error("Error:", error);
-                } 
-            },
+                    const payload = {
+                    staff_id: this.staffid_Main,
+                    group_id: this.groupid_Main,
+                    fac_id: this.dataPor.fac_id,
+                    year_id: this.dataPor.d_date,
+                    evalua: this.dataPor.evalua,
+
+                    posadio: this.posadio, 
+                    postypenameid: this.postypenameid,
+                    postypename: `ระดับ${this.postypename}`, 
+                    
+                    PREFIXFULLNAME: user.user.name.PREFIXFULLNAME,
+                    STAFFNAME: user.user.name.STAFFNAME,
+                    STAFFSURNAME: user.user.name.STAFFSURNAME,
+                    POSITIONNAME: user.user.name.POSITIONNAME,
+                    POSTYPENAME: user.user.name.POSTYPENAME,
+                    SCOPES: user.user.name.SCOPES.staffdepartmentname,
+                    };
+
+                    const response = await axios.post(
+                    "http://127.0.0.1:8000/api/exportPdf_P03",
+                    payload,
+                    {
+                        responseType: 'blob'
+                    }
+                    ); 
+                    Swal.close(); 
+
+                    const blob = new Blob([response.data], { type: 'application/pdf' });
+                    const url = window.URL.createObjectURL(blob);
+
+                    window.open(url, '_blank');
  
+                    setTimeout(() => window.URL.revokeObjectURL(url), 100);
+
+                } catch (error) {
+                    Swal.close();
+                    console.error("Error:", error);
+                    Swal.fire('เกิดข้อผิดพลาด', 'ไม่สามารถสร้างไฟล์ PDF ได้', 'error');
+                }
+            }, 
+
              // แก้ไขตัวชี้วัด / เกณฑ์การประเมิน
             EditRegislickP03(data){
                 //console.log(data);
