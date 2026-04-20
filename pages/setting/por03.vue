@@ -494,7 +494,7 @@
                             <Textarea v-model="p04_re1" rows="4" placeholder="ความรู้/ทักษะ/สมรรถนะ ที่ต้องการพัฒนา" />
                             <Textarea v-model="p04_re2" rows="4" placeholder="วิธีการพัฒนา" />
                             <Textarea v-model="p04_re3" rows="4" placeholder="ช่วงเวลาที่ต้องการพัฒนา" /> 
-                            <Button label="เพิ่ม" severity="info" @click="AddDatap04" />
+                            <Button icon="pi pi-plus" label="เพิ่ม" severity="info" @click="AddDatap04" />
                         </InputGroup>
                     </div>
                 </div>

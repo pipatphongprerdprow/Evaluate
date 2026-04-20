@@ -313,7 +313,8 @@
                                      <td class="text-center">
                                         <div class="flex justify-content-center gap-2">
                                             <Button  severity="primary" icon="pi pi-pencil" class="p-button-text p-button-rounded icon-btn-sm p-button-sm" outlined @click="Edtwork(item)" /> 
-                                            <Button  severity="danger" icon="pi pi-trash" class="p-button-text p-button-rounded icon-btn-sm p-button-sm" outlined @click="Delework(item)" />
+                                            <!-- <Button  severity="danger" icon="pi pi-trash" class="p-button-text p-button-rounded icon-btn-sm p-button-sm" outlined @click="Delework(item)" /> -->
+                                             <Button v-if="!item.subP01s || item.subP01s.length === 0" severity="danger" icon="pi pi-trash" class="p-button-text p-button-rounded icon-btn-sm p-button-sm" outlined @click="Delework(item)"/>
                                         </div>
                                     </td> 
                                 </tr>
@@ -654,7 +655,7 @@
                 console.error('Error:', error);
                 Swal.fire("เกิดข้อผิดพลาด!", "ไม่สามารถบันทึกข้อมูลได้", "error");
                 });
-            },
+        },
 
         // บันทึกประเภทภาระงาน   
         saveDatawork() {
@@ -665,7 +666,7 @@
                     text: "กรุณากรอกลำดับที่",
                     icon: "warning"
                 });
-                return; // หยุดการทำงานถ้าข้อมูลไม่ครบ
+                return; 
             }
 
             if (!this.text_Evalua) {
@@ -674,7 +675,7 @@
                     text: "กรุณาเลือกรอบประเมิน",
                     icon: "warning"
                 });
-                return; // หยุดการทำงานถ้าข้อมูลไม่ครบ
+                return;  
             }
 
             if (!this.text_searchwork) {
@@ -683,7 +684,7 @@
                     text: "กรุณากรอกชื่อภาระงาน",
                     icon: "warning"
                 });
-                return; // หยุดการทำงานถ้าข้อมูลไม่ครบ
+                return;  
             }
 
             // ถ้าข้อมูลครบถ้วน ก็ทำการบันทึกข้อมูล
@@ -694,8 +695,8 @@
                 nameH: this.text_searchwork,
                 // fac_id: this.facid_Main,
                 // year_id: this.year_Main
-                fac_id: this.dataP01.staffdepartment, // ใช้จาก props
-                year_id: this.dataP01.year             // 👈 ใช้ปีจาก props โ
+                fac_id: this.dataP01.staffdepartment,  
+                year_id: this.dataP01.year             
             }).then(res => {
                 //console.log(res.data);
                 Swal.fire({
@@ -757,36 +758,69 @@
                 } catch (error) {
                     console.error('Error:', error);
                 }
-            }, 
-            async Delework(id){  
-                Swal.fire({
-                    title: "คุณต้องการลบแบบ ป01 ใช่หรือไม่ ?",
-                    text: "เมื่อคลิกปุ่ม Yes, delete it! ข้อมูลจะถูกลบทันที!",
-                    icon: "warning",
-                    showCancelButton: true,
-                    confirmButtonColor: "#3085d6",
-                    cancelButtonColor: "#d33",
-                    confirmButtonText: "Yes, delete it!"
-                    }).then((result) => {
-                    if (result.isConfirmed) {
-                        axios.post(' http://127.0.0.1:8000/api/Delework',{
-                            id:id
-                        }).then(res => { 
-                                //console.log(res.data);   
-                            this.showDataPerson(this.dataP01.year,this.dataP01.staffdepartment,this.dataP01.evalua);
-                            Swal.fire({
-                            title: "ลบข้อมูลเสร็จสิ้น!",
-                            text: "ข้อมูลของคุณถูกลบแล้ว",
-                            icon: "success"
-                            });
-                        })
-                        .catch(error => {
-                            console.error('Error:', error);
-                        }); 
-                    }
-                }); 
             },  
 
+            // async Delework(id){  
+            //     Swal.fire({
+            //         title: "คุณต้องการลบแบบ ป01 ใช่หรือไม่ ?",
+            //         text: "เมื่อคลิกปุ่ม Yes, delete it! ข้อมูลจะถูกลบทันที!",
+            //         icon: "warning",
+            //         showCancelButton: true,
+            //         confirmButtonColor: "#3085d6",
+            //         cancelButtonColor: "#d33",
+            //         confirmButtonText: "Yes, delete it!"
+            //         }).then((result) => {
+            //         if (result.isConfirmed) {
+            //             axios.post(' http://127.0.0.1:8000/api/Delework',{
+            //                 id:id
+            //             }).then(res => { 
+            //                     //console.log(res.data);   
+            //                 this.showDataPerson(this.dataP01.year,this.dataP01.staffdepartment,this.dataP01.evalua);
+            //                 Swal.fire({
+            //                 title: "ลบข้อมูลเสร็จสิ้น!",
+            //                 text: "ข้อมูลของคุณถูกลบแล้ว",
+            //                 icon: "success"
+            //                 });
+            //             })
+            //             .catch(error => {
+            //                 console.error('Error:', error);
+            //             }); 
+            //         }
+            //     }); 
+            // },  
+
+        async Delework(id){  
+            Swal.fire({
+                title: "คุณต้องการลบหรือไม่ ?",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonText: "Yes, delete it!"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    axios.post('http://127.0.0.1:8000/api/Delework',{ id:id })
+                    .then(res => { 
+                        this.showDataPerson(this.dataP01.year,this.dataP01.staffdepartment,this.dataP01.evalua);
+
+                        Swal.fire({
+                            title: "สำเร็จ!",
+                            text: res.data.message,
+                            icon: "success"
+                        });
+                    })
+                    .catch(error => {
+
+                        // 🔥 ดัก error จาก backend
+                        if (error.response && error.response.data.message) {
+                            Swal.fire('แจ้งเตือน', error.response.data.message, 'warning');
+                        } else {
+                            Swal.fire('ผิดพลาด', 'ไม่สามารถลบข้อมูลได้', 'error');
+                        }
+
+                    }); 
+                }
+            }); 
+        },
+ 
         //แก้ไขเกณฑ์/ตัวชี้วัดของ ป.01
         // Editcriteria(item) {
         //     const index = this.products_list.findIndex(p => p.ind_no === item.ind_no);
