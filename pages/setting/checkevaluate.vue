@@ -2235,18 +2235,33 @@ export default {
                     persen: this.persen,
                     period_text: this.period_text
                 }, {
-                    responseType: 'blob'
+                    responseType: 'arraybuffer',
+                    headers: { Accept: 'application/pdf' }
                 });
 
                 Swal.close();
 
-                // สร้าง URL สำหรับเปิด PDF ใน Tab ใหม่
+                // สร้าง Blob และแสดง preview ในแท็บใหม่ (iframe)
                 const blob = new Blob([response.data], { type: 'application/pdf' });
                 const url = window.URL.createObjectURL(blob);
-                window.open(url, '_blank');
-                
-                // ล้างหน่วยความจำ
-                setTimeout(() => window.URL.revokeObjectURL(url), 100);
+
+                const preview = window.open('', '_blank');
+                if (preview) {
+                    preview.document.body.style.margin = '0';
+                    const iframe = preview.document.createElement('iframe');
+                    iframe.style.width = '100%';
+                    iframe.style.height = '100%';
+                    iframe.style.border = 'none';
+                    iframe.src = url;
+                    preview.document.body.appendChild(iframe);
+                    preview.addEventListener('beforeunload', () => {
+                        try { window.URL.revokeObjectURL(url); } catch (e) {}
+                    });
+                } else {
+                    // fallback ถ้าป๊อปอัพถูกบล็อก ให้เปิด url โดยตรง
+                    window.open(url, '_blank');
+                    setTimeout(() => window.URL.revokeObjectURL(url), 100);
+                }
 
             } catch (error) {
                 Swal.close();
@@ -2305,18 +2320,31 @@ export default {
                     persen: this.persen,
                     period_text: this.period_text
                 }, {
-                    responseType: 'blob'
+                    responseType: 'arraybuffer',
+                    headers: { Accept: 'application/pdf' }
                 });
 
                 Swal.close();
 
-                // สร้าง URL สำหรับเปิด PDF ใน Tab ใหม่
                 const blob = new Blob([response.data], { type: 'application/pdf' });
                 const url = window.URL.createObjectURL(blob);
-                window.open(url, '_blank');
-                
-                // ล้างหน่วยความจำ
-                setTimeout(() => window.URL.revokeObjectURL(url), 100);
+
+                const preview = window.open('', '_blank');
+                if (preview) {
+                    preview.document.body.style.margin = '0';
+                    const iframe = preview.document.createElement('iframe');
+                    iframe.style.width = '100%';
+                    iframe.style.height = '100%';
+                    iframe.style.border = 'none';
+                    iframe.src = url;
+                    preview.document.body.appendChild(iframe);
+                    preview.addEventListener('beforeunload', () => {
+                        try { window.URL.revokeObjectURL(url); } catch (e) {}
+                    });
+                } else {
+                    window.open(url, '_blank');
+                    setTimeout(() => window.URL.revokeObjectURL(url), 100);
+                }
 
             } catch (error) {
                 Swal.close();
@@ -2402,18 +2430,31 @@ export default {
                     persen: this.persen,
                     period_text: this.period_text
                 }, {
-                    responseType: 'blob'
+                    responseType: 'arraybuffer',
+                    headers: { Accept: 'application/pdf' }
                 }); 
 
                 Swal.close();
 
-                // สร้าง URL สำหรับเปิด PDF ใน Tab ใหม่
                 const blob = new Blob([response.data], { type: 'application/pdf' });
                 const url = window.URL.createObjectURL(blob);
-                window.open(url, '_blank');
-                
-                // ล้างหน่วยความจำ
-                setTimeout(() => window.URL.revokeObjectURL(url), 100);
+
+                const preview = window.open('', '_blank');
+                if (preview) {
+                    preview.document.body.style.margin = '0';
+                    const iframe = preview.document.createElement('iframe');
+                    iframe.style.width = '100%';
+                    iframe.style.height = '100%';
+                    iframe.style.border = 'none';
+                    iframe.src = url;
+                    preview.document.body.appendChild(iframe);
+                    preview.addEventListener('beforeunload', () => {
+                        try { window.URL.revokeObjectURL(url); } catch (e) {}
+                    });
+                } else {
+                    window.open(url, '_blank');
+                    setTimeout(() => window.URL.revokeObjectURL(url), 100);
+                }
 
             } catch (error) {
                 Swal.close();
@@ -2475,18 +2516,31 @@ export default {
                     persen: this.persen,
                     period_text: this.period_text
                 }, {
-                    responseType: 'blob'
+                    responseType: 'arraybuffer',
+                    headers: { Accept: 'application/pdf' }
                 });
 
                 Swal.close();
 
-                // สร้าง URL สำหรับเปิด PDF ใน Tab ใหม่
                 const blob = new Blob([response.data], { type: 'application/pdf' });
                 const url = window.URL.createObjectURL(blob);
-                window.open(url, '_blank');
-                
-                // ล้างหน่วยความจำ
-                setTimeout(() => window.URL.revokeObjectURL(url), 100);
+
+                const preview = window.open('', '_blank');
+                if (preview) {
+                    preview.document.body.style.margin = '0';
+                    const iframe = preview.document.createElement('iframe');
+                    iframe.style.width = '100%';
+                    iframe.style.height = '100%';
+                    iframe.style.border = 'none';
+                    iframe.src = url;
+                    preview.document.body.appendChild(iframe);
+                    preview.addEventListener('beforeunload', () => {
+                        try { window.URL.revokeObjectURL(url); } catch (e) {}
+                    });
+                } else {
+                    window.open(url, '_blank');
+                    setTimeout(() => window.URL.revokeObjectURL(url), 100);
+                }
 
             } catch (error) {
                 Swal.close();
@@ -2543,18 +2597,31 @@ export default {
                     persen: this.persen,
                     period_text: this.period_text
                 }, {
-                    responseType: 'blob'
+                    responseType: 'arraybuffer',
+                    headers: { Accept: 'application/pdf' }
                 });
 
                 Swal.close();
 
-                // สร้าง URL สำหรับเปิด PDF ใน Tab ใหม่
                 const blob = new Blob([response.data], { type: 'application/pdf' });
                 const url = window.URL.createObjectURL(blob);
-                window.open(url, '_blank');
-                
-                // ล้างหน่วยความจำ
-                setTimeout(() => window.URL.revokeObjectURL(url), 100);
+
+                const preview = window.open('', '_blank');
+                if (preview) {
+                    preview.document.body.style.margin = '0';
+                    const iframe = preview.document.createElement('iframe');
+                    iframe.style.width = '100%';
+                    iframe.style.height = '100%';
+                    iframe.style.border = 'none';
+                    iframe.src = url;
+                    preview.document.body.appendChild(iframe);
+                    preview.addEventListener('beforeunload', () => {
+                        try { window.URL.revokeObjectURL(url); } catch (e) {}
+                    });
+                } else {
+                    window.open(url, '_blank');
+                    setTimeout(() => window.URL.revokeObjectURL(url), 100);
+                }
 
             } catch (error) {
                 Swal.close();

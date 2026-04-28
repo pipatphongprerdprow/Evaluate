@@ -16,7 +16,7 @@
                         v-model="product_date"
                         :options="latestProductOnly"
                         autoFilterFocus
-                        :optionLabel="(item) => `${item.d_evaluationround} ${item.d_date}`"
+                        :optionLabel="(item) => item.d_evaluationround + ' ' + item.d_date"
                         placeholder="กรุณาเลือกรอบการประเมิน"
                         style="max-width: 500px;width: 100%;border: outset;"
                         @change="showdatator" 
@@ -592,18 +592,53 @@ const user = await getSession();
                         persen: this.dropdownProportion,
                         period_text: this.displayEvaluationPeriod,
                     }, {
-                        responseType: 'blob' // สำคัญมากสำหรับการรับไฟล์ PDF
+                        // รับข้อมูลไบนารี่เป็น ArrayBuffer (ปลอดภัยกว่าในบางกรณี)
+                        responseType: 'arraybuffer',
+                        headers: { 'Accept': 'application/pdf' }
                     });
 
-                    Swal.close();
+                        // ปิด loading
+                        Swal.close();
 
-                    // สร้าง URL สำหรับเปิด PDF ใน Tab ใหม่
-                    const blob = new Blob([response.data], { type: 'application/pdf' });
-                    const url = window.URL.createObjectURL(blob);
-                    window.open(url, '_blank');
-                    
-                    // ล้างหน่วยความจำ
-                    setTimeout(() => window.URL.revokeObjectURL(url), 100);
+                        // สร้าง Blob จาก ArrayBuffer ที่ได้มา แล้วสร้าง URL สำหรับ preview
+                        const blob = new Blob([response.data], { type: 'application/pdf' });
+                        const url = window.URL.createObjectURL(blob);
+
+                        // ชื่อไฟล์สำหรับดาวน์โหลด
+                        const fileName = `coverpage_${this.staffid_Main || 'user'}_${this.product_date.d_date || 'report'}.pdf`;
+
+                        // สร้างหน้าต่าง preview โดยใช้ DOM API (หลีกเลี่ยงการเขียน HTML เป็นสตริงเพื่อไม่ให้ parser สับสน)
+                        const previewWindow = window.open('', '_blank');
+                        if (previewWindow) {
+                            const doc = previewWindow.document;
+
+                            // ตั้งค่า head
+                            const meta = doc.createElement('meta');
+                            meta.name = 'viewport';
+                            meta.content = 'width=device-width, initial-scale=1';
+                            doc.head.appendChild(meta);
+
+                            const title = doc.createElement('title');
+                            title.textContent = `Preview - ${fileName}`;
+                            doc.head.appendChild(title);
+
+                            const style = doc.createElement('style');
+                            style.textContent = `html,body{height:100%;margin:0} .toolbar{padding:8px;background:#f5f5f5;display:flex;gap:8px;align-items:center} .pdf-frame{width:100%;height:calc(100% - 56px);border:0} a.button{padding:8px 12px;background:#1976d2;color:#fff;border-radius:4px;text-decoration:none}`;
+                            doc.head.appendChild(style);
+
+                                // เพิ่ม iframe สำหรับแสดง PDF
+                                const iframe = doc.createElement('iframe');
+                                iframe.className = 'pdf-frame';
+                                iframe.src = url;
+                                doc.body.appendChild(iframe);
+
+                                // คืนหน่วยความจำเมื่อหน้าต่าง preview ปิดลง
+                                previewWindow.addEventListener('unload', function() { try { URL.revokeObjectURL(url); } catch(e) {} });
+                        } else {
+                            // fallback: เปิด URL ตรงๆ
+                            window.open(url, '_blank');
+                            window.addEventListener('unload', function(){ try{ URL.revokeObjectURL(url); } catch(e){} });
+                        }
 
                 } catch (error) {
                     Swal.close();
