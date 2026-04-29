@@ -2,8 +2,8 @@
     <div class="grid">
         <div class="col-12 lg:col-12 xl:col-12">
             <div class="col md:col-12 text-right">
-               <!-- <Button label="Export" icon="pi pi-file-word" class="mr-2 mb-2 " @click="printDataP03"></Button>  -->
-                <Button label="Export" icon="pi pi-file-pdf" class="mr-2 mb-2" @click="printDataP03X" />
+               <Button label="Export" icon="pi pi-file-word" class="mr-2 mb-2 " @click="printDataP03"></Button> 
+                <!-- <Button label="Export" icon="pi pi-file-pdf" class="mr-2 mb-2" @click="printDataP03X" /> -->
             </div>   
               <!-- {{ user }} -->
             <div class="card mb-0">
@@ -2404,148 +2404,148 @@ import InputText from 'primevue/inputtext';
                 }); 
             },
 
-            // async printDataP03() { 
-            //     const { getSession } = await useAuth();
-            //     const user = await getSession();
-
-            //     // ✅ ให้แน่ใจว่า posadio ถูกโหลดแล้วก่อน export
-            //     await this.getAadioPosition(this.staffid_Main);
-
-            //     const staffId = String(this.staffid_Main).trim();
-            //     const executive = EXECUTIVE_ALLOWLIST.has(staffId) ? 1 : 0;
-
-            //     const form = {
-            //         staff_id: this.staffid_Main,
-            //         group_id: this.groupid_Main,
-            //         fac_id: this.dataPor.fac_id,
-            //         year_id: this.dataPor.d_date,
-            //         evalua: this.dataPor.evalua,
-
-            //         PREFIXFULLNAME: user.user.name.PREFIXFULLNAME,
-            //         STAFFNAME: user.user.name.STAFFNAME,
-            //         STAFFSURNAME: user.user.name.STAFFSURNAME,
-            //         POSITIONNAME: user.user.name.POSITIONNAME,
-            //         GROUPTYPENAME: user.user.name.GROUPTYPENAME,
-            //         POSTYPENAME: user.user.name.POSTYPENAME,
-            //         SCOPES: user.user.name.SCOPES.staffdepartmentname,
-
-            //         postypename: `ระดับ${this.postypename}`,
-
-            //         // ✅ เพิ่ม 2 ตัวนี้
-            //         posadio: String(this.posadio ?? ''),
-            //         executive: String(executive),
-            //     };
-
-            //     const queryParams = new URLSearchParams(form).toString();
-            //     const url = `http://127.0.0.1:8000/report_p03?${queryParams}`;
-            //     window.open(url, "_blank");
-            // },
-
-            // async printDataP03X() {
-            //     const { getSession } = await useAuth();
-            //     const user = await getSession(); 
-            //     const staffId = String(this.staffid_Main).trim();
-
-            //     try {
-            //         const payload = {
-            //             staff_id: this.staffid_Main,
-            //             group_id: this.groupid_Main,
-            //             fac_id: this.dataPor.fac_id,
-            //             year_id: this.dataPor.d_date,
-            //             evalua: this.dataPor.evalua,
-                        
-            //             // ✅ ส่งค่าให้ครบเหมือน ป.02
-            //             posadio: this.posadio, 
-            //             postypenameid: this.postypenameid,
-            //             postypename: `ระดับ${this.postypename}`, // ส่งไปเพื่อทำ Level Mapping ใน Blade
-                        
-            //             PREFIXFULLNAME: user.user.name.PREFIXFULLNAME,
-            //             STAFFNAME: user.user.name.STAFFNAME,
-            //             STAFFSURNAME: user.user.name.STAFFSURNAME,
-            //             POSITIONNAME: user.user.name.POSITIONNAME,
-            //             POSTYPENAME: user.user.name.POSTYPENAME,
-            //             SCOPES: user.user.name.SCOPES.staffdepartmentname,
-            //         };
-
-            //         const response = await axios.post("http://127.0.0.1:8000/api/exportPdf_P03", payload, {
-            //             responseType: 'blob' 
-            //         });
-
-            //         const url = window.URL.createObjectURL(response.data); 
-            //         window.open(url, '_blank');  
-            //     } catch (error) {
-            //         console.error("Error:", error);
-            //     } 
-            // },
-
-            async printDataP03X() {
+            async printDataP03() { 
                 const { getSession } = await useAuth();
-                const user = await getSession(); 
- 
-                try {  
-                    Swal.fire({
-                    title: 'กำลังสร้างไฟล์ PDF...',
-                    allowOutsideClick: false,
-                    didOpen: () => {
-                        Swal.showLoading();
-                    }
-                    });
+                const user = await getSession();
 
-                    const payload = {
+                // ✅ ให้แน่ใจว่า posadio ถูกโหลดแล้วก่อน export
+                await this.getAadioPosition(this.staffid_Main);
+
+                const staffId = String(this.staffid_Main).trim();
+                const executive = EXECUTIVE_ALLOWLIST.has(staffId) ? 1 : 0;
+
+                const form = {
                     staff_id: this.staffid_Main,
                     group_id: this.groupid_Main,
                     fac_id: this.dataPor.fac_id,
                     year_id: this.dataPor.d_date,
                     evalua: this.dataPor.evalua,
 
-                    posadio: this.posadio, 
-                    postypenameid: this.postypenameid,
-                    postypename: `ระดับ${this.postypename}`, 
-                    
                     PREFIXFULLNAME: user.user.name.PREFIXFULLNAME,
                     STAFFNAME: user.user.name.STAFFNAME,
                     STAFFSURNAME: user.user.name.STAFFSURNAME,
                     POSITIONNAME: user.user.name.POSITIONNAME,
+                    GROUPTYPENAME: user.user.name.GROUPTYPENAME,
                     POSTYPENAME: user.user.name.POSTYPENAME,
                     SCOPES: user.user.name.SCOPES.staffdepartmentname,
+
+                    postypename: `ระดับ${this.postypename}`,
+
+                    // ✅ เพิ่ม 2 ตัวนี้
+                    posadio: String(this.posadio ?? ''),
+                    executive: String(executive),
+                };
+
+                const queryParams = new URLSearchParams(form).toString();
+                const url = `http://127.0.0.1:8000/report_p03?${queryParams}`;
+                window.open(url, "_blank");
+            },
+
+            async printDataP03X() {
+                const { getSession } = await useAuth();
+                const user = await getSession(); 
+                const staffId = String(this.staffid_Main).trim();
+
+                try {
+                    const payload = {
+                        staff_id: this.staffid_Main,
+                        group_id: this.groupid_Main,
+                        fac_id: this.dataPor.fac_id,
+                        year_id: this.dataPor.d_date,
+                        evalua: this.dataPor.evalua,
+                        
+                        // ✅ ส่งค่าให้ครบเหมือน ป.02
+                        posadio: this.posadio, 
+                        postypenameid: this.postypenameid,
+                        postypename: `ระดับ${this.postypename}`, // ส่งไปเพื่อทำ Level Mapping ใน Blade
+                        
+                        PREFIXFULLNAME: user.user.name.PREFIXFULLNAME,
+                        STAFFNAME: user.user.name.STAFFNAME,
+                        STAFFSURNAME: user.user.name.STAFFSURNAME,
+                        POSITIONNAME: user.user.name.POSITIONNAME,
+                        POSTYPENAME: user.user.name.POSTYPENAME,
+                        SCOPES: user.user.name.SCOPES.staffdepartmentname,
                     };
 
-                    const response = await axios.post(
-                    "http://127.0.0.1:8000/api/exportPdf_P03",
-                    payload,
-                    {
-                        responseType: 'arraybuffer',
-                        headers: { Accept: 'application/pdf' }
-                    }
-                    );
-                    Swal.close();
+                    const response = await axios.post("http://127.0.0.1:8000/api/exportPdf_P03", payload, {
+                        responseType: 'blob' 
+                    });
 
-                    const blob = new Blob([response.data], { type: 'application/pdf' });
-                    const url = window.URL.createObjectURL(blob);
-
-                    const preview = window.open('', '_blank');
-                    if (preview) {
-                        preview.document.body.style.margin = '0';
-                        const iframe = preview.document.createElement('iframe');
-                        iframe.style.width = '100%';
-                        iframe.style.height = '100%';
-                        iframe.style.border = 'none';
-                        iframe.src = url;
-                        preview.document.body.appendChild(iframe);
-                        preview.addEventListener('beforeunload', () => {
-                            try { window.URL.revokeObjectURL(url); } catch (e) {}
-                        });
-                    } else {
-                        window.open(url, '_blank');
-                        setTimeout(() => window.URL.revokeObjectURL(url), 100);
-                    }
-
+                    const url = window.URL.createObjectURL(response.data); 
+                    window.open(url, '_blank');  
                 } catch (error) {
-                    Swal.close();
                     console.error("Error:", error);
-                    Swal.fire('เกิดข้อผิดพลาด', 'ไม่สามารถสร้างไฟล์ PDF ได้', 'error');
-                }
-            }, 
+                } 
+            },
+
+            // async printDataP03X() {
+            //     const { getSession } = await useAuth();
+            //     const user = await getSession(); 
+ 
+            //     try {  
+            //         Swal.fire({
+            //         title: 'กำลังสร้างไฟล์ PDF...',
+            //         allowOutsideClick: false,
+            //         didOpen: () => {
+            //             Swal.showLoading();
+            //         }
+            //         });
+
+            //         const payload = {
+            //         staff_id: this.staffid_Main,
+            //         group_id: this.groupid_Main,
+            //         fac_id: this.dataPor.fac_id,
+            //         year_id: this.dataPor.d_date,
+            //         evalua: this.dataPor.evalua,
+
+            //         posadio: this.posadio, 
+            //         postypenameid: this.postypenameid,
+            //         postypename: `ระดับ${this.postypename}`, 
+                    
+            //         PREFIXFULLNAME: user.user.name.PREFIXFULLNAME,
+            //         STAFFNAME: user.user.name.STAFFNAME,
+            //         STAFFSURNAME: user.user.name.STAFFSURNAME,
+            //         POSITIONNAME: user.user.name.POSITIONNAME,
+            //         POSTYPENAME: user.user.name.POSTYPENAME,
+            //         SCOPES: user.user.name.SCOPES.staffdepartmentname,
+            //         };
+
+            //         const response = await axios.post(
+            //         "http://127.0.0.1:8000/api/exportPdf_P03",
+            //         payload,
+            //         {
+            //             responseType: 'arraybuffer',
+            //             headers: { Accept: 'application/pdf' }
+            //         }
+            //         );
+            //         Swal.close();
+
+            //         const blob = new Blob([response.data], { type: 'application/pdf' });
+            //         const url = window.URL.createObjectURL(blob);
+
+            //         const preview = window.open('', '_blank');
+            //         if (preview) {
+            //             preview.document.body.style.margin = '0';
+            //             const iframe = preview.document.createElement('iframe');
+            //             iframe.style.width = '100%';
+            //             iframe.style.height = '100%';
+            //             iframe.style.border = 'none';
+            //             iframe.src = url;
+            //             preview.document.body.appendChild(iframe);
+            //             preview.addEventListener('beforeunload', () => {
+            //                 try { window.URL.revokeObjectURL(url); } catch (e) {}
+            //             });
+            //         } else {
+            //             window.open(url, '_blank');
+            //             setTimeout(() => window.URL.revokeObjectURL(url), 100);
+            //         }
+
+            //     } catch (error) {
+            //         Swal.close();
+            //         console.error("Error:", error);
+            //         Swal.fire('เกิดข้อผิดพลาด', 'ไม่สามารถสร้างไฟล์ PDF ได้', 'error');
+            //     }
+            // }, 
 
              // แก้ไขตัวชี้วัด / เกณฑ์การประเมิน
             EditRegislickP03(data){

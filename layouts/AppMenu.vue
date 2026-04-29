@@ -58,19 +58,22 @@ const allMenus = ref([
             //{ label: 'จัดการสิทธิ์บุคคล', icon: 'pi pi-fw pi-user', to: '/setting/setting_useradmin' }, 
         ]
     }, 
+     {
+        id: 'contact',
+        label: 'ช่องทางการติดต่อ',
+        items: [
+            { label: 'ช่องทางการติดต่อ', icon: 'pi pi-fw pi-phone', to: '/setting/setting_date' } 
+        ]
+    },  
 
-      
-    // {
-    //     id: 'Ad',
-    //     label: 'คำนวนค่างาน',
-    //     items: [ 
-    //         { label: 'ตรวจสอบค่างาน', icon: 'pi pi-calculator', to: '/setting/workcalculate' }, 
-    //     ]
-    // },
     {
         id: 'manual',
         label: 'คู่มือการใช้งานระบบ'
-    }
+    },
+
+   
+
+
 ]); 
 
 const group_chkUser = ref(null);
@@ -114,19 +117,19 @@ const model = computed(() => {
    // console.log("Computed model for group:", group);
     switch (group) {
         case '99':
-            return allMenus.value.filter(menu => ['home', 'tor', 'manual','history','torday'].includes(menu.id));//ผู้ใช้งานทั่วไป
+            return allMenus.value.filter(menu => ['home', 'tor', 'manual','history','torday','contact'].includes(menu.id));//ผู้ใช้งานทั่วไป
         case '2':
            // return allMenus.value.filter(menu => ['home', 'tor', 'executive','manual'].includes(menu.id)); //ฝ่ายบุคคล
-            return allMenus.value.filter(menu => ['home', 'tor', 'executive', 'hr', 'manual','Ad','torday','history'].includes(menu.id));//ฝ่ายบุคคล
+            return allMenus.value.filter(menu => ['home', 'tor', 'executive', 'hr', 'manual','Ad','torday','history','contact'].includes(menu.id));//ฝ่ายบุคคล
         case '3':
             //return allMenus.value.filter(menu => ['home', 'tor', 'executive', 'hr', 'manual'].includes(menu.id));//หน หน่วยงาน
-            return allMenus.value.filter(menu => ['home', 'tor', 'executive','manual','history'].includes(menu.id));//หน หน่วยงาน
+            return allMenus.value.filter(menu => ['home', 'tor', 'executive','manual','history','contact'].includes(menu.id));//หน หน่วยงาน
         case '4':
-            return allMenus.value.filter(menu => [ 'home','executive',].includes(menu.id));//ผู้บริหารสูงขึ้นไป
+            return allMenus.value.filter(menu => [ 'home','executive',,'contact'].includes(menu.id));//ผู้บริหารสูงขึ้นไป
         case '5':
-            return allMenus.value.filter(menu => [ 'home', 'tor', 'manual','Ad','torday',].includes(menu.id));//admin 
+            return allMenus.value.filter(menu => [ 'home', 'tor', 'manual','Ad','torday',,'contact'].includes(menu.id));//admin 
         default:
-            return allMenus.value.filter(menu => ['home', 'manual'].includes(menu.id));
+            return allMenus.value.filter(menu => ['home', 'manual','contact'].includes(menu.id));
     }
 });
 
