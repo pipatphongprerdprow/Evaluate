@@ -1,7 +1,7 @@
 <template>
   <div class="col md:col-12 text-right"> 
-    <Button label="Export" icon="pi pi-file-word" class="mr-2 mb-2" @click="printDataP01" /> 
-    <!-- <Button label="Export" icon="pi pi-file-pdf" class="mr-2 mb-2" @click="printDataP01" /> -->
+    <!-- <Button label="Export" icon="pi pi-file-word" class="mr-2 mb-2" @click="printDataP01" />  -->
+    <Button label="Export" icon="pi pi-file-pdf" class="mr-2 mb-2" @click="printDataP01" />
   </div> 
   <div class="col md:col-12 text-left" v-if="totalWeight < 100">
     <small style="color: red; font-size: larger;">
@@ -937,127 +937,99 @@ export default {
         })
         .catch((error) => console.error("Error:", error));
     },
+ 
+    
+    async printDataP01() {
+      const { getSession } = await useAuth();
+      const user = await getSession();
 
-    // async printDataP01() {
-    //   const { getSession } = await useAuth();
-    //   const user = await getSession(); 
-    //   try {
-    //     const response = await axios.post("http://127.0.0.1:8000/api/exportPdf_P01", {
-    //       staff_id: this.staffid_Main,
-    //       group_id: this.groupid_Main,
-    //       fac_id: this.dataPor.fac_id,
-    //       year_id: this.dataPor.d_date,
-    //       evalua: this.dataPor.evalua,
-    //       PREFIXFULLNAME: user.user.name.PREFIXFULLNAME,
-    //       STAFFNAME: user.user.name.STAFFNAME,
-    //       STAFFSURNAME: user.user.name.STAFFSURNAME,
-    //       POSITIONNAME: user.user.name.POSITIONNAME,
-    //       GROUPTYPENAME: user.user.name.GROUPTYPENAME,
-    //       POSTYPENAME: user.user.name.POSTYPENAME,
-    //       SCOPES: user.user.name.SCOPES.staffdepartmentname,
-    //       },
-    //   {
-    //     responseType: 'blob' // 🔥 สำคัญ 
-    //     });
+      try {
+        Swal.fire({
+          title: 'กำลังสร้างไฟล์ PDF...',
+          allowOutsideClick: false,
+          didOpen: () => {
+            Swal.showLoading();
+          }
+        });
 
-    //     console.log('response: ',response.data); 
-    //     const url = window.URL.createObjectURL(response.data); 
-    //     window.open(url, '_blank');  
-    //   } catch (error) {
-    //     console.error("Error:", error);
-    //   } 
-    // },
+        const response = await axios.post(
+          "http://127.0.0.1:8000/api/exportPdf_P01",
+          {
+            staff_id: this.staffid_Main,
+            group_id: this.groupid_Main,
+            fac_id: this.dataPor.fac_id,
+            year_id: this.dataPor.d_date,
+            evalua: this.dataPor.evalua,
+            PREFIXFULLNAME: user.user.name.PREFIXFULLNAME,
+            STAFFNAME: user.user.name.STAFFNAME,
+            STAFFSURNAME: user.user.name.STAFFSURNAME,
+            POSITIONNAME: user.user.name.POSITIONNAME,
+            GROUPTYPENAME: user.user.name.GROUPTYPENAME,
+            POSTYPENAME: user.user.name.POSTYPENAME,
+            SCOPES: user.user.name.SCOPES.staffdepartmentname,
+          },
+          {
+            responseType: 'arraybuffer',
+            headers: { Accept: 'application/pdf' }
+          }
+        );
+
+        Swal.close();
+
+        const blob = new Blob([response.data], { type: 'application/pdf' });
+        const url = window.URL.createObjectURL(blob);
+
+        const preview = window.open('', '_blank');
+        if (preview) {
+          preview.document.body.style.margin = '0';
+          const iframe = preview.document.createElement('iframe');
+          iframe.style.width = '100%';
+          iframe.style.height = '100%';
+          iframe.style.border = 'none';
+          iframe.src = url;
+          preview.document.body.appendChild(iframe);
+          preview.addEventListener('beforeunload', () => {
+            try { window.URL.revokeObjectURL(url); } catch (e) {}
+          });
+        } else {
+          // fallback if popup blocked
+          window.open(url, '_blank');
+          setTimeout(() => window.URL.revokeObjectURL(url), 100);
+        }
+
+      } catch (error) {
+        Swal.close();
+        console.error("Error:", error);
+        Swal.fire('เกิดข้อผิดพลาด', 'ไม่สามารถสร้างไฟล์ PDF ได้', 'error');
+      }
+     },
+
+     
+    //Export word (เดิม)
 
     // async printDataP01() {
     //   const { getSession } = await useAuth();
     //   const user = await getSession();
 
-    //   try {
-    //     Swal.fire({
-    //       title: 'กำลังสร้างไฟล์ PDF...',
-    //       allowOutsideClick: false,
-    //       didOpen: () => {
-    //         Swal.showLoading();
-    //       }
-    //     });
+    //   const form = {
+    //     staff_id: this.staffid_Main,
+    //     group_id: this.groupid_Main,
+    //     fac_id: this.dataPor.fac_id,
+    //     year_id: this.dataPor.d_date,
+    //     evalua: this.dataPor.evalua,
+    //     PREFIXFULLNAME: user.user.name.PREFIXFULLNAME,
+    //     STAFFNAME: user.user.name.STAFFNAME,
+    //     STAFFSURNAME: user.user.name.STAFFSURNAME,
+    //     POSITIONNAME: user.user.name.POSITIONNAME,
+    //     GROUPTYPENAME: user.user.name.GROUPTYPENAME,
+    //     POSTYPENAME: user.user.name.POSTYPENAME,
+    //     SCOPES: user.user.name.SCOPES.staffdepartmentname,
+    //   };
 
-    //     const response = await axios.post(
-    //       "http://127.0.0.1:8000/api/exportPdf_P01",
-    //       {
-    //         staff_id: this.staffid_Main,
-    //         group_id: this.groupid_Main,
-    //         fac_id: this.dataPor.fac_id,
-    //         year_id: this.dataPor.d_date,
-    //         evalua: this.dataPor.evalua,
-    //         PREFIXFULLNAME: user.user.name.PREFIXFULLNAME,
-    //         STAFFNAME: user.user.name.STAFFNAME,
-    //         STAFFSURNAME: user.user.name.STAFFSURNAME,
-    //         POSITIONNAME: user.user.name.POSITIONNAME,
-    //         GROUPTYPENAME: user.user.name.GROUPTYPENAME,
-    //         POSTYPENAME: user.user.name.POSTYPENAME,
-    //         SCOPES: user.user.name.SCOPES.staffdepartmentname,
-    //       },
-    //       {
-    //         responseType: 'arraybuffer',
-    //         headers: { Accept: 'application/pdf' }
-    //       }
-    //     );
-
-    //     Swal.close();
-
-    //     const blob = new Blob([response.data], { type: 'application/pdf' });
-    //     const url = window.URL.createObjectURL(blob);
-
-    //     const preview = window.open('', '_blank');
-    //     if (preview) {
-    //       preview.document.body.style.margin = '0';
-    //       const iframe = preview.document.createElement('iframe');
-    //       iframe.style.width = '100%';
-    //       iframe.style.height = '100%';
-    //       iframe.style.border = 'none';
-    //       iframe.src = url;
-    //       preview.document.body.appendChild(iframe);
-    //       preview.addEventListener('beforeunload', () => {
-    //         try { window.URL.revokeObjectURL(url); } catch (e) {}
-    //       });
-    //     } else {
-    //       // fallback if popup blocked
-    //       window.open(url, '_blank');
-    //       setTimeout(() => window.URL.revokeObjectURL(url), 100);
-    //     }
-
-    //   } catch (error) {
-    //     Swal.close();
-    //     console.error("Error:", error);
-    //     Swal.fire('เกิดข้อผิดพลาด', 'ไม่สามารถสร้างไฟล์ PDF ได้', 'error');
-    //   }
+    //   const queryParams = new URLSearchParams(form).toString();
+    //   const url = `http://127.0.0.1:8000/report_p01?${queryParams}`;
+    //   window.open(url, "_blank");
     // },
-
-    //Export word (เดิม)
-
-    async printDataP01() {
-      const { getSession } = await useAuth();
-      const user = await getSession();
-
-      const form = {
-        staff_id: this.staffid_Main,
-        group_id: this.groupid_Main,
-        fac_id: this.dataPor.fac_id,
-        year_id: this.dataPor.d_date,
-        evalua: this.dataPor.evalua,
-        PREFIXFULLNAME: user.user.name.PREFIXFULLNAME,
-        STAFFNAME: user.user.name.STAFFNAME,
-        STAFFSURNAME: user.user.name.STAFFSURNAME,
-        POSITIONNAME: user.user.name.POSITIONNAME,
-        GROUPTYPENAME: user.user.name.GROUPTYPENAME,
-        POSTYPENAME: user.user.name.POSTYPENAME,
-        SCOPES: user.user.name.SCOPES.staffdepartmentname,
-      };
-
-      const queryParams = new URLSearchParams(form).toString();
-      const url = `http://127.0.0.1:8000/report_p01?${queryParams}`;
-      window.open(url, "_blank");
-    },
 
     OpenDialogP01() {
       axios

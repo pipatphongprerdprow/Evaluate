@@ -2,8 +2,8 @@
     <div class="grid">
         <div class="col-12 lg:col-12 xl:col-12">
             <div class="col md:col-12 text-right">
-               <Button label="Export" icon="pi pi-file-word" class="mr-2 mb-2 " @click="printDataP03"></Button> 
-                <!-- <Button label="Export" icon="pi pi-file-pdf" class="mr-2 mb-2" @click="printDataP03X" /> -->
+               <!-- <Button label="Export" icon="pi pi-file-word" class="mr-2 mb-2 " @click="printDataP03"></Button>  -->
+                <Button label="Export" icon="pi pi-file-pdf" class="mr-2 mb-2" @click="printDataP03X" />
             </div>   
               <!-- {{ user }} -->
             <div class="card mb-0">
@@ -180,7 +180,7 @@
                                     <b v-if="subP01.score==1">&#10003;</b>
                                     <b v-if="subP01.score!=1"></b>
                                 </td> -->
-                                <td style="vertical-align: middle;" class="text-center">
+                                <td style="vertical-align: top;" class="text-center">
                                     <template v-if="isRowLoading(subP01.p01_id)">
                                         <Skeleton shape="circle" size="1.2rem" />
                                     </template>
@@ -194,7 +194,7 @@
                                     <b v-if="subP01.score==2">&#10003;</b>
                                     <b v-if="subP01.score!=2"></b>
                                 </td> -->
-                                <td style="vertical-align: middle;" class="text-center">
+                                <td style="vertical-align: top;" class="text-center">
                                     <template v-if="isRowLoading(subP01.p01_id)">
                                         <Skeleton shape="circle" size="1.2rem" />
                                     </template>
@@ -209,7 +209,7 @@
                                     <b v-if="subP01.score==3">&#10003;</b>
                                     <b v-if="subP01.score!=3"></b>
                                 </td> -->
-                                <td style="vertical-align: middle;" class="text-center">
+                                <td style="vertical-align: top;" class="text-center">
                                     <template v-if="isRowLoading(subP01.p01_id)">
                                         <Skeleton shape="circle" size="1.2rem" />
                                     </template>
@@ -223,7 +223,7 @@
                                     <b v-if="subP01.score==4">&#10003;</b>
                                     <b v-if="subP01.score!=4"></b>
                                 </td> -->
-                                <td style="vertical-align: middle;" class="text-center">
+                                <td style="vertical-align: top;" class="text-center">
                                     <template v-if="isRowLoading(subP01.p01_id)">
                                         <Skeleton shape="circle" size="1.2rem" />
                                     </template>
@@ -237,7 +237,7 @@
                                     <b v-if="subP01.score==5">&#10003;</b>
                                     <b v-if="subP01.score!=5"></b>
                                 </td>  -->
-                                <td style="vertical-align: middle;" class="text-center">
+                                <td style="vertical-align: top;" class="text-center">
                                     <template v-if="isRowLoading(subP01.p01_id)">
                                         <Skeleton shape="circle" size="1.2rem" />
                                     </template>
@@ -251,7 +251,7 @@
                                 <!-- <td v-if="currentDate >= dataPor.d_scoringday" style="vertical-align: middle;" class="text-center">
                                     {{ subP01.p01_score }}
                                 </td>  -->
-                                <td v-if="currentDate >= dataPor.d_scoringday" style="vertical-align: middle;" class="text-center">
+                                <td v-if="currentDate >= dataPor.d_scoringday" style="vertical-align: top;" class="text-center">
                                     <template v-if="isRowLoading(subP01.p01_id)">
                                         <Skeleton height="1rem" width="2rem" />
                                     </template>
@@ -266,7 +266,7 @@
                                     </div>
                                     <div v-else style="color: brown; font-weight: bold; text-align: center;"> ครบกำหนดวันบันทึก ป.03 </div>
                                 </td> -->
-                                <td style="vertical-align: middle;" class="text-center">
+                                <td style="vertical-align: top;" class="text-center">
                                     <template v-if="isRowLoading(subP01.p01_id)">
                                         <Skeleton height="2.4rem" width="5.5rem" borderRadius="10px" />
                                     </template>
@@ -2441,111 +2441,111 @@ import InputText from 'primevue/inputtext';
                 window.open(url, "_blank");
             },
 
-            async printDataP03X() {
-                const { getSession } = await useAuth();
-                const user = await getSession(); 
-                const staffId = String(this.staffid_Main).trim();
-
-                try {
-                    const payload = {
-                        staff_id: this.staffid_Main,
-                        group_id: this.groupid_Main,
-                        fac_id: this.dataPor.fac_id,
-                        year_id: this.dataPor.d_date,
-                        evalua: this.dataPor.evalua,
-                        
-                        // ✅ ส่งค่าให้ครบเหมือน ป.02
-                        posadio: this.posadio, 
-                        postypenameid: this.postypenameid,
-                        postypename: `ระดับ${this.postypename}`, // ส่งไปเพื่อทำ Level Mapping ใน Blade
-                        
-                        PREFIXFULLNAME: user.user.name.PREFIXFULLNAME,
-                        STAFFNAME: user.user.name.STAFFNAME,
-                        STAFFSURNAME: user.user.name.STAFFSURNAME,
-                        POSITIONNAME: user.user.name.POSITIONNAME,
-                        POSTYPENAME: user.user.name.POSTYPENAME,
-                        SCOPES: user.user.name.SCOPES.staffdepartmentname,
-                    };
-
-                    const response = await axios.post("http://127.0.0.1:8000/api/exportPdf_P03", payload, {
-                        responseType: 'blob' 
-                    });
-
-                    const url = window.URL.createObjectURL(response.data); 
-                    window.open(url, '_blank');  
-                } catch (error) {
-                    console.error("Error:", error);
-                } 
-            },
-
             // async printDataP03X() {
             //     const { getSession } = await useAuth();
             //     const user = await getSession(); 
- 
-            //     try {  
-            //         Swal.fire({
-            //         title: 'กำลังสร้างไฟล์ PDF...',
-            //         allowOutsideClick: false,
-            //         didOpen: () => {
-            //             Swal.showLoading();
-            //         }
-            //         });
+            //     const staffId = String(this.staffid_Main).trim();
 
+            //     try {
             //         const payload = {
-            //         staff_id: this.staffid_Main,
-            //         group_id: this.groupid_Main,
-            //         fac_id: this.dataPor.fac_id,
-            //         year_id: this.dataPor.d_date,
-            //         evalua: this.dataPor.evalua,
-
-            //         posadio: this.posadio, 
-            //         postypenameid: this.postypenameid,
-            //         postypename: `ระดับ${this.postypename}`, 
-                    
-            //         PREFIXFULLNAME: user.user.name.PREFIXFULLNAME,
-            //         STAFFNAME: user.user.name.STAFFNAME,
-            //         STAFFSURNAME: user.user.name.STAFFSURNAME,
-            //         POSITIONNAME: user.user.name.POSITIONNAME,
-            //         POSTYPENAME: user.user.name.POSTYPENAME,
-            //         SCOPES: user.user.name.SCOPES.staffdepartmentname,
+            //             staff_id: this.staffid_Main,
+            //             group_id: this.groupid_Main,
+            //             fac_id: this.dataPor.fac_id,
+            //             year_id: this.dataPor.d_date,
+            //             evalua: this.dataPor.evalua,
+                        
+            //             // ✅ ส่งค่าให้ครบเหมือน ป.02
+            //             posadio: this.posadio, 
+            //             postypenameid: this.postypenameid,
+            //             postypename: `ระดับ${this.postypename}`, // ส่งไปเพื่อทำ Level Mapping ใน Blade
+                        
+            //             PREFIXFULLNAME: user.user.name.PREFIXFULLNAME,
+            //             STAFFNAME: user.user.name.STAFFNAME,
+            //             STAFFSURNAME: user.user.name.STAFFSURNAME,
+            //             POSITIONNAME: user.user.name.POSITIONNAME,
+            //             POSTYPENAME: user.user.name.POSTYPENAME,
+            //             SCOPES: user.user.name.SCOPES.staffdepartmentname,
             //         };
 
-            //         const response = await axios.post(
-            //         "http://127.0.0.1:8000/api/exportPdf_P03",
-            //         payload,
-            //         {
-            //             responseType: 'arraybuffer',
-            //             headers: { Accept: 'application/pdf' }
-            //         }
-            //         );
-            //         Swal.close();
+            //         const response = await axios.post("http://127.0.0.1:8000/api/exportPdf_P03", payload, {
+            //             responseType: 'blob' 
+            //         });
 
-            //         const blob = new Blob([response.data], { type: 'application/pdf' });
-            //         const url = window.URL.createObjectURL(blob);
-
-            //         const preview = window.open('', '_blank');
-            //         if (preview) {
-            //             preview.document.body.style.margin = '0';
-            //             const iframe = preview.document.createElement('iframe');
-            //             iframe.style.width = '100%';
-            //             iframe.style.height = '100%';
-            //             iframe.style.border = 'none';
-            //             iframe.src = url;
-            //             preview.document.body.appendChild(iframe);
-            //             preview.addEventListener('beforeunload', () => {
-            //                 try { window.URL.revokeObjectURL(url); } catch (e) {}
-            //             });
-            //         } else {
-            //             window.open(url, '_blank');
-            //             setTimeout(() => window.URL.revokeObjectURL(url), 100);
-            //         }
-
+            //         const url = window.URL.createObjectURL(response.data); 
+            //         window.open(url, '_blank');  
             //     } catch (error) {
-            //         Swal.close();
             //         console.error("Error:", error);
-            //         Swal.fire('เกิดข้อผิดพลาด', 'ไม่สามารถสร้างไฟล์ PDF ได้', 'error');
-            //     }
-            // }, 
+            //     } 
+            // },
+
+            async printDataP03X() {
+                const { getSession } = await useAuth();
+                const user = await getSession(); 
+ 
+                try {  
+                        Swal.fire({
+                            title: 'กำลังสร้างไฟล์ PDF...',
+                            allowOutsideClick: false,
+                            didOpen: () => {
+                        Swal.showLoading();
+                        }
+                    });
+
+                    const payload = {
+                    staff_id: this.staffid_Main,
+                    group_id: this.groupid_Main,
+                    fac_id: this.dataPor.fac_id,
+                    year_id: this.dataPor.d_date,
+                    evalua: this.dataPor.evalua,
+
+                    posadio: this.posadio, 
+                    postypenameid: this.postypenameid,
+                    postypename: `ระดับ${this.postypename}`, 
+                    
+                    PREFIXFULLNAME: user.user.name.PREFIXFULLNAME,
+                    STAFFNAME: user.user.name.STAFFNAME,
+                    STAFFSURNAME: user.user.name.STAFFSURNAME,
+                    POSITIONNAME: user.user.name.POSITIONNAME,
+                    POSTYPENAME: user.user.name.POSTYPENAME,
+                    SCOPES: user.user.name.SCOPES.staffdepartmentname,
+                    };
+
+                    const response = await axios.post(
+                    "http://127.0.0.1:8000/api/exportPdf_P03",
+                    payload,
+                    {
+                        responseType: 'arraybuffer',
+                        headers: { Accept: 'application/pdf' }
+                    }
+                    );
+                    Swal.close();
+
+                    const blob = new Blob([response.data], { type: 'application/pdf' });
+                    const url = window.URL.createObjectURL(blob);
+
+                    const preview = window.open('', '_blank');
+                    if (preview) {
+                        preview.document.body.style.margin = '0';
+                        const iframe = preview.document.createElement('iframe');
+                        iframe.style.width = '100%';
+                        iframe.style.height = '100%';
+                        iframe.style.border = 'none';
+                        iframe.src = url;
+                        preview.document.body.appendChild(iframe);
+                        preview.addEventListener('beforeunload', () => {
+                            try { window.URL.revokeObjectURL(url); } catch (e) {}
+                        });
+                    } else {
+                        window.open(url, '_blank');
+                        setTimeout(() => window.URL.revokeObjectURL(url), 100);
+                    }
+
+                } catch (error) {
+                    Swal.close();
+                    console.error("Error:", error);
+                    Swal.fire('เกิดข้อผิดพลาด', 'ไม่สามารถสร้างไฟล์ PDF ได้', 'error');
+                }
+            }, 
 
              // แก้ไขตัวชี้วัด / เกณฑ์การประเมิน
             EditRegislickP03(data){
