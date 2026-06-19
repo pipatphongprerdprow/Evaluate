@@ -17,6 +17,15 @@ const allMenus = ref([
         items: [{ label: 'หน้าหลัก', icon: 'pi pi-fw pi-home', to: '/' }]
     },
     {
+        id: 'dashboard',
+        label: 'dashboard',
+        items: [
+            { label: 'dashboard', icon: 'pi pi-chart-bar', to: '/setting/dashboard' } 
+
+        ]
+        
+    }, 
+    {
         id: 'tor',
         label: 'แบบบันทึกข้อตกลง(TOR)ป.01-ป.03',
         items: [
@@ -62,7 +71,7 @@ const allMenus = ref([
         id: 'contact',
         label: 'ช่องทางการติดต่อ',
         items: [
-            { label: 'ช่องทางการติดต่อ', icon: 'pi pi-fw pi-phone', to: '/setting/setting_date' } 
+            { label: 'ช่องทางการติดต่อ', icon: 'pi pi-fw pi-phone', to: '/setting/contact' } 
         ]
     },  
 
@@ -120,14 +129,14 @@ const model = computed(() => {
             return allMenus.value.filter(menu => ['home', 'tor', 'manual','history','torday','contact'].includes(menu.id));//ผู้ใช้งานทั่วไป
         case '2':
            // return allMenus.value.filter(menu => ['home', 'tor', 'executive','manual'].includes(menu.id)); //ฝ่ายบุคคล
-            return allMenus.value.filter(menu => ['home', 'tor', 'executive', 'hr', 'manual','Ad','torday','history','contact'].includes(menu.id));//ฝ่ายบุคคล
+            return allMenus.value.filter(menu => ['home', 'tor', 'executive', 'hr', 'manual','Ad','torday','history','contact', 'dashboard'].includes(menu.id));//ฝ่ายบุคคล
         case '3':
             //return allMenus.value.filter(menu => ['home', 'tor', 'executive', 'hr', 'manual'].includes(menu.id));//หน หน่วยงาน
-            return allMenus.value.filter(menu => ['home', 'tor', 'executive','manual','history','contact'].includes(menu.id));//หน หน่วยงาน
+            return allMenus.value.filter(menu => ['home', 'tor', 'executive','manual','history','contact', 'dashboard'].includes(menu.id));//หน หน่วยงาน
         case '4':
-            return allMenus.value.filter(menu => [ 'home','executive',,'contact'].includes(menu.id));//ผู้บริหารสูงขึ้นไป
+            return allMenus.value.filter(menu => [ 'home','executive',,'contact', 'dashboard'].includes(menu.id));//ผู้บริหารสูงขึ้นไป
         case '5':
-            return allMenus.value.filter(menu => [ 'home', 'tor', 'manual','Ad','torday',,'contact'].includes(menu.id));//admin 
+            return allMenus.value.filter(menu => [ 'home', 'tor', 'manual','Ad','torday',,'contact', 'dashboard'].includes(menu.id));//admin 
         default:
             return allMenus.value.filter(menu => ['home', 'manual','contact'].includes(menu.id));
     }
