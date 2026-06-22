@@ -14,7 +14,10 @@ const allMenus = ref([
     {
         id: 'home',
         label: 'หน้าหลัก',
-        items: [{ label: 'หน้าหลัก', icon: 'pi pi-fw pi-home', to: '/' }]
+        items: [
+            { label: 'หน้าหลัก', icon: 'pi pi-fw pi-home', to: '/' },
+            { label: 'ภาพรวมการประเมิน', icon: 'pi pi-chart-bar', to: '/setting/dashboardstaff' } 
+        ]
     },
     {
         id: 'dashboard',
