@@ -15,13 +15,10 @@
           <h3>ผลการประเมินของฉัน</h3>
 
           <p>
-            Dashboard แสดงสถานะ คะแนน และรายละเอียดผลการประเมินเฉพาะผู้ใช้งานที่เข้าสู่ระบบ
+            Dashboard แสดงสถานะ คะแนน และรายละเอียดผลการประเมิน
           </p>
 
-          <div class="profile-strip">
-            <!-- <div class="profile-avatar">
-              {{ profileInitial }}
-            </div> -->
+          <div class="profile-strip"> 
 
             <div class="profile-avatar">
               <img
@@ -29,8 +26,7 @@
                 :src="profileImageSrc"
                 :alt="profileFullName"
                 @error="profileImageLoadError = true"
-              />
-
+              /> 
               <span v-else>
                 {{ profileInitial }}
               </span>
@@ -1277,22 +1273,8 @@ export default {
   background: rgba(255, 255, 255, 0.12);
   border: 1px solid rgba(255, 255, 255, 0.18);
   backdrop-filter: blur(12px);
-}
-
-/* .profile-avatar {
-  width: 58px;
-  height: 58px;
-  display: grid;
-  place-items: center;
-  border-radius: 20px;
-  background: linear-gradient(135deg, #facc15, #f97316);
-  color: #111827;
-  font-size: 1.6rem;
-  font-weight: 900;
-  box-shadow: 0 12px 28px rgba(250, 204, 21, 0.25);
-  flex-shrink: 0;
-} */
- .profile-avatar {
+} 
+.profile-avatar {
   width: 58px !important;
   height: 58px !important;
   min-width: 58px !important;
