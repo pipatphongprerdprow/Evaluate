@@ -74,7 +74,7 @@
                         </tr> 
                     </tbody> 
                 </table>   
-<!-- 
+
                 <div style="text-align: center;">
                     <Button 
                         label="ส่งคะแนนประเมิน" 
@@ -88,7 +88,7 @@
                 </div>
                 <div style=" color: red; font-size: 16px; margin-top: 6px; font-weight: 500; text-align: center; ">
                     * ⚠️ หมายเหตุ: เมื่อกดปุ่มส่งคะแนน ระบบจะส่งคะแนนประเมินทั้งหมดไปยังระบบบุคลากร ⚠️
-                </div>  -->
+                </div> 
 
 
                 <div class="col md:col-5 text-right">   

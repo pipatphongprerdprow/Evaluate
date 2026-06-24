@@ -33,14 +33,15 @@
             </div>
           </div>
 
-          <div class="card-actions">
+          <!-- <div class="card-actions">
             <a v-if="admin.phone" :href="`tel:${admin.phone}`" class="action-btn primary">
               <i class="pi pi-phone"></i> โทรติดต่อ
             </a>
             <a v-if="admin.email" :href="`mailto:${admin.email}`" class="action-btn secondary">
               <i class="pi pi-envelope"></i> ส่งอีเมล
             </a>
-          </div>
+          </div> -->
+          
         </div>
       </div>
 

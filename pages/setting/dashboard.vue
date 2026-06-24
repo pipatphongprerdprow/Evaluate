@@ -214,9 +214,21 @@
                 <Column header="ผู้รับการประเมิน" style="min-width: 260px">
                     <template #body="slotProps">
                         <div class="person-cell">
-                            <div class="avatar">
+                            <!-- <div class="avatar">
                                 {{ getInitial(slotProps.data) }}
-                            </div>
+                            </div> -->
+
+                            <div class="avatar">
+                              <img
+                                v-if="getProfileImageSrc(slotProps.data) && !avatarImageLoadErrors[getAvatarKey(slotProps.data)]"
+                                :src="getProfileImageSrc(slotProps.data)"
+                                :alt="`${slotProps.data.prefixfullname || ''} ${slotProps.data.namefully || ''}`.trim()"
+                                @error="markAvatarImageError(slotProps.data)"
+                              /> 
+                              <span v-else>
+                                {{ getInitial(slotProps.data) }}
+                              </span>
+                            </div> 
 
                             <div>
                                 <strong>
@@ -320,9 +332,21 @@
                   <Column header="ผู้รับการประเมิน" style="min-width: 260px">
                       <template #body="slotProps">
                           <div class="person-cell">
-                              <div class="avatar">
+                              <!-- <div class="avatar">
                                   {{ getInitial(slotProps.data) }}
-                              </div>
+                              </div> -->
+
+                              <div class="avatar">
+                                <img
+                                  v-if="getProfileImageSrc(slotProps.data) && !avatarImageLoadErrors[getAvatarKey(slotProps.data)]"
+                                  :src="getProfileImageSrc(slotProps.data)"
+                                  :alt="`${slotProps.data.prefixfullname || ''} ${slotProps.data.namefully || ''}`.trim()"
+                                  @error="markAvatarImageError(slotProps.data)"
+                                /> 
+                                <span v-else>
+                                  {{ getInitial(slotProps.data) }}
+                                </span>
+                              </div>  
 
                               <div>
                                   <strong>
@@ -415,6 +439,8 @@
   import axios from 'axios';
   import Swal from 'sweetalert2';
 
+  const PROFILE_IMAGE_URL = 'https://pd.msu.ac.th/staff/picture/';
+
   export default {
     data() {
       return {
@@ -424,6 +450,8 @@
       selected_faculty: null,
       facultyList: [],
       products: [],
+
+      avatarImageLoadErrors: {},
 
       loading: false,
       loadingEvalu: false,
@@ -1141,6 +1169,52 @@
           });
         }
       },
+
+      normalizeStaffId(value) {
+        return String(value ?? '').replace(/\s+/g, '').trim();
+      },
+
+      getRowStaffId(item) {
+        return this.normalizeStaffId(
+          item?.staffid ||
+          item?.STAFFID ||
+          item?.staff_id ||
+          item?.staffId ||
+          item?.STAFF_ID ||
+          item?.staffcode ||
+          item?.STAFFCODE ||
+          item?.person_id ||
+          item?.PERSON_ID ||
+          item?.pid ||
+          item?.PID ||
+          item?.tb_tor?.staffid ||
+          item?.tb_tor?.STAFFID ||
+          item?.tb_tor?.staff_id ||
+          item?.tb_tor?.staffId ||
+          item?.tb_tor?.STAFF_ID ||
+          item?.tb_tor?.staffcode ||
+          item?.tb_tor?.STAFFCODE ||
+          ''
+        );
+      },
+
+      getAvatarKey(item) {
+        return this.getRowStaffId(item) || `${item?.namefully || ''}-${item?.posnameth || ''}`;
+      },
+
+      getProfileImageSrc(item) {
+        const staffid = this.getRowStaffId(item);
+        return staffid ? `${PROFILE_IMAGE_URL}${staffid}.jpg` : '';
+      },
+
+      markAvatarImageError(item) {
+        const key = this.getAvatarKey(item);
+
+        this.avatarImageLoadErrors = {
+          ...this.avatarImageLoadErrors,
+          [key]: true
+        };
+      },
  
     }
   };
@@ -1519,10 +1593,27 @@
     border-radius: 50%;
     display: grid;
     place-items: center;
+    overflow: hidden;
     background: #e0f2fe;
     color: #0369a1;
     font-weight: 800;
     flex-shrink: 0;
+  }
+
+  .avatar img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+    object-position: center top;
+    border-radius: 50%;
+  }
+
+  .avatar span {
+    width: 100%;
+    height: 100%;
+    display: grid;
+    place-items: center;
   }
 
   .person-cell strong {
