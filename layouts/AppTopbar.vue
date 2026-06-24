@@ -82,12 +82,15 @@ const isOutsideClicked = (event) => {
 <template>
     <div class="layout-topbar">
         <router-link to="/" class="layout-topbar-logo">
-            <img src="~/assets/layout/images/MSU_PA.4.jpg" alt="logo" style="width: 300px; height: auto;" />
-            <!-- <img src="~/assets/layout/images/evalua_MSU.jpg" alt="logo" style="width: 300px; height: auto;" /> -->
-             
-            <!-- <img src="~/assets/layout/images/kongkang.jpg" alt="logo" />
-            <span>Evaluate Personnel MSU</span> -->
+            <img src="~/assets/layout/images/MSU_PA.4.jpg" alt="logo" style="width: 300px; height: auto;" />  
         </router-link>
+        <!-- <router-link to="/" class="layout-topbar-logo pa-logo-box">
+            <img 
+                src="~/assets/layout/images/PA1.png" 
+                alt="logo" 
+                class="pa-logo-img" 
+            />
+        </router-link> -->
 
         <button class="p-link layout-menu-button layout-topbar-button" @click="onMenuToggle()">
             <i class="pi pi-bars"></i>
@@ -114,4 +117,34 @@ const isOutsideClicked = (event) => {
     </div>
 </template>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+    .layout-topbar {
+        height: 86px !important;
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
+        display: flex;
+        align-items: center;
+    }
+
+    .pa-logo-box {
+        width: 300px !important;
+        min-width: 300px !important;
+        height: 86px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: flex-start !important;
+        padding: 0 0 0 12px !important;
+        overflow: visible !important;
+    }
+
+    /* ตัวนี้สำคัญที่สุด ใช้ override CSS เดิมของ template */
+    .layout-topbar .pa-logo-box img.pa-logo-img {
+        width: 280px !important;
+        height: auto !important;
+        max-height: 82px !important;
+        object-fit: contain !important;
+        object-position: left center !important;
+        display: block !important;
+    }
+
+</style>

@@ -58,10 +58,10 @@
                                 <div v-else>
                                     <span style="color: brown;">รอประกาศผลคะแนน</span>
                                 </div>
-                                </td>
+                            </td>
 
 
-                                <td class="text-center" style="color: blue;">
+                            <td class="text-center" style="color: blue;">
                                 <div v-if="isScoreAnnounced(Item)">
                                     <b>{{ calcBehaviorSum(Item) }}</b>
                                 </div>

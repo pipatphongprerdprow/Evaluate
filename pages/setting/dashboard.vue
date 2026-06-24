@@ -11,31 +11,29 @@
                   </p>
               </div>
 
-              <div class="hero-actions">
+            <div class="hero-actions">
+                  <Dropdown
+                      v-model="selected_faculty"
+                      :options="facultyOptions"
+                      :optionLabel="facultyOptionLabel"
+                      placeholder="เลือกคณะ / หน่วยงาน"
+                      class="faculty-select"
+                      filter
+                      :disabled="loading || facultyOptions.length === 0"
+                      @change="onFacultyChange"
+                  /> 
                   <Dropdown
                       v-model="tracking_date"
-                      :options="tracking_dates || []"
-                      :optionLabel="(item) => `${item.facuties} ${item.d_evaluationround} ${item.d_date}`"
+                      :options="filteredTrackingDates"
+                      :optionLabel="roundOptionLabel"
                       placeholder="กรุณาเลือกรอบการประเมิน"
                       class="round-select"
+                      :disabled="loading || !selected_faculty"
+                      @change="onTrackingDateChange"
                   />
+            </div>
 
-                  <Button
-                      label="ค้นหา"
-                      icon="pi pi-search"
-                      :disabled="loading || !tracking_date"
-                      @click="xxr"
-                  />
-
-                  <Button
-                      label="Export PDF"
-                      icon="pi pi-file-pdf"
-                      severity="danger"
-                      outlined
-                      :disabled="loading || totalStaff === 0"
-                      @click="printDatatrackingpdf"
-                  />
-              </div>
+            
           </section>
 
           <!-- LOADING -->
@@ -51,8 +49,8 @@
                       <i class="pi pi-users"></i>
                   </div>
                   <div>
-                      <span>บุคลากรทั้งหมด</span>
-                      <strong>{{ totalStaff }}</strong>
+                      <span>บุคลากรทั้งหมด</span> 
+                        <strong>{{ formatAnimated(animated.totalStaff, 0) }}</strong>
                       <small>คนในรอบประเมินที่เลือก</small>
                   </div>
               </div>
@@ -63,8 +61,8 @@
                   </div>
                   <div>
                       <span>ประเมินแล้ว</span>
-                      <strong>{{ completedStaff }}</strong>
-                      <small>{{ completedPercent }}% ของทั้งหมด</small>
+                      <strong>{{ formatAnimated(animated.completedStaff, 0) }}</strong>
+                      <small>{{ formatAnimated(animated.completedPercent, 1) }}% ของทั้งหมด</small>
                   </div>
               </div>
 
@@ -73,8 +71,8 @@
                       <i class="pi pi-clock"></i>
                   </div>
                   <div>
-                      <span>รอข้อมูลประเมิน</span>
-                      <strong>{{ pendingStaff }}</strong>
+                      <span>รอข้อมูลประเมิน</span> 
+                      <strong>{{ formatAnimated(animated.pendingStaff, 0) }}</strong>
                       <small>ควรติดตามข้อมูลเพิ่มเติม</small>
                   </div>
               </div>
@@ -84,8 +82,8 @@
                       <i class="pi pi-chart-line"></i>
                   </div>
                   <div>
-                      <span>คะแนนเฉลี่ยรวม</span>
-                      <strong>{{ avgTotalScore }}</strong>
+                      <span>คะแนนเฉลี่ยรวม</span> 
+                      <strong>{{ formatAnimated(animated.avgTotalScore, 2) }}</strong>
                       <small>จากผู้ที่มีข้อมูลประเมิน</small>
                   </div>
               </div>
@@ -99,14 +97,14 @@
                           <h3>ความคืบหน้าการประเมิน</h3>
                           <p>แสดงสัดส่วนผู้ที่มีข้อมูลประเมินแล้ว</p>
                       </div>
-                      <Tag :value="`${completedPercent}%`" severity="success" />
+                      <Tag :value="`${formatAnimated(animated.completedPercent, 1)}%`" severity="success" />
                   </div>
 
-                  <ProgressBar :value="completedPercent" />
+                  <ProgressBar :value="animated.completedPercent" /> 
 
                   <div class="progress-meta">
-                      <span>ประเมินแล้ว {{ completedStaff }} คน</span>
-                      <span>รอข้อมูล {{ pendingStaff }} คน</span>
+                      <span>ประเมินแล้ว {{ formatAnimated(animated.completedStaff, 0) }} คน</span>
+                      <span>รอข้อมูล {{ formatAnimated(animated.pendingStaff, 0) }} คน</span>
                   </div>
               </div>
 
@@ -120,55 +118,22 @@
 
                   <div class="score-summary-grid">
                       <div class="score-box">
-                          <span>ผลสัมฤทธิ์ของงาน</span>
-                          <strong>{{ avgAchievementScore }}</strong>
+                          <span>ผลสัมฤทธิ์ของงาน</span> 
+                          <strong>{{ formatAnimated(animated.avgAchievementScore, 2) }}</strong>
                       </div>
 
                       <div class="score-box">
                           <span>พฤติกรรมฯ</span>
-                          <strong>{{ avgBehaviorScore }}</strong>
+                          <strong>{{ formatAnimated(animated.avgBehaviorScore, 2) }}</strong>
                       </div>
 
                       <div class="score-box highlight">
                           <span>คะแนนรวม</span>
-                          <strong>{{ avgTotalScore }}</strong>
+                          <strong>{{ formatAnimated(animated.avgTotalScore, 2) }}</strong>
                       </div>
                   </div>
               </div>
-          </section>
-
-          <!-- LEVEL SUMMARY -->
-          <!-- <section class="level-grid">
-              <div class="level-card excellent">
-                  <span>ดีเด่น</span>
-                  <strong>{{ outstandingCount }}</strong>
-                  <small>90 - 100 คะแนน</small>
-              </div>
-
-              <div class="level-card very-good">
-                  <span>ดีมาก</span>
-                  <strong>{{ veryGoodCount }}</strong>
-                  <small>80 - 89 คะแนน</small>
-              </div>
-
-              <div class="level-card good">
-                  <span>ดี</span>
-                  <strong>{{ goodCount }}</strong>
-                  <small>70 - 79 คะแนน</small>
-              </div>
-
-              <div class="level-card fair">
-                  <span>พอใช้</span>
-                  <strong>{{ fairCount }}</strong>
-                  <small>60 - 69 คะแนน</small>
-              </div>
-
-              <div class="level-card improve">
-                  <span>ต้องปรับปรุง</span>
-                  <strong>{{ improveCount }}</strong>
-                  <small>ต่ำกว่า 60 คะแนน</small>
-              </div>
-          </section> -->
+          </section> 
 
           <!-- LEVEL SUMMARY -->
           <section class="level-grid">
@@ -177,7 +142,7 @@
                   @click="openLevelDialog('outstanding')"
               >
                   <span>ดีเด่น</span>
-                  <strong>{{ outstandingCount }}</strong>
+                  <strong>{{ formatAnimated(animated.outstandingCount, 0) }}</strong>
                   <small>90 - 100 คะแนน</small>
                   <em>คลิกดูรายชื่อ</em>
               </div>
@@ -187,7 +152,7 @@
                   @click="openLevelDialog('veryGood')"
               >
                   <span>ดีมาก</span>
-                  <strong>{{ veryGoodCount }}</strong>
+                  <strong>{{ formatAnimated(animated.veryGoodCount, 0) }}</strong>
                   <small>80 - 89 คะแนน</small>
                   <em>คลิกดูรายชื่อ</em>
               </div>
@@ -197,7 +162,7 @@
                   @click="openLevelDialog('good')"
               >
                   <span>ดี</span>
-                  <strong>{{ goodCount }}</strong>
+                  <strong>{{ formatAnimated(animated.goodCount, 0) }}</strong>
                   <small>70 - 79 คะแนน</small>
                   <em>คลิกดูรายชื่อ</em>
               </div>
@@ -207,7 +172,7 @@
                   @click="openLevelDialog('fair')"
               >
                   <span>พอใช้</span>
-                  <strong>{{ fairCount }}</strong>
+                  <strong>{{ formatAnimated(animated.fairCount, 0) }}</strong>
                   <small>60 - 69 คะแนน</small>
                   <em>คลิกดูรายชื่อ</em>
               </div>
@@ -217,7 +182,7 @@
                   @click="openLevelDialog('improve')"
               >
                   <span>ต้องปรับปรุง</span>
-                  <strong>{{ improveCount }}</strong>
+                  <strong>{{ formatAnimated(animated.improveCount, 0) }}</strong>
                   <small>ต่ำกว่า 60 คะแนน</small>
                   <em>คลิกดูรายชื่อ</em>
               </div>
@@ -286,12 +251,17 @@
                         </div>
                     </template>
                 </Column>
-
+ 
                 <Column header="ระดับ" style="width: 120px">
-                    <template #body="slotProps">
-                        <b>{{ scoreLevel(slotProps.data.tb_tor?.sum_score) }}</b>
-                    </template>
-                </Column>
+                  <template #body="slotProps">
+                      <span
+                          class="level-text"
+                          :class="scoreClass(slotProps.data.tb_tor?.sum_score)"
+                      >
+                          {{ scoreLevel(slotProps.data.tb_tor?.sum_score) }}
+                      </span>
+                  </template>
+              </Column> 
             </DataTable>
 
             <div v-if="selectedLevelRows.length === 0" class="empty-level">
@@ -302,7 +272,7 @@
                 <Button
                     label="ปิด"
                     icon="pi pi-times"
-                    severity="secondary"
+                    severity="warning"
                     @click="levelDialogVisible = false"
                 />
             </template>
@@ -332,7 +302,7 @@
               <div class="panel-head table-head">
                   <div>
                       <h3>รายชื่อผู้รับการประเมิน</h3>
-                      <p>แสดงข้อมูลจากตารางเดิม พร้อมสถานะและระดับผลประเมิน</p>
+                      <!-- <p>แสดงข้อมูลจากตารางเดิม พร้อมสถานะและระดับผลประเมิน</p> -->
                   </div>
 
                   <span class="table-summary">{{ dashboardRows.length }} รายการ</span>
@@ -420,28 +390,17 @@
 
                   <Column header="ระดับ" style="width: 130px">
                       <template #body="slotProps">
-                          <span v-if="slotProps.data.tb_tor">
+                          <span
+                              v-if="slotProps.data.tb_tor"
+                              class="level-text"
+                              :class="scoreClass(slotProps.data.tb_tor.sum_score)"
+                          >
                               {{ scoreLevel(slotProps.data.tb_tor.sum_score) }}
                           </span>
-                          <span v-else>-</span>
-                      </template>
-                  </Column>
 
-                  <!-- <Column header="ประเมิน" style="width: 130px">
-                      <template #body="slotProps">
-                          <Button
-                              v-if="slotProps.data.tb_tor"
-                              label="ประเมิน"
-                              icon="pi pi-list"
-                              size="small"
-                              :loading="loadingEvaluIndex === slotProps.index"
-                              :disabled="loadingEvalu"
-                              @click="openDataEvalu(slotProps.data, slotProps.index)"
-                          />
-
-                          <span v-else class="pending-text">รอข้อมูล</span>
+                          <span v-else class="level-text muted">-</span>
                       </template>
-                  </Column> -->
+                  </Column> 
               </DataTable>
           </section>
       </div>
@@ -459,13 +418,37 @@
   export default {
     data() {
       return {
+      access_token:'',
       tracking_date: null,
       tracking_dates: [],
+      selected_faculty: null,
+      facultyList: [],
       products: [],
 
       loading: false,
       loadingEvalu: false,
       loadingEvaluIndex: null,
+
+      animated: {
+        totalStaff: 0,
+        completedStaff: 0,
+        pendingStaff: 0,
+        completedPercent: 0,
+
+        avgTotalScore: 0,
+        avgAchievementScore: 0,
+        avgBehaviorScore: 0,
+
+        outstandingCount: 0,
+        veryGoodCount: 0,
+        goodCount: 0,
+        fairCount: 0,
+        improveCount: 0
+      },
+
+      counterFrames: [],
+
+
 
       levelDialogVisible: false,
       selectedLevelKey: null,
@@ -480,8 +463,8 @@
 
       postypename: '',
       postypenameid: '',
-      stftypename: '', 
-
+      stftypename: '',  
+ 
       };
     },
 
@@ -657,10 +640,41 @@
           });
       },
 
+      facultyOptions() {
+        const rows = Array.isArray(this.facultyList) ? this.facultyList : [];
 
+        return rows
+          .map((item) => {
+            return {
+              fac_id: String(
+                item?.fac_id ??
+                item?.facultyID ??
+                item?.FACULTYID ??
+                item?.faculty_id ??
+                item?.id ??
+                ''
+              ).trim(),
 
-
-
+              facuties: String(
+                item?.facuties ??
+                item?.faculty_name ??
+                item?.FACULTYNAME ??
+                item?.facultyName ??
+                item?.name ??
+                ''
+              ).trim() || 'ไม่ระบุคณะ / หน่วยงาน'
+            };
+          })
+          .filter((item) => item.fac_id || item.facuties)
+          .sort((a, b) => {
+            return String(a.facuties || '').localeCompare(String(b.facuties || ''), 'th');
+          });
+      },
+ 
+      filteredTrackingDates() {
+        return Array.isArray(this.tracking_dates) ? this.tracking_dates : [];
+      },
+ 
     },
 
     async mounted() {
@@ -671,6 +685,8 @@
         const { STAFFID, SCOPES } = user.user.name;
         const { staffdepartment, groupid } = SCOPES;
 
+        this.access_token = user?.providerInfo?.access_token;
+
         this.setSession(
           STAFFID,
           staffdepartment,
@@ -679,10 +695,32 @@
           user.user.name.POSITIONNAMEID
         );
 
-        await this.showDataSet();
+        // 1) โหลดรายชื่อคณะ / หน่วยงานทั้งหมด
+        await this.onFacultySelectAll();
+
+        // 2) ตั้งค่าเริ่มต้นเป็นคณะของผู้ใช้งาน
+        this.selected_faculty =
+          this.facultyOptions.find((item) => {
+            return String(item.fac_id) === String(this.facid_Main);
+          }) ||
+          this.facultyOptions[0] ||
+          null;
+
+        // 3) โหลดรอบประเมินของคณะที่เลือก
+        if (this.selected_faculty?.fac_id) {
+          await this.showDataSet(this.selected_faculty.fac_id);
+
+          // 4) ถ้าต้องการให้ข้อมูลแสดงทันที
+          this.tracking_date = this.filteredTrackingDates[0] || null;
+
+          if (this.tracking_date) {
+            await this.showDataEvalu();
+          }
+        }
 
       } catch (error) {
         console.error('mounted error:', error);
+
         Swal.fire({
           icon: 'error',
           title: 'โหลดข้อมูลผู้ใช้ไม่สำเร็จ',
@@ -708,17 +746,27 @@
         } finally {
           this.loading = false;
         }
-      },
+      }, 
 
-      async showDataSet() {
+      async showDataSet(facId = null) {
         try {
-          const res = await axios.post('http://127.0.0.1:8000/api/showDateSetleader', {
-            staff_id: this.staffid_Main,
-            fac_id: this.facid_Main,
-            group_id: this.groupid_Main
+          const targetFacId = String(
+            facId || this.selected_faculty?.fac_id || ''
+          ).trim();
+
+          if (!targetFacId) {
+            this.tracking_dates = [];
+            return;
+          }
+
+          const res = await axios.get('http://127.0.0.1:8000/api/searchDateSetFaculty', {
+            params: {
+              fac_id: targetFacId
+            }
           });
 
-          console.log('showDateSetleader:', res.data);
+          // console.log('searchDateSetFaculty fac_id:', targetFacId);
+          // console.log('searchDateSetFaculty result:', res.data);
 
           this.tracking_dates = Array.isArray(res.data) ? res.data : [];
 
@@ -730,7 +778,7 @@
           Swal.fire({
             icon: 'error',
             title: 'โหลดรอบประเมินไม่สำเร็จ',
-            text: 'กรุณาตรวจสอบ API showDateSetleader'
+            text: 'กรุณาตรวจสอบ API searchDateSetFaculty'
           });
         }
       },
@@ -750,26 +798,58 @@
         });
       },
 
+      async onTrackingDateChange() {
+        this.products = [];
+        this.levelDialogVisible = false;
+        this.selectedLevelKey = null;
+        this.selectedLevelTitle = '';
+
+        this.clearCounterAnimations();
+        this.resetAnimatedNumbers();
+
+        if (!this.tracking_date || this.tracking_date?.evalua === undefined) {
+          return;
+        }
+
+        await this.withLoading(async () => {
+          await this.showDataEvalu();
+        });
+      },
+  
       async showDataEvalu() {
         try {
+          if (!this.selected_faculty?.fac_id || !this.tracking_date) {
+            this.products = [];
+            return;
+          }
+
           const res = await axios.get('http://127.0.0.1:8000/api/showDataEvalu', {
             params: {
               staff_id: this.staffid_Main,
-              fac_id: this.tracking_date.fac_id,
+
+              // จุดสำคัญ ใช้คณะที่เลือกจาก Dropdown
+              fac_id: this.selected_faculty.fac_id,
+
               group_id: this.groupid_Main,
               evalua: this.tracking_date.evalua,
               p_year: this.tracking_date.d_date
             }
           });
 
-          console.log('showDataEvalu:', res.data);
+          // console.log('showDataEvalu:', res.data);
 
           this.products = Array.isArray(res.data) ? res.data : [];
+
+          this.$nextTick(() => {
+            this.animateDashboardNumbers();
+          });
 
         } catch (error) {
           console.error('showDataEvalu error:', error);
 
           this.products = [];
+          this.clearCounterAnimations();
+          this.resetAnimatedNumbers();
 
           Swal.fire({
             icon: 'error',
@@ -852,8 +932,7 @@
               console.log('selectedLevelRows:', this.selectedLevelRows);
           });
       },
-
-
+ 
       async printDatatrackingpdf() {
         if (!this.tracking_date) {
           Swal.fire({
@@ -903,8 +982,7 @@
           });
         }
       },
-
-
+ 
       openDataEvalu(item, index) {
         console.log('openDataEvalu:', item, index);
 
@@ -913,7 +991,157 @@
           title: 'ยังไม่ได้เชื่อม Dialog เดิม',
           text: 'ถ้าต้องการใช้แบบประเมิน ป.01 - ป.04 ต้องนำ methods เดิมของ openDataEvalu กลับมาใส่'
         });
-      }
+      },
+
+      clearCounterAnimations() {
+        this.counterFrames.forEach((frameId) => {
+          cancelAnimationFrame(frameId);
+        });
+
+        this.counterFrames = [];
+      },
+
+      resetAnimatedNumbers() {
+        this.animated = {
+          totalStaff: 0,
+          completedStaff: 0,
+          pendingStaff: 0,
+          completedPercent: 0,
+
+          avgTotalScore: 0,
+          avgAchievementScore: 0,
+          avgBehaviorScore: 0,
+
+          outstandingCount: 0,
+          veryGoodCount: 0,
+          goodCount: 0,
+          fairCount: 0,
+          improveCount: 0
+        };
+      },
+
+      animateNumber(key, targetValue, decimals = 0, duration = 900) {
+        const startValue = 0;
+        const endValue = Number(targetValue) || 0;
+        const startTime = performance.now();
+
+        const run = (currentTime) => {
+          const elapsed = currentTime - startTime;
+          const progress = Math.min(elapsed / duration, 1);
+
+          // ทำให้ช่วงท้ายช้าลง ดูนุ่มกว่า linear
+          const easedProgress = 1 - Math.pow(1 - progress, 3);
+
+          const currentValue = startValue + (endValue - startValue) * easedProgress;
+
+          this.animated[key] =
+            decimals > 0
+              ? Number(currentValue.toFixed(decimals))
+              : Math.round(currentValue);
+
+          if (progress < 1) {
+            const frameId = requestAnimationFrame(run);
+            this.counterFrames.push(frameId);
+          } else {
+            this.animated[key] =
+              decimals > 0
+                ? Number(endValue.toFixed(decimals))
+                : Math.round(endValue);
+          }
+        };
+
+        const frameId = requestAnimationFrame(run);
+        this.counterFrames.push(frameId);
+      },
+
+      animateDashboardNumbers() {
+        this.clearCounterAnimations();
+        this.resetAnimatedNumbers();
+
+        this.animateNumber('totalStaff', this.totalStaff, 0, 800);
+        this.animateNumber('completedStaff', this.completedStaff, 0, 800);
+        this.animateNumber('pendingStaff', this.pendingStaff, 0, 800);
+        this.animateNumber('completedPercent', this.completedPercent, 1, 900);
+
+        this.animateNumber('avgTotalScore', this.avgTotalScore, 2, 1000);
+        this.animateNumber('avgAchievementScore', this.avgAchievementScore, 2, 1000);
+        this.animateNumber('avgBehaviorScore', this.avgBehaviorScore, 2, 1000);
+
+        this.animateNumber('outstandingCount', this.outstandingCount, 0, 850);
+        this.animateNumber('veryGoodCount', this.veryGoodCount, 0, 850);
+        this.animateNumber('goodCount', this.goodCount, 0, 850);
+        this.animateNumber('fairCount', this.fairCount, 0, 850);
+        this.animateNumber('improveCount', this.improveCount, 0, 850);
+      },
+
+      formatAnimated(value, decimals = 0) {
+        const num = Number(value) || 0;
+
+        return num.toLocaleString('th-TH', {
+          minimumFractionDigits: decimals,
+          maximumFractionDigits: decimals
+        });
+      },
+
+      facultyOptionLabel(item) {
+          return item?.facuties || 'ไม่ระบุคณะ / หน่วยงาน';
+      },
+
+      roundOptionLabel(item) {
+          if (!item) return '';
+
+          return `${item.d_evaluationround || ''} ${item.d_date || ''}`.trim();
+          //  return `${item.facuties || ''} ${item.d_evaluationround || ''} ${item.d_date || ''}`.trim();
+      },
+ 
+      async onFacultyChange() {
+        this.tracking_date = null;
+        this.tracking_dates = [];
+        this.products = [];
+
+        this.levelDialogVisible = false;
+        this.selectedLevelKey = null;
+        this.selectedLevelTitle = '';
+
+        this.clearCounterAnimations();
+        this.resetAnimatedNumbers();
+
+        if (!this.selected_faculty?.fac_id) return;
+
+        await this.withLoading(async () => {
+          await this.showDataSet(this.selected_faculty.fac_id);
+        });
+      },
+ 
+      async onFacultySelectAll() {
+        try {
+          const res = await axios.get('http://127.0.0.1:8000/api/searchDataFaculty', {
+            params: {
+              access_token: this.access_token
+            }
+          });
+
+          // console.log('searchDataFaculty:', res.data);
+
+          this.facultyList = Array.isArray(res.data)
+            ? res.data
+            : Array.isArray(res.data?.data)
+              ? res.data.data
+              : [];
+
+        } catch (error) {
+          console.error('onFacultySelectAll error:', error);
+
+          this.facultyList = [];
+
+          Swal.fire({
+            icon: 'error',
+            title: 'โหลดรายชื่อคณะ / หน่วยงานไม่สำเร็จ',
+            text: 'กรุณาตรวจสอบ API searchDataFaculty'
+          });
+        }
+      },
+ 
     }
   };
   </script>
@@ -926,22 +1154,22 @@
   }
 
   /* HEADER */
-  .dash-hero {
-    display: flex;
-    justify-content: space-between;
-    gap: 1.5rem;
-    align-items: center;
-    padding: 1.55rem 1.65rem;
-    border-radius: 24px;
-    background:
-      radial-gradient(circle at top right, rgba(20, 184, 166, 0.28), transparent 34%),
-      linear-gradient(135deg, #0f1f4b 0%, #1e3a8a 48%, #0f766e 100%);
-    color: #ffffff;
-    box-shadow:
-      0 18px 40px rgba(15, 31, 75, 0.22),
-      0 6px 16px rgba(15, 118, 110, 0.14);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-  }
+ .dash-hero {
+      display: flex;
+      justify-content: space-between;
+      gap: 1.5rem;
+      align-items: center;
+      padding: 1.55rem 1.65rem;
+      border-radius: 24px;
+      background:
+        radial-gradient(circle at top right, rgba(45, 212, 191, 0.22), transparent 36%),
+        linear-gradient(135deg, #2563eb 0%, #38bdf8 52%, #14b8a6 100%);
+      color: #ffffff;
+      box-shadow:
+        0 14px 30px rgba(37, 99, 235, 0.16),
+        0 6px 16px rgba(20, 184, 166, 0.10);
+      border: 1px solid rgba(255, 255, 255, 0.24);
+    }
 
   .eyebrow {
     font-size: 0.72rem;
@@ -1005,20 +1233,7 @@
     font-weight: 700;
     padding: 0 1rem;
     transition: all 0.22s ease;
-  }
-
-  /* ปุ่มค้นหา */
-  :deep(.hero-actions .p-button:not(.p-button-outlined)) {
-    background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
-    border: none;
-    color: #ffffff;
-    box-shadow: 0 10px 22px rgba(20, 184, 166, 0.26);
-  }
-
-  :deep(.hero-actions .p-button:not(.p-button-outlined):hover) {
-    background: linear-gradient(135deg, #0f766e 0%, #115e59 100%);
-    transform: translateY(-1px);
-  }
+  } 
 
   /* ปุ่ม Export PDF */
   :deep(.hero-actions .p-button.p-button-outlined) {
@@ -1418,4 +1633,143 @@
       font-size: 1.55rem;
     }
   }
-  </style>
+
+  .clickable-level {
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition:
+    transform 0.22s ease,
+    box-shadow 0.22s ease,
+    border-color 0.22s ease,
+    background 0.22s ease;
+}
+
+.clickable-level:hover {
+  transform: translateY(-7px) scale(1.015);
+  box-shadow: 0 16px 34px rgba(15, 23, 42, 0.14);
+  background: #ffffff;
+}
+
+.clickable-level:active {
+  transform: translateY(-2px) scale(0.995);
+}
+
+.clickable-level em {
+  display: inline-block;
+  margin-top: 0.45rem;
+  font-size: 0.78rem;
+  font-style: normal;
+  font-weight: 700;
+  color: #64748b;
+  opacity: 0;
+  transform: translateY(5px);
+  transition: all 0.22s ease;
+}
+
+.clickable-level:hover em {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.level-card.excellent:hover {
+  border-left-color: #22c55e;
+}
+
+.level-card.very-good:hover {
+  border-left-color: #0ea5e9;
+}
+
+.level-card.good:hover {
+  border-left-color: #6366f1;
+}
+
+.level-card.fair:hover {
+  border-left-color: #f59e0b;
+}
+
+.level-card.improve:hover {
+  border-left-color: #ef4444;
+}
+
+.level-text {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 88px;
+  padding: 0.32rem 0.65rem;
+  border-radius: 999px;
+  font-weight: 800;
+  font-size: 0.92rem;
+}
+
+/* ดีเด่น */
+.level-text.excellent {
+  color: #16a34a;
+  background: #f0fdf4;
+}
+
+/* ดีมาก */
+.level-text.very-good {
+  color: #0284c7;
+  background: #f0f9ff;
+}
+
+/* ดี */
+.level-text.good {
+  color: #4f46e5;
+  background: #eef2ff;
+}
+
+/* พอใช้ */
+.level-text.fair {
+  color: #f59e0b;
+  background: #fffbeb;
+}
+
+/* ต้องปรับปรุง */
+.level-text.improve {
+  color: #dc2626;
+  background: #fef2f2;
+}
+
+/* กรณียังไม่มีข้อมูล */
+.level-text.muted {
+  color: #94a3b8;
+  background: transparent;
+  font-weight: 700;
+}
+
+
+.faculty-select {
+  min-width: 300px;
+}
+
+.round-select {
+  min-width: 360px;
+}
+
+:deep(.faculty-select.p-dropdown),
+:deep(.faculty-select .p-dropdown),
+:deep(.round-select.p-dropdown),
+:deep(.round-select .p-dropdown) {
+  min-height: 46px;
+  border-radius: 12px;
+  border: 1px solid rgba(226, 232, 240, 0.95);
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.12);
+}
+
+:deep(.faculty-select .p-dropdown-label),
+:deep(.round-select .p-dropdown-label) {
+  color: #334155;
+  font-weight: 500;
+}
+
+:deep(.faculty-select .p-dropdown-trigger),
+:deep(.round-select .p-dropdown-trigger) {
+  color: #64748b;
+}
+
+
+</style>

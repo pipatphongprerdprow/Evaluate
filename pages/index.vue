@@ -2,7 +2,31 @@
     <!-- Loading state -->
     <div v-if="status === 'loading'" class="flex align-items-center justify-content-center" style="min-height: 400px;">
         <i class="pi pi-spin pi-spinner" style="font-size: 3rem;"></i>
-    </div>
+        <div style="width: 70%; margin-top: 1rem;">
+            <div class="surface-card p-4" style="border-radius:8px;">
+                <h4 class="mb-3">รายการโปรแกรม (Programs)</h4>
+                <div v-if="programsLoading" class="flex align-items-center">
+                    <i class="pi pi-spin pi-spinner" style="font-size: 1.5rem;"></i>
+                    <span class="ml-3">กำลังดาวน์โหลด...</span>
+                </div>
+                <div v-else-if="programsError" class="text-red-600">Error: {{ programsError }}</div>
+                <table v-else class="w-full">
+                    <thead>
+                        <tr>
+                            <th style="text-align:left">#</th>
+                            <th style="text-align:left">Program</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="(p, i) in programs" :key="i">
+                            <td>{{ i + 1 }}</td>
+                            <td>{{ p.programname ?? p.program_name ?? p.name ?? JSON.stringify(p) }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>  
     
     <!-- Content when authenticated -->
     <div v-else-if="status === 'authenticated'" class="flex flex-column align-items-center justify-content-center" style="width: 100%; max-width: 1200px;"> 
@@ -63,7 +87,7 @@
                     </span>
                 </router-link>
             </div> 
-        </div> 
+        </div>  
     </div>
     
     <!-- Content for guests (not logged in) -->
@@ -86,23 +110,25 @@
             </div> 
         </div> 
     </div> 
-</template>
+</template> 
 
 <script setup> 
     definePageMeta({
         auth: false
     });
     
-    const { status, data: sessionData } = useAuthState();
-    const { signIn } = useAuth();
+    const { status, data: sessionData, data } = useAuthState();
+    const { signIn } = useAuth();  
     
     // รอให้ session โหลดเสร็จก่อนแสดงผล
     const user = computed(() => sessionData.value || {});
-    console.log(sessionData);
+    // console.log('user: ',user?.value?.providerInfo.access_token);
     
     
     // Profile image URL
-    const profileImageUrl = 'https://pd.msu.ac.th/staff/picture/';
+    const profileImageUrl = 'https://pd.msu.ac.th/staff/picture/'; 
+
+    
 </script> 
                             
     <style scoped>

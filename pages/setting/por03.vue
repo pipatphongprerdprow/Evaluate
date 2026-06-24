@@ -986,13 +986,7 @@ import InputText from 'primevue/inputtext';
             ],
             //ตาราง ข. สมรรถนะเฉพาะตามลักษณะงานที่ปฏิบัติ
             jobSpecificCompetencies: [],
-                //{ id: 6, activity: 'ข. 1 การคิดวิเคราะห์', indicator: '1', data_table2: '' },
-            //     { id: 7, activity: 'ข. 2 การดำเนินการเชิงรุก', indicator: '1', data_table2: '' },
-            //     { id: 8, activity: 'ข. 3 ความผูกพันที่มีต่อส่วนราชการ', indicator: '1', data_table2: '' },
-            //     { id: 9, activity: 'ข. 4 การมองภาพองค์รวม', indicator: '1', data_table2: '' },
-            //     { id: 10, activity: 'ข. 5 การสืบเสาะหาข้อมูล', indicator: '1', data_table2: '' },
-            //     { id: 11, activity: 'ข. 6 การตรวจสอบความถูกต้องตามกระบวนงาน', indicator: '1', data_table2: '' }
-            // ],
+            
             //ตาราง ค. สมรรถนะอื่นๆ
             otherCompetencies: [
                 { id: 12, activity: 'ค. 1 สภาวะผู้นำ', indicator: '0', datatable3: '' },
@@ -1295,15 +1289,7 @@ import InputText from 'primevue/inputtext';
                 expectedLevel: 0, 
             }   
         }, 
-        // async mounted(){  
-        //     const { signIn, getSession, signOut } = await useAuth()
-        //     const user = await getSession(); 
-        //     //console.log(user.user.name); 
-        //     const {STAFFID, SCOPES} = user.user.name
-        //     const {staffdepartment, groupid, staffdepartmentname, groupname} = SCOPES
-        //     await this.setSession(STAFFID,staffdepartment,groupid,user.user.name.POSTYPENAME,user.user.name.POSITIONNAMEID,user.user.name.POSITIONNAME);   
-        //     await this.loadCompetencyDescriptions();
-        // }, 
+        
 
         async mounted(){  
             const { getSession } = await useAuth();
@@ -1324,30 +1310,7 @@ import InputText from 'primevue/inputtext';
             await this.loadCompetencyDescriptions();
             await this.reloadAllData();
         },
-
-        // watch: { 
-        //     tab3Reload(v) { 
-        //         // console.log("por03 tab3Reload",v);
-        //         this.showDataP03(); 
-        //           // ✅ เพิ่ม 3 บรรทัดนี้
-        //         this.showdataPo();
-        //         this.getjobSpecificCompetencies();
-        //         this.showAssess();
-        //     }, 
-        //     // เฝ้าดูการเปลี่ยนแปลงของ dataPor
-        //     dataPor: {
-        //         handler(newVal, oldVal) {
-        //             // console.log('dataPor changed:', newVal);
-        //             this.showDataP03();
-        //             this.showdataPo();
-        //             this.chkp03data();
-        //             this.getjobSpecificCompetencies(); 
-        //             this.showAssess();
-        //             // ทำสิ่งที่ต้องการเมื่อ dataPor เปลี่ยนแปลง
-        //         },
-        //         deep: true  
-        //     }
-        // },
+ 
         watch: { 
             tab3Reload: {
                 async handler() {
@@ -1378,16 +1341,7 @@ import InputText from 'primevue/inputtext';
                 }
             }, 
 
-            // setSession (staffid_Main,facid_Main,groupid_Main,postypename,postypenameid,positionname) { 
-            //     this.staffid_Main = staffid_Main
-            //     this.facid_Main = facid_Main
-            //     this.groupid_Main = groupid_Main  
-            //     this.postypename = postypename    
-            //     this.postypenameid = postypenameid
-            //     this.positionname = positionname   
-            //     this.getAadioPosition(staffid_Main); 
-            //     // console.log('setSession: ',staffid_Main,facid_Main,groupid_Main);  
-            // },
+            
             async setSession(staffid_Main, facid_Main, groupid_Main, postypename, postypenameid, positionname) { 
                 this.staffid_Main = staffid_Main;
                 this.facid_Main = facid_Main;
@@ -1491,32 +1445,7 @@ import InputText from 'primevue/inputtext';
                  //this.products_list_p03 = this.products_list_p03.filter(product => product.p03ind_no !== data.p03ind_no); 
                  this.products_list_p03.splice(index, 1); // ลบรายการจาก products_list_p03 ที่ตำแหน่ง index
             },
-            // บันทึกรายงานผลการปฏิบัติราชการตามตัวชี้วัด/ เกณฑ์การประเมิน
-            // 100369
-            // saveDataListP03() {   
-            //     if(this.products_list_p03.length == 0){
-            //         Swal.fire("error","กรุณาตรวจสอบตารางข้อมูล ตัวชี้วัดการประเมิน!","error");
-            //     }else{
-            //         axios.post('   http://127.0.0.1:8000/api/saveListP03', {
-            //             p_id: this.text_edtP03,
-            //             products_list: this.products_list_p03
-            //         })
-            //         .then((res) => {
-            //              console.log(res.data);  
-            //             Swal.fire({
-            //                 title: "บันทึกสำเร็จ!",
-            //                 text: "ข้อมูล ตัวชี้วัด/ เกณฑ์การประเมิน ถูกบันทึกเรียบร้อย!",
-            //                 icon: "success"
-            //             });
-            //             this.DialogAdd = false;
-            //             this.showDataP03();
-            //         })
-            //         .catch((error) => {
-            //             console.error('Error:', error);
-            //         });
-            //     }
-            // },
-
+             
             async saveDataListP03() {
                 if (this.products_list_p03.length === 0) {
                     Swal.fire("error", "กรุณาตรวจสอบตารางข้อมูล ตัวชี้วัดการประเมิน!", "error");
@@ -1620,89 +1549,206 @@ import InputText from 'primevue/inputtext';
                     };
                 });
             }, 
+
+            //23/06/69
+            // async saveDataDoc() {
+            //     const file = this.selectedFiles[0];
+            //     //console.log(file);
+            //     try {
+            //         if (this.radioValue === 'doc') {
+            //             if (!this.doc_no) {
+            //                 Swal.fire("error", "กรุณากรอก ลำดับ!", "error");
+            //             } else if (!this.doc_name) {
+            //                 Swal.fire("error", "กรุณากรอก ชื่อไฟล์!", "error");
+            //             } else if (!file) {
+            //                 Swal.fire("error", "กรุณาเลือกไฟล์แนบ!", "error");
+            //             } else {
+            //                 const fileData = await this.add_data_file(file);
+            //                 const formData = new FormData();
+            //                 formData.append("text_edtDoc", this.text_edtDoc);
+            //                 formData.append("doc_type", this.radioValue);
+            //                 formData.append("doc_no", this.doc_no);
+            //                 formData.append("doc_name", this.doc_name);
+            //                 formData.append("file", JSON.stringify(fileData));
+
+            //                 const instance_x = axios.create({
+            //                     headers: {
+            //                         'Content-Type': 'application/x-www-form-urlencoded',
+            //                     }
+            //                 });
+
+            //                 instance_x.post('   http://127.0.0.1:8000/api/saveDocP03', formData)
+            //                     .then(res => {
+            //                         this.showDataP03();
+            //                         this.Data_Doc();
+            //                         this.resetFormFields();  // รีเซ็ตฟิลด์หลังจากบันทึกสำเร็จ
+
+            //                     })
+            //                     .catch(error => {
+            //                         console.error('Error:', error);
+            //                     });
+            //             }
+            //         } else if (this.radioValue === 'link') {
+            //             if (!this.doc_no) {
+            //                 Swal.fire("error", "กรุณากรอก ลำดับ!", "error");
+            //             } else if (!this.doc_name) {
+            //                 Swal.fire("error", "กรุณากรอก ชื่อไฟล์!", "error");
+            //             } else if (!this.doc_link) {
+            //                 Swal.fire("error", "กรุณากรอกข้อมูล แนบลิงค์เอกสาร!", "error");
+            //             } else {
+            //                 const formData = new FormData();
+            //                 formData.append("text_edtDoc", this.text_edtDoc);
+            //                 formData.append("doc_type", this.radioValue);
+            //                 formData.append("doc_no", this.doc_no);
+            //                 formData.append("doc_name", this.doc_name);
+            //                 formData.append("doc_link", this.doc_link);
+
+            //                 const instance_x = axios.create({
+            //                     headers: {
+            //                         'Content-Type': 'application/x-www-form-urlencoded',
+            //                     }
+            //                 });
+
+            //                 instance_x.post('   http://127.0.0.1:8000/api/saveDocP03', formData)
+            //                     .then(res => {
+            //                         this.showDataP03();
+            //                         this.Data_Doc();
+            //                         this.resetFormFields();  // รีเซ็ตฟิลด์หลังจากบันทึกสำเร็จ
+            //                         this.docSavedSuccess = true;
+            //                         Swal.fire({
+            //                             position: "top-end",
+            //                             icon: "success",
+            //                             title: "บันทึกหลักฐานสำเร็จ",
+            //                             showConfirmButton: false,
+            //                             timer: 1000
+            //                         });
+            //                     })
+            //                     .catch(error => {
+            //                         console.error('Error:', error);
+            //                     });
+            //             }
+            //         } else {
+            //             Swal.fire("error", "กรุณาตรวจสอบ ประเภทการแนปเอกสาร!", "error");
+            //         }
+            //     } catch (error) {
+            //         console.error('Error processing file:', error);
+            //     }
+            // },
+
             async saveDataDoc() {
                 const file = this.selectedFiles[0];
-                //console.log(file);
+
                 try {
                     if (this.radioValue === 'doc') {
                         if (!this.doc_no) {
                             Swal.fire("error", "กรุณากรอก ลำดับ!", "error");
-                        } else if (!this.doc_name) {
-                            Swal.fire("error", "กรุณากรอก ชื่อไฟล์!", "error");
-                        } else if (!file) {
-                            Swal.fire("error", "กรุณาเลือกไฟล์แนบ!", "error");
-                        } else {
-                            const fileData = await this.add_data_file(file);
-                            const formData = new FormData();
-                            formData.append("text_edtDoc", this.text_edtDoc);
-                            formData.append("doc_type", this.radioValue);
-                            formData.append("doc_no", this.doc_no);
-                            formData.append("doc_name", this.doc_name);
-                            formData.append("file", JSON.stringify(fileData));
-
-                            const instance_x = axios.create({
-                                headers: {
-                                    'Content-Type': 'application/x-www-form-urlencoded',
-                                }
-                            });
-
-                            instance_x.post('   http://127.0.0.1:8000/api/saveDocP03', formData)
-                                .then(res => {
-                                    this.showDataP03();
-                                    this.Data_Doc();
-                                    this.resetFormFields();  // รีเซ็ตฟิลด์หลังจากบันทึกสำเร็จ
-
-                                })
-                                .catch(error => {
-                                    console.error('Error:', error);
-                                });
+                            return;
                         }
+
+                        if (!this.doc_name) {
+                            Swal.fire("error", "กรุณากรอก ชื่อไฟล์!", "error");
+                            return;
+                        }
+
+                        if (!file) {
+                            Swal.fire("error", "กรุณาเลือกไฟล์แนบ!", "error");
+                            return;
+                        }
+
+                        const fileData = await this.add_data_file(file);
+
+                        const formData = new FormData();
+                        formData.append("text_edtDoc", this.text_edtDoc);
+                        formData.append("doc_type", this.radioValue);
+                        formData.append("doc_no", this.doc_no);
+                        formData.append("doc_name", this.doc_name);
+                        formData.append("file", JSON.stringify(fileData));
+
+                        const instance_x = axios.create({
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded',
+                            }
+                        });
+
+                        await instance_x.post('http://127.0.0.1:8000/api/saveDocP03', formData);
+
+                        this.showDataP03();
+                        this.Data_Doc();
+                        this.resetFormFields();
+
+                        this.docSavedSuccess = true;
+
+                        Swal.fire({
+                            position: "top-end",
+                            icon: "success",
+                            title: "บันทึกหลักฐานสำเร็จ",
+                            text: "บันทึกไฟล์เอกสารเรียบร้อยแล้ว",
+                            showConfirmButton: false,
+                            timer: 1500
+                        });
+
                     } else if (this.radioValue === 'link') {
                         if (!this.doc_no) {
                             Swal.fire("error", "กรุณากรอก ลำดับ!", "error");
-                        } else if (!this.doc_name) {
-                            Swal.fire("error", "กรุณากรอก ชื่อไฟล์!", "error");
-                        } else if (!this.doc_link) {
-                            Swal.fire("error", "กรุณากรอกข้อมูล แนบลิงค์เอกสาร!", "error");
-                        } else {
-                            const formData = new FormData();
-                            formData.append("text_edtDoc", this.text_edtDoc);
-                            formData.append("doc_type", this.radioValue);
-                            formData.append("doc_no", this.doc_no);
-                            formData.append("doc_name", this.doc_name);
-                            formData.append("doc_link", this.doc_link);
-
-                            const instance_x = axios.create({
-                                headers: {
-                                    'Content-Type': 'application/x-www-form-urlencoded',
-                                }
-                            });
-
-                            instance_x.post('   http://127.0.0.1:8000/api/saveDocP03', formData)
-                                .then(res => {
-                                    this.showDataP03();
-                                    this.Data_Doc();
-                                    this.resetFormFields();  // รีเซ็ตฟิลด์หลังจากบันทึกสำเร็จ
-                                    this.docSavedSuccess = true;
-                                    Swal.fire({
-                                        position: "top-end",
-                                        icon: "success",
-                                        title: "บันทึกหลักฐานสำเร็จ",
-                                        showConfirmButton: false,
-                                        timer: 1000
-                                    });
-                                })
-                                .catch(error => {
-                                    console.error('Error:', error);
-                                });
+                            return;
                         }
+
+                        if (!this.doc_name) {
+                            Swal.fire("error", "กรุณากรอก ชื่อไฟล์!", "error");
+                            return;
+                        }
+
+                        if (!this.doc_link) {
+                            Swal.fire("error", "กรุณากรอกข้อมูล แนบลิงค์เอกสาร!", "error");
+                            return;
+                        }
+
+                        const formData = new FormData();
+                        formData.append("text_edtDoc", this.text_edtDoc);
+                        formData.append("doc_type", this.radioValue);
+                        formData.append("doc_no", this.doc_no);
+                        formData.append("doc_name", this.doc_name);
+                        formData.append("doc_link", this.doc_link);
+
+                        const instance_x = axios.create({
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded',
+                            }
+                        });
+
+                        await instance_x.post('http://127.0.0.1:8000/api/saveDocP03', formData);
+
+                        this.showDataP03();
+                        this.Data_Doc();
+                        this.resetFormFields();
+
+                        this.docSavedSuccess = true;
+
+                        Swal.fire({
+                            position: "top-end",
+                            icon: "success",
+                            title: "บันทึกหลักฐานสำเร็จ",
+                            text: "บันทึกลิงก์เอกสารเรียบร้อยแล้ว",
+                            showConfirmButton: false,
+                            timer: 1500
+                        });
+
                     } else {
-                        Swal.fire("error", "กรุณาตรวจสอบ ประเภทการแนปเอกสาร!", "error");
+                        Swal.fire("error", "กรุณาตรวจสอบ ประเภทการแนบเอกสาร!", "error");
                     }
+
                 } catch (error) {
-                    console.error('Error processing file:', error);
+                    console.error('Error saving document:', error);
+
+                    Swal.fire({
+                        icon: "error",
+                        title: "บันทึกไม่สำเร็จ",
+                        text: "เกิดข้อผิดพลาดในการบันทึกหลักฐาน กรุณาตรวจสอบข้อมูลและลองใหม่อีกครั้ง",
+                        confirmButtonText: "ตกลง"
+                    });
                 }
             },
+
             resetFormFields() {
                 this.radioValue = 'doc';
                 this.doc_no = null;
@@ -1740,41 +1786,8 @@ import InputText from 'primevue/inputtext';
                     Swal.fire("error","เกิดข้อผิดพลาดในการลบข้อมูล!","error");
                 }); 
             },
-            // ลบรายงานผลการปฏิบัติราชการตามตัวชี้วัด/ เกณฑ์การประเมิน
 
-            // async delDataDoc(data) {        
-            //     Swal.fire({
-            //         title: "คุณต้องการลบแบบ ป03 ใช่หรือไม่ ?",
-            //         text: "เมื่อคลิกปุ่ม Yes, delete it! ข้อมูลจะถูกลบทันที!",
-            //         icon: "warning",
-            //         showCancelButton: true,
-            //         confirmButtonColor: "#3085d6",
-            //         cancelButtonColor: "#d33",
-            //         confirmButtonText: "Yes, delete it!"
-            //     }).then((result) => {
-            //         if (result.isConfirmed) {
-            //             axios.post('   http://127.0.0.1:8000/api/delDocP03', {
-            //                 p01_id: data.p01_id
-            //             }).then(res => { 
-            //                 this.showDataP03();
-            //                 this.Data_Doc();
-            //                 this.radioValue = 'doc';
-            //                 this.doc_no = null;
-            //                 this.doc_name = null;
-            //                 this.doc_link = null;
-            //                 this.$refs.upload.value = null;
-
-            //                 Swal.fire({
-            //                     title: "ลบข้อมูลเสร็จสิ้น!",
-            //                     text: "ข้อมูลของคุณถูกลบแล้ว",
-            //                     icon: "success"
-            //                 });
-            //             }).catch(error => {
-            //                 console.error('Error:', error);
-            //             }); 
-            //         }
-            //     }); 
-            // },
+            // ลบรายงานผลการปฏิบัติราชการตามตัวชี้วัด/ เกณฑ์การประเมิน 
             async delDataDoc(data) {
                 const result = await Swal.fire({
                     title: "คุณต้องการลบแบบ ป03 ใช่หรือไม่ ?",
@@ -1864,35 +1877,7 @@ import InputText from 'primevue/inputtext';
                         console.error('Error:', error);
                     });
                 }
-            }, 
-
-            // getjobSpecificCompetencies(){
-            //     //console.log(this.staffid_Main,this.dataPor); 
-            //     axios.post('   http://127.0.0.1:8000/api/showdataposp02', { 
-            //         p_year: this.dataPor.d_date,
-            //         evalua: this.dataPor.evalua,
-            //         p_staffid: this.staffid_Main
-            //     })
-            //     .then(res => {
-            //         for (let i = 0; i < this.jobSpecificCompetencies.length; i++) { // แก้ไขเงื่อนไขที่นี่
-            //             // ตรวจสอบว่า `res.data[0][`p${i+6}`]` มีค่าก่อนตั้งค่า
-            //             if (res.data[0] && res.data[0][`p${i+6}`] !== undefined) {
-            //                 this.jobSpecificCompetencies[i]['SCORE'] = res.data[0][`p${i+6}`]; 
-            //             } else {
-            //                 console.warn(`Missing data for p${i+6}`);
-            //             }
-            //         }
-            //         for (let i = 0; i < this.otherCompetencies.length; i++) { // แก้ไขเงื่อนไขที่นี่
-            //             // ตรวจสอบว่า `res.data[0][`p${i+6}`]` มีค่าก่อนตั้งค่า
-            //             if (res.data[0] && res.data[0][`pSE_${i+1}`] !== undefined) {
-            //                 this.otherCompetencies[i]['selfAssessment3'] = res.data[0][`pSE_${i+1}`]; 
-            //             } else {
-            //                 console.warn(`Missing data for p${i+6}`);
-            //             }
-            //         } 
-            //         // console.log('Response', res.data);
-            //     })
-            // }, 
+            },  
 
             async getjobSpecificCompetencies() {
                 const res = await axios.post('http://127.0.0.1:8000/api/showdataposp02', { 
@@ -1912,134 +1897,7 @@ import InputText from 'primevue/inputtext';
                     ...item,
                     selfAssessment3: row[`pSE_${i + 1}`] ?? ''
                 }));
-            },
-
-
-            //บิวแก้100369  
-            // showdataPo() {
-            //     const staffId = String(this.staffid_Main ?? '').trim();
-            //     const blacklist = ['110105', '110146', '160018'];
-
-            //     // 1) normalize กัน "ระดับระดับ..."
-            //     const cleanPostype = this.normalizeLevelName(this.postypename);
-
-            //     // 2) เงื่อนไขพิเศษเดิมของคุณ
-            //     const isSpecialExpert =
-            //         String(this.posadio) === '128' ||
-            //         (String(this.postypenameid) === '137' && this.positionname === 'ผู้บริหาร');
-
-            //     let postypetext = isSpecialExpert ? 'ระดับชำนาญการพิเศษ' : `ระดับ${cleanPostype}`;
-            //     let postypenameid = isSpecialExpert ? 90 : this.postypenameid;
-            //     let positionname = isSpecialExpert ? 'ระดับชำนาญการพิเศษ' : `ระดับ${cleanPostype}`;
-
-            //     // ยกเว้นบางคนกลับไปใช้ค่าปกติ
-            //     if (blacklist.includes(staffId)) {
-            //         postypetext = `ระดับ${cleanPostype}`;
-            //         postypenameid = this.postypenameid;
-            //         positionname = `ระดับ${cleanPostype}`;
-            //     }
-
-            //     // 3) map ระดับ (1) และ (3)
-            //     const levelMapping = {
-            //         'ระดับปฏิบัติการ': 1,
-            //         'ระดับปฏิบัติงาน': 1,
-            //         'ระดับชำนาญการ': 2,
-            //         'ระดับชำนาญงาน': 2,
-            //         'ระดับชำนาญการพิเศษ': 3,
-            //         'ระดับชำนาญงานพิเศษ': 3,
-            //         'อาจารย์': 3,
-            //         'ระดับเชี่ยวชาญ': 4,
-            //         'ระดับเชี่ยวชาญพิเศษ': 5
-            //     };
-
-            //     let xr = levelMapping[postypetext] ?? 0;
-
-            //     // ✅ 4) ฟิกเฉพาะคนที่ไม่ขึ้น (xr==0) เท่านั้น
-            //     if (xr === 0) {
-            //         const forced = this.getForcedExpectedLevel(staffId); // Map staffId -> number
-            //         if (forced !== null) {
-            //         xr = forced;
-
-            //         const lvName = LEVEL_NAME_BY_SCORE[forced] || 'ชำนาญการพิเศษ';
-            //         postypetext = `ระดับ${lvName}`;
-            //         positionname = `ระดับ${lvName}`;
-
-            //         // ถ้าต้องการให้ดึงชุดสมรรถนะ ข. แบบชำนาญการพิเศษ
-            //         if (forced === 3) postypenameid = 90;
-            //         }
-            //     }
-
-            //     // เก็บไว้ให้ showPostype เติม COMPLEVEL ตอนว่าง/0
-            //     this.expectedLevel = xr;
-
-            //     // 5) ตั้งค่าตาราง ก.
-            //     this.coreCompetencies = [
-            //         { id: 1, activity: 'ก. 1 การมุ่งผลสัมฤทธิ์', indicator: xr, data_table1: '', selfAssessment: '' },
-            //         { id: 2, activity: 'ก. 2 การบริการที่ดี', indicator: xr, data_table1: '', selfAssessment: '' },
-            //         { id: 3, activity: 'ก. 3 การสั่งสมความเชี่ยวชาญในงานอาชีพ', indicator: xr, data_table1: '', selfAssessment: '' },
-            //         { id: 4, activity: 'ก. 4 การยึดมั่นในความถูกต้องชอบธรรมและจริยธรรม', indicator: xr, data_table1: '', selfAssessment: '' },
-            //         { id: 5, activity: 'ก. 5 การทำงานเป็นทีม', indicator: xr, data_table1: '', selfAssessment: '' }
-            //     ];
-
-            //     // 6) ตาราง ค. (ของเดิมคุณ: allowlist)
-            //     const executive = EXECUTIVE_ALLOWLIST.has(staffId) ? 1 : 0;
-            //     this.canScoreExecutive = EXECUTIVE_SCORE_ALLOWLIST.has(staffId);
-
-            //     this.otherCompetencies = [
-            //         { id: 12, activity: 'ค. 1 สภาวะผู้นำ', indicator3: executive, datatable3: '', selfAssessment3: '' },
-            //         { id: 13, activity: 'ค. 2 วิสัยทัศน์', indicator3: executive, datatable3: '', selfAssessment3: '' },
-            //         { id: 14, activity: 'ค. 3 การวางกลยุทธ์ภาครัฐ', indicator3: executive, datatable3: '', selfAssessment3: '' },
-            //         { id: 15, activity: 'ค. 4 ศักยภาพเพื่อนำการปรับเปลี่ยน', indicator3: executive, datatable3: '', selfAssessment3: '' },
-            //         { id: 16, activity: 'ค. 5 การสอนงานและการมอบหมายงาน', indicator3: executive, datatable3: '', selfAssessment3: '' }
-            //     ];
-
-            //     // 7) โหลดตาราง ข. (และให้ showPostype เติม COMPLEVEL เฉพาะตอนว่าง)
-            //     this.jobSpecificCompetencies = [];
-            //     this.showPostype(positionname, postypenameid);
-
-            //     // 8) โหลดข้อมูลคะแนนที่เคยบันทึก (ก. และ ค.)
-            //     axios
-            //         .post('http://127.0.0.1:8000/api/showDataPo', {
-            //         staff_id: this.staffid_Main,
-            //         fac_id: this.facid_Main,
-            //         year_id: this.dataPor.d_date,
-            //         record: this.dataPor.evalua,
-            //         postypename: postypetext
-            //         })
-            //         .then((res) => {
-            //         if (Array.isArray(res.data) && res.data.length > 0) {
-            //             const data = res.data[0];
-
-            //             // ✅ ก. (2)
-            //             this.coreCompetencies = this.coreCompetencies.map((item) => {
-            //             if (data[`p${item.id}`] !== undefined) {
-            //                 return {
-            //                 ...item,
-            //                 data_table1: data[`p${item.id}`],
-            //                 selfAssessment: data[`pa_${item.id}`]
-            //                 };
-            //             }
-            //             return item;
-            //             });
-
-            //             // ✅ ค. (6)
-            //             this.otherCompetencies = this.otherCompetencies.map((item, idx) => {
-            //             const pxKey = `px_${idx + 1}`; // px_1..px_5
-            //             if (data[pxKey] !== undefined) {
-            //                 return {
-            //                 ...item,
-            //                 datatable3: data[pxKey],
-            //                 selfAssessment3: data[`pSE_${idx + 1}`]
-            //                 };
-            //             }
-            //             return item;
-            //             });
-            //         }
-            //         })
-            //         .catch((error) => {
-            //         console.error('Error:', error);
-            //     });
-            // },
+            }, 
 
             async showdataPo() {
                 const staffId = String(this.staffid_Main ?? '').trim();
@@ -2135,27 +1993,7 @@ import InputText from 'primevue/inputtext';
                     }));
                 }
             },
- 
-            // showPostype(postypename, postypenameid){
-            //     axios.post('http://127.0.0.1:8000/api/showdatapostypenameAdmin', {
-            //         postypename,
-            //         postypenameid
-            //     })
-            //     .then(res => {
-            //         const expected = Number(this.expectedLevel || 0);
-
-            //         // ✅ เติม COMPLEVEL เฉพาะรายการที่ยังไม่ขึ้น (null/0)
-            //         this.jobSpecificCompetencies = (Array.isArray(res.data) ? res.data : []).map(r => {
-            //         const cur = Number(r.COMPLEVEL ?? 0);
-            //         return {
-            //             ...r,
-            //             COMPLEVEL: cur > 0 ? cur : expected
-            //         };
-            //         });
-            //     })
-            //     .catch(err => console.error('Error fetching data:', err));
-            // },
-
+  
             async showPostype(postypename, postypenameid) {
                 const res = await axios.post('http://127.0.0.1:8000/api/showdatapostypenameAdmin', {
                     postypename,
@@ -2440,44 +2278,7 @@ import InputText from 'primevue/inputtext';
                 const url = `http://127.0.0.1:8000/report_p03?${queryParams}`;
                 window.open(url, "_blank");
             },
-
-            // async printDataP03X() {
-            //     const { getSession } = await useAuth();
-            //     const user = await getSession(); 
-            //     const staffId = String(this.staffid_Main).trim();
-
-            //     try {
-            //         const payload = {
-            //             staff_id: this.staffid_Main,
-            //             group_id: this.groupid_Main,
-            //             fac_id: this.dataPor.fac_id,
-            //             year_id: this.dataPor.d_date,
-            //             evalua: this.dataPor.evalua,
-                        
-            //             // ✅ ส่งค่าให้ครบเหมือน ป.02
-            //             posadio: this.posadio, 
-            //             postypenameid: this.postypenameid,
-            //             postypename: `ระดับ${this.postypename}`, // ส่งไปเพื่อทำ Level Mapping ใน Blade
-                        
-            //             PREFIXFULLNAME: user.user.name.PREFIXFULLNAME,
-            //             STAFFNAME: user.user.name.STAFFNAME,
-            //             STAFFSURNAME: user.user.name.STAFFSURNAME,
-            //             POSITIONNAME: user.user.name.POSITIONNAME,
-            //             POSTYPENAME: user.user.name.POSTYPENAME,
-            //             SCOPES: user.user.name.SCOPES.staffdepartmentname,
-            //         };
-
-            //         const response = await axios.post("http://127.0.0.1:8000/api/exportPdf_P03", payload, {
-            //             responseType: 'blob' 
-            //         });
-
-            //         const url = window.URL.createObjectURL(response.data); 
-            //         window.open(url, '_blank');  
-            //     } catch (error) {
-            //         console.error("Error:", error);
-            //     } 
-            // },
-
+ 
             async printDataP03X() {
                 const { getSession } = await useAuth();
                 const user = await getSession(); 
@@ -2607,29 +2408,7 @@ import InputText from 'primevue/inputtext';
             cancelDialogEditFileP03(){ 
                 this.DialogEditFileP03 = false;  
             }, 
-            // saveDataxEditFileP03(){ 
-            //     console.log({
-            //         text_search_noEditFileP03: this.text_search_noEditFileP03,
-            //         text_searchEditFileP03: this.text_searchEditFileP03
-            //     });
-
-            //     // สมมติว่าเรามีฟังก์ชันสำหรับอัพเดตข้อมูลใน array
-            //     let updatedItem = {
-            //         doc_no: this.text_search_noEditFileP03,
-            //         doc_name: this.text_searchEditFileP03
-            //     };
-
-            //     // ค้นหาข้อมูลที่ต้องการแก้ไขใน products_list และอัพเดต
-            //     const index = this.products_doc_p03.findIndex(item => item.doc_no === this.text_search_noEditFileP03);
-            //     console.log(index);
-                
-            //     if (index !== -1) {
-            //         this.products_doc_p03[index] = updatedItem;
-            //     }
-
-            //     // ปิด Dialog หลังบันทึกข้อมูล
-            //     this.DialogEditFileP03 = false;  
-            // },
+             
             saveDataxEditFileP03() {
                 // console.log({
                 //     text_docid: this.text_docid,
@@ -2787,21 +2566,7 @@ import InputText from 'primevue/inputtext';
                     });
                 }
             },
-            //100369
-            // closeDocDialogWithSuccess() {
-            //     // 1) ปิด dialog ทันที
-            //     this.DialogDoc = false;
-
-            //     // 2) แจ้งเตือนหลังปิด (หน่วงนิดเดียวให้ dialog ปิดก่อน)
-            //     this.$nextTick(() => {
-            //         Swal.fire({
-            //         icon: "success",
-            //         title: "บันทึกข้อมูลสำเร็จ",
-            //         text: "บันทึกหลักฐานเชิงประจักษ์เรียบร้อยแล้ว",
-            //         confirmButtonText: "ตกลง",
-            //         });
-            //     });
-            // }, 
+            
             async closeDocDialogWithSuccess() {
                 const p01Id = this.text_edtDoc;
 
@@ -2893,19 +2658,7 @@ import InputText from 'primevue/inputtext';
 
                 return today < scoringDate;
             },
-
-            // getScoreDisplay(score, scoringDay) {
-            //     // ยังไม่ถึงวันประกาศคะแนน
-            //     if (this.isBeforeScoringDay(scoringDay)) {
-            //         return 0;
-            //     }  
-            //     if (score === null || score === '' || Number(score) === 0) {
-            //         return 0;
-            //     }
-
-            //     return score;
-            // },
-
+ 
             getScoreDisplay(score, scoringDay) {
                 if (this.isBeforeScoringDay(scoringDay)) return 0;
 
@@ -2921,21 +2674,7 @@ import InputText from 'primevue/inputtext';
 
                 return score;
             },
- 
-            // getScoreColor(score, scoringDay) {
-            //     // ยังไม่ถึงวันประกาศคะแนน
-            //     if (this.isBeforeScoringDay(scoringDay)) {
-            //         return 'red';
-            //     }
-
-            //     // ถึงวันแล้วแต่ยังไม่มีคะแนน
-            //     if (score === null || score === '' || Number(score) === 0) {
-            //         return 'red';
-            //     }
-
-            //     return 'black';
-            // },
-
+  
             getScoreColor(score, scoringDay) {
                 if (this.isBeforeScoringDay(scoringDay)) return 'red';
 
@@ -2951,19 +2690,7 @@ import InputText from 'primevue/inputtext';
 
                 return 'black';
             },
-
  
-            //ค.กำหนดวันแสดงคะแนน 
-            // getDashScoreDisplay(score, scoringDay) {
-            //     if (this.isBeforeScoringDay(scoringDay)) {
-            //         return '-';
-            //     }
-
-            //     if (score === null || score === '' || Number(score) === 0) {
-            //         return '-';
-            //     } 
-            //     return score;
-            // },
             getDashScoreDisplay(score, scoringDay) {
                 if (this.isBeforeScoringDay(scoringDay)) return '-';
 
@@ -2979,17 +2706,7 @@ import InputText from 'primevue/inputtext';
 
                 return score;
             },
-
-            // getDashScoreColor(score, scoringDay) {
-            //     if (this.isBeforeScoringDay(scoringDay)) {
-            //         return 'red';
-            //     }
-
-            //     if (score === null || score === '' || Number(score) === 0) {
-            //         return 'red';
-            //     } 
-            //     return 'black';
-            // },  
+  
             getDashScoreColor(score, scoringDay) {
                 if (this.isBeforeScoringDay(scoringDay)) return 'red';
 

@@ -32,17 +32,7 @@
                         <div class="mt-2">กำลังโหลดข้อมูล…</div>
                     </div>
                 <table class="table">
-                    <thead> 
-                        <!-- <tr style="height: 40px;background-color: blanchedalmond;">
-                            <th style="width: 60%;">ผู้รับการประเมิน</th>  
-                            <th>สัดส่วน</th>  
-                            <th>ผลรวมสัดส่วน <br>70 หรือ 50</th>  
-                            <th>ผลรวมสัดส่วน <br>30 </th>   
-                            <th>ผลสัมฤทธิ์ของงาน</th>  
-                            <th>พฤติกรรมการปฏิบัติราชการ</th>  
-                            <th>ผลคะแนน</th>  
-                            <th>ประเมิน</th>  
-                        </tr> --> 
+                    <thead>  
                         <tr style="height: 40px;background-color: blanchedalmond;">
                             <th style="width: 60%;">ผู้รับการประเมิน</th>  
                             <th>สัดส่วน</th>  
@@ -54,34 +44,7 @@
                             <th>ประเมิน</th>  
                         </tr>
                     </thead>
-                    <tbody> 
-                        <!-- <tr v-for="(Item, index) in products.filter(item => item.tb_tor).concat(products.filter(item => !item.tb_tor))" :key="index">
-                            <td style="padding-left: 5px;width: 30%;text-align: left;">   
-                                <b style="color: blue;">{{ Item.prefixfullname }} {{ Item.namefully }} </b> 
-                            </td> 
-                            <td class="text-center" style="color: blue;"><b>{{ Item.tb_tor ? Item.tb_tor.persen : '' }}</b></td>  
-
-                            <td class="text-center" style="color: red;"><b>{{ calcAchievement(Item) }}</b></td>
-                            <td class="text-center" style="color: red;"><b>{{ calcBehavior(Item) }}</b></td> 
-
-                            <td class="text-center" style="color: blue;"><b>{{ Item.tb_tor ? Item.tb_tor.achievement_score : '' }}</b></td>    
-                            <td class="text-center" style="color: blue;"><b>{{ Item.tb_tor ? Item.tb_tor.behavior : '' }}</b></td>
-                            <td class="text-center" style="color: blue;"><b>{{ Item.tb_tor ? Item.tb_tor.sum_score : '' }} </b></td>  
-                            <td style="text-align: center;width: 10%;">  
-                                <div v-if="Item.tb_tor">
-                                    <Button 
-                                        label="ประเมิน" 
-                                        class="mb-2 mr-2" 
-                                        icon="pi pi-list" 
-                                        @click="openDataEvalu(Item)" 
-                                    />  
-                                </div>
-                                <div v-else>
-                                    <p style="color: brown;">-รอข้อมูลการประเมิน-</p>
-                                </div> 
-                            </td> 
-                        </tr> -->
-
+                    <tbody>  
                         <tr v-for="(Item, index) in products.filter(item => item.tb_tor).concat(products.filter(item => !item.tb_tor))" :key="index">
                             <td style="padding-left: 5px;width: 30%;text-align: left;">   
                                 <b style="color: blue;">{{ Item.prefixfullname }} {{ Item.namefully }} </b> 
@@ -92,10 +55,7 @@
                             <td class="text-center" style="color: blue;"><b>{{ Item.tb_tor ? Item.tb_tor.behavior : '' }}</b></td> 
                             <td class="text-center" style="color: brown;"><b>{{ calcBehavior(Item) }}</b></td>   
                             <td class="text-center" style="color: blue;"><b>{{ Item.tb_tor ? Item.tb_tor.sum_score : '' }} </b></td>  
-                            <td style="text-align: center;width: 10%;">  
-                                <!-- <div v-if="Item.tb_tor">
-                                    <Button  label="ประเมิน" class="mb-2 mr-2" icon="pi pi-list" @click="openDataEvalu(Item)" />  
-                                </div> -->
+                            <td style="text-align: center;width: 10%;">   
                                 <div v-if="Item.tb_tor">
                                     <Button
                                         label="ประเมิน"
@@ -111,18 +71,25 @@
                                     <p style="color: brown;">-รอข้อมูลการประเมิน-</p>
                                 </div> 
                             </td> 
-                        </tr>
-
+                        </tr> 
                     </tbody> 
                 </table>   
-                <!-- <div style="text-align: center;">
+<!-- 
+                <div style="text-align: center;">
                     <Button 
-                        label="บันทึกผลคะแนน" 
+                        label="ส่งคะแนนประเมิน" 
                         class="mb-2 mr-2" 
-                        icon="pi pi-save" 
+                        icon="pi pi-send" 
                         style="background-color:orangered; color: white;" 
-                        @click="saveScore"/>
+                        :loading="loadingSendScoreAll"
+                        :disabled="loadingSendScoreAll || !products.some(item => item.tb_tor)"
+                        @click="sendAllScoresToOtherSystem"
+                    />
+                </div>
+                <div style=" color: red; font-size: 16px; margin-top: 6px; font-weight: 500; text-align: center; ">
+                    * ⚠️ หมายเหตุ: เมื่อกดปุ่มส่งคะแนน ระบบจะส่งคะแนนประเมินทั้งหมดไปยังระบบบุคลากร ⚠️
                 </div>  -->
+
 
                 <div class="col md:col-5 text-right">   
                     <Dialog header="จัดการแบบ ป01" maximizable v-model:visible="DialogAdd" :breakpoints="{ '960px': '75vw' }" :style="{ width: '100vw',height: '100vh' }" :modal="true" position="top">
@@ -442,22 +409,8 @@
                                                             <td></td>
                                                         </tr> 
                                                         <tr v-for="(subP01, idx) in h.subP01sX" :key="idx" style="vertical-align: baseline;">
-                                                            <td style="text-align: left;">{{ subP01.p01_no }} {{ subP01.p01_subject }}</td>
+                                                            <td style="text-align: left;">{{ subP01.p01_no }} {{ subP01.p01_subject }}</td> 
 
-                                                            <!-- แก้แดง -->
-                                                            <!-- <td style="text-align: left;">
-                                                                <b>ตัวชี้วัดที่ {{ idx+1 }} {{ subP01.p01_subject }}</b>
-                                                                <p v-for="(subIitem, idI) in subP01.subITems" :key="idI" style="padding-left: 8px;margin-bottom: 5px;">
-                                                                    <div v-if="subIitem.ind_no!=0" ><b>ระดับ {{ subIitem.ind_no }}</b> {{ subIitem.ind_Items }}</div>
-                                                                    <div v-if="subIitem.ind_no==0" ><b>{{ subIitem.ind_Items }}</b></div>
-                                                                </p>
-                                                                <p v-if="subP01.p01_detail != null">
-                                                                    
-                                                                    <b style="color: red;">ข้อเสนอแนะ</b>
-                                                                    <br>
-                                                                    <em style="color: red;">{{ subP01.p01_detail }}</em>
-                                                                </p>
-                                                            </td>  -->
                                                             <td style="text-align: left;">
                                                                 <b>ตัวชี้วัดที่ {{ idx+1 }} {{ subP01.p01_subject }}</b> 
                                                                 <div v-for="(subIitem, idI) in subP01.subITems" :key="idI" style="padding-left: 8px; margin-bottom: 5px;"> 
@@ -472,17 +425,7 @@
                                                                     <b style="color: red;">ข้อเสนอแนะ</b><br>
                                                                     <em style="color: red;">{{ subP01.p01_detail }}</em>
                                                                 </div>
-                                                            </td> 
-
-                                                            <!-- <td style="text-align: left;">
-                                                                <p v-for="(subIitemInd, inD) in subP01.subITemP03ind" :key="inD" style="padding-left: 8px;margin-bottom: 5px;">
-                                                                    <div v-if="subIitemInd.p03ind_no!=0"><b>ระดับ {{ subIitemInd.p03ind_no }}</b> {{ subIitemInd.p03ind_Items }}</div>
-                                                                    <div v-if="subIitemInd.p03ind_no==0"><b>{{ subIitemInd.p03ind_Items }}</b></div> 
-                                                                </p>
-                                                                <p v-if="subP01.subITemP03ind.length == 0" style="padding-left: 8px;margin-bottom: 5px;">
-                                                                    <b style="color: red;">- ไม่มีข้อมูล -</b>
-                                                                </p>  
-                                                            </td>  -->
+                                                            </td>  
                                                             <td style="text-align: left;">
                                                                 <!-- วนลูปแสดงระดับ 1 ถึง 5 -->
                                                                 <div v-for="level in [1, 2, 3, 4, 5]" :key="level">
@@ -500,18 +443,7 @@
                                                                 <p v-if="subP01.subITemP03ind.length == 0" style="padding-left: 8px;margin-bottom: 5px;">
                                                                     <b style="color: red;">- ไม่มีข้อมูล -</b>
                                                                 </p>
-                                                            </td>
-                                                            
-                                                            <!-- //รายงานป.01 --> 
-                                                            <!-- <td style="text-align: left;"> 
-                                                                <p v-for="(subIitemDoc, inDoc) in subP01.subITemP03doc" :key="inDoc" style="padding-left: 8px;margin-bottom: 5px;"> 
-                                                                    <a v-if="subIitemDoc.doc_file!=null" :href="'   http://127.0.0.1:8000/storage/uploadsP03/'+subIitemDoc.doc_file" target="_blank"><b>ระดับ</b> <b>{{subIitemDoc.doc_no }}</b> {{ subIitemDoc.doc_name }}</a> 
-                                                                    <a v-if="subIitemDoc.doc_link!=null" :href="subIitemDoc.doc_link" target="_blank"><b>ระดับ</b> <b>{{ subIitemDoc.p03ind_no }}</b> {{ subIitemDoc.doc_name }}</a> 
-                                                                </p>
-                                                                <p v-if="subP01.subITemP03doc.length == 0" style="padding-left: 8px;margin-bottom: 5px;">
-                                                                    <b style="color: red;">- ไม่มีข้อมูล -</b>
-                                                                </p>
-                                                            </td>    -->
+                                                            </td> 
                                                             <td style="text-align: left;"> 
                                                                 <p v-for="(subIitemDoc, inDoc) in subP01.subITemP03doc.slice().sort((a, b) => a.doc_no - b.doc_no)" 
                                                                 :key="inDoc" 
@@ -1279,12 +1211,7 @@ export default {
                 { id: 13, activity: 'ค. 2 วิสัยทัศน์', indicator: '0', data_table3: '' },
                 { id: 14, activity: 'ค. 3 การวางกลยุทธ์ภาครัฐ', indicator: '0', data_table3: '' },
                 { id: 15, activity: 'ค. 4 ศักยภาพเพื่อนำการปรับเปลี่ยน', indicator: '0', data_table3: '' },
-                { id: 16, activity: 'ค. 5 การสอนงานและการมอบหมายงาน', indicator: '0', data_table3: '' }
-                // { id: 12, activity: 'ค. 1 สภาวะผู้นำ', indicator3: executive, datatable3: '', selfAssessment3: '' },
-                // { id: 13, activity: 'ค. 2 วิสัยทัศน์', indicator3: executive, datatable3: '', selfAssessment3: '' },
-                // { id: 14, activity: 'ค. 3 การวางกลยุทธ์ภาครัฐ', indicator3: executive, datatable3: '', selfAssessment3: '' },
-                // { id: 15, activity: 'ค. 4 ศักยภาพเพื่อนำการปรับเปลี่ยน', indicator3: executive, datatable3: '', selfAssessment3: '' },
-                // { id: 16, activity: 'ค. 5 การสอนงานและการมอบหมายงาน', indicator3: executive, datatable3: '', selfAssessment3: '' }
+                { id: 16, activity: 'ค. 5 การสอนงานและการมอบหมายงาน', indicator: '0', data_table3: '' } 
             ],
             
 
@@ -1330,6 +1257,9 @@ export default {
             //datatable3: [] 
             posadio: 0,
             competencyMap: {},
+
+            //ส่งคะแนนประเมินไประบบบุคลากร
+            loadingSendScoreAll: false,
 
             competencyDialogVisible: false,
             selectedCompetency: {
@@ -1649,28 +1579,7 @@ export default {
 
 
 
-        // ตารางรายชื่อ
-         
-        // xxr() {
-        //     if (this.tracking_date?.evalua === undefined) {
-        //         Swal.fire({
-        //             title: 'แจ้งเตือนจากระบบ!',
-        //             text: 'กรุณาเลือก รอบประเมิน ก่อน!',
-        //             icon: 'error'
-        //         });
-        //     } else {
-        //         // เช็คว่า dataList เป็น array หรือไม่
-        //         if (Array.isArray(this.dataList)) {   
-        //             // กรองข้อมูลที่ไม่ใช่ "ลูกจ้างชั่วคราว"
-        //             // this.filteredData = this.dataList.filter(item => item.stftypename !== "ลูกจ้างชั่วคราว");
-        //             this.filteredData = this.dataList.filter(item => item.stftypename !== "ลูกจ้างชั่วคราว" && item.stftypename !== "พนักงานราชการ" && item.stftypename !== "ลูกจ้างประจำ"); 
-        //             // เรียกใช้ฟังก์ชัน showDataEvalu()
-        //             this.showDataEvalu();
-        //         } else {
-        //             console.error("dataList is not an array:", this.dataList);
-        //         }
-        //     }
-        // }, 
+        // ตารางรายชื่อ 
         xxr() {
             if (this.tracking_date?.evalua === undefined) {
                 Swal.fire({ title:'แจ้งเตือนจากระบบ!', text:'กรุณาเลือก รอบประเมิน ก่อน!', icon:'error' })
@@ -1744,61 +1653,8 @@ export default {
             } catch (error) {
                 console.error('Error fetching evaluation data:', error);
             } 
-        }, 
-        // async openDataEvalu(data) {
-        //     if (this.tracking_date.d_date === undefined) {
-        //         Swal.fire('แจ้งเตือนจากระบบ', 'กรุณาเลือกรอบประเมิน', 'error')
-        //         return
-        //     }
+        },  
 
-        //     // ⬇️ ทุกงานที่ทำตอนเปิด Dialog ค่อนข้างเยอะ กดครั้งเดียวให้โชว์โหลดตลอดจนเสร็จ
-        //     await this.withLoading(async () => {
-        //         // this.getAadioPosition(data.staffid) บิวแก้090269
-        //         await this.getAadioPosition(data.staffid)
-        //         this.dataStaffid = data.staffid
-
-        //         await this.showDataEvalu()
-        //         this.currentstaff = this.products.filter(p => p.staffid === this.dataStaffid)
-
-        //         // reset ค่าต่าง ๆ …
-        //         this.products_Tab1 = []
-        //         this.p01_scores = [
-        //         { name: '0 คะแนน', code: 0 }, { name: '1 คะแนน', code: 1 },
-        //         { name: '2 คะแนน', code: 2 }, { name: '3 คะแนน', code: 3 },
-        //         { name: '4 คะแนน', code: 4 }, { name: '5 คะแนน', code: 5 }
-        //         ]
-        //         this.coreCompetencies = [
-        //         { id:1, activity:'ก. 1 การมุ่งผลสัมฤทธิ์', indicator:'1', data_table1:'', selfAssessment:'' },
-        //         { id:2, activity:'ก. 2 การบริการที่ดี', indicator:'1', data_table1:'', selfAssessment:'' },
-        //         { id:3, activity:'ก. 3 การสั่งสมความเชี่ยวชาญในงานอาชีพ', indicator:'1', data_table1:'', selfAssessment:'' },
-        //         { id:4, activity:'ก. 4 การยึดมั่นในความถูกต้องชอบธรรมและจริยธรรม', indicator:'1', data_table1:'', selfAssessment:'' },
-        //         { id:5, activity:'ก. 5 การทำงานเป็นทีม', indicator:'1', data_table1:'', selfAssessment:'' }
-        //         ]
-        //         this.jobSpecificCompetencies = []
-        //         this.improvements = null
-        //         this.suggestions = null
-
-        //         const facxx = this.tracking_date.fac_id ? this.tracking_date.fac_id : this.facid_Main
-        //         await this.showdataPo(data.staffid, facxx, this.tracking_date.d_date, this.tracking_date.evalua, data.posnameid)
-
-        //         const res = await axios.post('http://127.0.0.1:8000/api/showDataP03New', {
-        //         staff_id: data.staffid,
-        //         fac_id: this.tracking_date.fac_id,
-        //         year_id: this.tracking_date.d_date,
-        //         evalua: this.tracking_date.evalua
-        //         })
-        //         if (Array.isArray(res.data)) {
-        //         this.products_Tab1 = res.data
-        //         this.products_Tab1.forEach(h => {
-        //             h.subP01sX.forEach(sub => {
-        //             const found = this.p01_scores.find(s => s.code === sub.p01_score)
-        //             sub.p01_score = found ? found.code : this.p01_scores[0].code
-        //             })
-        //         })
-        //         }
-        //         this.DialogAdd = true
-        //     })
-        //  },
         async openDataEvalu(data, idx = null) {
             if (this.tracking_date?.d_date === undefined) {
                 Swal.fire('แจ้งเตือนจากระบบ', 'กรุณาเลือกรอบประเมิน', 'error');
@@ -1818,10 +1674,7 @@ export default {
                 didOpen: () => Swal.showLoading()
             });
 
-            try {
-                // =========================
-                // ⬇️ ใส่โค้ดเดิมของคุณตรงนี้
-                // =========================
+            try { 
 
                 await this.getAadioPosition(data.staffid);
                 this.dataStaffid = data.staffid;
@@ -1925,78 +1778,7 @@ export default {
             }
         },
 
-        // async saveEvaTab1_1() {
-        //    // console.log('this.coreCompetencies: ',this.coreCompetencies);
-            
-        //     this.coreCompetencies.forEach((item, index) => {
-        //         if (index === 0) {
-        //             item.data_table1 = item.data_table1 ?? 0; // Update based on the API response
-        //         } else if (index === 1) {
-        //             item.data_table1 = item.data_table1 ?? 0; // Update based on the API response
-        //         } else if (index === 2) {
-        //             item.data_table1 = item.data_table1 ?? 0; // Add more conditions if necessary
-        //         } else if (index === 3) {
-        //             item.data_table1 = item.data_table1 ?? 0; // Add more conditions if necessary
-        //         } else if (index === 4) {
-        //             item.data_table1 = item.data_table1 ?? 0; // Add more conditions if necessary
-        //         } else if (index === 5) {
-        //             item.data_table1 = item.data_table1 ?? 0; // Add more conditions if necessary
-        //         }
-        //     });
-        //     this.jobSpecificCompetencies.forEach((item, index) => {
-        //         if (index === 0) {
-        //             item.SCORE = item.SCORE ?? 0; // Update based on the API response
-        //         } else if (index === 1) {
-        //             item.SCORE = item.SCORE ?? 0; // Update based on the API response
-        //         } else if (index === 2) {
-        //             item.SCORE = item.SCORE ?? 0; // Add more conditions if necessary
-        //         } else if (index === 3) {
-        //             item.SCORE = item.SCORE ?? 0; // Add more conditions if necessary
-        //         } else if (index === 4) {
-        //             item.SCORE = item.SCORE ?? 0; // Add more conditions if necessary
-        //         } else if (index === 5) {
-        //             item.SCORE = item.SCORE ?? 0; // Add more conditions if necessary
-        //         }
-        //     });
-        //     this.otherCompetencies.forEach((item, index) => {
-        //         if (index === 0) {
-        //             item.selfAssessment3 = item.selfAssessment3 ?? 0; // Update based on the API response
-        //         } else if (index === 1) {
-        //             item.selfAssessment3 = item.selfAssessment3 ?? 0; // Update based on the API response
-        //         } else if (index === 2) {
-        //             item.selfAssessment3 = item.selfAssessment3 ?? 0; // Add more conditions if necessary
-        //         } else if (index === 3) {
-        //             item.selfAssessment3 = item.selfAssessment3 ?? 0; // Add more conditions if necessary
-        //         } else if (index === 4) {
-        //             item.selfAssessment3 = item.selfAssessment3 ?? 0; // Add more conditions if necessary
-        //         } else if (index === 5) {
-        //             item.selfAssessment3 = item.selfAssessment3 ?? 0; // Add more conditions if necessary
-        //         }
-        //     });
-        //     const payload = {
-        //         staffid_po: this.staffid_po,
-        //         staff_id: this.staffid_Main,
-        //         dataStaffid: this.dataStaffid,
-        //         fac_id: this.tracking_date.fac_id ? this.tracking_date.fac_id :  this.facid_Main,
-        //         year: this.tracking_date.d_date,
-        //         record: this.tracking_date.evalua,
-        //         coreCompetencies: this.coreCompetencies,
-        //         jobSpecificCompetencies: this.jobSpecificCompetencies,
-        //         otherCompetencies: this.otherCompetencies,
-        //         improvements: this.improvements,
-        //         suggestions: this.suggestions
-        //     };
-        //     const res = await axios.post('http://127.0.0.1:8000/api/saveP03PoTab1', payload);
-        //     console.log(res.data);
-        //     Swal.fire({
-        //         position: 'top-end',
-        //         icon: 'success',
-        //         title: 'บันทึกข้อมูลสมรรถนะ / ความเห็นเพิ่มเติม เสร็จสิ้น',
-        //         showConfirmButton: false,
-        //         timer: 1500
-        //     });
-        //     await this.showDataEvalu();
-        // },
+         
 
         async saveEvaTab1_1() { 
             // ✅ 1) Validate ความเห็นก่อน
@@ -2412,120 +2194,7 @@ export default {
             const s = String(v ?? '').trim();
             return s.replace(/^ระดับ\s*/, '').trim();
         },
-        
-        //บิวแก้020369 
-
-        // async showdataPo(staff_id, facid_Main, d_date, evalua, posnameid) {
-        //     if (!this.currentstaff || this.currentstaff.length === 0) {
-        //         console.error("Error: currentstaff is undefined or empty.");
-        //         return;
-        //     }
-
-        //     // ===== 1) ตีความ "ผู้ถูกประเมินเป็นผู้บริหารไหม"
-        //     // posadio มาจาก await this.getAadioPosition(data.staffid) ใน openDataEvalu()
-        //     const targetId = String(staff_id).trim();
-        //     const posadioStr = String(this.posadio).trim();
-
-        //     // ✅ ผู้ถูกประเมินเป็นผู้บริหาร: posadio=128 หรืออยู่ใน allowlist
-        //     this.isTargetExecutive = (posadioStr === '128') || EXECUTIVE_ALLOWLIST.has(targetId);
-
-        //     // ===== 2) ตีความ "ผู้ประเมินมีสิทธิ์ให้คะแนน (6) ไหม"
-        //     const scorerId = String(this.staffid_Main).trim(); // คน login
-        //     this.canScoreExecutive = EXECUTIVE_SCORE_ALLOWLIST.has(scorerId);
-
-        //     // ระดับที่คาดหวังของ ค.(5)
-        //     const executiveExpected = this.isTargetExecutive ? 1 : 0;
-
-        //     // ===== 3) คำนวณระดับ ก.(1) ตามระดับตำแหน่ง
-        //     const isExecutiveRole =
-        //         this.normalizeLevelName(this.currentstaff[0]?.posnameth) === "ผู้บริหาร";
-
-        //     const isSpecialExpert =
-        //         (posadioStr === "128") || (String(posnameid).trim() === "137" && isExecutiveRole);
-
-        //     if (isSpecialExpert) {
-        //         this.postypenameth = "ชำนาญการพิเศษ";
-        //     } else {
-        //         this.postypenameth =
-        //         this.normalizeLevelName(this.currentstaff[0]?.postypenameth) || "ปฏิบัติการ";
-        //     }
-
-        //     const levelName = this.normalizeLevelName(this.postypenameth);
-        //     const postypetext = `ระดับ${levelName}`;
-
-        //     const levelMapping = {
-        //         "ระดับปฏิบัติการ": 1,
-        //         "ระดับปฏิบัติงาน": 1,
-        //         "ระดับชำนาญการ": 2,
-        //         "ระดับชำนาญงาน": 2,
-        //         "ระดับชำนาญการพิเศษ": 3,
-        //         "ระดับชำนาญงานพิเศษ": 3,
-        //         "อาจารย์": 3,
-        //         "ระดับเชี่ยวชาญ": 4,
-        //         "ระดับเชี่ยวชาญพิเศษ": 5
-        //     };
-        //     const xr = levelMapping[postypetext] ?? 0;
-
-        //     // ===== 4) ตั้งค่าเริ่มต้นตาราง
-        //     this.coreCompetencies = [
-        //         { id: 1, activity: "ก. 1 การมุ่งผลสัมฤทธิ์", indicator: xr, data_table1: "", selfAssessment: "" },
-        //         { id: 2, activity: "ก. 2 การบริการที่ดี", indicator: xr, data_table1: "", selfAssessment: "" },
-        //         { id: 3, activity: "ก. 3 การสั่งสมความเชี่ยวชาญในงานอาชีพ", indicator: xr, data_table1: "", selfAssessment: "" },
-        //         { id: 4, activity: "ก. 4 การยึดมั่นในความถูกต้องชอบธรรมและจริยธรรม", indicator: xr, data_table1: "", selfAssessment: "" },
-        //         { id: 5, activity: "ก. 5 การทำงานเป็นทีม", indicator: xr, data_table1: "", selfAssessment: "" }
-        //     ];
-
-        //     this.jobSpecificCompetencies = [];
-
-        //     this.otherCompetencies = [
-        //         { id: 12, activity: "ค. 1 สภาวะผู้นำ", indicator3: executiveExpected, datatable3: "", selfAssessment3: "" },
-        //         { id: 13, activity: "ค. 2 วิสัยทัศน์", indicator3: executiveExpected, datatable3: "", selfAssessment3: "" },
-        //         { id: 14, activity: "ค. 3 การวางกลยุทธ์ภาครัฐ", indicator3: executiveExpected, datatable3: "", selfAssessment3: "" },
-        //         { id: 15, activity: "ค. 4 ศักยภาพเพื่อนำการปรับเปลี่ยน", indicator3: executiveExpected, datatable3: "", selfAssessment3: "" },
-        //         { id: 16, activity: "ค. 5 การสอนงานและการมอบหมายงาน", indicator3: executiveExpected, datatable3: "", selfAssessment3: "" }
-        //     ];
-
-        //     // โหลด ข.
-        //     await this.showPostype(levelName, posnameid);
-
-        //     // โหลดคะแนนเดิม ก.
-        //     try {
-        //         const res = await axios.post("http://127.0.0.1:8000/api/showDataPo", {
-        //         staff_id: staff_id,
-        //         fac_id: facid_Main,
-        //         year_id: d_date,
-        //         record: evalua,
-        //         postypename: postypetext
-        //         });
-
-        //         if (Array.isArray(res.data) && res.data.length > 0) {
-        //         const data = res.data[0];
-        //         this.coreCompetencies = this.coreCompetencies.map((item) => {
-        //             const keyScore = `p${item.id}`;
-        //             const keySelf = `pa_${item.id}`;
-        //             if (data[keyScore] !== undefined) {
-        //             return {
-        //                 ...item,
-        //                 data_table1: data[keyScore] ?? 0,
-        //                 selfAssessment: data[keySelf] ?? 0
-        //             };
-        //             }
-        //             return item;
-        //         });
-        //         }
-        //     } catch (error) {
-        //         console.error("Error:", error);
-        //     }
-
-        //     // ✅ debug สำคัญ (เปิด console แล้วดู)
-        //     // console.log("[EXEC DEBUG]", {
-        //     //     targetId,
-        //     //     posadio: this.posadio,
-        //     //     isTargetExecutive: this.isTargetExecutive,
-        //     //     scorerId,
-        //     //     canScoreExecutive: this.canScoreExecutive
-        //     // });
-        // },
+         
         async showdataPo(staff_id, facid_Main, d_date, evalua, posnameid) {
             if (!this.currentstaff || this.currentstaff.length === 0) {
                 console.error("Error: currentstaff is undefined or empty.");
@@ -2827,33 +2496,33 @@ export default {
 
         /*============= ความรู้/ทักษะ/สมรรถนะ ที่ต้องการพัฒนาสำหรับผู้บริหาร =============*/ 
         chkp03data(){ 
-                this.products_Tab3 = [];
-                axios.post('http://127.0.0.1:8000/api/showData04Tab3',{
-                    staff_id: this.staffid_Main,
-                    fac_id: this.facid_Main,
-                    year_id: this.tracking_date.d_date,
-                    record: this.tracking_date.evalua, 
-                }).then(res => {     
-                   // console.log('showData04Tab3',res.data);     
-                    if(res.data.length > 0){
-                        res.data.forEach(p04 => {
-                            const newData = {
-                                px04_re1: p04.px04_re1,
-                                px04_re2: p04.px04_re2,
-                                px04_re3: p04.px04_re3,
-                                id:p04.p02_id
-                            };
-                            this.products_Tab3.push(newData); 
-                        });  
-                    }
-                    this.px04_re1 = '';
-                    this.px04_re2 = '';
-                    this.px04_re3 = '';
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                });
-            },  
+            this.products_Tab3 = [];
+            axios.post('http://127.0.0.1:8000/api/showData04Tab3',{
+                staff_id: this.staffid_Main,
+                fac_id: this.facid_Main,
+                year_id: this.tracking_date.d_date,
+                record: this.tracking_date.evalua, 
+            }).then(res => {     
+                // console.log('showData04Tab3',res.data);     
+                if(res.data.length > 0){
+                    res.data.forEach(p04 => {
+                        const newData = {
+                            px04_re1: p04.px04_re1,
+                            px04_re2: p04.px04_re2,
+                            px04_re3: p04.px04_re3,
+                            id:p04.p02_id
+                        };
+                        this.products_Tab3.push(newData); 
+                    });  
+                }
+                this.px04_re1 = '';
+                this.px04_re2 = '';
+                this.px04_re3 = '';
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        },  
         AddDatap04X(){ 
             axios.post('http://127.0.0.1:8000/api/saveEvaTab03xx',{
                 staff_id: this.staffid_Main,
@@ -3023,8 +2692,7 @@ export default {
                 console.error("Error:", error);
             } 
         },
-
-        
+ 
         //110269
         normalizeActivityRaw(raw) {
             let s = String(raw || "").trim();
@@ -3092,17 +2760,17 @@ export default {
             } catch (e) {
                 console.error('loadCompetencyDescriptions error', e);
             }
-            },
+        },
 
-            extractNameFromActivity(activityText) {
+        extractNameFromActivity(activityText) {
             if (!activityText) return '';
             const parts = String(activityText).trim().split(/\s+/);
             if (parts.length <= 2) return String(activityText).trim();
             // "ก. 1 การมุ่งผลสัมฤทธิ์" -> "การมุ่งผลสัมฤทธิ์"
             return parts.slice(2).join(' ');
-            },
+        },
 
-            openCompetencyDialog(type, row, index = null) {
+        openCompetencyDialog(type, row, index = null) {
             let title = '';
             let description = '';
 
@@ -3141,6 +2809,363 @@ export default {
             this.selectedCompetency = { title, description };
             this.competencyDialogVisible = true;
         },
+
+        //ส่งคะแนนไประบบบุคลากร
+        toNumber(value, fallback = 0) {
+            const n = Number.parseFloat(String(value ?? '').replace(',', ''));
+            return Number.isFinite(n) ? n : fallback;
+        },
+
+        buildSendScorePayload(Item) {
+            const persen = Item?.tb_tor?.persen || '70:30';
+
+            const [weight1, weight2] = String(persen)
+                .split(':')
+                .map(v => this.toNumber(v));
+
+            const achievementScore = this.toNumber(Item?.tb_tor?.achievement_score);
+            const behaviorScore = this.toNumber(Item?.tb_tor?.behavior);
+
+            return {
+                staffid: Item.staffid,
+                staff_name: `${Item.prefixfullname ?? ''} ${Item.namefully ?? ''}`.trim(),
+
+                fac_id: this.tracking_date?.fac_id ?? this.facid_Main,
+                year: this.tracking_date?.d_date,
+                evalua: this.tracking_date?.evalua,
+
+                // องค์ประกอบที่ 1
+                component1_score: achievementScore,
+                component1_weight: weight1,
+                component1_weighted_score: Number((achievementScore * weight1).toFixed(2)),
+
+                // องค์ประกอบที่ 2
+                component2_score: behaviorScore,
+                component2_weight: weight2,
+                component2_weighted_score: Number((behaviorScore * weight2).toFixed(2)),
+
+                total_score: this.toNumber(Item?.tb_tor?.sum_score),
+                sent_by: this.staffid_Main
+            };
+        },
+
+        // buildSendScorePayload(Item) {
+        //     const persen = Item?.tb_tor?.persen || '70:30';
+
+        //     const [weight1, weight2] = String(persen)
+        //         .split(':')
+        //         .map(v => this.toNumber(v));
+
+        //     // คะแนนช่อง "คะแนน" ขององค์ประกอบที่ 1
+        //     const achievementScore = this.toNumber(Item?.tb_tor?.achievement_score);
+
+        //     // คะแนนช่อง "คะแนน" ขององค์ประกอบที่ 2
+        //     const behaviorScore = this.toNumber(Item?.tb_tor?.behavior);
+
+        //     const component1WeightedScore = Number((achievementScore * weight1).toFixed(2));
+        //     const component2WeightedScore = Number((behaviorScore * weight2).toFixed(2));
+        //     const totalScore = Number((component1WeightedScore + component2WeightedScore).toFixed(2));
+
+        //     return {
+        //         staffid: Item.staffid,
+        //         staff_name: `${Item.prefixfullname ?? ''} ${Item.namefully ?? ''}`.trim(),
+
+        //         fac_id: this.tracking_date?.fac_id ?? this.facid_Main,
+        //         fac_name: this.tracking_date?.facuties ?? '',
+        //         year: this.tracking_date?.d_date,
+        //         evalua: this.tracking_date?.evalua,
+
+        //         // ส่งตามชื่อ Field ระบบบุคลากรโดยตรง
+        //         EVO1: achievementScore,
+        //         EVA1: weight1,
+        //         EVA2: component1WeightedScore,
+
+        //         EVO2: behaviorScore,
+        //         EVB1: weight2,
+        //         EVB2: component2WeightedScore,
+
+        //         EVTOTAL: totalScore,
+        //         EVO3: this.getEvaluationText(totalScore),
+        //         EVO3VAL: this.getEvaluationValue(totalScore),
+        //         EVO3DETAIL: '',
+
+        //         sent_by: this.staffid_Main
+        //     };
+        // },
+
+
+
+        async sendAllScoresToOtherSystem() {
+            if (!this.tracking_date?.d_date || !this.tracking_date?.evalua) {
+                Swal.fire('แจ้งเตือน', 'กรุณาเลือกรอบการประเมินก่อนส่งคะแนน', 'warning');
+                return;
+            } 
+
+            const items = this.products.filter(item => {
+                return item?.staffid &&
+                    item?.tb_tor &&
+                    item.tb_tor.achievement_score !== null &&
+                    item.tb_tor.achievement_score !== '' &&
+                    item.tb_tor.behavior !== null &&
+                    item.tb_tor.behavior !== '';
+            });
+
+            if (items.length === 0) {
+                Swal.fire('แจ้งเตือน', 'ไม่พบข้อมูลคะแนนที่พร้อมส่ง', 'warning');
+                return;
+            } 
+
+            const totalPeople = this.products.length;
+            const evaluatedPeople = this.products.filter(item => item?.tb_tor).length;
+            const readyToSendPeople = items.length;
+            const waitingPeople = totalPeople - evaluatedPeople;
+
+            const roundText = [
+                this.tracking_date?.facuties,
+                this.tracking_date?.d_evaluationround,
+                this.tracking_date?.d_date
+            ].filter(Boolean).join(' ');
+
+            const safeRoundText = String(roundText || '-').replace(/[&<>"']/g, (m) => ({
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            }[m]));
+
+            const confirm = await Swal.fire({
+                title: 'ยืนยันส่งคะแนนประเมินทั้งหมด?',
+                html: `
+                    <div style="
+                        text-align:left;
+                        font-family:'Prompt', Tahoma, sans-serif;
+                        color:#1f2937;
+                    ">
+                        <div style="
+                            background:linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%);
+                            border:1px solid #fed7aa;
+                            border-radius:16px;
+                            padding:16px;
+                            margin-bottom:14px;
+                        ">
+                            <div style="
+                                font-size:13px;
+                                color:#9a3412;
+                                font-weight:700;
+                                margin-bottom:6px;
+                            ">
+                                รอบที่จะส่งคะแนน
+                            </div>
+                            <div style="
+                                font-size:16px;
+                                color:#0f172a;
+                                font-weight:800;
+                                line-height:1.6;
+                            ">
+                                ${safeRoundText}
+                            </div>
+                        </div>
+
+                        <div style="
+                            display:grid;
+                            grid-template-columns:repeat(2, 1fr);
+                            gap:10px;
+                            margin-bottom:14px;
+                        ">
+                           <div class="score-hover-card" style="
+                                background:#eff6ff;
+                                border:1px solid #bfdbfe;
+                                border-radius:14px;
+                                padding:13px 10px;
+                                text-align:center;
+                            ">
+                                <div style="font-size:12px; color:#1d4ed8; font-weight:700;">
+                                    ผู้รับการประเมินทั้งหมด
+                                </div>
+                                <div style="font-size:30px; color:#1e40af; font-weight:900;">
+                                    ${totalPeople}
+                                </div>
+                                <div style="font-size:12px; color:#475569;">คน</div>
+                            </div>
+
+                            <div class="score-hover-card" style="
+                                background:#ecfdf5;
+                                border:1px solid #bbf7d0;
+                                border-radius:14px;
+                                padding:13px 10px;
+                                text-align:center;
+                            ">
+                                <div style="font-size:12px; color:#15803d; font-weight:700;">
+                                    มีข้อมูลประเมินแล้ว
+                                </div>
+                                <div style="font-size:30px; color:#166534; font-weight:900;">
+                                    ${evaluatedPeople}
+                                </div>
+                                <div style="font-size:12px; color:#475569;">คน</div>
+                            </div>
+
+                            <div class="score-hover-card" style="
+                                background:#f0fdf4;
+                                border:1px solid #86efac;
+                                border-radius:14px;
+                                padding:13px 10px;
+                                text-align:center;
+                            ">
+                                <div style="font-size:12px; color:#16a34a; font-weight:700;">
+                                    พร้อมส่งคะแนน
+                                </div>
+                                <div style="font-size:30px; color:#15803d; font-weight:900;">
+                                    ${readyToSendPeople}
+                                </div>
+                                <div style="font-size:12px; color:#475569;">รายการ</div>
+                            </div>
+
+                            <div class="score-hover-card" style="
+                                background:#fef2f2;
+                                border:1px solid #fecaca;
+                                border-radius:14px;
+                                padding:13px 10px;
+                                text-align:center;
+                            ">
+                                <div style="font-size:12px; color:#dc2626; font-weight:700;">
+                                    รอข้อมูลประเมิน
+                                </div>
+                                <div style="font-size:30px; color:#b91c1c; font-weight:900;">
+                                    ${waitingPeople}
+                                </div>
+                                <div style="font-size:12px; color:#475569;">คน</div>
+                            </div>
+                        </div>
+
+                        <div style="
+                            background:linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+                            color:white;
+                            border-radius:16px;
+                            padding:15px 16px;
+                            text-align:center;
+                            box-shadow:0 8px 18px rgba(249,115,22,.25);
+                        ">
+                            <div style="font-size:14px; font-weight:600;">
+                                ระบบจะส่งคะแนนไปยังระบบ
+                            </div>
+                            <div style="font-size:21px; font-weight:900; margin-top:2px;">
+                                “บุคลากร”
+                            </div>
+                            <div style="font-size:14px; margin-top:6px;">
+                                จำนวน <b style="font-size:24px;">${readyToSendPeople}</b> รายการ
+                            </div>
+                        </div>
+
+                        ${
+                            waitingPeople > 0
+                                ? `
+                                    <div style="
+                                        margin-top:12px;
+                                        background:#fef2f2;
+                                        border:1px solid #fca5a5;
+                                        color:#b91c1c;
+                                        border-radius:12px;
+                                        padding:11px 13px;
+                                        font-size:13px;
+                                        line-height:1.6;
+                                    ">
+                                        <b>⚠️ หมายเหตุ:</b> มีผู้รับการประเมินที่ยังรอข้อมูลประเมิน
+                                        <b>${waitingPeople}</b> คน<br>
+                                        ระบบจะส่งเฉพาะรายการที่มีคะแนนครบถ้วนเท่านั้น
+                                    </div>
+                                `
+                                : `
+                                    <div style="
+                                        margin-top:12px;
+                                        background:#ecfdf5;
+                                        border:1px solid #bbf7d0;
+                                        color:#166534;
+                                        border-radius:12px;
+                                        padding:11px 13px;
+                                        font-size:13px;
+                                        line-height:1.6;
+                                    ">
+                                        <b>ข้อมูลครบถ้วน:</b> พร้อมส่งคะแนนทั้งหมด
+                                    </div>
+                                `
+                        }
+                    </div>
+                `,
+                icon: 'question',
+                iconColor: '#f97316',
+                showCancelButton: true,
+                confirmButtonText: `ส่งคะแนน ${readyToSendPeople} รายการ`,
+                cancelButtonText: 'ยกเลิก',
+                confirmButtonColor: '#16a34a',
+                cancelButtonColor: '#ef4444',
+                background: '#ffffff',
+                width: 650
+            });
+
+            if (!confirm.isConfirmed) return;
+
+            const payload = {
+                fac_id: this.tracking_date?.fac_id ?? this.facid_Main,
+                year: this.tracking_date.d_date,
+                evalua: this.tracking_date.evalua,
+                sent_by: this.staffid_Main,
+                scores: items.map(item => this.buildSendScorePayload(item))
+            };
+
+            this.loadingSendScoreAll = true;
+
+            try {
+                const res = await axios.post(
+                    'http://127.0.0.1:8000/api/sendEvaluateScoresToOtherSystem',
+                    payload
+                );
+
+                Swal.fire({
+                    icon: 'success',
+                    iconColor: '#16a34a',
+                    title: 'ส่งคะแนนทั้งหมดสำเร็จ',
+                    html: `
+                        <div style="
+                            font-family:'Prompt', Tahoma, sans-serif;
+                            color:#1f2937;
+                            line-height:1.7;
+                        ">
+                            <div style="
+                                background:#ecfdf5;
+                                border:1px solid #bbf7d0;
+                                border-radius:14px;
+                                padding:14px;
+                                margin-top:8px;
+                            ">
+                                ส่งคะแนนไปยังระบบ <b style="color:#166534;">“บุคลากร”</b> สำเร็จ<br>
+                                จำนวน <b style="color:#15803d; font-size:20px;">${items.length}</b> รายการ
+                            </div>
+                        </div>
+                    `,
+                    confirmButtonColor: '#16a34a',
+                    confirmButtonText: 'ตกลง'
+                });
+
+            } catch (error) {
+                console.error('sendAllScoresToOtherSystem error:', error);
+
+                Swal.fire({
+                    icon: 'error',
+                    iconColor: '#dc2626',
+                    title: 'ส่งคะแนนไม่สำเร็จ',
+                    text: error.response?.data?.message || 'เกิดข้อผิดพลาดในการส่งคะแนน',
+                    confirmButtonColor: '#dc2626',
+                    confirmButtonText: 'ตกลง'
+                });
+
+            } finally {
+                this.loadingSendScoreAll = false;
+            }
+        },
+
+
+
  
     },  
     filters: {
@@ -3400,6 +3425,27 @@ td:nth-child(3) {
 }
 .clickable:hover{
   text-decoration: underline;
+}
+
+:global(.score-hover-card) {
+    cursor: pointer;
+    transition: 
+        transform 0.22s ease,
+        box-shadow 0.22s ease,
+        border-color 0.22s ease,
+        filter 0.22s ease;
+    will-change: transform;
+}
+
+:global(.score-hover-card:hover) {
+    transform: translateY(-7px) scale(1.035);
+    box-shadow: 0 14px 28px rgba(15, 23, 42, 0.16);
+    filter: brightness(1.02);
+    z-index: 2;
+}
+
+:global(.score-hover-card:active) {
+    transform: translateY(-2px) scale(1.01);
 }
 
 </style>

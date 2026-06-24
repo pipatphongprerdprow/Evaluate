@@ -1,6 +1,5 @@
 <template>
   <div class="personal-dashboard">
-    <!-- TOP HERO -->
     <section class="hero-shell">
       <div class="hero-bg-glow glow-one"></div>
       <div class="hero-bg-glow glow-two"></div>
@@ -13,23 +12,17 @@
           </div>
 
           <h3>ผลการประเมินของฉัน</h3>
+          <p>Dashboard แสดงสถานะ คะแนน และรายละเอียดผลการประเมิน</p>
 
-          <p>
-            Dashboard แสดงสถานะ คะแนน และรายละเอียดผลการประเมิน
-          </p>
-
-          <div class="profile-strip"> 
-
+          <div class="profile-strip">
             <div class="profile-avatar">
               <img
                 v-if="profileImageSrc && !profileImageLoadError"
                 :src="profileImageSrc"
                 :alt="profileFullName"
                 @error="profileImageLoadError = true"
-              /> 
-              <span v-else>
-                {{ profileInitial }}
-              </span>
+              />
+              <span v-else>{{ profileInitial }}</span>
             </div>
 
             <div class="profile-info">
@@ -53,12 +46,24 @@
         <div class="control-panel">
           <label>เลือกรอบการประเมิน</label>
 
-          <Dropdown
+          <!-- <Dropdown
             v-model="tracking_date"
-            :options="tracking_dates || []"
+            :options="tracking_dates"
             :optionLabel="roundOptionLabel"
             placeholder="กรุณาเลือกรอบการประเมิน"
             class="round-select"
+            :disabled="loading"
+            @change="onRoundChanged"
+          /> -->
+
+          <Dropdown
+            v-model="tracking_date"
+            :options="allEvaluationRounds"
+            autoFilterFocus
+            :optionLabel="(item) => item.d_evaluationround + ' ' + item.d_date"
+            placeholder="กรุณาเลือกรอบการประเมิน"
+            class="round-select"
+            appendTo="body"
             :disabled="loading"
             @change="onRoundChanged"
           />
@@ -67,43 +72,38 @@
             <i class="pi pi-calendar"></i>
             <span>{{ selectedRoundText }}</span>
           </div>
-
-          <!-- <Button
-            label="Export PDF"
-            icon="pi pi-file-pdf"
-            severity="danger"
-            outlined
-            class="export-btn"
-            :disabled="loading || !tracking_date || totalStaff === 0"
-            @click="printDatatrackingpdf"
-          /> -->
         </div>
       </div>
     </section>
 
-    <!-- LOADING -->
     <section v-if="loading" class="loading-card">
       <ProgressSpinner style="width:62px;height:62px" strokeWidth="6" />
       <strong>กำลังโหลดข้อมูลผลการประเมิน…</strong>
       <span>ระบบกำลังดึงข้อมูลเฉพาะของผู้ใช้งานที่เข้าสู่ระบบ</span>
     </section>
 
-    <!-- EMPTY BEFORE SELECT ROUND -->
     <section v-else-if="!tracking_date" class="empty-state">
       <div class="empty-icon">
         <i class="pi pi-calendar-plus"></i>
       </div>
       <h2>กรุณาเลือกรอบการประเมิน</h2>
-      <p>
-        เมื่อเลือกรอบการประเมินแล้ว ระบบจะแสดงข้อมูลให้อัตโนมัติ โดยไม่ต้องกดปุ่มค้นหา
-      </p>
+      <p>เมื่อเลือกรอบการประเมินแล้ว ระบบจะแสดงข้อมูลให้อัตโนมัติ โดยไม่ต้องกดปุ่มค้นหา</p>
     </section>
 
-    <!-- MAIN DASHBOARD -->
-    <template v-else>
-      <!-- SUMMARY AREA -->
-      <section class="summary-layout">
-        <!-- MAIN SCORE CARD -->
+     <template v-else>
+      <section v-if="!isSelectedScoreAnnounced" class="score-wait-card">
+        <div class="score-wait-icon">
+          <i class="pi pi-clock"></i>
+        </div>
+
+        <h2>รอประกาศผลคะแนน</h2>
+        <p>{{ scoreAnnounceText }}</p>
+        <span>
+          เมื่อถึงวันประกาศผลคะแนน ระบบจะแสดงคะแนนรวม กราฟย้อนหลัง และคะแนนรายองค์ประกอบโดยอัตโนมัติ
+        </span>
+      </section>
+
+      <section v-else class="summary-layout">
         <div class="score-hero-card">
           <div class="score-card-head">
             <div>
@@ -111,18 +111,11 @@
               <h2>{{ displayTotalScore }}</h2>
             </div>
 
-            <Tag
-              :value="statusText"
-              :severity="statusSeverity"
-              rounded
-            />
+            <Tag :value="statusText" :severity="statusSeverity" rounded />
           </div>
 
           <div class="score-ring-wrap">
-            <div
-              class="score-ring"
-              :style="scoreRingStyle"
-            >
+            <div class="score-ring" :style="scoreRingStyle">
               <div class="score-ring-inner">
                 <strong>{{ displayTotalScore }}</strong>
                 <span>/ 100</span>
@@ -136,43 +129,97 @@
           </div>
         </div>
 
-        <!-- STATUS CARD -->
-        <div class="status-card">
+        <div class="status-card history-card">
           <div class="card-title-row">
             <div>
-              <h3>สถานะการประเมิน</h3>
-              <p>ข้อมูลเฉพาะเจ้าของบัญชี</p>
+              <h3>คะแนนรอบประเมินย้อนหลัง</h3>
+              <p>เปรียบเทียบคะแนนรวมในแต่ละรอบ / ปีงบประมาณ</p>
             </div>
 
-            <div class="soft-icon">
-              <i class="pi pi-user-check"></i>
+            <div class="soft-icon history-icon">
+              <i class="pi pi-chart-bar"></i>
             </div>
           </div>
 
-          <div class="status-big">
-            <strong>{{ completedPercent }}%</strong>
-            <span>{{ hasEvaluation ? 'มีข้อมูลการประเมินแล้ว' : 'ยังไม่มีข้อมูลการประเมิน' }}</span>
+          <div class="history-summary">
+            <div>
+              <span>ผลสัมฤทธิ์ของงาน</span>
+              <strong>{{ avgAchievementScore }}</strong>
+            </div>
+            <div>
+              <span>พฤติกรรมฯ</span>
+              <strong>{{ avgBehaviorScore }}</strong>
+            </div>
+            <div>
+              <span>คะแนนรวม</span>
+              <strong>{{ avgTotalScore }}</strong>
+            </div>
           </div>
 
-          <ProgressBar :value="completedPercent" />
+          <div v-if="loadingHistory" class="history-loading">
+            <ProgressSpinner style="width:34px;height:34px" strokeWidth="6" />
+            <span>กำลังโหลดคะแนนย้อนหลัง…</span>
+          </div>
 
-          <div class="status-grid">
-            <div>
-              <span>รายการทั้งหมด</span>
-              <strong>{{ totalStaff }}</strong>
+          <div v-else-if="!scoreHistoryRows.length" class="history-empty">
+            <i class="pi pi-info-circle"></i>
+            <span>ยังไม่มีข้อมูลคะแนนย้อนหลัง</span>
+          </div>
+
+          <div v-else class="history-chart grouped-history-chart">
+            <div class="history-grid-line line-100">100</div>
+            <div class="history-grid-line line-75">75</div>
+            <div class="history-grid-line line-50">50</div>
+
+            <div
+              v-for="group in groupedScoreHistoryRows"
+              :key="group.year"
+              class="history-year-group"
+            >
+              <div class="history-bars-pair">
+                <div
+                  class="history-bar-item round-one"
+                  :class="{ active: group.round1?.key === selectedRoundKey }"
+                  :title="getHistoryTitle(group.round1, group.year, 1)"
+                >
+                  <div class="history-score">
+                    {{ historyScoreText(group.round1) }}
+                  </div>
+                  <div class="history-bar-track">
+                    <div
+                      class="history-bar-fill"
+                      :style="{ height: historyBarHeight(group.round1?.score) }"
+                    ></div>
+                  </div>
+                </div>
+
+                <div
+                  class="history-bar-item round-two"
+                  :class="{ active: group.round2?.key === selectedRoundKey }"
+                  :title="getHistoryTitle(group.round2, group.year, 2)"
+                >
+                  <div class="history-score">
+                    {{ historyScoreText(group.round2) }}
+                  </div>
+                  <div class="history-bar-track">
+                    <div
+                      class="history-bar-fill"
+                      :style="{ height: historyBarHeight(group.round2?.score) }"
+                    ></div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="history-year-label">ปี {{ group.year }}</div>
             </div>
-            <div>
-              <span>ประเมินแล้ว</span>
-              <strong>{{ completedStaff }}</strong>
-            </div>
-            <div>
-              <span>รอข้อมูล</span>
-              <strong>{{ pendingStaff }}</strong>
+
+            <div class="history-legend">
+              <span><i class="legend-one"></i> รอบ 1</span>
+              <span><i class="legend-two"></i> รอบ 2</span>
             </div>
           </div>
         </div>
 
-        <!-- SCORE COMPONENTS -->
         <div class="component-card">
           <div class="card-title-row">
             <div>
@@ -219,66 +266,8 @@
         </div>
       </section>
 
-      <!-- LEVEL CARDS -->
-      <section class="level-section">
-        <div class="section-head">
-          <div>
-            <h2>ระดับผลการประเมิน</h2>
-            <p>คลิกที่ระดับเพื่อดูรายละเอียดข้อมูลในระดับนั้น</p>
-          </div>
-        </div>
-
-        <div class="level-grid">
-          <div
-            class="level-card excellent clickable-level"
-            @click="openLevelDialog('outstanding')"
-          >
-            <span>ดีเด่น</span>
-            <strong>{{ outstandingCount }}</strong>
-            <small>90 - 100 คะแนน</small>
-          </div>
-
-          <div
-            class="level-card very-good clickable-level"
-            @click="openLevelDialog('veryGood')"
-          >
-            <span>ดีมาก</span>
-            <strong>{{ veryGoodCount }}</strong>
-            <small>80 - 89 คะแนน</small>
-          </div>
-
-          <div
-            class="level-card good clickable-level"
-            @click="openLevelDialog('good')"
-          >
-            <span>ดี</span>
-            <strong>{{ goodCount }}</strong>
-            <small>70 - 79 คะแนน</small>
-          </div>
-
-          <div
-            class="level-card fair clickable-level"
-            @click="openLevelDialog('fair')"
-          >
-            <span>พอใช้</span>
-            <strong>{{ fairCount }}</strong>
-            <small>60 - 69 คะแนน</small>
-          </div>
-
-          <div
-            class="level-card improve clickable-level"
-            @click="openLevelDialog('improve')"
-          >
-            <span>ต้องปรับปรุง</span>
-            <strong>{{ improveCount }}</strong>
-            <small>ต่ำกว่า 60 คะแนน</small>
-          </div>
-        </div>
-      </section>
-
-      <!-- ALERT -->
       <section
-        v-if="pendingStaff > 0 || lowScoreRows.length > 0 || dashboardRows.length === 0"
+        v-if="isSelectedScoreAnnounced && (pendingStaff > 0 || lowScoreRows.length > 0 || dashboardRows.length === 0)"
         class="insight-section"
       >
         <div v-if="dashboardRows.length === 0" class="insight-card neutral">
@@ -306,201 +295,87 @@
         </div>
       </section>
 
-      <!-- DETAIL TABLE -->
-      <section class="detail-card">
+      <section class="detail-card recommendation-card">
         <div class="section-head table-head">
           <div>
-            <h2>รายละเอียดผลการประเมิน</h2>
-            <p>แสดงเฉพาะข้อมูลของเจ้าของบัญชีที่เข้าสู่ระบบเท่านั้น</p>
+            <h2>ข้อเสนอแนะจากผู้ประเมิน</h2>
+            <!-- <p>แสดงเฉพาะหัวข้อที่มีข้อเสนอแนะในรอบประเมินที่เลือก</p> -->
           </div>
 
-          <span class="table-count">
-            {{ dashboardRows.length }} รายการ
+          <span class="table-count recommendation-count">
+            {{ recommendationRows.length }} ข้อเสนอแนะ
           </span>
         </div>
 
-        <DataTable
-          :value="dashboardRows"
-          :paginator="dashboardRows.length > 10"
-          :rows="10"
-          responsiveLayout="scroll"
-          stripedRows
-          dataKey="staffid"
-          class="modern-table"
-        >
-          <Column header="ผู้รับการประเมิน" style="min-width: 280px">
-            <template #body="slotProps">
-              <div class="person-cell">
-                <div class="avatar">
-                  {{ getInitial(slotProps.data) }}
-                </div>
+        <div v-if="loadingRecommendations" class="recommendation-loading">
+          <ProgressSpinner style="width:42px;height:42px" strokeWidth="6" />
+          <span>กำลังโหลดข้อเสนอแนะจากผู้ประเมิน…</span>
+        </div>
 
-                <div>
-                  <strong>
-                    {{ slotProps.data.prefixfullname }}
-                    {{ slotProps.data.namefully }}
-                  </strong>
-                  <small>{{ slotProps.data.posnameth || '-' }}</small>
-                </div>
-              </div>
-            </template>
-          </Column>
+        <div v-else-if="!recommendationRows.length" class="recommendation-empty">
+          <div class="recommendation-empty-icon">
+            <i class="pi pi-check-circle"></i>
+          </div>
 
-          <Column header="สถานะ" style="width: 150px">
-            <template #body="slotProps">
-              <Tag
-                :value="slotProps.data.tb_tor ? 'ประเมินแล้ว' : 'รอข้อมูล'"
-                :severity="slotProps.data.tb_tor ? 'success' : 'warning'"
-                rounded
-              />
-            </template>
-          </Column>
+          <div>
+            <strong>ยังไม่มีข้อเสนอแนะในรอบนี้</strong>
+            <span>
+              ระบบไม่พบข้อเสนอแนะรายหัวข้อจากผู้ประเมินในรอบ
+              {{ selectedRoundText }}
+            </span>
+          </div>
+        </div>
 
-          <Column header="สัดส่วน" style="width: 120px">
-            <template #body="slotProps">
-              <b>{{ slotProps.data.tb_tor?.persen || '-' }}</b>
-            </template>
-          </Column>
+        <div v-else class="recommendation-table-wrap">
+          <table class="recommendation-table">
+            <thead>
+              <tr>
+                <th class="col-no">ลำดับ</th>
+                <th class="col-work">กิจกรรม / โครงการ / งาน</th>
+                <th class="col-recommend">ข้อเสนอแนะ</th>
+              </tr>
+            </thead>
 
-          <Column header="ผลสัมฤทธิ์" style="width: 130px">
-            <template #body="slotProps">
-              <b>{{ slotProps.data.tb_tor?.achievement_score || '-' }}</b>
-            </template>
-          </Column>
-
-          <Column header="ผลรวมสัดส่วน" style="width: 140px">
-            <template #body="slotProps">
-              <b class="weight-score">{{ calcAchievement(slotProps.data) || '-' }}</b>
-            </template>
-          </Column>
-
-          <Column header="พฤติกรรมฯ" style="width: 130px">
-            <template #body="slotProps">
-              <b>{{ slotProps.data.tb_tor?.behavior || '-' }}</b>
-            </template>
-          </Column>
-
-          <Column header="ผลรวมสัดส่วน" style="width: 140px">
-            <template #body="slotProps">
-              <b class="weight-score">{{ calcBehavior(slotProps.data) || '-' }}</b>
-            </template>
-          </Column>
-
-          <Column header="คะแนนรวม" style="width: 140px">
-            <template #body="slotProps">
-              <div
-                v-if="slotProps.data.tb_tor"
-                class="score-pill"
-                :class="scoreClass(slotProps.data.tb_tor.sum_score)"
+            <tbody>
+              <tr
+                v-for="(item, index) in recommendationRows"
+                :key="item.id || index"
               >
-                {{ Number(slotProps.data.tb_tor.sum_score || 0).toFixed(2) }}
-              </div>
+                <td class="col-no">{{ index + 1 }}</td>
 
-              <span v-else>-</span>
-            </template>
-          </Column>
+                <td class="col-work">
+                  <div class="work-title">
+                    <strong class="main-work-title">
+                      {{ item.groupNo }} {{ item.groupName }}
+                    </strong>
 
-          <Column header="ระดับ" style="width: 140px">
-            <template #body="slotProps">
-              <span v-if="slotProps.data.tb_tor" class="level-text">
-                {{ scoreLevel(slotProps.data.tb_tor.sum_score) }}
-              </span>
-              <span v-else>-</span>
-            </template>
-          </Column>
-        </DataTable>
+                    <!-- <span class="round-line">
+                      <i class="pi pi-calendar"></i>
+                      {{ item.roundLabel }}
+                    </span> -->
+
+                    <div v-if="item.activityText" class="activity-subject-line">
+                      <strong>{{ item.activityNo }}</strong>
+                      <span>{{ item.activityText }}</span>
+                    </div>
+                  </div>
+                </td>
+
+                <td class="col-recommend">
+                  <div class="recommend-red-text">
+                    <div class="recommend-red-label">
+                      <i class="pi pi-comments"></i>
+                      ข้อเสนอแนะจากผู้ประเมิน :
+                    </div>
+                    <p>{{ item.recommendation }}</p>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </section>
     </template>
-
-    <!-- LEVEL DETAIL DIALOG -->
-    <Dialog
-      v-model:visible="levelDialogVisible"
-      :modal="true"
-      :style="{ width: '820px', maxWidth: '95vw' }"
-      :breakpoints="{ '960px': '90vw', '640px': '96vw' }"
-    >
-      <template #header>
-        <div>
-          <h3 class="dialog-title">{{ selectedLevelTitle }}</h3>
-          <p class="dialog-subtitle">
-            จำนวน {{ selectedLevelRows.length }} รายการ
-            <span v-if="dashboardRows.length === 0">
-              — ยังไม่มีข้อมูลในรอบประเมินที่เลือก
-            </span>
-          </p>
-        </div>
-      </template>
-
-      <DataTable
-        :value="selectedLevelRows"
-        :paginator="selectedLevelRows.length > 8"
-        :rows="8"
-        responsiveLayout="scroll"
-        stripedRows
-        dataKey="staffid"
-        class="level-detail-table"
-      >
-        <Column header="ผู้รับการประเมิน" style="min-width: 280px">
-          <template #body="slotProps">
-            <div class="person-cell">
-              <div class="avatar">
-                {{ getInitial(slotProps.data) }}
-              </div>
-
-              <div>
-                <strong>
-                  {{ slotProps.data.prefixfullname }}
-                  {{ slotProps.data.namefully }}
-                </strong>
-                <small>{{ slotProps.data.posnameth || '-' }}</small>
-              </div>
-            </div>
-          </template>
-        </Column>
-
-        <Column header="ผลสัมฤทธิ์" style="width: 120px">
-          <template #body="slotProps">
-            <b>{{ slotProps.data.tb_tor?.achievement_score || '-' }}</b>
-          </template>
-        </Column>
-
-        <Column header="พฤติกรรมฯ" style="width: 120px">
-          <template #body="slotProps">
-            <b>{{ slotProps.data.tb_tor?.behavior || '-' }}</b>
-          </template>
-        </Column>
-
-        <Column header="คะแนนรวม" style="width: 130px">
-          <template #body="slotProps">
-            <div
-              class="score-pill"
-              :class="scoreClass(slotProps.data.tb_tor?.sum_score)"
-            >
-              {{ Number(slotProps.data.tb_tor?.sum_score || 0).toFixed(2) }}
-            </div>
-          </template>
-        </Column>
-
-        <Column header="ระดับ" style="width: 120px">
-          <template #body="slotProps">
-            <b>{{ scoreLevel(slotProps.data.tb_tor?.sum_score) }}</b>
-          </template>
-        </Column>
-      </DataTable>
-
-      <div v-if="selectedLevelRows.length === 0" class="empty-level">
-        ไม่มีข้อมูลในระดับนี้
-      </div>
-
-      <template #footer>
-        <Button
-          label="ปิด"
-          icon="pi pi-times"
-          severity="secondary"
-          @click="levelDialogVisible = false"
-        />
-      </template>
-    </Dialog>
   </div>
 </template>
 
@@ -508,45 +383,44 @@
 import axios from 'axios';
 import Swal from 'sweetalert2';
 
+const API = 'http://127.0.0.1:8000/api';
+const PROFILE_IMAGE_URL = 'https://pd.msu.ac.th/staff/picture/';
+
 export default {
   data() {
     return {
       tracking_date: null,
       tracking_dates: [],
       products: [],
+      scoreHistory: [],
+      recommendationRows: [],
 
       loading: false,
-      loadingEvalu: false,
-      loadingEvaluIndex: null,
-
-      levelDialogVisible: false,
-      selectedLevelKey: null,
-      selectedLevelTitle: '',
-
-      dataList: [],
-      filteredData: [],
+      loadingHistory: false,
+      loadingRecommendations: false,
 
       staffid_Main: '',
       facid_Main: '',
       groupid_Main: '',
-
       postypename: '',
       postypenameid: '',
-      stftypename: '',
-
       currentUserProfile: {},
       profileImageLoadError: false,
+
+      animatedScoreValue: 0,
+      animatedAchievementValue: 0,
+      animatedBehaviorValue: 0,
+      animateCharts: false,
+      counterFrame: null,
     };
   },
 
   computed: {
     evaluatedRows() {
-      const rows = Array.isArray(this.products) ? this.products : [];
-
-      return [...rows]
-        .filter((item) => item)
-        .map((item) => this.normalizeRow(item))
-        .filter((item) => this.isLoginStaffRow(item))
+      return (Array.isArray(this.products) ? this.products : [])
+        .filter(Boolean)
+        .map(this.normalizeRow)
+        .filter(this.isLoginStaffRow)
         .sort((a, b) => Number(!!b.tb_tor) - Number(!!a.tb_tor));
     },
 
@@ -555,7 +429,7 @@ export default {
     },
 
     personalRow() {
-      return this.dashboardRows?.[0] || null;
+      return this.dashboardRows[0] || null;
     },
 
     hasEvaluation() {
@@ -574,105 +448,61 @@ export default {
       return Math.max(this.totalStaff - this.completedStaff, 0);
     },
 
-    completedPercent() {
-      if (!this.totalStaff) return 0;
-      return Number(((this.completedStaff / this.totalStaff) * 100).toFixed(1));
-    },
-
     evaluatedOnly() {
       return this.evaluatedRows.filter((item) => item?.tb_tor);
     },
 
-    avgScore() {
-      if (!this.evaluatedOnly.length) return '0.00';
-
-      const total = this.evaluatedOnly.reduce((sum, item) => {
-        return sum + (this.parseScore(item?.tb_tor?.sum_score) || 0);
-      }, 0);
-
-      return (total / this.evaluatedOnly.length).toFixed(2);
-    },
-
-    avgTotalScore() {
-      return this.avgScore;
-    },
-
     avgAchievement() {
-      if (!this.evaluatedOnly.length) return 0;
-
-      const total = this.evaluatedOnly.reduce((sum, item) => {
-        return sum + (this.parseScore(item?.tb_tor?.achievement_score) || 0);
-      }, 0);
-
-      return Number((total / this.evaluatedOnly.length).toFixed(2));
-    },
-
-    avgAchievementScore() {
-      return Number(this.avgAchievement).toFixed(2);
+      return this.averageByField('achievement_score');
     },
 
     avgBehavior() {
-      if (!this.evaluatedOnly.length) return 0;
-
-      const total = this.evaluatedOnly.reduce((sum, item) => {
-        return sum + (this.parseScore(item?.tb_tor?.behavior) || 0);
-      }, 0);
-
-      return Number((total / this.evaluatedOnly.length).toFixed(2));
-    },
-
-    avgBehaviorScore() {
-      return Number(this.avgBehavior).toFixed(2);
+      return this.averageByField('behavior');
     },
 
     scoreValue() {
-      if (!this.hasEvaluation) return 0;
-      return this.parseScore(this.personalRow?.tb_tor?.sum_score);
+      return this.hasEvaluation ? this.parseScore(this.personalRow?.tb_tor?.sum_score) : 0;
+    },
+
+    avgAchievementScore() {
+      return Number(this.animatedAchievementValue || 0).toFixed(2);
+    },
+
+    avgBehaviorScore() {
+      return Number(this.animatedBehaviorValue || 0).toFixed(2);
+    },
+
+    avgTotalScore() {
+      return Number(this.animatedScoreValue || 0).toFixed(2);
     },
 
     displayTotalScore() {
-      if (!this.hasEvaluation) return '0.00';
-      return Number(this.scoreValue || 0).toFixed(2);
+      return this.hasEvaluation ? Number(this.animatedScoreValue || 0).toFixed(2) : '0.00';
     },
 
     scoreRingStyle() {
-      const safeScore = Math.max(0, Math.min(Number(this.scoreValue) || 0, 100));
-      return {
-        '--score-deg': `${safeScore * 3.6}deg`,
-      };
+      const score = Math.max(0, Math.min(Number(this.animatedScoreValue) || 0, 100));
+      return { '--score-deg': `${score * 3.6}deg` };
     },
 
-    // achievementPercentWidth() {
-    //   return `${Math.max(0, Math.min(Number(this.avgAchievement) || 0, 100))}%`;
-    // },
-
-    // behaviorPercentWidth() {
-    //   return `${Math.max(0, Math.min(Number(this.avgBehavior) || 0, 100))}%`;
-    // },
-
-    // totalPercentWidth() {
-    //   return `${Math.max(0, Math.min(Number(this.scoreValue) || 0, 100))}%`;
-    // },
     achievementPercentWidth() {
-      return this.percentWidthFromScore(this.avgAchievement, 1);
+      return this.percentWidthFromScore(this.animatedAchievementValue, 1);
     },
 
     behaviorPercentWidth() {
-      return this.percentWidthFromScore(this.avgBehavior, 1);
+      return this.percentWidthFromScore(this.animatedBehaviorValue, 1);
     },
 
     totalPercentWidth() {
-      return this.percentWidthFromScore(this.scoreValue, 100);
+      return this.percentWidthFromScore(this.animatedScoreValue, 100);
     },
- 
+
     currentLevelText() {
-      if (!this.hasEvaluation) return 'รอข้อมูล';
-      return this.scoreLevel(this.scoreValue);
+      return this.hasEvaluation ? this.scoreLevel(this.scoreValue) : 'รอข้อมูล';
     },
 
     currentLevelClass() {
-      if (!this.hasEvaluation) return 'pending';
-      return this.scoreClass(this.scoreValue);
+      return this.hasEvaluation ? this.scoreClass(this.scoreValue) : 'pending';
     },
 
     statusText() {
@@ -683,96 +513,8 @@ export default {
       return this.hasEvaluation ? 'success' : 'warning';
     },
 
-    lowScoreStaff() {
-      return this.evaluatedOnly.filter((item) => {
-        return this.parseScore(item?.tb_tor?.sum_score) < 70;
-      });
-    },
-
     lowScoreRows() {
-      return this.lowScoreStaff;
-    },
-
-    scoreDistribution() {
-      const dist = {
-        outstanding: 0,
-        veryGood: 0,
-        good: 0,
-        fair: 0,
-        improve: 0,
-      };
-
-      this.evaluatedOnly.forEach((item) => {
-        const score = this.parseScore(item?.tb_tor?.sum_score);
-
-        if (score >= 90) dist.outstanding++;
-        else if (score >= 80) dist.veryGood++;
-        else if (score >= 70) dist.good++;
-        else if (score >= 60) dist.fair++;
-        else dist.improve++;
-      });
-
-      return dist;
-    },
-
-    outstandingCount() {
-      return this.scoreDistribution.outstanding;
-    },
-
-    veryGoodCount() {
-      return this.scoreDistribution.veryGood;
-    },
-
-    goodCount() {
-      return this.scoreDistribution.good;
-    },
-
-    fairCount() {
-      return this.scoreDistribution.fair;
-    },
-
-    improveCount() {
-      return this.scoreDistribution.improve;
-    },
-
-    selectedLevelRows() {
-      const levelKey = this.selectedLevelKey;
-
-      if (!levelKey) return [];
-
-      const rows = Array.isArray(this.dashboardRows)
-        ? this.dashboardRows
-        : [];
-
-      return rows.filter((item) => {
-        if (!item || !item.tb_tor) return false;
-
-        const score = this.parseScore(item.tb_tor.sum_score);
-
-        if (Number.isNaN(score)) return false;
-
-        if (levelKey === 'outstanding') {
-          return score >= 90;
-        }
-
-        if (levelKey === 'veryGood') {
-          return score >= 80 && score < 90;
-        }
-
-        if (levelKey === 'good') {
-          return score >= 70 && score < 80;
-        }
-
-        if (levelKey === 'fair') {
-          return score >= 60 && score < 70;
-        }
-
-        if (levelKey === 'improve') {
-          return score < 60;
-        }
-
-        return false;
-      });
+      return this.evaluatedOnly.filter((item) => this.parseScore(item?.tb_tor?.sum_score) < 70);
     },
 
     profileFullName() {
@@ -786,12 +528,7 @@ export default {
     },
 
     profileInitial() {
-      const name =
-        this.personalRow?.namefully ||
-        this.currentUserProfile.STAFFNAME ||
-        this.profileFullName ||
-        'P';
-
+      const name = this.personalRow?.namefully || this.currentUserProfile.STAFFNAME || this.profileFullName || 'P';
       return String(name).trim().slice(0, 1) || 'P';
     },
 
@@ -813,25 +550,69 @@ export default {
       );
     },
 
-    selectedRoundText() {
-      if (!this.tracking_date) return 'ยังไม่ได้เลือกรอบการประเมิน';
-      return this.roundOptionLabel(this.tracking_date);
-    },
-
     profileImageSrc() {
-      const staffid = this.normalizeStaffId(
-        this.staffid_Main ||
-        this.currentUserProfile.STAFFID ||
-        this.personalRow?.staffid ||
-        this.personalRow?.STAFFID ||
-        this.personalRow?.staff_id ||
-        ''
-      );
-
-      if (!staffid) return '';
-
-      return `https://pd.msu.ac.th/staff/picture/${staffid}.jpg`;
+      const staffid = this.normalizeStaffId(this.staffid_Main || this.currentUserProfile.STAFFID);
+      return staffid ? `${PROFILE_IMAGE_URL}${staffid}.jpg` : '';
     },
+
+    selectedRoundText() {
+      return this.tracking_date ? this.roundOptionLabel(this.tracking_date) : 'ยังไม่ได้เลือกรอบการประเมิน';
+    },
+
+    selectedRoundKey() {
+      return this.getRoundKey(this.tracking_date);
+    },
+
+    scoreHistoryRows() {
+      return Array.isArray(this.scoreHistory) ? this.scoreHistory.filter(Boolean) : [];
+    },
+
+    groupedScoreHistoryRows() {
+      const map = new Map();
+
+      this.scoreHistoryRows.forEach((item) => {
+        const year = String(item.year || this.historyYear(item.round) || '-');
+        const roundNo = String(item.roundNo || this.historyRoundNo(item.round));
+
+        if (!map.has(year)) {
+          map.set(year, { year, round1: null, round2: null });
+        }
+
+        map.get(year)[roundNo === '2' ? 'round2' : 'round1'] = item;
+      });
+
+      return Array.from(map.values()).sort((a, b) => Number(a.year) - Number(b.year));
+    },
+
+    allEvaluationRounds() {
+      if (!Array.isArray(this.tracking_dates) || this.tracking_dates.length === 0) {
+        return [];
+      }
+
+      return [...this.tracking_dates].sort((a, b) => {
+        const yearA = Number(String(a.d_date || '').match(/25\d{2}/)?.[0] || 0);
+        const yearB = Number(String(b.d_date || '').match(/25\d{2}/)?.[0] || 0);
+
+        const roundA = Number(a.evalua || 0);
+        const roundB = Number(b.evalua || 0);
+
+        if (yearB !== yearA) return yearB - yearA;
+        return roundB - roundA;
+      });
+    },
+    isSelectedScoreAnnounced() {
+      return this.isScoreAnnounced(this.tracking_date);
+    },
+
+    scoreAnnounceText() {
+      const dateText = this.formatThaiDate(this.tracking_date?.d_scoringday);
+
+      return dateText
+        ? `ระบบจะประกาศผลคะแนนในวันที่ ${dateText}`
+        : 'ยังไม่กำหนดวันประกาศผลคะแนน';
+    },
+
+
 
 
   },
@@ -840,23 +621,17 @@ export default {
     try {
       const { getSession } = await useAuth();
       const user = await getSession();
-
       const sessionName = user?.user?.name || {};
-      const { STAFFID, SCOPES } = sessionName;
-      const { staffdepartment, groupid } = SCOPES || {};
+      const scopes = sessionName.SCOPES || {};
 
       this.currentUserProfile = sessionName;
-
-      this.setSession(
-        STAFFID,
-        staffdepartment,
-        groupid,
-        sessionName.POSTYPENAME,
-        sessionName.POSITIONNAMEID
-      );
+      this.staffid_Main = sessionName.STAFFID || '';
+      this.facid_Main = scopes.staffdepartment || '';
+      this.groupid_Main = scopes.groupid || '';
+      this.postypename = sessionName.POSTYPENAME || '';
+      this.postypenameid = sessionName.POSITIONNAMEID || '';
 
       await this.showDataSet();
-
     } catch (error) {
       console.error('mounted error:', error);
       Swal.fire({
@@ -867,15 +642,13 @@ export default {
     }
   },
 
-  methods: {
-    setSession(staffid_Main, facid_Main, groupid_Main, postypename, postypenameid) {
-      this.staffid_Main = staffid_Main;
-      this.facid_Main = facid_Main;
-      this.groupid_Main = groupid_Main;
-      this.postypename = postypename;
-      this.postypenameid = postypenameid;
-    },
+  beforeUnmount() {
+    if (this.counterFrame) {
+      cancelAnimationFrame(this.counterFrame);
+    }
+  },
 
+  methods: {
     roundOptionLabel(item) {
       if (!item) return '';
       return `${item.facuties || ''} ${item.d_evaluationround || ''} ${item.d_date || ''}`.trim();
@@ -883,146 +656,107 @@ export default {
 
     getRoundKey(item) {
       if (!item) return '';
-      return [
-        item.fac_id,
-        item.evalua,
-        item.d_date,
-        item.d_evaluationround,
-      ].join('|');
+      return [item.fac_id, item.evalua, item.d_date, item.d_evaluationround].join('|');
     },
+
+    // async onRoundChanged() {
+    //   if (!this.tracking_date || this.tracking_date?.evalua === undefined) {
+    //     this.resetDashboard();
+    //     return;
+    //   }
+
+    //   await this.withLoading(async () => {
+    //     await Promise.all([
+    //       this.showDataEvalu(),
+    //       this.fetchEvaluationRecommendations(),
+    //     ]);
+    //   });
+
+    //   this.runDashboardAnimation();
+    // },
 
     async onRoundChanged() {
       if (!this.tracking_date || this.tracking_date?.evalua === undefined) {
-        this.products = [];
+        this.resetDashboard();
         return;
       }
 
       await this.withLoading(async () => {
-        await this.showDataEvalu();
+        await Promise.all([
+          this.showDataEvalu(),
+          this.fetchEvaluationRecommendations(),
+        ]);
       });
+
+      if (this.isSelectedScoreAnnounced) {
+        this.runDashboardAnimation();
+      } else {
+        this.animatedScoreValue = 0;
+        this.animatedAchievementValue = 0;
+        this.animatedBehaviorValue = 0;
+        this.animateCharts = false;
+      }
     },
 
-    normalizeStaffId(value) {
-      return String(value ?? '')
-        .replace(/\s+/g, '')
-        .trim();
-    },
-
-    parseScore(value) {
-      const score = parseFloat(String(value ?? '0').replace(',', '').trim());
-      return Number.isNaN(score) ? 0 : score;
-    },
-
-    normalizeRow(item) {
-      const tor = Array.isArray(item?.tb_tor)
-        ? item.tb_tor[0] || null
-        : item?.tb_tor || null;
-
-      return {
-        ...item,
-        tb_tor: tor,
-      };
-    },
-
-    getRowStaffId(item) {
-      const normalizedItem = this.normalizeRow(item);
-
-      return this.normalizeStaffId(
-        normalizedItem?.staffid ||
-        normalizedItem?.STAFFID ||
-        normalizedItem?.staff_id ||
-        normalizedItem?.staffId ||
-        normalizedItem?.STAFF_ID ||
-        normalizedItem?.tb_tor?.staffid ||
-        normalizedItem?.tb_tor?.STAFFID ||
-        normalizedItem?.tb_tor?.staff_id ||
-        normalizedItem?.tb_tor?.staffId ||
-        normalizedItem?.tb_tor?.STAFF_ID ||
-        ''
-      );
-    },
-
-    isLoginStaffRow(item) {
-      const loginStaffId = this.normalizeStaffId(this.staffid_Main);
-      const rowStaffId = this.getRowStaffId(item);
-
-      if (!loginStaffId || !rowStaffId) return false;
-
-      return rowStaffId === loginStaffId;
-    },
-
-    filterOnlyLoginStaff(rows) {
-      if (!Array.isArray(rows)) return [];
-
-      return rows
-        .map((item) => this.normalizeRow(item))
-        .filter((item) => this.isLoginStaffRow(item));
+    resetDashboard() {
+      this.products = [];
+      this.recommendationRows = [];
+      this.animateCharts = false;
+      this.animatedScoreValue = 0;
+      this.animatedAchievementValue = 0;
+      this.animatedBehaviorValue = 0;
     },
 
     async withLoading(task) {
       this.loading = true;
-
       try {
         return await task();
       } finally {
         this.loading = false;
       }
     },
-
+ 
     async showDataSet() {
       try {
-        const res = await axios.post('http://127.0.0.1:8000/api/showDateSetleader', {
+        const res = await axios.post(`${API}/showDateSet`, {
           staff_id: this.staffid_Main,
           fac_id: this.facid_Main,
           group_id: this.groupid_Main,
         });
 
-        console.log('showDateSetleader:', res.data);
-
         this.tracking_dates = Array.isArray(res.data) ? res.data : [];
 
+        console.log('รอบประเมินทั้งหมด:', this.tracking_dates.length);
+        console.table(this.tracking_dates);
+
+        await this.fetchScoreHistory(10);
       } catch (error) {
         console.error('showDataSet error:', error);
-
         this.tracking_dates = [];
-
         Swal.fire({
           icon: 'error',
           title: 'โหลดรอบประเมินไม่สำเร็จ',
-          text: 'กรุณาตรวจสอบ API showDateSetleader',
+          text: 'กรุณาตรวจสอบ API showDateSet',
         });
       }
     },
-
+ 
     async showDataEvalu() {
       try {
-        const res = await axios.get('http://127.0.0.1:8000/api/showDataEvalu', {
+        const res = await axios.get(`${API}/showDataEvalu`, {
           params: {
             staff_id: this.staffid_Main,
-            fac_id: this.tracking_date?.fac_id,
+            fac_id: this.tracking_date?.fac_id ?? this.facid_Main,
             group_id: this.groupid_Main,
             evalua: this.tracking_date?.evalua,
             p_year: this.tracking_date?.d_date,
           },
         });
 
-        console.log('showDataEvalu raw:', res.data);
-
-        const rows = Array.isArray(res.data) ? res.data : [];
-
-        /*
-          กรองข้อมูลเฉพาะผู้ที่ login เข้าระบบ
-          เช่น staffid_Main = 5009942 จะเห็นเฉพาะ staffid 5009942
-        */
-        this.products = this.filterOnlyLoginStaff(rows);
-
-        console.log('showDataEvalu filtered by login staff:', this.products);
-
+        this.products = this.filterOnlyLoginStaff(Array.isArray(res.data) ? res.data : []);
       } catch (error) {
         console.error('showDataEvalu error:', error);
-
         this.products = [];
-
         Swal.fire({
           icon: 'error',
           title: 'โหลดข้อมูลประเมินไม่สำเร็จ',
@@ -1031,342 +765,438 @@ export default {
       }
     },
 
-    parsePersen(persen) {
-      const [wAch, wBeh] = String(persen || '0:0')
-        .split(':')
-        .map((v) => parseFloat(v) || 0);
+    async fetchScoreHistory(limit = 10) {
+      const rounds = this.getHistoryRounds(limit);
 
-      return { wAch, wBeh };
+      if (!rounds.length || !this.staffid_Main) {
+        this.scoreHistory = [];
+        return;
+      }
+
+      this.loadingHistory = true;
+
+      try {
+        this.scoreHistory = await Promise.all(rounds.map(this.fetchScoreHistoryItem));
+      } catch (error) {
+        console.error('fetchScoreHistory error:', error);
+        this.scoreHistory = [];
+      } finally {
+        this.loadingHistory = false;
+      }
     },
 
-    calcAchievement(item) {
-      if (!item?.tb_tor?.persen) return '';
+    // async fetchScoreHistoryItem(round) {
+    //   try {
+    //     const res = await axios.get(`${API}/showDataEvalu`, {
+    //       params: {
+    //         staff_id: this.staffid_Main,
+    //         fac_id: round?.fac_id,
+    //         group_id: this.groupid_Main,
+    //         evalua: round?.evalua,
+    //         p_year: round?.d_date,
+    //       },
+    //     });
 
-      const { wAch } = this.parsePersen(item.tb_tor.persen);
-      const ach = this.parseScore(item.tb_tor.achievement_score);
+    //     const row = this.filterOnlyLoginStaff(Array.isArray(res.data) ? res.data : [])[0] || null;
+    //     const score = row?.tb_tor ? this.parseScore(row.tb_tor.sum_score) : null;
 
-      return (wAch * ach).toFixed(2);
+    //     return this.makeScoreHistoryItem(round, score, score !== null ? this.scoreLevel(score) : 'ไม่มีข้อมูล');
+    //   } catch (error) {
+    //     console.error('fetchScoreHistory item error:', error);
+    //     return this.makeScoreHistoryItem(round, null, 'โหลดข้อมูลไม่สำเร็จ');
+    //   }
+    // },
+
+    async fetchScoreHistoryItem(round) {
+      try {
+        const announced = this.isScoreAnnounced(round);
+
+        if (!announced) {
+          return this.makeScoreHistoryItem(round, null, 'รอประกาศผลคะแนน', false);
+        }
+
+        const res = await axios.get(`${API}/showDataEvalu`, {
+          params: {
+            staff_id: this.staffid_Main,
+            fac_id: round?.fac_id ?? this.facid_Main,
+            group_id: this.groupid_Main,
+            evalua: round?.evalua,
+            p_year: round?.d_date,
+          },
+        });
+
+        const row = this.filterOnlyLoginStaff(Array.isArray(res.data) ? res.data : [])[0] || null;
+        const score = row?.tb_tor ? this.parseScore(row.tb_tor.sum_score) : null;
+
+        return this.makeScoreHistoryItem(
+          round,
+          score,
+          score !== null ? this.scoreLevel(score) : 'ไม่มีข้อมูล',
+          true
+        );
+      } catch (error) {
+        console.error('fetchScoreHistory item error:', error);
+        return this.makeScoreHistoryItem(round, null, 'โหลดข้อมูลไม่สำเร็จ', true);
+      }
     },
 
-    calcBehavior(item) {
-      if (!item?.tb_tor?.persen) return '';
+    // makeScoreHistoryItem(round, score, level) {
+    //   return {
+    //     key: this.getRoundKey(round),
+    //     round,
+    //     year: this.historyYear(round),
+    //     roundNo: this.historyRoundNo(round),
+    //     fullLabel: this.historyFullLabel(round),
+    //     score,
+    //     hasData: score !== null && !Number.isNaN(score),
+    //     level,
+    //   };
+    // },
 
-      const { wBeh } = this.parsePersen(item.tb_tor.persen);
-      const beh = this.parseScore(item.tb_tor.behavior);
+    makeScoreHistoryItem(round, score, level, isAnnounced = true) {
+      return {
+        key: this.getRoundKey(round),
+        round,
+        year: this.historyYear(round),
+        roundNo: this.historyRoundNo(round),
+        fullLabel: this.historyFullLabel(round),
+        score,
+        isAnnounced,
+        hasData: isAnnounced && score !== null && !Number.isNaN(score),
+        level: isAnnounced ? level : 'รอประกาศผลคะแนน',
+      };
+    },
 
-      return (wBeh * beh).toFixed(2);
+    async fetchEvaluationRecommendations() {
+      if (!this.tracking_date || !this.staffid_Main) {
+        this.recommendationRows = [];
+        return;
+      }
+
+      this.loadingRecommendations = true;
+
+      try {
+        const res = await axios.post(`${API}/showDataP03New`, {
+          staff_id: this.staffid_Main,
+          fac_id: this.tracking_date?.fac_id ?? this.facid_Main,
+          year_id: this.tracking_date?.d_date,
+          evalua: this.tracking_date?.evalua,
+        });
+
+        this.recommendationRows = this.mapRecommendationRows(Array.isArray(res.data) ? res.data : []);
+      } catch (error) {
+        console.error('fetchEvaluationRecommendations error:', error);
+        this.recommendationRows = [];
+      } finally {
+        this.loadingRecommendations = false;
+      }
+    },
+
+    mapRecommendationRows(groups) {
+      const rows = [];
+
+      groups.forEach((group, groupIndex) => {
+        const subItems = Array.isArray(group?.subP01sX) ? group.subP01sX : [];
+
+        subItems.forEach((item, itemIndex) => {
+          const recommendation = this.cleanRecommendationText(item?.p01_detail);
+          if (!recommendation) return;
+
+          // rows.push({
+          //   id: [
+          //     group?.h_no ?? groupIndex,
+          //     item?.p01_id ?? itemIndex,
+          //     this.tracking_date?.d_date,
+          //     this.tracking_date?.evalua,
+          //   ].join('-'),
+          //   groupNo: group?.h_no || '',
+          //   groupName: group?.nameH || 'ไม่ระบุหมวดงาน',
+          //   recommendation,
+          //   roundLabel: this.selectedRoundText,
+          // });
+
+          rows.push({
+            id: [
+              group?.h_no ?? groupIndex,
+              item?.p01_id ?? itemIndex,
+              this.tracking_date?.d_date,
+              this.tracking_date?.evalua,
+            ].join('-'),
+
+            groupNo: group?.h_no || '',
+            groupName: group?.nameH || 'ไม่ระบุหมวดงาน',
+
+            activityNo: item?.p01_no || '',
+            activityText: this.getMainActivityText(item?.p01_subject),
+
+            recommendation,
+            roundLabel: this.selectedRoundText,
+          }); 
+        });
+      });
+
+      return rows;
+    },
+
+    cleanRecommendationText(value) {
+      const text = String(value ?? '')
+        .replace(/<br\s*\/?>/gi, '\n')
+        .replace(/<\/?[^>]+(>|$)/g, '')
+        .trim();
+
+      return text && !['-', 'null', 'undefined'].includes(text.toLowerCase()) ? text : '';
+    },
+
+    normalizeRow(item) {
+      return {
+        ...item,
+        tb_tor: Array.isArray(item?.tb_tor) ? item.tb_tor[0] || null : item?.tb_tor || null,
+      };
+    },
+
+    normalizeStaffId(value) {
+      return String(value ?? '').replace(/\s+/g, '').trim();
+    },
+
+    getRowStaffId(item) {
+      const row = this.normalizeRow(item);
+
+      return this.normalizeStaffId(
+        row?.staffid ||
+        row?.STAFFID ||
+        row?.staff_id ||
+        row?.staffId ||
+        row?.STAFF_ID ||
+        row?.tb_tor?.staffid ||
+        row?.tb_tor?.STAFFID ||
+        row?.tb_tor?.staff_id ||
+        row?.tb_tor?.staffId ||
+        row?.tb_tor?.STAFF_ID ||
+        ''
+      );
+    },
+
+    isLoginStaffRow(item) {
+      const loginStaffId = this.normalizeStaffId(this.staffid_Main);
+      const rowStaffId = this.getRowStaffId(item);
+      return !!loginStaffId && !!rowStaffId && rowStaffId === loginStaffId;
+    },
+
+    filterOnlyLoginStaff(rows) {
+      return Array.isArray(rows)
+        ? rows.map(this.normalizeRow).filter(this.isLoginStaffRow)
+        : [];
+    },
+
+    parseScore(value) {
+      const score = parseFloat(String(value ?? '0').replace(',', '').trim());
+      return Number.isNaN(score) ? 0 : score;
+    },
+
+    averageByField(field) {
+      if (!this.evaluatedOnly.length) return 0;
+
+      const total = this.evaluatedOnly.reduce((sum, item) => {
+        return sum + this.parseScore(item?.tb_tor?.[field]);
+      }, 0);
+
+      return Number((total / this.evaluatedOnly.length).toFixed(2));
+    },
+
+    percentWidthFromScore(value, fullScore = 100) {
+      const percent = (this.parseScore(value) / (Number(fullScore) || 100)) * 100;
+      return `${Math.max(0, Math.min(percent, 100))}%`;
     },
 
     scoreLevel(score) {
-      const s = this.parseScore(score);
-
-      if (s >= 90) return 'ดีเด่น';
-      if (s >= 80) return 'ดีมาก';
-      if (s >= 70) return 'ดี';
-      if (s >= 60) return 'พอใช้';
-
+      const value = this.parseScore(score);
+      if (value >= 90) return 'ดีเด่น';
+      if (value >= 80) return 'ดีมาก';
+      if (value >= 70) return 'ดี';
+      if (value >= 60) return 'พอใช้';
       return 'ต้องปรับปรุง';
     },
 
     scoreClass(score) {
-      const s = this.parseScore(score);
-
-      if (s >= 90) return 'excellent';
-      if (s >= 80) return 'very-good';
-      if (s >= 70) return 'good';
-      if (s >= 60) return 'fair';
-
+      const value = this.parseScore(score);
+      if (value >= 90) return 'excellent';
+      if (value >= 80) return 'very-good';
+      if (value >= 70) return 'good';
+      if (value >= 60) return 'fair';
       return 'improve';
     },
 
-    getInitial(item) {
-      const name = item?.namefully || item?.staffname || item?.STAFFNAME || '';
-      return name.trim().slice(0, 1) || 'P';
+    getHistoryRounds(limit = 10) {
+      return (Array.isArray(this.tracking_dates) ? [...this.tracking_dates] : [])
+        .slice(0, limit)
+        .reverse();
     },
 
-    openLevelDialog(levelKey) {
-      const titleMap = {
-        outstanding: 'รายละเอียดผลประเมินระดับดีเด่น',
-        veryGood: 'รายละเอียดผลประเมินระดับดีมาก',
-        good: 'รายละเอียดผลประเมินระดับดี',
-        fair: 'รายละเอียดผลประเมินระดับพอใช้',
-        improve: 'รายละเอียดผลประเมินระดับต้องปรับปรุง',
-      };
+    historyFullLabel(round) {
+      return `${round?.facuties || ''} ${round?.d_evaluationround || ''} ${round?.d_date || ''}`.trim();
+    },
 
-      this.selectedLevelKey = levelKey;
-      this.selectedLevelTitle = titleMap[levelKey] || 'รายละเอียดผลการประเมิน';
-      this.levelDialogVisible = true;
+    historyYear(round) {
+      const match = String(round?.d_date || '').trim().match(/\d{4}/);
+      return match ? match[0] : String(round?.d_date || '-').trim();
+    },
+
+    historyRoundNo(round) {
+      const text = String(round?.d_evaluationround || round?.evalua || '').trim();
+      const match = text.match(/(?:รอบ|ครั้ง)(?:ที่)?\s*([12])/);
+
+      if (match?.[1]) return match[1];
+
+      return String(round?.evalua || '').trim() === '2' ? '2' : '1';
+    },
+
+    getHistoryTitle(item, year, roundNo) {
+      return item?.fullLabel || `ปี ${year} รอบ ${roundNo}`;
+    },
+
+    historyBarHeight(score) {
+      if (!this.animateCharts) return '0%';
+      return `${Math.max(0, Math.min(this.parseScore(score), 100))}%`;
+    },
+
+    runDashboardAnimation() {
+      this.animateCharts = false;
+      this.animatedScoreValue = 0;
+      this.animatedAchievementValue = 0;
+      this.animatedBehaviorValue = 0;
 
       this.$nextTick(() => {
-        console.log('เปิดดูระดับ:', levelKey);
-        console.log('products:', this.products);
-        console.log('dashboardRows:', this.dashboardRows);
-        console.log('selectedLevelRows:', this.selectedLevelRows);
+        requestAnimationFrame(() => {
+          this.animateCharts = true;
+          this.countUpDashboardValues({
+            score: this.scoreValue,
+            achievement: this.avgAchievement,
+            behavior: this.avgBehavior,
+            duration: 1300,
+          });
+        });
       });
     },
 
-    async printDatatrackingpdf() {
-      if (!this.tracking_date) {
-        Swal.fire({
-          icon: 'warning',
-          title: 'กรุณาเลือกรอบประเมินก่อน',
-        });
-        return;
+    countUpDashboardValues({ score = 0, achievement = 0, behavior = 0, duration = 1200 }) {
+      if (this.counterFrame) {
+        cancelAnimationFrame(this.counterFrame);
       }
 
-      try {
-        const { getSession } = await useAuth();
-        const user = await getSession();
-        const sessionName = user?.user?.name || {};
+      const startTime = performance.now();
 
-        const form = {
-          staff_id: this.staffid_Main,
-          group_id: this.groupid_Main,
-          fac_id: this.tracking_date.fac_id,
-          year_id: this.tracking_date.d_date,
-          evalua: this.tracking_date.evalua,
-          PREFIXFULLNAME: sessionName.PREFIXFULLNAME,
-          STAFFNAME: sessionName.STAFFNAME,
-          STAFFSURNAME: sessionName.STAFFSURNAME,
-          POSITIONNAME: sessionName.POSITIONNAME,
-          GROUPTYPENAME: sessionName.GROUPTYPENAME,
-          POSTYPENAME: sessionName.POSTYPENAME,
-          SCOPES: sessionName?.SCOPES?.staffdepartmentname,
-          postypename: `ระดับ${this.postypename}`,
-          postypenameid: this.postypenameid,
-          stftypename: this.stftypename,
-        };
+      const animate = (now) => {
+        const progress = Math.min((now - startTime) / duration, 1);
+        const eased = this.easeOutCubic(progress);
 
-        const response = await axios.post(
-          'http://127.0.0.1:8000/api/exportPdf_Tracking',
-          form,
-          { responseType: 'blob' }
-        );
+        this.animatedScoreValue = score * eased;
+        this.animatedAchievementValue = achievement * eased;
+        this.animatedBehaviorValue = behavior * eased;
 
-        const url = window.URL.createObjectURL(response.data);
-        window.open(url, '_blank');
+        if (progress < 1) {
+          this.counterFrame = requestAnimationFrame(animate);
+        } else {
+          this.animatedScoreValue = score;
+          this.animatedAchievementValue = achievement;
+          this.animatedBehaviorValue = behavior;
+          this.counterFrame = null;
+        }
+      };
 
-      } catch (error) {
-        console.error('printDatatrackingpdf error:', error);
-
-        Swal.fire({
-          icon: 'error',
-          title: 'Export PDF ไม่สำเร็จ',
-        });
-      }
+      this.counterFrame = requestAnimationFrame(animate);
     },
 
-    percentWidthFromScore(value, fullScore = 100) {
-      const score = this.parseScore(value);
-      const max = Number(fullScore) || 100;
+    easeOutCubic(value) {
+      return 1 - Math.pow(1 - value, 3);
+    },
 
-      const percent = (score / max) * 100;
+    getMainActivityText(text) {
+      const lines = String(text || '')
+        .split(/\r?\n/)
+        .map((line) => line.trim())
+        .filter(Boolean);
 
-      return `${Math.max(0, Math.min(percent, 100))}%`;
-    }, 
+      return lines[0] || '';
+    },
+
+    parseDbDate(value) {
+      if (!value) return null;
+
+      if (value instanceof Date) {
+        const date = new Date(value);
+        date.setHours(0, 0, 0, 0);
+        return date;
+      }
+
+      const text = String(value).trim();
+      if (!text) return null;
+
+      // รองรับทั้ง 2026-06-23 และ 2026-06-23 00:00:00
+      const datePart = text.includes('T')
+        ? text.split('T')[0]
+        : text.split(' ')[0];
+
+      const date = new Date(`${datePart}T00:00:00`);
+      if (Number.isNaN(date.getTime())) return null;
+
+      date.setHours(0, 0, 0, 0);
+      return date;
+    },
+
+    isScoreAnnounced(item) {
+      const scoringDate = this.parseDbDate(item?.d_scoringday);
+
+      // ถ้าไม่มีวันประกาศคะแนน ให้ถือว่ายังไม่ประกาศ
+      if (!scoringDate) return false;
+
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      return today >= scoringDate;
+    },
+
+    formatThaiDate(value) {
+      const date = this.parseDbDate(value);
+      if (!date) return '';
+
+      return date.toLocaleDateString('th-TH', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+      });
+    },
+
+    historyScoreText(item) {
+      if (!item) return '-';
+      if (!item.isAnnounced) return 'รอประกาศ';
+      return item.hasData ? Number(item.score).toFixed(2) : '-';
+    },
+ 
   },
 };
 </script>
 
 <style scoped>
 .personal-dashboard {
-  position: relative;
   min-height: 100vh;
   padding: 1.5rem;
+  color: #0f172a;
   background:
     radial-gradient(circle at top left, rgba(14, 165, 233, 0.18), transparent 28%),
     radial-gradient(circle at top right, rgba(20, 184, 166, 0.16), transparent 30%),
     linear-gradient(180deg, #eef5ff 0%, #f8fafc 42%, #ffffff 100%);
-  color: #0f172a;
 }
 
-/* HERO */
 .hero-shell {
   position: relative;
   overflow: hidden;
-  border-radius: 32px;
-  padding: 1.5rem;
-  background:
-    linear-gradient(135deg, rgba(15, 23, 42, 0.98) 0%, rgba(30, 64, 175, 0.94) 48%, rgba(13, 148, 136, 0.9) 100%);
-  box-shadow:
-    0 24px 55px rgba(15, 23, 42, 0.22),
-    0 8px 24px rgba(13, 148, 136, 0.12);
-}
-
-.hero-bg-glow {
-  position: absolute;
-  border-radius: 999px;
-  filter: blur(6px);
-  opacity: 0.45;
-  pointer-events: none;
-}
-
-.glow-one {
-  width: 260px;
-  height: 260px;
-  right: -70px;
-  top: -80px;
-  background: rgba(34, 211, 238, 0.42);
-}
-
-.glow-two {
-  width: 220px;
-  height: 220px;
-  left: 36%;
-  bottom: -120px;
-  background: rgba(250, 204, 21, 0.22);
-}
-
-.hero-content {
-  position: relative;
-  z-index: 1;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 380px;
-  gap: 1.4rem;
-  align-items: stretch;
-}
-
-.hero-copy {
-  color: #ffffff;
-  padding: 0.35rem 0.25rem;
-}
-
-.eyebrow {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.42rem 0.75rem;
-  border-radius: 999px;
-  font-size: 0.72rem;
-  letter-spacing: 0.14em;
-  font-weight: 900;
-  color: rgba(255, 255, 255, 0.92);
-  background: rgba(255, 255, 255, 0.12);
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  backdrop-filter: blur(10px);
-}
-
-.hero-copy h3 {
-  margin: 1rem 0 0.5rem;
-  font-size: clamp(2rem, 4vw, 3.15rem);
-  line-height: 1.05;
-  font-weight: 900;
-  color: #ffffff;
-  text-align: left;
-}
-
-.hero-copy p {
-  margin: 0;
-  max-width: 760px;
-  color: rgba(255, 255, 255, 0.82);
-  line-height: 1.7;
-  font-size: 1rem;
-}
-
-.profile-strip {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  margin-top: 1.35rem;
-  padding: 1rem;
-  border-radius: 22px;
-  background: rgba(255, 255, 255, 0.12);
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  backdrop-filter: blur(12px);
-} 
-.profile-avatar {
-  width: 58px !important;
-  height: 58px !important;
-  min-width: 58px !important;
-  max-width: 58px !important;
-  min-height: 58px !important;
-  max-height: 58px !important;
-  display: grid;
-  place-items: center;
-  border-radius: 20px;
-  overflow: hidden;
-  flex: 0 0 58px;
-  background: #ffffff;
-  border: 2px solid #ffffff;
-  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.10);
-}
-
-.profile-avatar img {
-  width: 100% !important;
-  height: 100% !important;
-  max-width: 100% !important;
-  max-height: 100% !important;
-  display: block;
-  object-fit: cover;
-  object-position: center top;
-  border-radius: 18px;
-}
-
-.profile-avatar span {
-  width: 100%;
-  height: 100%;
-  display: grid;
-  place-items: center;
-  background: linear-gradient(135deg, #fef3c7, #fde68a);
-  color: #78350f;
-  font-size: 1.3rem;
-  font-weight: 900;
-}
-
-.profile-info {
-  min-width: 220px;
-}
-
-.profile-info strong {
-  display: block;
-  color: #ffffff;
-  font-size: 1.08rem;
-}
-
-.profile-info span {
-  display: block;
-  margin-top: 0.2rem;
-  color: rgba(255, 255, 255, 0.72);
-}
-
-.profile-meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.55rem;
-  margin-left: auto;
-  justify-content: flex-end;
-}
-
-.profile-meta span {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  padding: 0.48rem 0.7rem;
-  border-radius: 999px;
-  color: rgba(255, 255, 255, 0.86);
-  background: rgba(15, 23, 42, 0.28);
-  border: 1px solid rgba(255, 255, 255, 0.13);
-  font-size: 0.82rem;
-  font-weight: 700;
-}
-
-/* CONTROL PANEL */
-
-/* HERO - โทนสีจืดแบบตัวอย่าง */
-.hero-shell {
-  position: relative;
-  overflow: hidden;
-  border-radius: 28px;
   padding: 1.4rem;
-  background:
-    linear-gradient(135deg, #eef4ff 0%, #eafcf7 58%, #ffffff 100%);
-  box-shadow:
-    0 14px 34px rgba(30, 64, 175, 0.08),
-    0 4px 14px rgba(15, 118, 110, 0.05);
   border: 1px solid #c7d2fe;
+  border-radius: 28px;
+  background: linear-gradient(135deg, #eef4ff 0%, #eafcf7 58%, #ffffff 100%);
+  box-shadow: 0 14px 34px rgba(30, 64, 175, 0.08), 0 4px 14px rgba(15, 118, 110, 0.05);
 }
 
-/* ถ้าไม่อยากให้มีแสงฟุ้งเข้ม ให้ลด opacity */
 .hero-bg-glow {
   position: absolute;
   border-radius: 999px;
@@ -1391,9 +1221,17 @@ export default {
   background: rgba(96, 165, 250, 0.22);
 }
 
+.hero-content {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 380px;
+  gap: 1.4rem;
+}
+
 .hero-copy {
-  color: #172554;
   padding: 0.35rem 0.25rem;
+  color: #172554;
 }
 
 .eyebrow {
@@ -1402,59 +1240,75 @@ export default {
   gap: 0.5rem;
   padding: 0.48rem 0.9rem;
   border-radius: 999px;
-  font-size: 0.78rem;
-  letter-spacing: 0;
-  font-weight: 900;
   color: #ffffff;
+  font-size: 0.78rem;
+  font-weight: 900;
   background: linear-gradient(135deg, #60a5fa, #3b82f6);
-  border: 1px solid rgba(59, 130, 246, 0.18);
-  backdrop-filter: none;
   box-shadow: 0 8px 18px rgba(59, 130, 246, 0.16);
 }
 
 .hero-copy h3 {
   margin: 1rem 0 0.45rem;
-  font-size: clamp(1.65rem, 3vw, 2.2rem);
-  line-height: 1.18;
-  font-weight: 900;
   color: #1e1b4b;
-  text-align: left;
+  font-size: clamp(1.65rem, 3vw, 2.2rem);
+  font-weight: 900;
+  line-height: 1.18;
 }
 
-.hero-copy p {
-  margin: 0;
-  max-width: 780px;
-  color: #475569;
-  line-height: 1.65;
-  font-size: 0.98rem;
+.hero-copy p,
+.card-title-row p,
+.section-head p {
+  margin: 0.25rem 0 0;
+  color: #64748b;
+  line-height: 1.6;
 }
 
-/* กล่องข้อมูลผู้ใช้ ให้เป็นสีอ่อน */
 .profile-strip {
   display: flex;
   align-items: center;
   gap: 1rem;
   margin-top: 1.2rem;
   padding: 1rem;
+  border: 1px solid #e6b087;
   border-radius: 22px;
   background: rgba(255, 255, 255, 0.66);
-  border: 1px solid #dbeafe;
-  backdrop-filter: blur(10px);
   box-shadow: 0 10px 24px rgba(30, 64, 175, 0.06);
 }
 
 .profile-avatar {
-  width: 58px;
-  height: 58px;
+  width: 58px !important;
+  height: 58px !important;
+  flex: 0 0 58px;
   display: grid;
   place-items: center;
+  overflow: hidden;
+  border: 2px solid #ffffff;
   border-radius: 20px;
-  background: linear-gradient(135deg, #fef3c7, #fde68a);
+  background: #ffffff;
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.1);
+}
+
+.profile-avatar img {
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
+  object-fit: cover;
+  object-position: center top;
+  border-radius: 18px;
+}
+
+.profile-avatar span {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
   color: #78350f;
-  font-size: 1.6rem;
   font-weight: 900;
-  box-shadow: none;
-  flex-shrink: 0;
+  background: linear-gradient(135deg, #fef3c7, #fde68a);
+}
+
+.profile-info {
+  min-width: 220px;
 }
 
 .profile-info strong {
@@ -1469,36 +1323,64 @@ export default {
   color: #64748b;
 }
 
+.profile-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  margin-left: auto;
+  justify-content: flex-end;
+}
+
 .profile-meta span {
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
   padding: 0.48rem 0.7rem;
+  border: 1px solid #bfdbfe;
   border-radius: 999px;
   color: #334155;
-  background: #efbcbc;
-  border: 1px solid #8cb5ec;
   font-size: 0.82rem;
   font-weight: 800;
+  background: #ffffff;
 }
 
-/* CONTROL PANEL - กล่องเลือกรอบด้านขวา */
 .control-panel {
   display: flex;
   flex-direction: column;
   gap: 0.8rem;
   padding: 1.05rem;
+  border: 1px solid #dbeafe;
   border-radius: 24px;
   background: rgba(226, 243, 179, 0.78);
   box-shadow: 0 12px 26px rgba(30, 64, 175, 0.08);
-  border: 1px solid #dbeafe;
-  align-self: stretch;
 }
 
 .control-panel label {
   color: #334155;
-  font-weight: 900;
   font-size: 0.9rem;
+  font-weight: 900;
+}
+
+.round-select {
+  width: 100%;
+}
+
+:deep(.round-select.p-dropdown),
+:deep(.round-select .p-dropdown) {
+  min-height: 50px;
+  border: 1px solid #dbeafe;
+  border-radius: 16px;
+  background: #f8fafc;
+  box-shadow: none;
+}
+
+:deep(.round-select .p-dropdown-label) {
+  color: #0f172a;
+  font-weight: 700;
+}
+
+:deep(.round-select .p-dropdown-trigger) {
+  color: #2563eb;
 }
 
 .round-status {
@@ -1507,50 +1389,33 @@ export default {
   gap: 0.55rem;
   min-height: 46px;
   padding: 0.75rem;
-  border-radius: 16px;
-  background: #f8fafc;
   border: 1px solid #dbeafe;
+  border-radius: 16px;
   color: #475569;
   font-size: 0.9rem;
   line-height: 1.45;
+  background: #f8fafc;
 }
 
-.round-status i {
-  margin-top: 0.15rem;
-  color: #3b82f6;
-}
-.export-btn {
-  width: 100%;
-  justify-content: center;
-  min-height: 46px;
-  border-radius: 16px;
-  font-weight: 900;
-}
-
-/* LOADING / EMPTY */
 .loading-card,
 .empty-state {
+  min-height: 320px;
   margin-top: 1.25rem;
+  padding: 2rem;
   display: grid;
   place-items: center;
   text-align: center;
-  min-height: 320px;
-  padding: 2rem;
-  border-radius: 28px;
-  background: rgba(255, 255, 255, 0.86);
   border: 1px solid #e2e8f0;
+  border-radius: 28px;
+  color: #64748b;
+  background: rgba(255, 255, 255, 0.86);
   box-shadow: 0 18px 40px rgba(15, 23, 42, 0.07);
 }
 
 .loading-card strong {
   margin-top: 0.8rem;
-  font-size: 1.15rem;
   color: #0f172a;
-}
-
-.loading-card span,
-.empty-state p {
-  color: #64748b;
+  font-size: 1.15rem;
 }
 
 .empty-icon {
@@ -1558,19 +1423,13 @@ export default {
   height: 78px;
   display: grid;
   place-items: center;
+  margin-bottom: 1rem;
   border-radius: 26px;
-  background: linear-gradient(135deg, #dbeafe, #ccfbf1);
   color: #2563eb;
   font-size: 2rem;
-  margin-bottom: 1rem;
+  background: linear-gradient(135deg, #dbeafe, #ccfbf1);
 }
 
-.empty-state h2 {
-  margin: 0;
-  color: #0f172a;
-}
-
-/* SUMMARY */
 .summary-layout {
   display: grid;
   grid-template-columns: 380px minmax(0, 1fr) minmax(0, 1fr);
@@ -1581,39 +1440,35 @@ export default {
 .score-hero-card,
 .status-card,
 .component-card,
-.detail-card,
-.level-section {
-  background: rgba(255, 255, 255, 0.92);
+.detail-card {
+  padding: 1.2rem;
   border: 1px solid #e2e8f0;
   border-radius: 28px;
-  box-shadow:
-    0 18px 42px rgba(15, 23, 42, 0.08),
-    inset 0 1px 0 rgba(255, 255, 255, 0.75);
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 18px 42px rgba(15, 23, 42, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.75);
+  animation: cardLiftIn 0.55s ease both;
 }
 
-.score-hero-card {
-  padding: 1.25rem;
-  background:
-    radial-gradient(circle at top right, rgba(34, 211, 238, 0.18), transparent 34%),
-    linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
-}
-
-.score-card-head {
+.score-card-head,
+.card-title-row,
+.section-head {
   display: flex;
   justify-content: space-between;
   gap: 1rem;
   align-items: flex-start;
 }
 
-.score-card-head span {
+.score-card-head span,
+.history-summary span,
+.component-item span {
   color: #64748b;
   font-weight: 800;
 }
 
 .score-card-head h2 {
   margin: 0.1rem 0 0;
-  font-size: 2.35rem;
   color: #0f172a;
+  font-size: 2.35rem;
   line-height: 1;
 }
 
@@ -1623,15 +1478,21 @@ export default {
   padding: 1.35rem 0;
 }
 
+@property --score-deg {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
+
 .score-ring {
   width: 210px;
   height: 210px;
   display: grid;
   place-items: center;
   border-radius: 50%;
-  background:
-    conic-gradient(#0ea5e9 var(--score-deg), #e2e8f0 0deg);
-  box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.04);
+  background: conic-gradient(#32cd63 var(--score-deg), #e2e8f0 0deg);
+  transition: --score-deg 1.25s cubic-bezier(0.22, 1, 0.36, 1);
+  animation: scorePop 0.85s ease both;
 }
 
 .score-ring-inner {
@@ -1646,9 +1507,9 @@ export default {
 }
 
 .score-ring-inner strong {
+  color: #0f172a;
   font-size: 2.15rem;
   line-height: 1;
-  color: #0f172a;
 }
 
 .score-ring-inner span {
@@ -1659,8 +1520,8 @@ export default {
 
 .score-level-box {
   padding: 1rem;
-  border-radius: 22px;
   border: 1px solid #e2e8f0;
+  border-radius: 22px;
   background: #f8fafc;
 }
 
@@ -1676,63 +1537,18 @@ export default {
   font-size: 1.35rem;
 }
 
-.score-level-box.excellent {
-  background: #dcfce7;
-  border-color: #bbf7d0;
-  color: #166534;
-}
+.score-level-box.excellent { background: #dcfce7; border-color: #bbf7d0; color: #166534; }
+.score-level-box.very-good { background: #e0f2fe; border-color: #bae6fd; color: #075985; }
+.score-level-box.good { background: #eef2ff; border-color: #c7d2fe; color: #3730a3; }
+.score-level-box.fair { background: #fef3c7; border-color: #fde68a; color: #92400e; }
+.score-level-box.improve { background: #fee2e2; border-color: #fecaca; color: #991b1b; }
+.score-level-box.pending { color: #64748b; }
 
-.score-level-box.very-good {
-  background: #e0f2fe;
-  border-color: #bae6fd;
-  color: #075985;
-}
-
-.score-level-box.good {
-  background: #eef2ff;
-  border-color: #c7d2fe;
-  color: #3730a3;
-}
-
-.score-level-box.fair {
-  background: #fef3c7;
-  border-color: #fde68a;
-  color: #92400e;
-}
-
-.score-level-box.improve {
-  background: #fee2e2;
-  border-color: #fecaca;
-  color: #991b1b;
-}
-
-.score-level-box.pending {
-  background: #f8fafc;
-  border-color: #e2e8f0;
-  color: #64748b;
-}
-
-.status-card,
-.component-card {
-  padding: 1.2rem;
-}
-
-.card-title-row {
-  display: flex;
-  justify-content: space-between;
-  gap: 1rem;
-  align-items: flex-start;
-}
-
-.card-title-row h3 {
+.card-title-row h3,
+.section-head h2 {
   margin: 0;
   color: #0f172a;
   font-size: 1.15rem;
-}
-
-.card-title-row p {
-  margin: 0.25rem 0 0;
-  color: #64748b;
 }
 
 .soft-icon {
@@ -1740,80 +1556,180 @@ export default {
   height: 48px;
   display: grid;
   place-items: center;
+  flex-shrink: 0;
   border-radius: 18px;
-  background: #dbeafe;
   color: #2563eb;
   font-size: 1.25rem;
-  flex-shrink: 0;
+  background: #dbeafe;
 }
 
-.soft-icon.alt {
-  background: #ccfbf1;
+.soft-icon.alt,
+.history-icon {
   color: #0f766e;
+  background: #ccfbf1;
 }
 
-.status-big {
-  margin: 1.25rem 0 1rem;
-}
-
-.status-big strong {
-  display: block;
-  font-size: 3rem;
-  line-height: 1;
-  color: #0f172a;
-}
-
-.status-big span {
-  display: block;
-  margin-top: 0.35rem;
-  color: #64748b;
-  font-weight: 700;
-}
-
-.status-grid {
+.history-summary {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 0.75rem;
-  margin-top: 1rem;
+  gap: 0.7rem;
+  margin: 1rem 0 1.15rem;
 }
 
-.status-grid div {
+.history-summary div,
+.component-item {
   padding: 0.85rem;
-  border-radius: 18px;
-  background: #f8fafc;
   border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  background: #f8fafc;
 }
 
-.status-grid span {
-  display: block;
-  color: #64748b;
-  font-size: 0.82rem;
-  font-weight: 800;
-}
-
-.status-grid strong {
+.history-summary strong,
+.component-item strong {
   display: block;
   margin-top: 0.2rem;
   color: #0f172a;
-  font-size: 1.35rem;
+  font-size: 1.25rem;
+  line-height: 1;
 }
+
+.history-loading,
+.history-empty {
+  min-height: 170px;
+  display: grid;
+  place-items: center;
+  gap: 0.65rem;
+  border: 1px dashed #cbd5e1;
+  border-radius: 20px;
+  color: #64748b;
+  font-weight: 800;
+  background: #f8fafc;
+}
+
+.grouped-history-chart {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(88px, 1fr));
+  align-items: end;
+  gap: 0.95rem;
+  height: 250px;
+  padding: 1.45rem 1rem 2.65rem;
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+  background: #ffffff;
+}
+
+.history-grid-line {
+  position: absolute;
+  left: 0.9rem;
+  right: 0.9rem;
+  height: 1px;
+  z-index: 0;
+  border-top: 1px dashed #dbeafe;
+  color: #94a3b8;
+  font-size: 0.68rem;
+  font-weight: 800;
+  pointer-events: none;
+}
+
+.line-100 { top: 1rem; }
+.line-75 { top: 25%; }
+.line-50 { top: 50%; }
+
+.history-year-group {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-rows: 1fr 26px;
+  align-items: end;
+  justify-items: center;
+  height: 100%;
+  animation: barGroupIn 0.45s ease both;
+}
+
+.history-bars-pair {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 0.38rem;
+  height: 100%;
+}
+
+.history-bar-item {
+  display: grid;
+  grid-template-rows: 24px 1fr;
+  align-items: end;
+  justify-items: center;
+  height: 100%;
+}
+
+.history-score,
+.history-year-label {
+  color: #475569;
+  font-size: 0.72rem;
+  font-weight: 900;
+}
+
+.history-bar-track {
+  width: 28px;
+  height: 142px;
+  display: flex;
+  align-items: flex-end;
+  overflow: hidden;
+  border-radius: 7px 7px 3px 3px;
+  background: #e2e8f0;
+  box-shadow: inset 0 1px 3px rgba(15, 23, 42, 0.08);
+}
+
+.history-bar-fill {
+  width: 100%;
+  min-height: 4px;
+  border-radius: 7px 7px 3px 3px;
+  transition: height 1.25s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.round-one .history-bar-fill { background: linear-gradient(180deg, #60a5fa 0%, #2563eb 100%); }
+.round-two .history-bar-fill { background: linear-gradient(180deg, #f87171 0%, #dc2626 100%); }
+.history-bar-item.active .history-bar-track { outline: 2px solid rgba(245, 158, 11, 0.35); background: #fef3c7; }
+.history-bar-item.active .history-score { color: #b45309; }
+
+.history-legend {
+  position: absolute;
+  right: 1rem;
+  bottom: 0.65rem;
+  z-index: 2;
+  display: flex;
+  gap: 0.9rem;
+  padding: 0.35rem 0.55rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 999px;
+  color: #475569;
+  font-size: 0.72rem;
+  font-weight: 900;
+  background: rgba(255, 255, 255, 0.86);
+}
+
+.history-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.history-legend i {
+  width: 10px;
+  height: 10px;
+  display: inline-block;
+  border-radius: 2px;
+}
+
+.legend-one { background: #2563eb; }
+.legend-two { background: #dc2626; }
 
 .component-list {
   display: grid;
   gap: 0.85rem;
   margin-top: 1.1rem;
-}
-
-.component-item {
-  padding: 0.95rem;
-  border-radius: 20px;
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
-}
-
-.component-item.highlight {
-  background: linear-gradient(135deg, #eff6ff, #ecfeff);
-  border-color: #bfdbfe;
 }
 
 .component-item > div:first-child {
@@ -1824,14 +1740,9 @@ export default {
   margin-bottom: 0.7rem;
 }
 
-.component-item span {
-  color: #64748b;
-  font-weight: 800;
-}
-
-.component-item strong {
-  color: #0f172a;
-  font-size: 1.25rem;
+.component-item.highlight {
+  background: linear-gradient(135deg, #eff6ff, #ecfeff);
+  border-color: #bfdbfe;
 }
 
 .mini-bar {
@@ -1846,136 +1757,9 @@ export default {
   height: 100%;
   border-radius: inherit;
   background: linear-gradient(90deg, #2563eb, #14b8a6);
+  transition: width 1.15s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-/* LEVEL */
-.level-section,
-.detail-card {
-  margin-top: 1rem;
-  padding: 1.2rem;
-}
-
-.section-head {
-  display: flex;
-  justify-content: space-between;
-  gap: 1rem;
-  align-items: flex-start;
-  margin-bottom: 1rem;
-}
-
-.section-head h2 {
-  margin: 0;
-  color: #0f172a;
-  font-size: 1.22rem;
-}
-
-.section-head p {
-  margin: 0.25rem 0 0;
-  color: #64748b;
-}
-
-.level-grid {
-  display: grid;
-  grid-template-columns: repeat(5, minmax(140px, 1fr));
-  gap: 0.85rem;
-}
-
-.level-card {
-  position: relative;
-  overflow: hidden;
-  padding: 1rem;
-  min-height: 126px;
-  border-radius: 24px;
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.05);
-}
-
-.level-card::after {
-  content: "";
-  position: absolute;
-  right: -26px;
-  top: -28px;
-  width: 86px;
-  height: 86px;
-  border-radius: 50%;
-  opacity: 0.14;
-}
-
-.level-card span,
-.level-card small,
-.level-card strong {
-  position: relative;
-  z-index: 1;
-  display: block;
-}
-
-.level-card span {
-  font-weight: 900;
-}
-
-.level-card strong {
-  margin: 0.28rem 0;
-  font-size: 2.05rem;
-  line-height: 1;
-}
-
-.level-card small {
-  color: #64748b;
-  font-weight: 700;
-}
-
-.clickable-level {
-  cursor: pointer;
-  transition: all 0.22s ease;
-}
-
-.clickable-level:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 18px 32px rgba(15, 23, 42, 0.1);
-}
-
-.level-card.excellent {
-  border-left: 6px solid #16a34a;
-}
-
-.level-card.excellent::after {
-  background: #16a34a;
-}
-
-.level-card.very-good {
-  border-left: 6px solid #0284c7;
-}
-
-.level-card.very-good::after {
-  background: #0284c7;
-}
-
-.level-card.good {
-  border-left: 6px solid #4f46e5;
-}
-
-.level-card.good::after {
-  background: #4f46e5;
-}
-
-.level-card.fair {
-  border-left: 6px solid #f59e0b;
-}
-
-.level-card.fair::after {
-  background: #f59e0b;
-}
-
-.level-card.improve {
-  border-left: 6px solid #dc2626;
-}
-
-.level-card.improve::after {
-  background: #dc2626;
-}
-
-/* INSIGHT */
 .insight-section {
   display: grid;
   grid-template-columns: repeat(2, minmax(260px, 1fr));
@@ -1988,8 +1772,8 @@ export default {
   gap: 0.9rem;
   align-items: flex-start;
   padding: 1rem;
-  border-radius: 24px;
   border: 1px solid #e2e8f0;
+  border-radius: 24px;
   background: #ffffff;
 }
 
@@ -1998,50 +1782,29 @@ export default {
   height: 42px;
   display: grid;
   place-items: center;
+  flex-shrink: 0;
   border-radius: 16px;
   font-size: 1.2rem;
-  flex-shrink: 0;
 }
 
-.insight-card strong {
+.insight-card strong,
+.insight-card span {
   display: block;
-  color: #0f172a;
 }
 
 .insight-card span {
-  display: block;
   margin-top: 0.25rem;
   color: #64748b;
 }
 
-.insight-card.neutral i {
-  color: #2563eb;
-  background: #dbeafe;
-}
+.insight-card.neutral i { color: #2563eb; background: #dbeafe; }
+.insight-card.warning { background: #fffbeb; border-color: #fde68a; }
+.insight-card.warning i { color: #92400e; background: #fef3c7; }
+.insight-card.danger { background: #fef2f2; border-color: #fecaca; }
+.insight-card.danger i { color: #991b1b; background: #fee2e2; }
 
-.insight-card.warning {
-  background: #fffbeb;
-  border-color: #fde68a;
-}
-
-.insight-card.warning i {
-  color: #92400e;
-  background: #fef3c7;
-}
-
-.insight-card.danger {
-  background: #fef2f2;
-  border-color: #fecaca;
-}
-
-.insight-card.danger i {
-  color: #991b1b;
-  background: #fee2e2;
-}
-
-/* TABLE */
-.table-head {
-  align-items: center;
+.detail-card {
+  margin-top: 1rem;
 }
 
 .table-count {
@@ -2050,145 +1813,244 @@ export default {
   justify-content: center;
   min-width: 92px;
   padding: 0.55rem 0.8rem;
+  border: 1px solid #bfdbfe;
   border-radius: 999px;
-  background: #eff6ff;
-  color: #2563eb;
+  color: #1d4ed8;
   font-weight: 900;
-  border: 1px solid #dbeafe;
+  background: #eff6ff;
 }
 
-.person-cell {
+.recommendation-card {
+  background: radial-gradient(circle at top right, rgba(59, 130, 246, 0.1), transparent 32%), linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+}
+
+.recommendation-loading,
+.recommendation-empty {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  text-align: left;
+  gap: 1rem;
+  min-height: 130px;
+  padding: 1.1rem;
+  border: 1px dashed #cbd5e1;
+  border-radius: 22px;
+  color: #64748b;
+  font-weight: 800;
+  background: #ffffff;
 }
 
-.avatar {
-  width: 42px;
-  height: 42px;
+.recommendation-empty-icon {
+  width: 56px;
+  height: 56px;
   display: grid;
   place-items: center;
   flex-shrink: 0;
-  border-radius: 16px;
-  background: linear-gradient(135deg, #dbeafe, #ccfbf1);
-  color: #075985;
-  font-weight: 900;
-}
-
-.person-cell strong {
-  display: block;
-  color: #0f172a;
-}
-
-.person-cell small {
-  display: block;
-  margin-top: 0.15rem;
-  color: #64748b;
-}
-
-.score-pill {
-  display: inline-flex;
-  min-width: 78px;
-  justify-content: center;
-  padding: 0.38rem 0.75rem;
-  border-radius: 999px;
-  font-weight: 900;
-}
-
-.score-pill.excellent {
+  border-radius: 20px;
+  color: #16a34a;
+  font-size: 1.5rem;
   background: #dcfce7;
-  color: #166534;
 }
 
-.score-pill.very-good {
-  background: #e0f2fe;
-  color: #075985;
+.recommendation-empty strong,
+.recommendation-empty span {
+  display: block;
 }
 
-.score-pill.good {
-  background: #eef2ff;
-  color: #3730a3;
+.recommendation-empty span {
+  margin-top: 0.25rem;
+  color: #64748b;
+  font-weight: 600;
 }
 
-.score-pill.fair {
-  background: #fef3c7;
-  color: #92400e;
+.recommendation-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  border: 1px solid #dbeafe;
+  border-radius: 22px;
+  background: #ffffff;
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.06);
 }
 
-.score-pill.improve {
-  background: #fee2e2;
-  color: #991b1b;
+.recommendation-table {
+  width: 100%;
+  min-width: 760px;
+  table-layout: fixed;
+  border-collapse: separate;
+  border-spacing: 0;
 }
 
-.weight-score {
-  color: #92400e;
-}
-
-.level-text {
+.recommendation-table th {
+  padding: 0.9rem 1rem;
+  border-bottom: 1px solid #bfdbfe;
+  border-right: 1px solid #dbeafe;
+  color: #0f172a;
+  font-size: 0.9rem;
   font-weight: 900;
-  color: #0f172a;
+  text-align: left;
+  background: linear-gradient(180deg, #f8fafc 0%, #eff6ff 100%);
 }
 
-.dialog-title {
-  margin: 0;
-  color: #0f172a;
-}
-
-.dialog-subtitle {
-  margin: 0.25rem 0 0;
-  color: #64748b;
-}
-
-.empty-level {
+.recommendation-table td {
   padding: 1rem;
+  border-bottom: 1px solid #e2e8f0;
+  border-right: 1px solid #e2e8f0;
+  color: #334155;
+  line-height: 1.6;
+  vertical-align: top;
+}
+
+.recommendation-table th:last-child,
+.recommendation-table td:last-child {
+  border-right: none;
+}
+
+.recommendation-table tr:last-child td {
+  border-bottom: none;
+}
+
+.recommendation-table tbody tr:hover {
+  background: #fffafa;
+}
+
+.recommendation-table .col-no {
+  width: 70px;
   text-align: center;
-  color: #64748b;
   font-weight: 800;
 }
 
-/* PrimeVue table refinement */
-:deep(.modern-table .p-datatable-header),
-:deep(.level-detail-table .p-datatable-header) {
-  border: none;
+.recommendation-table .col-work {
+  width: 45%;
+  text-align: left;
 }
 
-:deep(.modern-table .p-datatable-thead > tr > th),
-:deep(.level-detail-table .p-datatable-thead > tr > th) {
-  background: #f8fafc;
-  color: #334155;
+.recommendation-table .col-recommend {
+  width: 55%;
+  text-align: left;
+}
+
+.work-title strong {
+  display: inline;
+  color: #0f172a;
   font-weight: 900;
-  border-color: #e2e8f0;
 }
 
-:deep(.modern-table .p-datatable-tbody > tr > td),
-:deep(.level-detail-table .p-datatable-tbody > tr > td) {
-  border-color: #edf2f7;
+.work-title span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-left: 0.35rem;
+  color: #334155;
+  font-size: 0.86rem;
+} 
+.recommend-red-text {
+  color: #dc2626;
 }
 
-/* RESPONSIVE */
+.recommend-red-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-bottom: 0.25rem;
+  color: #0f172a !important;
+  font-size: 0.86rem;
+  font-weight: 900;
+}
+
+.recommend-red-label i {
+  color: #0f172a !important;
+}
+
+.recommend-red-text p {
+  margin: 0;
+  color: #dc2626 !important;
+  font-weight: 900;
+  line-height: 1.7;
+  white-space: pre-line;
+} 
+@keyframes scorePop {
+  0% { transform: scale(0.92); }
+  65% { transform: scale(1.035); }
+  100% { transform: scale(1); }
+}
+
+@keyframes cardLiftIn {
+  0% { opacity: 0; transform: translateY(14px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes barGroupIn {
+  0% { opacity: 0; transform: translateY(12px) scale(0.96); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+
+  .score-wait-card {
+  min-height: 300px;
+  margin-top: 1.25rem;
+  padding: 2rem;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  border: 1px dashed #bfdbfe;
+  border-radius: 28px;
+  color: #64748b;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.07);
+}
+
+/* กล่องรอประกาศผลคะแนน */
+.score-wait-card {
+  min-height: 300px;
+  margin-top: 1.25rem;
+  padding: 2rem;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  border: 1px dashed #ef4444;
+  border-radius: 28px;
+  background: linear-gradient(180deg, #fff5f5 0%, #fee2e2 100%);
+  box-shadow: 0 18px 40px rgba(220, 38, 38, 0.12);
+}
+
+/* ไอคอนนาฬิกา */
+.score-wait-icon {
+  width: 78px;
+  height: 78px;
+  display: grid;
+  place-items: center;
+  margin-bottom: 1rem;
+  border-radius: 26px;
+  color: #dc2626;
+  font-size: 2rem;
+  background: #fecaca;
+}
+
+/* หัวข้อ: รอประกาศผลคะแนน */
+.score-wait-card h2 {
+  margin: 0;
+  color: #dc2626 !important;
+  font-size: 1.6rem;
+  font-weight: 900;
+}
+
+/* บรรทัดวันที่ประกาศ */
+.score-wait-card p {
+  margin: 0.65rem 0 0.25rem;
+  color: #b91c1c !important;
+  font-size: 1.05rem;
+  font-weight: 900;
+}
+
+/* ข้อความอธิบาย */
+.score-wait-card span {
+  color: #991b1b !important;
+  font-weight: 700;
+  line-height: 1.6;
+}
+ 
 @media (max-width: 1180px) {
-  .hero-content {
-    grid-template-columns: 1fr;
-  }
-
-  .control-panel {
-    max-width: none;
-  }
-
+  .hero-content,
   .summary-layout {
     grid-template-columns: 1fr;
-  }
-
-  .score-hero-card {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto minmax(220px, 0.75fr);
-    gap: 1rem;
-    align-items: center;
-  }
-
-  .score-ring-wrap {
-    padding: 0;
   }
 }
 
@@ -2207,20 +2069,18 @@ export default {
     justify-content: flex-start;
   }
 
-  .level-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
+  .history-summary,
   .insight-section {
     grid-template-columns: 1fr;
   }
 
-  .score-hero-card {
-    display: block;
+  .grouped-history-chart {
+    grid-template-columns: repeat(auto-fit, minmax(86px, 1fr));
+    height: 260px;
   }
 
-  .score-ring-wrap {
-    padding: 1.2rem 0;
+  .recommendation-table {
+    min-width: 760px;
   }
 }
 
@@ -2230,23 +2090,60 @@ export default {
     border-radius: 24px;
   }
 
-  .hero-copy h1 {
+  .hero-copy h3 {
     font-size: 1.5rem;
   }
 
-  .status-grid,
-  .level-grid {
-    grid-template-columns: 1fr;
-  }
-
+  .section-head,
   .component-item > div:first-child {
-    align-items: flex-start;
     flex-direction: column;
     gap: 0.25rem;
   }
 
-  .section-head {
-    flex-direction: column;
+  .work-title .main-work-title {
+    display: block;
+    color: #0f172a;
+    font-weight: 900;
+    line-height: 1.5;
   }
+
+  .work-title .round-line {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    margin-top: 0.25rem;
+    margin-left: 0;
+    color: #64748b;
+    font-size: 0.86rem;
+    font-weight: 700;
+  }
+
+  .activity-subject-line {
+    margin-top: 0.5rem;
+    padding: 0.55rem 0.65rem;
+    border-left: 4px solid #2563eb;
+    border-radius: 10px;
+    background: #eff6ff;
+    color: #0f172a;
+    line-height: 1.55;
+  }
+
+  .activity-subject-line strong {
+    display: inline;
+    margin-right: 0.35rem;
+    color: #1d4ed8;
+    font-weight: 900;
+  }
+
+  .activity-subject-line span {
+    display: inline;
+    margin-left: 0;
+    color: #0f172a;
+    font-weight: 800;
+  }
+ 
+  
 }
+
+
 </style>
