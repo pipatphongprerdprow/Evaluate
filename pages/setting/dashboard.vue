@@ -214,10 +214,7 @@
                 <Column header="ผู้รับการประเมิน" style="min-width: 260px">
                     <template #body="slotProps">
                         <div class="person-cell">
-                            <!-- <div class="avatar">
-                                {{ getInitial(slotProps.data) }}
-                            </div> -->
-
+                             
                             <div class="avatar">
                               <img
                                 v-if="getProfileImageSrc(slotProps.data) && !avatarImageLoadErrors[getAvatarKey(slotProps.data)]"
@@ -332,10 +329,7 @@
                   <Column header="ผู้รับการประเมิน" style="min-width: 260px">
                       <template #body="slotProps">
                           <div class="person-cell">
-                              <!-- <div class="avatar">
-                                  {{ getInitial(slotProps.data) }}
-                              </div> -->
-
+                               
                               <div class="avatar">
                                 <img
                                   v-if="getProfileImageSrc(slotProps.data) && !avatarImageLoadErrors[getAvatarKey(slotProps.data)]"
@@ -497,10 +491,7 @@
     },
 
     computed: {
-      /* =========================
-        ROWS / STAFF SUMMARY
-      ========================= */
-
+     
       evaluatedRows() {
         const rows = Array.isArray(this.products) ? this.products : [];
 

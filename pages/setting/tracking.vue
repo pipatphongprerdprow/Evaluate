@@ -930,81 +930,276 @@
                                                 </tbody>
                                             </table> 
                                             <h5 class="mb-4"><i class="" style="font-size: x-large;"></i> ส่วนที่ 4 การรับทราบผลการประเมิน</h5>
-                                                    <table class="styled-table">
-                                                    <tbody>
-                                                        <tr>
-                                                        <td>
-                                                            <b>ผู้รับการประเมิน</b><br>
-                                                            <label for="receiver-acknowledgment">[ &nbsp;&nbsp; ] ได้รับทราบผลการประเมินและแผนพัฒนาการปฏิบัติราชการ รายบุคคลแล้ว</label><br>
-                                                        </td>
-                                                            <td class="center-align"><br><br>
-                                                                ลงชื่อ .................................................................<br>
-                                                                ชื่อ {{ currentstaff[0].prefixfullname }} {{ currentstaff[0].staffname }} {{   currentstaff[0].staffsurname }}<br>
-                                                                ตำแหน่ง {{ currentstaff[0].posnameth }}<br>
-                                                                วันที่ .......... เดือน .......................... พ.ศ.
-                                                            </td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td>
-                                                                <b>ผู้ประเมิน</b><br>
-                                                                <label for="evaluator-acknowledgment-1">[ &nbsp;&nbsp; ] ได้แจ้งผลการประเมินและผู้รับการประเมินได้ลงนามรับทราบ รายบุคคลแล้ว</label><br>
-                                                                <label for="evaluator-acknowledgment-2">[ &nbsp;&nbsp; ] ได้แจ้งผลการประเมินเมื่อวันที่ ..............................แต่ผู้รับการประเมินไม่ลงนามรับทราบผลการประเมิน โดยมี .......................... เป็นพยาน</label><br>
-                                                                ลงชื่อ .................................................................<br>
-                                                                ชื่อ {{assessorText}}<br>
-                                                                ตำแหน่ง {{assessor_positionText}}<br>
-                                                                วันที่ .......... เดือน .......................... พ.ศ...........
-                                                            </td>
-                                                        <td class="center-align"><br><br>
-                                                            ลงชื่อ .................................................................<br>
-                                                            ชื่อ {{assessorText}}<br>
-                                                            ตำแหน่ง {{assessor_positionText}}<br>
-                                                            วันที่ .......... เดือน .......................... พ.ศ...........
-                                                        </td>
-                                                        </tr>
-                                                    </tbody>
-                                                    </table>
-                                                    <h5 class="mb-4"><i class="" style="font-size: x-large;"></i> ส่วนที่ 5  ความเห็นของผู้บังคับบัญชาเหนือขึ้นไป</h5>
-                                                    <table class="styled-table">
-                                                        <tbody>
-                                                            <tr>
-                                                                <td>
-                                                                    <b>ผู้บังคับบัญชาเหนือขึ้นไป</b><br>
-                                                                    <label for="evaluator-acknowledgment-3">[ &nbsp;&nbsp;] เห็นด้วยกับผลการประเมิน</label><br>
-                                                                    <label for="evaluator-acknowledgment-3">[ &nbsp;&nbsp;] มีความเห็นต่าง ดังนี้<br>..............................................................................................................</label><br>
-                                                                    .....................................................................................................................................<br>
-                                                                    .....................................................................................................................................
-                                                                </td>
-                                                                <td class="center-align"><br><br>
-                                                                    
-                                                                    ลงชื่อ .................................................................<br>
-                                                                            (.......................................................)<br>
-                                                                        ตำแหน่ง .................................................................<br>
-                                                                    <!-- ชื่อ : {{ user.user.name.PREFIXFULLNAME }} {{ user.user.name.STAFFNAME }} {{ user.user.name.STAFFSURNAME }}<br>
-                                                                    ตำแหน่ง : {{ user.user.name.POSITIONNAME }}<br> -->
-                                                                    วันที่ : .......... เดือน .......................... พ.ศ.............
-                                                                </td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td>
-                                                                    <b>ผู้บังคับบัญชาเหนือขึ้นไปอีกชั้นหนึ่ง (ถ้ามี)</b><br>
-                                                                    
-                                                                    <label for="evaluator-acknowledgment-5">[ &nbsp;&nbsp;] เห็นด้วยกับผลการประเมิน</label><br>
-                                                                    
-                                                                    <label for="evaluator-acknowledgment-6">[ &nbsp;&nbsp;] มีความเห็นต่าง ดังนี้<br>...............................................................................................................</label><br>
-                                                                    .......................................................................................................................................<br>
-                                                                    .......................................................................................................................................
-                                                                </td>
-                                                                <td class="center-align"><br><br>
-                                                                    ลงชื่อ .................................................................<br>
-                                                                        (.......................................................)<br>
-                                                                    ตำแหน่ง .................................................................<br>
-                                                                    <!-- ชื่อ {{ assessorText }}<br>
-                                                                    ตำแหน่ง {{ assessor_positionText }}<br> -->
-                                                                    วันที่ .......... เดือน .......................... พ.ศ...........
-                                                                </td>
-                                                            </tr>
-                                                    </tbody>
-                                                </table> 
+                                                <table class="styled-table">
+    <tbody>
+        <tr>
+            <td>
+                <b>ผู้รับการประเมิน</b><br>
+                <label for="receiver-acknowledgment">
+                    [ &nbsp;&nbsp; ] ได้รับทราบผลการประเมินและแผนพัฒนาการปฏิบัติราชการ รายบุคคลแล้ว
+                </label><br>
+            </td>
+
+            <td class="center-align"><br><br>
+                ลงชื่อ .................................................................<br>
+                ชื่อ {{ currentstaff[0].prefixfullname }} {{ currentstaff[0].staffname }} {{ currentstaff[0].staffsurname }}<br>
+                ตำแหน่ง {{ currentstaff[0].posnameth }}<br>
+                วันที่ .......... เดือน .......................... พ.ศ.
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                <b>ผู้ประเมิน</b><br>
+                <label for="evaluator-acknowledgment-1">
+                    [ &nbsp;&nbsp; ] ได้แจ้งผลการประเมินและผู้รับการประเมินได้ลงนามรับทราบ รายบุคคลแล้ว
+                </label><br>
+                <label for="evaluator-acknowledgment-2">
+                    [ &nbsp;&nbsp; ] ได้แจ้งผลการประเมินเมื่อวันที่ ..............................แต่ผู้รับการประเมินไม่ลงนามรับทราบผลการประเมิน โดยมี .......................... เป็นพยาน
+                </label><br>
+
+                <div class="signature-box">
+                    <div>
+                        ลงชื่อ
+                        <span v-if="signatures.assessor" class="online-signature">
+                            {{ signatures.assessor.signer_name }}
+                        </span>
+                        <span v-else>
+                            .........................................................
+                        </span>
+                    </div>
+
+                    <div>ชื่อ {{ assessorText }}</div>
+                    <div>ตำแหน่ง {{ assessor_positionText }}</div>
+
+                    <div v-if="signatures.assessor">
+                        วันที่ {{ formatThaiDateTime(signatures.assessor.signed_at) }}
+                    </div>
+                    <div v-else>
+                        วันที่ .......... เดือน .......................... พ.ศ...........
+                    </div>
+
+                    <div class="signature-button-wrap">
+                        <Button
+                            v-if="!signatures.assessor"
+                            label="ลงนาม"
+                            icon="pi pi-pencil"
+                            severity="success"
+                            size="small"
+                            class="signature-btn"
+                            :loading="loadingSign.assessor"
+                            @click="signP04('assessor')"
+                        />
+                    </div>
+
+                    <small v-if="signatures.assessor" style="color: green;">
+                        ลงนามออนไลน์เรียบร้อยแล้ว
+                    </small>
+                </div>
+            </td>
+
+            <td class="center-align"><br><br>
+                <div class="signature-box">
+                    <div>
+                        ลงชื่อ
+                        <span v-if="signatures.assessor" class="online-signature">
+                            {{ signatures.assessor.signer_name }}
+                        </span>
+                        <span v-else>
+                            .........................................................
+                        </span>
+                    </div>
+
+                    <div>ชื่อ {{ assessorText }}</div>
+                    <div>ตำแหน่ง {{ assessor_positionText }}</div>
+
+                    <div v-if="signatures.assessor">
+                        วันที่ {{ formatThaiDateTime(signatures.assessor.signed_at) }}
+                    </div>
+                    <div v-else>
+                        วันที่ .......... เดือน .......................... พ.ศ...........
+                    </div>
+
+                    <div class="signature-button-wrap">
+                        <Button
+                            v-if="!signatures.assessor"
+                            label="ลงนาม"
+                            icon="pi pi-pencil"
+                            severity="success"
+                            size="small"
+                            class="signature-btn"
+                            :loading="loadingSign.assessor"
+                            @click="signP04('assessor')"
+                        />
+                    </div>
+
+                    <small v-if="signatures.assessor" style="color: green;">
+                        ลงนามออนไลน์เรียบร้อยแล้ว
+                    </small>
+                </div>
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+<h5 class="mb-4">
+    <i class="" style="font-size: x-large;"></i>
+    ส่วนที่ 5  ความเห็นของผู้บังคับบัญชาเหนือขึ้นไป
+</h5>
+
+<table class="styled-table">
+    <tbody>
+        <tr>
+            <td>
+                <b>ผู้บังคับบัญชาเหนือขึ้นไป</b><br>
+                <label for="evaluator-acknowledgment-3">
+                    [ &nbsp;&nbsp;] เห็นด้วยกับผลการประเมิน
+                </label><br>
+                <label for="evaluator-acknowledgment-4">
+                    [ &nbsp;&nbsp;] มีความเห็นต่าง ดังนี้<br>
+                    ..............................................................................................................
+                </label><br>
+                .....................................................................................................................................<br>
+                .....................................................................................................................................
+            </td>
+
+            <td class="center-align"><br><br>
+                <div class="signature-box">
+                    <div>
+                        ลงชื่อ
+                        <span v-if="signatures.supervisor1" class="online-signature">
+                            {{ signatures.supervisor1.signer_name }}
+                        </span>
+                        <span v-else>
+                            .........................................................
+                        </span>
+                    </div>
+
+                    <div>
+                        (
+                        <span v-if="signatures.supervisor1">
+                            {{ signatures.supervisor1.signer_name }}
+                        </span>
+                        <span v-else>
+                            .......................................................
+                        </span>
+                        )
+                    </div>
+
+                    <div>
+                        ตำแหน่ง
+                        <span v-if="signatures.supervisor1">
+                            {{ signatures.supervisor1.signer_position }}
+                        </span>
+                        <span v-else>
+                            .........................................................
+                        </span>
+                    </div>
+
+                    <div v-if="signatures.supervisor1">
+                        วันที่ {{ formatThaiDateTime(signatures.supervisor1.signed_at) }}
+                    </div>
+                    <div v-else>
+                        วันที่ .......... เดือน .......................... พ.ศ.............
+                    </div>
+
+                    <div class="signature-button-wrap">
+                        <Button
+                            v-if="!signatures.supervisor1"
+                            label="ลงนาม"
+                            icon="pi pi-pencil"
+                            severity="success"
+                            size="small"
+                            class="signature-btn"
+                            :loading="loadingSign.supervisor1"
+                            @click="signP04('supervisor1')"
+                        />
+                    </div>
+
+                    <small v-if="signatures.supervisor1" style="color: green;">
+                        ลงนามออนไลน์เรียบร้อยแล้ว
+                    </small>
+                </div>
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                <b>ผู้บังคับบัญชาเหนือขึ้นไปอีกชั้นหนึ่ง (ถ้ามี)</b><br>
+
+                <label for="evaluator-acknowledgment-5">
+                    [ &nbsp;&nbsp;] เห็นด้วยกับผลการประเมิน
+                </label><br>
+
+                <label for="evaluator-acknowledgment-6">
+                    [ &nbsp;&nbsp;] มีความเห็นต่าง ดังนี้<br>
+                    ...............................................................................................................
+                </label><br>
+                .......................................................................................................................................<br>
+                .......................................................................................................................................
+            </td>
+
+            <td class="center-align"><br><br>
+                <div class="signature-box">
+                    <div>
+                        ลงชื่อ
+                        <span v-if="signatures.supervisor2" class="online-signature">
+                            {{ signatures.supervisor2.signer_name }}
+                        </span>
+                        <span v-else>
+                            .........................................................
+                        </span>
+                    </div>
+
+                    <div>
+                        (
+                        <span v-if="signatures.supervisor2">
+                            {{ signatures.supervisor2.signer_name }}
+                        </span>
+                        <span v-else>
+                            .......................................................
+                        </span>
+                        )
+                    </div>
+
+                    <div>
+                        ตำแหน่ง
+                        <span v-if="signatures.supervisor2">
+                            {{ signatures.supervisor2.signer_position }}
+                        </span>
+                        <span v-else>
+                            .........................................................
+                        </span>
+                    </div>
+
+                    <div v-if="signatures.supervisor2">
+                        วันที่ {{ formatThaiDateTime(signatures.supervisor2.signed_at) }}
+                    </div>
+                    <div v-else>
+                        วันที่ .......... เดือน .......................... พ.ศ...........
+                    </div>
+
+                    <div class="signature-button-wrap">
+                        <Button
+                            v-if="!signatures.supervisor2"
+                            label="ลงนาม"
+                            icon="pi pi-pencil"
+                            severity="success"
+                            size="small"
+                            class="signature-btn"
+                            :loading="loadingSign.supervisor2"
+                            @click="signP04('supervisor2')"
+                        />
+                    </div>
+
+                    <small v-if="signatures.supervisor2" style="color: green;">
+                        ลงนามออนไลน์เรียบร้อยแล้ว
+                    </small>
+                </div>
+            </td>
+        </tr>
+    </tbody>
+</table>
                                             </div>
                                         </div>  
                                     </div>
@@ -1257,6 +1452,19 @@ export default {
             //datatable3: [] 
             posadio: 0,
             competencyMap: {},
+
+            //ลงนามออนไลน์
+            signatures: {
+                assessor: null,
+                supervisor1: null,
+                supervisor2: null
+            },
+
+            loadingSign: {
+                assessor: false,
+                supervisor1: false,
+                supervisor2: false
+            },
 
             //ส่งคะแนนประเมินไประบบบุคลากร
             loadingSendScoreAll: false,
@@ -1887,14 +2095,22 @@ export default {
                 this.chkp04(this.dataStaffid, this.facid_Main, this.tracking_date.d_date, this.tracking_date.evalua);
                 this.chkp04data(this.dataStaffid, this.facid_Main, this.tracking_date.d_date, this.tracking_date.evalua);
             }
+            // if (event.index == 3) {
+            //     //console.log('รายงาน ป.04 -',event.index);
+            //     this.tab2Data(this.dataStaffid);
+            //     await this.chkp04dataT4(this.dataStaffid, this.facid_Main, this.tracking_date.d_date, this.tracking_date.evalua);
+            //     await this.chkp03data(this.dataStaffid, this.facid_Main, this.tracking_date.d_date, this.tracking_date.evalua);
+            //     await this.showdatator();
+                
+            // }
+
             if (event.index == 3) {
-                //console.log('รายงาน ป.04 -',event.index);
                 this.tab2Data(this.dataStaffid);
                 await this.chkp04dataT4(this.dataStaffid, this.facid_Main, this.tracking_date.d_date, this.tracking_date.evalua);
                 await this.chkp03data(this.dataStaffid, this.facid_Main, this.tracking_date.d_date, this.tracking_date.evalua);
                 await this.showdatator();
-                
-            }
+                await this.loadP04Signatures();
+            } 
         },
         async tab2Data(staff_id) {
             await axios.post('http://127.0.0.1:8000/api/showDataP03New', {
@@ -2848,53 +3064,7 @@ export default {
                 sent_by: this.staffid_Main
             };
         },
-
-        // buildSendScorePayload(Item) {
-        //     const persen = Item?.tb_tor?.persen || '70:30';
-
-        //     const [weight1, weight2] = String(persen)
-        //         .split(':')
-        //         .map(v => this.toNumber(v));
-
-        //     // คะแนนช่อง "คะแนน" ขององค์ประกอบที่ 1
-        //     const achievementScore = this.toNumber(Item?.tb_tor?.achievement_score);
-
-        //     // คะแนนช่อง "คะแนน" ขององค์ประกอบที่ 2
-        //     const behaviorScore = this.toNumber(Item?.tb_tor?.behavior);
-
-        //     const component1WeightedScore = Number((achievementScore * weight1).toFixed(2));
-        //     const component2WeightedScore = Number((behaviorScore * weight2).toFixed(2));
-        //     const totalScore = Number((component1WeightedScore + component2WeightedScore).toFixed(2));
-
-        //     return {
-        //         staffid: Item.staffid,
-        //         staff_name: `${Item.prefixfullname ?? ''} ${Item.namefully ?? ''}`.trim(),
-
-        //         fac_id: this.tracking_date?.fac_id ?? this.facid_Main,
-        //         fac_name: this.tracking_date?.facuties ?? '',
-        //         year: this.tracking_date?.d_date,
-        //         evalua: this.tracking_date?.evalua,
-
-        //         // ส่งตามชื่อ Field ระบบบุคลากรโดยตรง
-        //         EVO1: achievementScore,
-        //         EVA1: weight1,
-        //         EVA2: component1WeightedScore,
-
-        //         EVO2: behaviorScore,
-        //         EVB1: weight2,
-        //         EVB2: component2WeightedScore,
-
-        //         EVTOTAL: totalScore,
-        //         EVO3: this.getEvaluationText(totalScore),
-        //         EVO3VAL: this.getEvaluationValue(totalScore),
-        //         EVO3DETAIL: '',
-
-        //         sent_by: this.staffid_Main
-        //     };
-        // },
-
-
-
+ 
         async sendAllScoresToOtherSystem() {
             if (!this.tracking_date?.d_date || !this.tracking_date?.evalua) {
                 Swal.fire('แจ้งเตือน', 'กรุณาเลือกรอบการประเมินก่อนส่งคะแนน', 'warning');
@@ -3163,6 +3333,96 @@ export default {
                 this.loadingSendScoreAll = false;
             }
         },
+
+        //ลงนามออนไลน์
+        async loadP04Signatures() {
+            try {
+                const res = await axios.get('http://127.0.0.1:8000/api/p04-signatures', {
+                    params: {
+                        staff_id: this.dataStaffid,
+                        year: this.tracking_date.d_date,
+                        evalua: this.tracking_date.evalua
+                    }
+                });
+
+                this.signatures = {
+                    assessor: res.data?.assessor || null,
+                    supervisor1: res.data?.supervisor1 || null,
+                    supervisor2: res.data?.supervisor2 || null
+                };
+
+            } catch (error) {
+                console.error('loadP04Signatures error:', error);
+            }
+        },
+
+        async signP04(role) {
+            const roleText = {
+                assessor: 'ผู้ประเมิน',
+                supervisor1: 'ผู้บังคับบัญชาเหนือขึ้นไป',
+                supervisor2: 'ผู้บังคับบัญชาเหนือขึ้นไปอีกชั้นหนึ่ง'
+            };
+
+            const confirm = await Swal.fire({
+                title: 'ยืนยันการลงนาม?',
+                text: `คุณต้องการลงนามในฐานะ ${roleText[role]} ใช่หรือไม่`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'ลงนาม',
+                cancelButtonText: 'ยกเลิก',
+                confirmButtonColor: '#16a34a',
+                cancelButtonColor: '#dc2626'
+            });
+
+            if (!confirm.isConfirmed) return;
+
+            this.loadingSign[role] = true;
+
+            try {
+                const res = await axios.post('http://127.0.0.1:8000/api/p04-signatures/sign', {
+                    staff_id: this.dataStaffid,
+                    year: this.tracking_date.d_date,
+                    evalua: this.tracking_date.evalua,
+                    signer_type: role,
+                    signer_staffid: this.staffid_Main,
+                    signer_name: `${user.user.name.PREFIXFULLNAME || ''} ${user.user.name.STAFFNAME || ''} ${user.user.name.STAFFSURNAME || ''}`.trim(),
+                    signer_position: user.user.name.POSITIONNAME || ''
+                });
+
+                this.signatures[role] = res.data;
+
+                Swal.fire({
+                    position: 'top-end',
+                    icon: 'success',
+                    title: 'ลงนามเรียบร้อย',
+                    showConfirmButton: false,
+                    timer: 1200
+                });
+
+            } catch (error) {
+                console.error('signP04 error:', error);
+
+                Swal.fire({
+                    icon: 'error',
+                    title: 'ลงนามไม่สำเร็จ',
+                    text: error.response?.data?.message || 'เกิดข้อผิดพลาดในการลงนาม'
+                });
+
+            } finally {
+                this.loadingSign[role] = false;
+            }
+        },
+
+        formatThaiDateTime(dateValue) {
+            if (!dateValue) return '';
+
+            const d = new Date(dateValue);
+            return d.toLocaleDateString('th-TH', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+        }
 
 
 
@@ -3446,6 +3706,44 @@ td:nth-child(3) {
 
 :global(.score-hover-card:active) {
     transform: translateY(-2px) scale(1.01);
+}
+
+
+
+
+.signature-box {
+    line-height: 1.9;
+    text-align: center;
+}
+
+.online-signature {
+    display: inline-block;
+    min-width: 230px;
+    color: #0d47a1;
+    font-weight: 700;
+    font-size: 16px;
+    border-bottom: 1px dotted #333;
+    padding: 0 8px;
+}
+
+.signature-button-wrap {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 8px;
+}
+
+:deep(.signature-btn) {
+    width: auto !important;
+    min-width: 110px;
+    max-width: 140px;
+    padding: 6px 18px !important;
+    display: inline-flex !important;
+    justify-content: center;
+}
+
+:deep(.signature-btn .p-button-label) {
+    flex: unset !important;
 }
 
 </style>

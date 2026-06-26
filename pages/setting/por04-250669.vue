@@ -134,269 +134,86 @@
                                 <td style="text-align: left;">{{ Tab3T4.px04_re1 }}</td> 
                             </tr> 
                         </tbody>
-                    </table> 
-
-                    <h5 class="mb-4">
-                        <i class="" style="font-size: x-large;"></i>
-                        ส่วนที่ 4 การรับทราบผลการประเมิน
-                    </h5>
-
-                    <!-- ส่วนที่4 -->
-                    <table class="styled-table sign-table">
+                    </table>  
+                        <h5 class="mb-4"><i class="" style="font-size: x-large;"></i> ส่วนที่ 4 การรับทราบผลการประเมิน</h5>
+                        <table class="styled-table">
                         <tbody>
-                            <!-- ผู้รับการประเมิน : ลงนามได้ -->
                             <tr>
-                                <td class="left-align">
-                                    <b>ผู้รับการประเมิน</b><br>
-
-                                    <label class="sign-check-line">
-                                        <input
-                                            type="checkbox"
-                                            v-model="signForm.receiver_ack"
-                                            :disabled="!!signatures.receiver_ack"
-                                        />
-                                        <span>ได้รับทราบผลการประเมินและแผนพัฒนาการปฏิบัติราชการ รายบุคคลแล้ว</span>
-                                    </label>
-
-                                    <div class="signature-button-wrap">
-                                        <Button
-                                            label="ลงนามผู้รับการประเมิน"
-                                            icon="pi pi-pencil"
-                                            severity="success"
-                                            size="small"
-                                            class="signature-btn"
-                                            :disabled="!signForm.receiver_ack || !!signatures.receiver_ack"
-                                            @click="signP04('receiver_ack', 'ผู้รับการประเมิน')"
-                                        />
-                                    </div>
-                                </td>
-
-                                <td class="center-align">
-                                    <div v-if="signatures.receiver_ack" class="signature-card signed">
-                                        <div class="signed-badge">ลงนามแล้ว</div>
-
-                                        <img
-                                            v-if="signatures.receiver_ack.signature_image"
-                                            :src="signatures.receiver_ack.signature_image"
-                                            class="signature-img"
-                                        />
-
-                                        <div v-else class="typed-signature">
-                                            {{ signatures.receiver_ack.signer_name }}
-                                        </div>
-
-                                        <div>ลงชื่อ {{ signatures.receiver_ack.signer_name }}</div>
-                                        <div>ตำแหน่ง {{ signatures.receiver_ack.signer_position }}</div>
-                                        <div>วันที่ {{ formatThaiDate(signatures.receiver_ack.signed_at) }}</div>
-                                    </div>
-
-                                    <div v-else class="signature-card waiting">
-                                        ลงชื่อ .................................................................<br>
-                                        ชื่อ: {{ user.user.name.PREFIXFULLNAME }} {{ user.user.name.STAFFNAME }} {{ user.user.name.STAFFSURNAME }}<br>
-                                        ตำแหน่ง: {{ user.user.name.POSITIONNAME }}<br>
-                                        วันที่ .......... เดือน .......................... พ.ศ................
-                                    </div>
+                            <td>
+                                <b>ผู้รับการประเมิน</b><br>
+                                <label for="receiver-acknowledgment">[ &nbsp;&nbsp; ] ได้รับทราบผลการประเมินและแผนพัฒนาการปฏิบัติราชการ รายบุคคลแล้ว</label><br>
+                            </td>
+                                <td class="center-align"><br><br>
+                                    ลงชื่อ .................................................................<br>
+                                    ชื่อ: {{ user.user.name.PREFIXFULLNAME }} {{ user.user.name.STAFFNAME }} {{ user.user.name.STAFFSURNAME }}<br>
+                                    ตำแหน่ง: {{ user.user.name.POSITIONNAME }}<br>
+                                    วันที่ .......... เดือน .......................... พ.ศ................
                                 </td>
                             </tr>
-
-                            <!-- ผู้ประเมิน : อ่านอย่างเดียว ดึงจากอีกหน้า -->
                             <tr>
-                                <td class="left-align readonly-section">
+                                <td>
                                     <b>ผู้ประเมิน</b><br>
-
-                                    <label class="sign-check-line readonly-check">
-                                        <input
-                                            type="checkbox"
-                                            :checked="!!signatures.evaluator_ack"
-                                            disabled
-                                        />
-                                        <span>ได้แจ้งผลการประเมินและผู้รับการประเมินได้ลงนามรับทราบ รายบุคคลแล้ว</span>
-                                    </label>
-
-                                    <label class="sign-check-line readonly-check">
-                                        <input
-                                            type="checkbox"
-                                            :checked="!!signatures.evaluator_no_ack"
-                                            disabled
-                                        />
-                                        <span>
-                                            ได้แจ้งผลการประเมินแล้ว แต่ผู้รับการประเมินไม่ลงนามรับทราบผลการประเมิน
-                                        </span>
-                                    </label>
-
-                                    <div v-if="signatures.evaluator_no_ack?.comment" class="readonly-comment">
-                                        {{ signatures.evaluator_no_ack.comment }}
-                                    </div>
-
-                                    <small style="color:#991b1b;font-weight:600;font-size:12px;">
-                                        <i class="pi pi-info-circle"></i>
-                                        ข้อมูลส่วนนี้ดึงจากหน้าลงนามของผู้ประเมิน
-                                    </small>
+                                    <label for="evaluator-acknowledgment-1">[ &nbsp;&nbsp; ] ได้แจ้งผลการประเมินและผู้รับการประเมินได้ลงนามรับทราบ รายบุคคลแล้ว</label><br>
+                                    <label for="evaluator-acknowledgment-2">[ &nbsp;&nbsp; ] ได้แจ้งผลการประเมินเมื่อวันที่ ..............................แต่ผู้รับการประเมินไม่ลงนามรับทราบผลการประเมิน 
+                                        โดยมี ....................................... เป็นพยาน และ....................................... เป็นพยาน</label><br>
+                                    ลงชื่อ .................................................................<br>
+                                            (.......................................................)<br>
+                                    วันที่ .......... เดือน .......................... พ.ศ...........<br>
+                                    ลงชื่อ .................................................................<br>
+                                            (.......................................................)<br>
+                                    วันที่ .......... เดือน .......................... พ.ศ...........
                                 </td>
-
-                                <td class="center-align">
-                                    <div v-if="getSignature('evaluator_ack', 'evaluator_no_ack')" class="signature-card signed">
-                                        <div class="signed-badge">ลงนามแล้ว</div>
-
-                                        <img
-                                            v-if="getSignature('evaluator_ack', 'evaluator_no_ack')?.signature_image"
-                                            :src="getSignature('evaluator_ack', 'evaluator_no_ack')?.signature_image"
-                                            class="signature-img"
-                                        />
-
-                                        <div v-else class="typed-signature">
-                                            {{ getSignature('evaluator_ack', 'evaluator_no_ack')?.signer_name }}
-                                        </div>
-
-                                        <div>ลงชื่อ {{ getSignature('evaluator_ack', 'evaluator_no_ack')?.signer_name }}</div>
-                                        <div>ตำแหน่ง {{ getSignature('evaluator_ack', 'evaluator_no_ack')?.signer_position }}</div>
-                                        <div>วันที่ {{ formatThaiDate(getSignature('evaluator_ack', 'evaluator_no_ack')?.signed_at) }}</div>
-                                    </div>
-
-                                    <div v-else class="signature-card waiting">
-                                        <span style="color:#7f1d1d;font-weight:600;">
-                                            รอการลงนามจากผู้ประเมิน
-                                        </span> <br>
-                                        ชื่อ {{ assessorText }}<br>
-                                        ตำแหน่ง {{ assessor_positionText }}<br>
-                                        วันที่ .......... เดือน .......................... พ.ศ...........
-                                    </div>
+                            <td class="center-align"><br><br>
+                                ลงชื่อ .................................................................<br>
+                                ชื่อ {{ assessorText }}<br>
+                                ตำแหน่ง {{ assessor_positionText }}<br>
+                                วันที่ .......... เดือน .......................... พ.ศ...........
+                            </td>
+                            </tr>
+                        </tbody>
+                        </table>
+                        <h5 class="mb-4"><i class="" style="font-size: x-large;"></i> ส่วนที่ 5  ความเห็นของผู้บังคับบัญชาเหนือขึ้นไป</h5>
+                        <table class="styled-table">
+                        <tbody>
+                            <tr>
+                            <td>
+                                <b>ผู้บังคับบัญชาเหนือขึ้นไป</b><br>
+                                <label for="evaluator-acknowledgment-3">[ &nbsp;&nbsp;] เห็นด้วยกับผลการประเมิน</label><br>
+                                <label for="evaluator-acknowledgment-3">[ &nbsp;&nbsp;] มีความเห็นต่าง ดังนี้<br>..............................................................................................................</label><br>
+                                .....................................................................................................................................<br>
+                                .....................................................................................................................................
+                            </td>
+                            <td class="center-align"><br><br>
+                                
+                                ลงชื่อ .................................................................<br>
+                                        (.......................................................)<br>
+                                    ตำแหน่ง .................................................................<br>
+                                <!-- ชื่อ : {{ user.user.name.PREFIXFULLNAME }} {{ user.user.name.STAFFNAME }} {{ user.user.name.STAFFSURNAME }}<br>
+                                ตำแหน่ง : {{ user.user.name.POSITIONNAME }}<br> -->
+                                วันที่ : .......... เดือน .......................... พ.ศ.............
+                            </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <b>ผู้บังคับบัญชาเหนือขึ้นไปอีกชั้นหนึ่ง (ถ้ามี)</b><br>
+                                    
+                                    <label for="evaluator-acknowledgment-5">[ &nbsp;&nbsp;] เห็นด้วยกับผลการประเมิน</label><br>
+                                    
+                                    <label for="evaluator-acknowledgment-6">[ &nbsp;&nbsp;] มีความเห็นต่าง ดังนี้<br>...............................................................................................................</label><br>
+                                    .......................................................................................................................................<br>
+                                    .......................................................................................................................................
+                                </td>
+                                <td class="center-align"><br><br>
+                                    ลงชื่อ .................................................................<br>
+                                        (.......................................................)<br>
+                                    ตำแหน่ง .................................................................<br>
+                                    <!-- ชื่อ {{ assessorText }}<br>
+                                    ตำแหน่ง {{ assessor_positionText }}<br> -->
+                                    วันที่ .......... เดือน .......................... พ.ศ...........
                                 </td>
                             </tr>
                         </tbody>
                     </table>
-
-                    <!-- ส่วนที่5 -->
-                    <h5 class="mb-4">
-                        <i class="" style="font-size: x-large;"></i>
-                        ส่วนที่ 5 ความเห็นของผู้บังคับบัญชาเหนือขึ้นไป
-                    </h5>
-                    <table class="styled-table sign-table">
-                        <tbody>
-                            <!-- ผู้บังคับบัญชาเหนือขึ้นไป : อ่านอย่างเดียว -->
-                            <tr>
-                                <td class="left-align readonly-section">
-                                    <b>ผู้บังคับบัญชาเหนือขึ้นไป</b><br>
-
-                                    <label class="sign-check-line readonly-check">
-                                        <input
-                                            type="checkbox"
-                                            :checked="!!signatures.superior_agree"
-                                            disabled
-                                        />
-                                        <span>เห็นด้วยกับผลการประเมิน</span>
-                                    </label>
-
-                                    <label class="sign-check-line readonly-check">
-                                        <input
-                                            type="checkbox"
-                                            :checked="!!signatures.superior_disagree"
-                                            disabled
-                                        />
-                                        <span>มีความเห็นต่าง ดังนี้</span>
-                                    </label>
-
-                                    <div v-if="signatures.superior_disagree?.comment" class="readonly-comment">
-                                        {{ signatures.superior_disagree.comment }}
-                                    </div>
-
-                                    <small style="color:#991b1b;font-weight:600;font-size:12px;">
-                                        * ข้อมูลส่วนนี้ดึงจากหน้าลงนามของผู้บังคับบัญชา
-                                    </small> 
-                                </td>
-
-                                <td class="center-align">
-                                    <div v-if="getSignature('superior_agree', 'superior_disagree')" class="signature-card signed">
-                                        <div class="signed-badge">ลงนามแล้ว</div>
-
-                                        <img
-                                            v-if="getSignature('superior_agree', 'superior_disagree')?.signature_image"
-                                            :src="getSignature('superior_agree', 'superior_disagree')?.signature_image"
-                                            class="signature-img"
-                                        />
-
-                                        <div v-else class="typed-signature">
-                                            {{ getSignature('superior_agree', 'superior_disagree')?.signer_name }}
-                                        </div>
-
-                                        <div>ลงชื่อ {{ getSignature('superior_agree', 'superior_disagree')?.signer_name }}</div>
-                                        <div>ตำแหน่ง {{ getSignature('superior_agree', 'superior_disagree')?.signer_position }}</div>
-                                        <div>วันที่ {{ formatThaiDate(getSignature('superior_agree', 'superior_disagree')?.signed_at) }}</div>
-                                    </div>
-
-                                    <div v-else class="signature-card waiting">
-                                         <span style="color:#7f1d1d;font-weight:600;"> 
-                                        รอการลงนามจากผู้บังคับบัญชาเหนือขึ้นไป </span><br>
-                                        ลงชื่อ .................................................................<br>
-                                        ตำแหน่ง .................................................................<br>
-                                        วันที่ .......... เดือน .......................... พ.ศ.............
-                                    </div>    
-                                </td>
-                            </tr>
-
-                            <!-- ผู้บังคับบัญชาเหนือขึ้นไปอีกชั้นหนึ่ง : อ่านอย่างเดียว -->
-                            <tr>
-                                <td class="left-align readonly-section">
-                                    <b>ผู้บังคับบัญชาเหนือขึ้นไปอีกชั้นหนึ่ง (ถ้ามี)</b><br>
-
-                                    <label class="sign-check-line readonly-check">
-                                        <input
-                                            type="checkbox"
-                                            :checked="!!signatures.superior2_agree"
-                                            disabled
-                                        />
-                                        <span>เห็นด้วยกับผลการประเมิน</span>
-                                    </label>
-
-                                    <label class="sign-check-line readonly-check">
-                                        <input
-                                            type="checkbox"
-                                            :checked="!!signatures.superior2_disagree"
-                                            disabled
-                                        />
-                                        <span>มีความเห็นต่าง ดังนี้</span>
-                                    </label>
-
-                                    <div v-if="signatures.superior2_disagree?.comment" class="readonly-comment">
-                                        {{ signatures.superior2_disagree.comment }}
-                                    </div>
-
-                                     <small style="color:#991b1b;font-weight:600;font-size:12px;">
-                                        * ข้อมูลส่วนนี้ดึงจากหน้าลงนามของผู้บังคับบัญชาอีกชั้นหนึ่ง
-                                    </small>   
-                                </td>
-
-                                <td class="center-align">
-                                    <div v-if="getSignature('superior2_agree', 'superior2_disagree')" class="signature-card signed">
-                                        <div class="signed-badge">ลงนามแล้ว</div>
-
-                                        <img
-                                            v-if="getSignature('superior2_agree', 'superior2_disagree')?.signature_image"
-                                            :src="getSignature('superior2_agree', 'superior2_disagree')?.signature_image"
-                                            class="signature-img"
-                                        />
-
-                                        <div v-else class="typed-signature">
-                                            {{ getSignature('superior2_agree', 'superior2_disagree')?.signer_name }}
-                                        </div>
-
-                                        <div>ลงชื่อ {{ getSignature('superior2_agree', 'superior2_disagree')?.signer_name }}</div>
-                                        <div>ตำแหน่ง {{ getSignature('superior2_agree', 'superior2_disagree')?.signer_position }}</div>
-                                        <div>วันที่ {{ formatThaiDate(getSignature('superior2_agree', 'superior2_disagree')?.signed_at) }}</div>
-                                    </div>
-
-                                    <div v-else class="signature-card waiting">
-                                        <span style="color:#7f1d1d;font-weight:600;"> 
-                                            รอการลงนามจากผู้บังคับบัญชาเหนือขึ้นไปอีกชั้นหนึ่ง 
-                                        </span><br>
-                                        ลงชื่อ .................................................................<br>
-                                        ตำแหน่ง .................................................................<br>
-                                        วันที่ .......... เดือน .......................... พ.ศ...........
-                                    </div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table> 
                 </div>
             </div>  
         </div>  
@@ -526,26 +343,7 @@ export default {
             totalScoreSum:{},
             totalScoreZeroSum:{},
             totalScoreFinalSum:{}, 
-            showscoresum:{} ,
-
-           //ลงนามออนไลน์
-            signForm: {
-                receiver_ack: false,
-            },
-
-            signatures: {
-                receiver_ack: null,
-
-                evaluator_ack: null,
-                evaluator_no_ack: null,
-
-                superior_agree: null,
-                superior_disagree: null,
-
-                superior2_agree: null,
-                superior2_disagree: null,
-            },
- 
+            showscoresum:{} 
         };
     }, 
     components: {
@@ -560,15 +358,13 @@ export default {
         const {STAFFID, SCOPES} = user.user.name
         const {staffdepartment, groupid, staffdepartmentname, groupname} = SCOPES
         await this.setSession(STAFFID,staffdepartment,groupid);
-        await this.loadP04Signatures(); 
         //this.showdatator()  
     }, 
     watch: { 
         tab4Reload(v) { 
             // console.log("por04 tab4Reload",v);
             this.chkp04dataXr(); 
-            this.showdatator(); 
-             
+            this.showdatator();  
         },  
     },
     computed: {
@@ -685,16 +481,55 @@ export default {
             return `${r} ${d}`.trim();
         },  
     }, 
-
     methods: { 
-          
+         insertscore1(scoreA04) { 
+        // //console.log(scoreA04); 
+        // //console.log(this.dataPor.d_date,this.dataPor.evalua,scoreA04); 
+        //     axios.post('   http://127.0.0.1:8000/api/savepersentor',{
+        //             p_staffid: this.staffid_Main, 
+        //             p_year: this.dataPor.d_date, 
+        //             evalua: this.dataPor.evalua, 
+        //             score: scoreA04, 
+        //             insert:"achievement_score"
+        //         }).then(res => {     
+        //             //console.log(res.data); 
+        //     });
+         },
+        // insertscore2(scoreB) { 
+        // //console.log(scoreB); 
+        // //console.log(this.dataStaffid); 
+        //     axios.post('   http://127.0.0.1:8000/api/savepersentor',{
+        //             p_staffid: this.staffid_Main, 
+        //             p_year: this.tracking_date.d_date, 
+        //             evalua: this.tracking_date.evalua, 
+        //             score: scoreB,
+        //             insert:"behavior" 
+
+        //         }).then(res => {     
+        //             console.log(res.data); 
+        //     });
+        // },
+        // insertscore3(scoreS) { 
+        // //console.log(scoreB); 
+        // //console.log(this.dataStaffid); 
+        //     axios.post('   http://127.0.0.1:8000/api/savepersentor',{
+        //             p_staffid: this.staffid_Main, 
+        //             p_year: this.tracking_date.d_date, 
+        //             evalua: this.tracking_date.evalua, 
+        //             score: scoreS,
+        //             insert:"sum_score" 
+
+        //         }).then(res => {     
+        //             console.log(res.data); 
+        //     });
+        // },
         setSession (staffid_Main,facid_Main,groupid_Main) {
            // console.log('setSession');  
             this.staffid_Main = staffid_Main
             this.facid_Main = facid_Main
             this.groupid_Main = groupid_Main  
         },  
-        showdatator() { 
+        showdatator() {  
             //console.log(this.dataPor.d_date,scoreA04); 
             axios.post('   http://127.0.0.1:8000/api/showdatator', {
                 p_year: this.dataPor.d_date,
@@ -855,176 +690,6 @@ export default {
                 Swal.fire('เกิดข้อผิดพลาด', 'ไม่สามารถสร้างไฟล์ PDF ได้', 'error');
             }
         }, 
-
-        //ลงนามออนไลน์
-        toggleExclusive(group, selectedKey) {
-            const groups = {
-                evaluator: ['evaluator_ack', 'evaluator_no_ack'],
-                superior: ['superior_agree', 'superior_disagree'],
-                superior2: ['superior2_agree', 'superior2_disagree'],
-            };
-
-            groups[group].forEach(key => {
-                if (key !== selectedKey) {
-                    this.signForm[key] = false;
-                }
-            });
-        },
-
-        getSignature(key1, key2) {
-            return this.signatures[key1] || this.signatures[key2] || null;
-        },
-
-        formatThaiDate(dateValue) {
-            if (!dateValue) return '';
-
-            const date = new Date(dateValue);
-
-            return date.toLocaleDateString('th-TH', {
-                day: 'numeric',
-                month: 'long',
-                year: 'numeric',
-            });
-        },
-
-        async getCurrentSigner() {
-            const { getSession } = await useAuth();
-            const session = await getSession();
-
-            const name = session.user.name;
-
-            return {
-                signer_staff_id: name.STAFFID,
-                signer_name: `${name.PREFIXFULLNAME || ''}${name.STAFFNAME || ''} ${name.STAFFSURNAME || ''}`.trim(),
-                signer_position: name.POSITIONNAME || '',
-                signature_image: name.SIGNATURE_IMAGE_URL || name.signature_image || '',
-            };
-        },
-
-        getSignComment(signKey) {
-            if (signKey === 'evaluator_no_ack') {
-                return `พยานคนที่ 1: ${this.signForm.witness_1 || '-'} / พยานคนที่ 2: ${this.signForm.witness_2 || '-'}`;
-            }
-
-            if (signKey === 'superior_disagree') {
-                return this.signForm.superior_comment || '';
-            }
-
-            if (signKey === 'superior2_disagree') {
-                return this.signForm.superior2_comment || '';
-            }
-
-            return '';
-        },
-
-        async signP04(signKey, roleName) {
-            try {
-                if (signKey !== 'receiver_ack') {
-                    Swal.fire({
-                        title: 'ไม่สามารถลงนามได้',
-                        text: 'หน้านี้อนุญาตให้ลงนามเฉพาะผู้รับการประเมินเท่านั้น',
-                        icon: 'warning',
-                    });
-                    return;
-                }
-
-                const signer = await this.getCurrentSigner();
-
-                if (Number(signer.signer_staff_id) !== Number(this.staffid_Main)) {
-                    Swal.fire({
-                        title: 'ไม่สามารถลงนามแทนได้',
-                        text: 'ผู้รับการประเมินต้องเป็นผู้ลงนามรับทราบด้วยตนเอง',
-                        icon: 'warning',
-                    });
-                    return;
-                }
-
-                const confirm = await Swal.fire({
-                    title: 'ยืนยันการลงนามรับทราบผลการประเมิน?',
-                    html: `
-                        <div style="text-align:left">
-                            <b>บทบาท:</b> ${roleName}<br>
-                            <b>ผู้ลงนาม:</b> ${signer.signer_name}<br>
-                            <b>ตำแหน่ง:</b> ${signer.signer_position}
-                        </div>
-                    `,
-                    icon: 'question',
-                    showCancelButton: true,
-                    confirmButtonText: 'ยืนยันลงนาม',
-                    cancelButtonText: 'ยกเลิก',
-                });
-
-                if (!confirm.isConfirmed) return;
-
-                const payload = {
-                    staff_id: this.staffid_Main,
-                    fac_id: this.facid_Main,
-                    group_id: this.groupid_Main,
-                    year_id: this.dataPor.d_date,
-                    evalua: this.dataPor.evalua,
-
-                    sign_key: 'receiver_ack',
-                    role_name: 'ผู้รับการประเมิน',
-
-                    signer_staff_id: signer.signer_staff_id,
-                    signer_name: signer.signer_name,
-                    signer_position: signer.signer_position,
-                    signature_image: signer.signature_image,
-
-                    comment: '',
-                    signed_at: new Date().toISOString(),
-                };
-
-                const res = await axios.post('http://127.0.0.1:8000/api/p04/sign', payload);
-
-                const savedSignature = res.data?.data || payload;
-
-                this.signatures.receiver_ack = savedSignature;
-                this.signForm.receiver_ack = true;
-
-                Swal.fire({
-                    title: 'ลงนามสำเร็จ',
-                    text: 'ระบบบันทึกการลงนามรับทราบผลการประเมินเรียบร้อยแล้ว',
-                    icon: 'success',
-                    timer: 1500,
-                    showConfirmButton: false,
-                });
-
-            } catch (error) {
-                console.error(error);
-
-                Swal.fire({
-                    title: 'เกิดข้อผิดพลาด',
-                    text: 'ไม่สามารถลงนามออนไลน์ได้',
-                    icon: 'error',
-                });
-            }
-        },
-
-        async loadP04Signatures() {
-            try {
-                const res = await axios.post('http://127.0.0.1:8000/api/p04/signatures', {
-                    staff_id: this.staffid_Main,
-                    year_id: this.dataPor.d_date,
-                    evalua: this.dataPor.evalua,
-                });
-
-                const rows = res.data?.data || [];
-
-                rows.forEach(row => {
-                    this.signatures[row.sign_key] = row;
-
-                    if (row.sign_key === 'receiver_ack') {
-                        this.signForm.receiver_ack = true;
-                    }
-                });
-
-            } catch (error) {
-                console.error('Error loading signatures:', error);
-            }
-        },
-
-
     }
 } 
 
@@ -1244,165 +909,6 @@ td:nth-child(2), td:nth-child(3) {
   .left-align {
     text-align: left;
   }
-
-  /* //ลงนามออนไลน์ */
-
-.sign-table td {
-     vertical-align: top;
-}
-
-.left-align {
-    text-align: left !important;
-}
-
-.center-align {
-    text-align: center !important;
-}
-
-.sign-check-line {
-    display: flex;
-    align-items: flex-start;
-    gap: 8px;
-    margin: 8px 0;
-    line-height: 1.6;
-    cursor: pointer;
-}
-
-.sign-check-line input[type="checkbox"] {
-    width: 18px;
-    height: 18px;
-    margin-top: 4px;
-    cursor: pointer;
-}
-
-.signature-card {
-    min-height: 130px;
-    padding: 14px;
-    border-radius: 10px;
-    border: 1px dashed #b9b9b9;
-    background: #fafafa;
-    font-size: 14px;
-    line-height: 1.8;
-}
-
-.signature-card.signed {
-    border: 1px solid #22c55e;
-    background: #f0fdf4;
-    color: #123524;
-}
-
-.signature-card.waiting {
-    color: #555;
-}
-
-.signed-badge {
-    display: inline-block;
-    background: #22c55e;
-    color: white;
-    padding: 3px 12px;
-    border-radius: 999px;
-    font-size: 13px;
-    margin-bottom: 8px;
-}
-
-.signature-img {
-    display: block;
-    max-width: 180px;
-    max-height: 70px;
-    object-fit: contain;
-    margin: 4px auto 8px auto;
-}
-
-.typed-signature {
-    font-size: 22px;
-    font-weight: 600;
-    color: #0f172a;
-    margin: 8px 0;
-}
-
-.witness-box {
-    margin-top: 10px;
-    padding: 10px;
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
-    border-radius: 8px;
-}
-
-.mt-2 {
-    margin-top: 0.5rem;
-}
-
-.mt-3 {
-    margin-top: 1rem;
-}
-
-.mb-2 {
-    margin-bottom: 0.5rem;
-}
-
-.w-full {
-    width: 100%;
-}
-
-.readonly-section {
-    background: #f8fafc;
-}
-
-.readonly-check {
-    cursor: default;
-    color: #475569;
-}
-
-.readonly-check input {
-    cursor: not-allowed !important;
-}
-
-.readonly-comment {
-    margin-top: 8px;
-    padding: 10px;
-    background: #fff;
-    border: 1px dashed #cbd5e1;
-    border-radius: 8px;
-    color: #334155;
-    line-height: 1.6;
-}
-
-.text-muted {
-    display: block;
-    margin-top: 8px;
-    color: #64748b;
-}
-
-
-
-.signature-button-wrap {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-top: 12px;
-    width: 100%;
-}
-
-/* สำหรับ PrimeVue ใน scoped style */
-:deep(.signature-btn) {
-    width: auto !important;
-    min-width: 170px;
-    max-width: 230px;
-    padding: 6px 18px !important;
-    display: inline-flex !important;
-    justify-content: center;
-    align-items: center;
-}
-
-/* กัน label ดันเต็มปุ่ม */
-:deep(.signature-btn .p-button-label) {
-    flex: unset !important;
-}
-
-/* กัน icon กับข้อความห่างเกินไป */
-:deep(.signature-btn .p-button-icon) {
-    margin-right: 6px;
-}
 </style>
 
 

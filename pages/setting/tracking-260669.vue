@@ -24,79 +24,72 @@
                         <Dropdown v-model="tracking_date" :options="tracking_dates" :optionLabel="(item) => `${item.facuties} ${item.d_evaluationround} ${item.d_date}`" placeholder="กรุณาเลือกรอบการประเมิน" style=" max-width: 500px; width: 100%"></Dropdown> 
                     </div> 
                         <Button class="mb-2 mr-2" icon="pi pi-search" :disabled="loading || !tracking_date" @click="xxr" /> &nbsp;&nbsp;&nbsp;&nbsp;
-                        <Button label="Export" icon="pi pi-file-word" class="mr-2 mb-2" :disabled="loading" @click="printDatatracking" />
+                        <!-- <Button label="Export" icon="pi pi-file-word" class="mr-2 mb-2" :disabled="loading" @click="printDatatracking" /> -->
+                        <Button label="Export" icon="pi pi-file-pdf" class="mr-2 mb-2" :disabled="loading" @click="printDatatrackingpdf" />
                     </div>  
                     <div v-if="loading" class="loading-wrap">
                         <ProgressSpinner style="width:60px;height:60px" strokeWidth="6" />
                         <div class="mt-2">กำลังโหลดข้อมูล…</div>
                     </div>
                 <table class="table">
-                    <thead> 
+                    <thead>  
                         <tr style="height: 40px;background-color: blanchedalmond;">
-                            <th style="width: 40%;">ผู้รับการประเมิน</th>  
+                            <th style="width: 60%;">ผู้รับการประเมิน</th>  
                             <th>สัดส่วน</th>  
                             <th>ผลสัมฤทธิ์ของงาน</th>  
-                            <th>พฤติกรรมการปฏิบัติราชการ</th>  
+                            <th>ผลรวมสัดส่วน <br>70 หรือ 50</th>  
+                            <th>พฤติกรรมการปฏิบัติราชการ</th>
+                            <th>ผลรวมสัดส่วน <br>30 หรือ 50 </th>   
                             <th>ผลคะแนน</th>  
-                            <th>ประเมิน</th> 
+                            <th>ประเมิน</th>  
                         </tr>
                     </thead>
-                    <tbody>
-                        <!-- <tr v-for="(Item, index) in products" :key="index">
-                            <td style="padding-left: 5px;width: 30%;text-align: left;">   
-                                <b style="color: blue;">{{ Item.prefixfullname }} {{ Item.namefully }} </b> 
-                            </td> 
-                            <td class="text-center" style="color: blue;"><b>{{ Item.tb_tor?Item.tb_tor.persen: '' }}</b></td>  
-                            <td class="text-center" style="color: blue;"><b>{{ Item.tb_tor?Item.tb_tor.achievement_score:'' }}</b></td>    
-                            <td class="text-center" style="color: blue;"><b>{{ Item.tb_tor?Item.tb_tor.behavior:'' }}</b></td>
-                            <td class="text-center" style="color: blue;"><b>{{ Item.tb_tor?Item.tb_tor.sum_score:'' }} </b></td>  
-                            <td style="text-align: center;width: 10%;">  
-                                <div v-if="Item.tb_tor">
-                                    <Button 
-                                        label="ประเมิน" 
-                                        class="mb-2 mr-2" 
-                                        icon="pi pi-list" 
-                                        @click="openDataEvalu(Item.staffid)" 
-                                    />  
-                                </div>
-                                <div v-else>
-                                    <p style="color: brown;">-รอข้อมูลการประเมิน-</p>
-                                </div> 
-                            </td> 
-                        </tr>   -->
+                    <tbody>  
                         <tr v-for="(Item, index) in products.filter(item => item.tb_tor).concat(products.filter(item => !item.tb_tor))" :key="index">
                             <td style="padding-left: 5px;width: 30%;text-align: left;">   
                                 <b style="color: blue;">{{ Item.prefixfullname }} {{ Item.namefully }} </b> 
-                            </td> 
+                            </td>  
                             <td class="text-center" style="color: blue;"><b>{{ Item.tb_tor ? Item.tb_tor.persen : '' }}</b></td>  
-                            <td class="text-center" style="color: blue;"><b>{{ Item.tb_tor ? Item.tb_tor.achievement_score : '' }}</b></td>    
-                            <td class="text-center" style="color: blue;"><b>{{ Item.tb_tor ? Item.tb_tor.behavior : '' }}</b></td>
+                            <td class="text-center" style="color: blue;"><b>{{ Item.tb_tor ? Item.tb_tor.achievement_score : '' }}</b></td>   
+                            <td class="text-center" style="color: brown;"><b>{{ calcAchievement(Item) }}</b></td>
+                            <td class="text-center" style="color: blue;"><b>{{ Item.tb_tor ? Item.tb_tor.behavior : '' }}</b></td> 
+                            <td class="text-center" style="color: brown;"><b>{{ calcBehavior(Item) }}</b></td>   
                             <td class="text-center" style="color: blue;"><b>{{ Item.tb_tor ? Item.tb_tor.sum_score : '' }} </b></td>  
-                            <td style="text-align: center;width: 10%;">  
+                            <td style="text-align: center;width: 10%;">   
                                 <div v-if="Item.tb_tor">
-                                    <Button 
-                                        label="ประเมิน" 
-                                        class="mb-2 mr-2" 
-                                        icon="pi pi-list" 
-                                        @click="openDataEvalu(Item)" 
-                                    />  
+                                    <Button
+                                        label="ประเมิน"
+                                        class="mb-2 mr-2"
+                                        icon="pi pi-list"
+                                        :loading="loadingEvaluIndex === index"
+                                        :disabled="loadingEvalu"
+                                        @click="openDataEvalu(Item, index)"
+                                    />
                                 </div>
+
                                 <div v-else>
                                     <p style="color: brown;">-รอข้อมูลการประเมิน-</p>
                                 </div> 
                             </td> 
-                        </tr>
-
+                        </tr> 
                     </tbody> 
                 </table>   
-                <!-- <div style="text-align: center;">
+
+                <div style="text-align: center;">
                     <Button 
-                        label="บันทึกผลคะแนน" 
+                        label="ส่งคะแนนประเมิน" 
                         class="mb-2 mr-2" 
-                        icon="pi pi-save" 
+                        icon="pi pi-send" 
                         style="background-color:orangered; color: white;" 
-                        @click="saveScore"/>
-                </div>  -->
+                        :loading="loadingSendScoreAll"
+                        :disabled="loadingSendScoreAll || !products.some(item => item.tb_tor)"
+                        @click="sendAllScoresToOtherSystem"
+                    />
+                </div>
+                <div style=" color: red; font-size: 16px; margin-top: 6px; font-weight: 500; text-align: center; ">
+                    * ⚠️ หมายเหตุ: เมื่อกดปุ่มส่งคะแนน ระบบจะส่งคะแนนประเมินทั้งหมดไปยังระบบบุคลากร ⚠️
+                </div> 
+
 
                 <div class="col md:col-5 text-right">   
                     <Dialog header="จัดการแบบ ป01" maximizable v-model:visible="DialogAdd" :breakpoints="{ '960px': '75vw' }" :style="{ width: '100vw',height: '100vh' }" :modal="true" position="top">
@@ -141,18 +134,24 @@
                                                             </td> 
                                                         </tr> 
                                                         <tr v-for="(subP01, idx) in h?.subP01sX || []" :key="idx">
-                                                            <td style="text-align: left;">{{ subP01?.p01_no || '-' }} {{ subP01?.p01_subject || '-' }}</td>
+                                                            <!-- <td style="text-align: left;">{{ subP01?.p01_no || '-' }} {{ subP01?.p01_subject || '-' }}</td> -->
+                                                             <td style="text-align:left;">
+                                                                <template v-for="(ln, i) in parseActivityText(subP01.p01_subject).lines" :key="i">
+                                                                    <div v-if="ln.type === 'main'" style="font-weight:700; margin-bottom:4px;">
+                                                                    <!-- {{ subP01.p01_no }} {{ ln.text }} -->
+                                                                          {{ subP01.p01_no }} {{ stripLeadingNo(ln.text) }}
+                                                                    </div>
+                                                                    <div v-else class="subline">
+                                                                    <span class="subno">{{ ln.no }}</span>
+                                                                    <span class="subtext">{{ ln.text }}</span>
+                                                                    </div>
+                                                                </template>
+                                                            </td> 
 
-                                                            <!-- แก้แดง -->
-                                                            <!-- <td style="text-align: left;">
-                                                                <b>ตัวชี้วัดที่ {{ idx+1 }} {{ subP01?.p01_subject || '-' }}</b>
-                                                                <p v-for="(subIitem, idI) in subP01?.subITems || []" :key="idI">
-                                                                    <div v-if="subIitem?.ind_no !== 0"><b>ระดับ {{ subIitem?.ind_no }}</b> {{ subIitem?.ind_Items || '-' }}</div>
-                                                                    <div v-else><b>{{ subIitem?.ind_Items || '-' }}</b></div>
-                                                                </p>
-                                                            </td> -->
+
                                                             <td style="text-align: left;">
-                                                                <b>ตัวชี้วัดที่ {{ idx + 1 }} {{ subP01?.p01_subject || '-' }}</b>
+                                                                <!-- <b>ตัวชี้วัดที่ {{ idx + 1 }} {{ subP01?.p01_subject || '-' }}</b> -->
+                                                                 <b>ตัวชี้วัดที่ {{ idx + 1 }} {{ getMainSubject(subP01.p01_subject) }}</b>
 
                                                                 <div v-for="(subIitem, idI) in subP01?.subITems || []" :key="idI">
                                                                     <div v-if="subIitem?.ind_no !== 0">
@@ -163,21 +162,7 @@
                                                                     </div>
                                                                 </div>
                                                             </td> 
-
-                                                            <!-- แก้แดง -->
-                                                            <!-- <td style="text-align: left;">
-                                                                <p v-if="(subP01?.subITemP03ind || []).length > 0">
-                                                                    <div v-for="level in [1, 2, 3, 4, 5]" :key="level">
-                                                                        <div v-if="subP01?.subITemP03ind?.some(item => item?.p03ind_no === level + '')">
-                                                                            <b>ระดับ {{ level }}</b>
-                                                                            <div v-for="(item, index) in subP01?.subITemP03ind?.filter(item => item?.p03ind_no === level + '')" :key="index">
-                                                                                <div>{{ index + 1 }}. {{ item?.p03ind_Items || '-' }}</div>
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                </p>
-                                                                <p v-else style="color: red;">- ไม่มีข้อมูล -</p>
-                                                            </td> -->
+ 
                                                             <td style="text-align: left;">
                                                                 <div v-if="(subP01?.subITemP03ind || []).length > 0">
                                                                     <div v-for="level in [1, 2, 3, 4, 5]" :key="level">
@@ -243,7 +228,11 @@
                                                         </thead>
                                                         <tbody> 
                                                             <tr v-for="(row1, index) in coreCompetencies" :key="index">
-                                                                <td style="text-align: left;">{{ row1.activity }}</td> 
+                                                                <!-- <td style="text-align: left;">{{ row1.activity }}</td>  -->
+                                                                 <td class="clickable" @click="openCompetencyDialog('core', row1)">
+                                                                    {{ row1.activity }}
+                                                                </td>
+                                                                
                                                                 <td>{{ row1.indicator }}</td>
                                                                 <td>
                                                                     <b v-if="!row1.selfAssessment" style="color: red;">0</b> 
@@ -276,7 +265,11 @@
                                                         </thead>
                                                         <tbody>
                                                             <tr v-for="(row2, index) in jobSpecificCompetencies" :key="index">
-                                                                <td style="text-align: left;"> ข. {{ index+1 }} {{ row2.WORK_NAME }}</td> 
+                                                                <!-- <td style="text-align: left;"> ข. {{ index+1 }} {{ row2.WORK_NAME }}</td>  -->
+                                                                 <td class="clickable" @click="openCompetencyDialog('job', row2, index)">
+                                                                    ข. {{ index + 1 }} {{ row2.WORK_NAME }}
+                                                                </td>
+
                                                                 <td> {{ row2.COMPLEVEL }}</td>
                                                                 <td>
                                                                     <b v-if="!row2.SCOREPERSON" style="color: red;">0</b> 
@@ -309,24 +302,39 @@
                                                         </thead>
                                                         <tbody>
                                                             <tr v-for="(row3, index) in otherCompetencies" :key="index">
-                                                                <td style="text-align: left;">{{ row3.activity }}</td> 
+                                                                <!-- <td style="text-align: left;">{{ row3.activity }}</td>  -->
+                                                                <td class="clickable" @click="openCompetencyDialog('other', row3)">
+                                                                    {{ row3.activity }}
+                                                                </td>
                                                                 <td> 
                                                                     <b v-if="!row3.indicator3" style="color: red;">-</b>
                                                                     <span v-else>{{ row3.indicator3 }}</span>  
                                                                 </td>
                                                                 <td>  
                                                                     <b v-if="!row3.datatable3" style="color: red;">-</b> 
-                                                                    <b v-else style="color: blue">{{ row3.datatable3 }}</b> 
+                                                                    <b v-else style="color: blue">{{ row3.datatable3 }}</b>  
                                                                 </td>
                                                                
-                                                                <td> 
-                                                                    <!-- <template v-if="Number(posadio) === 128">  -->
-                                                                    <template v-if="Number(posadio) === 128 && !['110105','110200','110999'].includes(String(staffid_Main))"> 
+                                                                <td>  
+                                                                    <!-- <template v-if="Number(posadio) === 128 && !['110105','110146', '160018'].includes(String(staffid_Main))"> 
                                                                         <InputNumber 
                                                                             v-model.number="row3.selfAssessment3" 
                                                                             type="text" 
                                                                             placeholder="0" 
                                                                             autocomplete="off" 
+                                                                            showButtons
+                                                                        />
+                                                                    </template>
+                                                                    <template v-else>
+                                                                        <b><span style="color: red;">-</span></b>
+                                                                    </template> -->
+                                                                    
+                                                                   <template v-if="isTargetExecutive && canScoreExecutive">
+                                                                        <InputNumber 
+                                                                            v-model.number="row3.selfAssessment3"
+                                                                            placeholder="0"
+                                                                            :min="0"
+                                                                            :max="5"
                                                                             showButtons
                                                                         />
                                                                     </template>
@@ -342,11 +350,19 @@
                                             <div class="p-fluid formgrid grid">
                                                 <div class="field col-12">
                                                     <h4>ความเห็นเพิ่มเติมของผู้ประเมิน</h4>
-                                                    <label>1) จุดเด่น และ/หรือ สิ่งที่ควรปรับปรุงแก้ไข</label>
+                                                    <label>
+                                                        1)<span style="color:red;">*</span>
+                                                         จุดเด่น และ/หรือ สิ่งที่ควรปรับปรุงแก้ไข 
+                                                        <span style="color:red;">(ถ้าไม่มีให้ใส่ '-')</span>
+                                                    </label>
                                                     <textarea class="p-inputtextarea p-inputtext p-component" v-model="improvements" rows="4"></textarea> 
                                                 </div>
                                                 <div class="field col-12">  
-                                                    <label>2) ข้อเสนอแนะเกี่ยวกับวิธีส่งเสริมและพัฒนา</label>
+                                                    <label>
+                                                        2)<span style="color:red;">*</span>
+                                                        ข้อเสนอแนะเกี่ยวกับวิธีส่งเสริมและพัฒนา
+                                                        <span style="color:red;">(ถ้าไม่มีให้ใส่ '-')</span>
+                                                    </label>
                                                     <textarea class="p-inputtextarea p-inputtext p-component" v-model="suggestions" rows="4"></textarea> 
                                                 </div> 
                                             </div>   
@@ -393,22 +409,8 @@
                                                             <td></td>
                                                         </tr> 
                                                         <tr v-for="(subP01, idx) in h.subP01sX" :key="idx" style="vertical-align: baseline;">
-                                                            <td style="text-align: left;">{{ subP01.p01_no }} {{ subP01.p01_subject }}</td>
+                                                            <td style="text-align: left;">{{ subP01.p01_no }} {{ subP01.p01_subject }}</td> 
 
-                                                            <!-- แก้แดง -->
-                                                            <!-- <td style="text-align: left;">
-                                                                <b>ตัวชี้วัดที่ {{ idx+1 }} {{ subP01.p01_subject }}</b>
-                                                                <p v-for="(subIitem, idI) in subP01.subITems" :key="idI" style="padding-left: 8px;margin-bottom: 5px;">
-                                                                    <div v-if="subIitem.ind_no!=0" ><b>ระดับ {{ subIitem.ind_no }}</b> {{ subIitem.ind_Items }}</div>
-                                                                    <div v-if="subIitem.ind_no==0" ><b>{{ subIitem.ind_Items }}</b></div>
-                                                                </p>
-                                                                <p v-if="subP01.p01_detail != null">
-                                                                    
-                                                                    <b style="color: red;">ข้อเสนอแนะ</b>
-                                                                    <br>
-                                                                    <em style="color: red;">{{ subP01.p01_detail }}</em>
-                                                                </p>
-                                                            </td>  -->
                                                             <td style="text-align: left;">
                                                                 <b>ตัวชี้วัดที่ {{ idx+1 }} {{ subP01.p01_subject }}</b> 
                                                                 <div v-for="(subIitem, idI) in subP01.subITems" :key="idI" style="padding-left: 8px; margin-bottom: 5px;"> 
@@ -423,17 +425,7 @@
                                                                     <b style="color: red;">ข้อเสนอแนะ</b><br>
                                                                     <em style="color: red;">{{ subP01.p01_detail }}</em>
                                                                 </div>
-                                                            </td> 
-
-                                                            <!-- <td style="text-align: left;">
-                                                                <p v-for="(subIitemInd, inD) in subP01.subITemP03ind" :key="inD" style="padding-left: 8px;margin-bottom: 5px;">
-                                                                    <div v-if="subIitemInd.p03ind_no!=0"><b>ระดับ {{ subIitemInd.p03ind_no }}</b> {{ subIitemInd.p03ind_Items }}</div>
-                                                                    <div v-if="subIitemInd.p03ind_no==0"><b>{{ subIitemInd.p03ind_Items }}</b></div> 
-                                                                </p>
-                                                                <p v-if="subP01.subITemP03ind.length == 0" style="padding-left: 8px;margin-bottom: 5px;">
-                                                                    <b style="color: red;">- ไม่มีข้อมูล -</b>
-                                                                </p>  
-                                                            </td>  -->
+                                                            </td>  
                                                             <td style="text-align: left;">
                                                                 <!-- วนลูปแสดงระดับ 1 ถึง 5 -->
                                                                 <div v-for="level in [1, 2, 3, 4, 5]" :key="level">
@@ -451,18 +443,7 @@
                                                                 <p v-if="subP01.subITemP03ind.length == 0" style="padding-left: 8px;margin-bottom: 5px;">
                                                                     <b style="color: red;">- ไม่มีข้อมูล -</b>
                                                                 </p>
-                                                            </td>
-                                                            
-                                                            <!-- //รายงานป.01 --> 
-                                                            <!-- <td style="text-align: left;"> 
-                                                                <p v-for="(subIitemDoc, inDoc) in subP01.subITemP03doc" :key="inDoc" style="padding-left: 8px;margin-bottom: 5px;"> 
-                                                                    <a v-if="subIitemDoc.doc_file!=null" :href="'   http://127.0.0.1:8000/storage/uploadsP03/'+subIitemDoc.doc_file" target="_blank"><b>ระดับ</b> <b>{{subIitemDoc.doc_no }}</b> {{ subIitemDoc.doc_name }}</a> 
-                                                                    <a v-if="subIitemDoc.doc_link!=null" :href="subIitemDoc.doc_link" target="_blank"><b>ระดับ</b> <b>{{ subIitemDoc.p03ind_no }}</b> {{ subIitemDoc.doc_name }}</a> 
-                                                                </p>
-                                                                <p v-if="subP01.subITemP03doc.length == 0" style="padding-left: 8px;margin-bottom: 5px;">
-                                                                    <b style="color: red;">- ไม่มีข้อมูล -</b>
-                                                                </p>
-                                                            </td>    -->
+                                                            </td> 
                                                             <td style="text-align: left;"> 
                                                                 <p v-for="(subIitemDoc, inDoc) in subP01.subITemP03doc.slice().sort((a, b) => a.doc_no - b.doc_no)" 
                                                                 :key="inDoc" 
@@ -562,7 +543,11 @@
                                                         </thead>
                                                         <tbody> 
                                                             <tr v-for="(row1, index) in coreCompetencies" :key="index">
-                                                                <td style="text-align: left;">{{ row1.activity }}</td> 
+                                                                <!-- <td style="text-align: left;">{{ row1.activity }}</td>  -->
+                                                                <td class="clickable" @click="openCompetencyDialog('core', row1)">
+                                                                    {{ row1.activity }}
+                                                                </td>
+
                                                                 <td>{{ row1.indicator }}</td>
                                                                 <!-- <td style="color: blue;"><b>{{ row1.selfAssessment}}</b></td>  -->
                                                                 <td>  
@@ -590,7 +575,11 @@
                                                         </thead>
                                                         <tbody>
                                                             <tr v-for="(row2, index) in jobSpecificCompetencies" :key="index">
-                                                                <td style="text-align: left;"> ข. {{ index+1 }} {{ row2.WORK_NAME }}</td> 
+                                                                <!-- <td style="text-align: left;"> ข. {{ index+1 }} {{ row2.WORK_NAME }}</td>  -->
+                                                                <td class="clickable" @click="openCompetencyDialog('job', row2, index)">
+                                                                    ข. {{ index + 1 }} {{ row2.WORK_NAME }}
+                                                                </td>
+
                                                                 <td> {{ row2.COMPLEVEL }} 
                                                                 </td> 
                                                                 <!-- <td style="color: blue"> <b>{{ row2 }}</b></td> -->
@@ -640,7 +629,10 @@
                                                         </thead>
                                                         <tbody>
                                                             <tr v-for="(row3, index) in otherCompetencies" :key="index">
-                                                                <td style="text-align: left;">{{ row3.activity }}</td> 
+                                                                <!-- <td style="text-align: left;">{{ row3.activity }}</td>  -->
+                                                                 <td class="clickable" @click="openCompetencyDialog('other', row3)">
+                                                                    {{ row3.activity }}
+                                                                </td>
                                                                 <td> 
                                                                     <b v-if="row3.indicator3 == '' ||  row3.indicator3 == null" style="color: red;">0</b>
                                                                     <span v-if="row3.indicator3 != 0">{{ row3.indicator3 }}</span>  
@@ -1020,9 +1012,20 @@
 
                         </TabView>
                         <template #footer>
-                            <Button label="ตกลง" severity="secondary" class="mb-2 mr-2" @click="DialogAdd = false " />
+                            <Button label="ตกลง" severity="info" class="mb-2 mr-2" @click="DialogAdd = false " />
                         </template>
                     </Dialog>
+                    <Dialog
+                        header="รายละเอียดสมรรถนะ"
+                        v-model:visible="competencyDialogVisible"
+                        :modal="true"
+                        :style="{ width: '80vw' }"
+                        >
+                        <h4>{{ selectedCompetency.title }}</h4>
+                        <p style="white-space: pre-line;">
+                            {{ selectedCompetency.description }}
+                        </p>
+                    </Dialog> 
                 </div>
             </div>
         </div>
@@ -1040,10 +1043,87 @@ import axios from 'axios';
 import Swal from 'sweetalert2';
 import TabView from 'primevue/tabview';
 import TabPanel from 'primevue/tabpanel';
-import { LogarithmicScale } from 'chart.js';
-import InputNumber from 'primevue/inputnumber'; 
-import ProgressSpinner from 'primevue/progressspinner'
-export default {
+// import { LogarithmicScale } from 'chart.js';
+// import InputNumber from 'primevue/inputnumber'; 
+// import ProgressSpinner from 'primevue/progressspinner'
+
+//แสดง 1 ค.
+const EXECUTIVE_ALLOWLIST = new Set([
+    '160018',//นายจีรพันธ์ ภูครองเพชร
+    '190015',//นางนงลักษณ์ พุ่มม่วง
+    '130069',//นายขรรชัย กลิ่นผกา
+    '110143',//นางวราลักษณ์ คุปต์บดินทร
+    '190042',//นางฉวีวรรณ คืนสันเทียะ
+    '110105',//นายจักริน เพชรสังหาร
+    '1140016',//นางบงกชทิพย์ เกาะสมบัต
+    '110407',//นายอานุภาพ งามสูงเนิน
+    '110138',//นางฉันทลักษณ์ สาชำนาญ
+    '120039',//นางสุชาราวตี มาบุญธรรม
+    '110142',//นางสาวอุทัยรัตน์ แก้วกู่
+    '120032',//นางวิรายา ภมรสมิต
+    '1100017',//นางพัชรนันญ ศรีแก่นจันทร
+    '190021',//นางศิโรวรรณ อินศร
+    '5002279',//นางสาวอนงค์ภาณุช ปะนะทังถิรวิทย
+    '140056',//นางฉวีวรรณ อรรคะเศรษฐัง
+    '110146',//นายนิวัฒ พัฒนิบูลย
+    '110108',//นางสาวดวงแข เนื่องอุดม
+    '110144',//นายอุทัย หามนตร
+    '110309',//นางมยุรี ผาผง
+    '130076',//นางกมลลักษณ์ พักพิงผ่องศิร
+    '140066',//นางอมรรัตน์ หลายโคตร
+    '190032',//นางชนัญชิดา สุวรรณเลิศ
+    '110148',//นางจุฑามาศ ภิญโญศร
+    '180010',//นางสิรีวรรณ ตติยรัตน
+    '140064',//นางพรทิพย์ พันธุมชัย
+    '120043',//นางลัดดาภรณ์ เชื้อในเขา
+    '5001661',//นางศรินทร์ยา เกียงขวา
+    '5001685',//นางแจ่มจันทร์ หลูปรีชาเศรษฐ
+    '310801',//นางสาวกนกวรรณ เชาว์น้อย
+    '410402',//นายนพวิทย์ ศรีเวียงธนาธิป
+    '314020',//นายไกรษร อุทัยแสง
+    '5000094',//นายสวัสดิ์ วิชระโภชน
+    '130102' //นางสาวพนมพร ปัจจวงษ
+    
+    ]);
+
+    //ผู้ที่ประเมิน ผอ หัวหน้าสำนักงาน ค.
+const EXECUTIVE_SCORE_ALLOWLIST = new Set([ 
+    //รายชื่อคนที่ประเมินผู้บริหาร ค.
+    '5006206', //นางสาวเมทินี โคตรดี ประเมินผูบริหาร 'กองกลาง'
+    '5001951', //จินดาพร จำรัสเลิศลักษณ์ ประเมินผูบริหาร 'กจ'
+    '5001492', //นางสาวนิตยา วรรณกิตร์ ประเมินผูบริหาร 'กองกิจการนิสิต'
+    '120047', //นางสาวมลฤดี เชาวรัตน์ ประเมินผูบริหาร 'กองคลังและพัสดุ '
+    '1130018', //นางสาวจันทร์ทิพย์ กาญจนศิลป์ ประเมินผูบริหาร 'กองทะเบียนและประมวลผล,กองบริการการศึกษา'
+    '5001492', //นางสาวนิตยา วรรณกิตร์ ประเมินผูบริหาร 'กองประชาสัมพันธ์และกิจการต่างประเทศ'
+    '5002492', //นายไพโรจน์ ประมวล ประเมินผูบริหาร 'กองส่งเสริมการวิจัยและบริการวิชาการ'
+    '5002149', //นางสาวปารณีย์ บุญไชย ประเมินผูบริหาร 'คณะการท่องเที่ยวและการโรงแรม'
+    '4110102', //นายจรวย สาวิถี ประเมินผูบริหาร 'คณะการบัญชีและการจัดการ'  
+    '5010330', //นายปรีชา ประเทพา ประเมินผูบริหาร 'คณะเทคโนโลยี'
+    '5005302', //นางสาวดาริกา โพธิรุกข์ ประเมินผูบริหาร 'คณะนิติศาสตร์' 
+    '5001051', //นายเทพลักษ์ ศิริธนะวุฒิชัย ประเมินผูบริหาร 'คณะแพทยศาสตร์' 
+    '4130108', //นางสาวรุจิลักขณ์ รัตตะรมย์ ประเมินผูบริหาร 'คณะเภสัชศาสตร์' 
+    '5002082', //นายกิตติพงษ์ ประพันธ์ประเมินผูบริหาร 'คณะมนุษยศาสตร์และสังคมศาสตร์'  
+    '5000312', //นางสาวจันทิมา พลพินิจ ประเมินผูบริหาร 'คณะวิทยาการสารสนเทศ' 
+    '140119', //นายสุนันท์ สายกระสุน ประเมินผูบริหาร 'คณะวิทยาศาสตร์' 
+    '5003574', //นายจักรมาส เลาหวณิช ประเมินผูบริหาร 'คณะวิศวกรรมศาสตร์' 
+    '3150119', //นายพีระ พันลูกท้าวประเมินผูบริหาร 'คณะศิลปกรรมศาสตร์และวัฒนธรรมศาสตร์' 
+    '5002326', //นายชวลิต ชูกำแพง ประเมินผูบริหาร 'คณะศึกษาศาสตร์'  
+    '5000224', //นางสาวจารุณีย์ นิมิตศิริวัฒน์ ประเมินผูบริหาร 'คณะสถาปัตยกรรมศาสตร์ ผังเมืองและนฤมิตศิลป์' 
+    '420106', //นางสุกัญญา ลีทองดี ประเมินผูบริหาร 'คณะสัตวแพทยศาสตร์'  
+    '5002914', //นายอดิศักดิ์ สิงห์สีโว ประเมินผูบริหาร 'คณะสิ่งแวดล้อมและทรัพยากรศาสตร์' 
+    '5002005',//นายพลเดช เชาวรัตน์ ประเมินผูบริหาร 'บัณฑิตวิทยาลัย' 
+    '5003212',//นายจีรศักดิ์ โพกาวิน ประเมินผูบริหาร 'วิทยาลัยการเมืองการปกครอง'  
+    '5000920',//นายสยาม จวงประโคน ประเมินผูบริหาร 'วิทยาลัยดุริยางคศิลป์' 
+    '160008',//นางสุดารัตน์ ถนนแก้ว ประเมินผูบริหาร 'สถาบันวิจัยวลัยรุกขเวช' 
+    '160016',//นายทม เกตุวงศา ประเมินผูบริหาร 'สถาบันวิจัยศิลปะและวัฒนธรรมอีสาน' 
+    '5002359',//นายสมหมาย ขันทอง ประเมินผูบริหาร 'สำนักคอมพิวเตอร์' 
+    '140123',//นายประยุกต์ ศรีวิไล ประเมินผูบริหาร 'สำนักงานอธิการบดี,สำนักตรวจสอบภายใน'
+    '5003323',//นายรัตนโชติ เทียนมงคล ประเมินผูบริหาร 'สำนักวิทยบริการ'
+    '5001470',//นางสาวอัญญารัตน์ นาถธีระพงษ์ ประเมินผูบริหาร 'สำนักศึกษาทั่วไป' 
+    
+    ]);
+    
+export default { 
     // props: {
     //     dataPor: {
     //         type: Object,
@@ -1081,7 +1161,14 @@ export default {
             tracking_dates: null,
             tracking_fac: '',
             //tracking_facuty: null,
-            
+
+            //โหลดข้อมูล
+            loadingEvalu: false,
+            loadingEvaluIndex: null,
+
+            //สมรรถนะ ค.
+            canScoreExecutive: false,
+            isTargetExecutive: false,
 
             // ตารางรายชื่อ
             products: [],
@@ -1117,26 +1204,14 @@ export default {
             ],
             //ตาราง ข. สมรรถนะเฉพาะตามลักษณะงานที่ปฏิบัติ
             jobSpecificCompetencies: [],
-            // jobSpecificCompetencies: [
-            //     { id: 6, activity: 'ข. 1 การคิดวิเคราะห์', indicator: '1', data_table2: '' },
-            //     { id: 7, activity: 'ข. 2 การดำเนินการเชิงรุก', indicator: '1', data_table2: '' },
-            //     { id: 8, activity: 'ข. 3 ความผูกพันที่มีต่อส่วนราชการ', indicator: '1', data_table2: '' },
-            //     { id: 9, activity: 'ข. 4 การมองภาพองค์รวม', indicator: '1', data_table2: '' },
-            //     { id: 10, activity: 'ข. 5 การสืบเสาะหาข้อมูล', indicator: '1', data_table2: '' },
-            //     { id: 11, activity: 'ข. 6 การตรวจสอบความถูกต้องตามกระบวนงาน', indicator: '1', data_table2: '' }
-            // ],
+          
             //ตาราง ค. สมรรถนะอื่นๆ
             otherCompetencies: [
                 { id: 12, activity: 'ค. 1 สภาวะผู้นำ', indicator: '0', data_table3: '' },
                 { id: 13, activity: 'ค. 2 วิสัยทัศน์', indicator: '0', data_table3: '' },
                 { id: 14, activity: 'ค. 3 การวางกลยุทธ์ภาครัฐ', indicator: '0', data_table3: '' },
                 { id: 15, activity: 'ค. 4 ศักยภาพเพื่อนำการปรับเปลี่ยน', indicator: '0', data_table3: '' },
-                { id: 16, activity: 'ค. 5 การสอนงานและการมอบหมายงาน', indicator: '0', data_table3: '' }
-                // { id: 12, activity: 'ค. 1 สภาวะผู้นำ', indicator3: executive, datatable3: '', selfAssessment3: '' },
-                // { id: 13, activity: 'ค. 2 วิสัยทัศน์', indicator3: executive, datatable3: '', selfAssessment3: '' },
-                // { id: 14, activity: 'ค. 3 การวางกลยุทธ์ภาครัฐ', indicator3: executive, datatable3: '', selfAssessment3: '' },
-                // { id: 15, activity: 'ค. 4 ศักยภาพเพื่อนำการปรับเปลี่ยน', indicator3: executive, datatable3: '', selfAssessment3: '' },
-                // { id: 16, activity: 'ค. 5 การสอนงานและการมอบหมายงาน', indicator3: executive, datatable3: '', selfAssessment3: '' }
+                { id: 16, activity: 'ค. 5 การสอนงานและการมอบหมายงาน', indicator: '0', data_table3: '' } 
             ],
             
 
@@ -1179,10 +1254,239 @@ export default {
             assessorText: null,
             assessor_positionText: null,
             currentstaff: {},  
-            //datatable3: []
-
+            //datatable3: [] 
             posadio: 0,
+            competencyMap: {},
 
+            //ส่งคะแนนประเมินไประบบบุคลากร
+            loadingSendScoreAll: false,
+
+            competencyDialogVisible: false,
+            selectedCompetency: {
+            title: '',
+            description: ''
+            },
+
+            // ✅ ถ้าจะใช้ fallback แบบยาวเหมือน P02
+            coreDescriptions: {
+                1: 'คำอธิบาย ก.1 การมั่งผลสัมฤทธ์\n\n' +
+                    'ความมุ่งมั่นจะปฏิบัติหน้าที่ราชการให้ดีหรือให้เกินมาตรฐานที่มีอยู่ โดยมาตรฐานนี้อาจเป็นผลการปฏิบัติงานที่ผ่านมาของตนเอง หรือเกณฑ์วัดผลสัมฤทธิ์ที่สถาบันอุดมศึกษา ' +
+                    'กำหนดขึ้น อีกทั้งยังหมายรวมถึงการสร้างสรรค์พัฒนาผลงานหรือกระบวนการปฏิบัติงานตามเป้าหมายที่ยากและท้าท้ายชนิดที่อาจไม่เคยมีผู้ใดสามารถกระทำได้มาก่อน\n\n' +  
+                    'ระดับที่ 0 ไม่แสดงสมรรถนะด้านนี้ หรือแสดงอย่างไม่ชัดเจน\n\n' +  
+                    'ระดับที่ 1 แสดงความพยายามในการปฏิบัติหน้าที่ราชการให้ดี\n' +
+                        '- พยายามทำงานในหน้าที่ให้ถูกต้อง\n' +
+                        '- พยายามปฏิบัติงานให้แล้วเสร็จตามกำหนดเวลา\n' +
+                        '- มานะอดทน ขยันหมั่นเพียรในการทำงาน\n' +
+                        '- แสดงออกว่าต้องการทำงานให้ได้ดีขึ้น\n' + 
+                        '- แสดงความเห็นในเชิงปรับปรุงพัฒนาเมื่อเห็นความสูญเปล่า หรือหย่อนประสิทธิภาพในงาน\n\n' +  
+                    'ระดับที่ 2 แสดงสมรรถนะระดับที่ 1 และสามารถทำงานได้ผลงานตามเป้าหมายที่วางไว้\n' + 
+                        '- กำหนดมาตรฐาน หรือเป้าหมายในการทำงานเพื่อให้ได้ผลงานที่ดี\n' + 
+                        '- ติดตาม และประเมินผลงานของตน โดยเทียบเคียงกับเกณฑ์มาตรฐาน\n' + 
+                        '- ทำงานได้ตามเป้าหมายที่ผู้บังคับบัญชากำหนด หรือเป้าหมายของหน่วยงานที่รับผิดชอบ\n' + 
+                        '- ทำงานได้ตามเป้าหมายที่ผู้บังคับบัญชากำหนด หรือเป้าหมายของหน่วยงานที่รับผิดชอบ\n' + 
+                        '- มีความละเอียดรอบคอบ เอาใจใส่ ตรวจตราความถูกต้อง เพื่อให้ได้งานที่มีคุณภาพ\n\n' +  
+                    'ระดับที่ 3 แสดงสมรรถนะระดับที่ 2 และสามารถปรับปรุงวิธีการทำงานเพื่อให้ได้ผลงานที่มีประสิทธิภาพมากยิ่งขึ้น\n' +
+                        '- ปรับปรุงวิธีการที่ทำให้งานได้ดีขึ้น เร็วขึ้น มีคุณภาพดีขึ้น มีประสิทธิภาพมากขึ้น หรือทำให้ผู้บริการพึงพอใจมากขึ้น\n' + 
+                        '- เสนอหรือทดลองวิธีการทำงานแบบใหม่ที่คาดว่าจะทำให้งานมีประสิทธิภาพมากขึ้น\n\n' +  
+                    'ระดับที่ 4 แสดงสมรรถนะระดับที่ 3 และสามารถกำหนดเป้าหมายรวมทั้งพัฒนางาน เพื่อให้ได้ผลงานที่โดดเด่น หรือแตกต่างอย่างมีนัยสำคัญ\n' +
+                        '- กำหนดเป้าหมายที่ท้าทาย และเป็นไปได้ยาก เพื่อให้ได้ผลงานที่ดีกว่าเดิมอย่างเห็นได้ชัด\n' + 
+                        '- พัฒนาระบบ ขั้นตอน วิธีการทำงาน เพื่อให้ได้ผลงานที่โดดเด่น หรือแตกต่างไม่เคยมีผู้ใดทำได้มาก่อน\n\n' +    
+                    'ระดับที่ 5 แสดงสมรรถนะระดับที่ 4 และกล้าตัดสินใจ แม้ว่าการตัดสินใจนั้นจะมีความเสี่ยงเพื่อให้บรรลุเป้าหมายของหน่วยงานหรือสถาบันอุดมศึกษา\n' +
+                        '- ตัดสินใจได้ โดยมีการคำนวณผลได้ผลเสียอย่างชัดเจน และดำเนินการ เพื่อให้ภาครัฐและประชาชนได้ประโยชน์สูงสุด\n' +
+                        '- บริหารจัดการและทุ่มเทเวลา ตลอดจนทรัพยากร เพื่อให้ได้ประโยชน์สูงสุดต่อภารกิจของหน่วยงานตามที่วางแผนไว้', 
+
+ 
+                2:  'คำอธิบาย ก.2 การบริการที่ดี\n\n' +
+                    'ความตั้งใจและความพยายามของข้าราชการ และพนักงานในการให้บริการต่อประชาชน ข้าราชการ หรือหน่วยงานอื่น ๆ ที่เกี่ยวข้อง\n\n' +
+                    'ระดับที่ 0 ไม่แสดงสมรรถนะด้านนี้ หรือแสดงอย่างไม่ชัดเจน\n\n' +
+                    'ระดับที่ 1 ให้บริการพื้นฐานได้อย่างเหมาะสม\n' +
+                        '- ให้บริการด้วยท่าทีเป็นมิตร สุภาพ และให้ข้อมูลข่าวสารที่ถูกต้อง ชัดเจน\n' +
+                        '- แจ้งความคืบหน้าการดำเนินเรื่อง และประสานงานกับหน่วยงานที่เกี่ยวข้องเพื่อให้บริการต่อเนื่อง\n\n' +
+                    'ระดับที่ 2 แสดงสมรรถนะระดับที่ 1 และช่วยแก้ปัญหาให้ผู้รับบริการ\n' +
+                        '- รับผิดชอบช่วยแก้ปัญหาหรือหาแนวทางแก้ไขให้ผู้รับบริการอย่างรวดเร็ว ไม่บ่ายเบี่ยง\n' +
+                        '- เก็บข้อขัดข้องจากการให้บริการมาใช้ปรับปรุงคุณภาพการบริการ\n\n' +
+                    'ระดับที่ 3 แสดงสมรรถนะระดับที่ 2 และให้บริการเกินกว่าที่คาดหวัง\n' +
+                        '- สละเวลาและความพยายามเพิ่มเติมเพื่อช่วยเหลือผู้รับบริการให้ปัญหาคลี่คลาย\n' +
+                        '- ให้ข้อมูลหรือคำแนะนำเพิ่มเติมที่เป็นประโยชน์ แม้ผู้รับบริการไม่ได้ถามโดยตรง\n' +
+                        '- เสนอวิธีให้บริการรูปแบบใหม่ ๆ เพื่อให้ผู้รับบริการได้รับประโยชน์สูงสุด\n\n' +
+                    'ระดับที่ 4 แสดงสมรรถนะระดับที่ 3 และเข้าใจความต้องการที่แท้จริงของผู้รับบริการ\n' +
+                        '- พยายามทำความเข้าใจเบื้องลึกถึงความจำเป็นและปัญหาของผู้รับบริการ\n' +
+                        '- ให้คำแนะนำที่ตอบโจทย์ความจำเป็นที่แท้จริง ไม่ใช่เพียงตามคำร้องขอเบื้องต้น\n\n' +
+                    'ระดับที่ 5 แสดงสมรรถนะระดับที่ 4 และมุ่งประโยชน์ระยะยาวของผู้รับบริการ\n' +
+                        '- พร้อมปรับวิธีหรือขั้นตอนการให้บริการ เพื่อประโยชน์สูงสุดของผู้รับบริการในระยะยาว\n' +
+                        '- ทำหน้าที่คล้ายที่ปรึกษาที่ผู้รับบริการให้ความไว้วางใจในการตัดสินใจ\n' +
+                        '- กล้าเสนอแนวทางที่ต่างจากวิธีที่ผู้รับบริการร้องขอ หากเห็นว่าเป็นประโยชน์แท้จริงต่อเขา',
+
+                3: 'คำอธิบาย ก.3 การสั่งสมความเชี่ยวชาญในงานอาชีพ\n\n' +
+                    'ความสนใจใฝ่รู้ สั่งสมความรู้และความสามารถของตนด้วยการศึกษา ค้นคว้า และพัฒนาตนเองอย่างต่อเนื่อง ' +
+                    'จนสามารถประยุกต์ใช้ความรู้เชิงวิชาการและเทคโนโลยีต่าง ๆ เข้ากับการปฏิบัติราชการให้เกิดผลสัมฤทธิ์\n\n' +
+                    'ระดับที่ 0 ไม่แสดงสมรรถนะด้านนี้ หรือแสดงอย่างไม่ชัดเจน\n\n' +
+                    'ระดับที่ 1 ติดตามและแสวงหาความรู้ใหม่ในสาขาอาชีพของตน\n' +
+                        '- สนใจศึกษาเทคโนโลยีและองค์ความรู้ใหม่ ๆ ที่เกี่ยวข้องกับงาน\n' +
+                        '- พยายามเพิ่มพูนความรู้ความสามารถของตนจากแหล่งข้อมูลต่าง ๆ\n\n' +
+                    'ระดับที่ 2 แสดงสมรรถนะระดับที่ 1 และมีความรู้ในวิชาการ/เทคโนโลยีใหม่ในสายงานของตน\n' +
+                        '- มีความเข้าใจที่ดีในองค์ความรู้หรือเทคโนโลยีใหม่ที่เกี่ยวข้องกับงาน\n' +
+                        '- มองเห็นแนวโน้มพัฒนาการทางวิชาการที่มีผลต่อการทำงานของตน\n\n' +
+                    'ระดับที่ 3 แสดงสมรรถนะระดับที่ 2 และนำความรู้หรือเทคโนโลยีใหม่มาปรับใช้ในการทำงาน\n' +
+                        '- ประยุกต์ใช้วิทยาการหรือเทคโนโลยีใหม่ในการปรับปรุงวิธีทำงานให้มีประสิทธิภาพยิ่งขึ้น\n' +
+                        '- แก้ปัญหาที่เกิดจากการใช้เทคโนโลยีใหม่ในการปฏิบัติงานได้\n\n' +
+                    'ระดับที่ 4 แสดงสมรรถนะระดับที่ 3 และพัฒนาตนเองให้มีความเชี่ยวชาญทั้งลึกและกว้าง\n' +
+                        '- มีความรู้เชิงบูรณาการครอบคลุมหลายสาขา และสามารถนำไปใช้ได้หลากหลายบริบท\n' +
+                        '- ใช้ความรู้ที่มีในการช่วยกำหนดวิสัยทัศน์หรือแนวทางพัฒนางานในอนาคต\n\n' +
+                    'ระดับที่ 5 แสดงสมรรถนะระดับที่ 4 และส่งเสริมให้องค์กรมีบรรยากาศแห่งความเชี่ยวชาญ\n' +
+                        '- สนับสนุนการจัดสรรทรัพยากรและเครื่องมือเพื่อให้บุคลากรได้พัฒนาความเชี่ยวชาญ\n' +
+                        '- ผลักดันให้องค์กรนำเทคโนโลยีหรือองค์ความรู้ใหม่ ๆ มาใช้ในงานราชการอย่างต่อเนื่อง',
+
+                4: 'คำอธิบาย ก.4 การยึดมั่นในความถูกต้องชอบธรรมและจริยธรรม\n\n' +
+                    'การดำรงตนและประพฤติปฏิบัติอย่างถูกต้องเหมาะสมตามกฎหมาย คุณธรรม จรรยาบรรณแห่งวิชาชีพ ' +
+                    'และจรรยาข้าราชการ พนักงาน เพื่อรักษาศักดิ์ศรีแห่งความเป็นข้าราชการ พนักงาน\n\n' +
+                    'ระดับที่ 0 ไม่แสดงสมรรถนะด้านนี้ หรือแสดงอย่างไม่ชัดเจน\n\n' +
+                    'ระดับที่ 1 ปฏิบัติงานด้วยความสุจริตและโปร่งใส\n' +
+                        '- ปฏิบัติหน้าที่ถูกต้องตามกฎหมายและระเบียบ ไม่เลือกปฏิบัติ\n' +
+                        '- แสดงความคิดเห็นตามหลักวิชาชีพด้วยความสุจริตใจ\n\n' +
+                    'ระดับที่ 2 แสดงสมรรถนะระดับที่ 1 และเป็นผู้มีสัจจะเชื่อถือได้\n' +
+                        '- รักษาคำพูด มีความรับผิดชอบ และได้รับความไว้วางใจจากผู้อื่น\n' +
+                        '- แสดงให้เห็นถึงความภูมิใจในความเป็นข้าราชการ พนักงานของตน\n\n' +
+                    'ระดับที่ 3 แสดงสมรรถนะระดับที่ 2 และยึดมั่นในหลักการและจรรยาบรรณ\n' +
+                        '- ยึดหลักวิชาชีพและจรรยาข้าราชการ ไม่ยอมเบี่ยงเบนเพราะอคติหรือผลประโยชน์ส่วนตน\n' +
+                        '- พร้อมรับผิดและเสียสละประโยชน์ส่วนตนเพื่อประโยชน์ของราชการ\n\n' +
+                    'ระดับที่ 4 แสดงสมรรถนะระดับที่ 3 และยืนหยัดเพื่อความถูกต้อง\n' +
+                        '- กล้าตัดสินใจและปฏิบัติอย่างถูกต้อง เป็นธรรม แม้จะสร้างความไม่พอใจให้ผู้เสียประโยชน์\n' +
+                        '- มุ่งพิทักษ์ผลประโยชน์ของทางราชการแม้อยู่ในสถานการณ์ที่กดดัน\n\n' +
+                    'ระดับที่ 5 แสดงสมรรถนะระดับที่ 4 และอุทิศตนเพื่อความยุติธรรมในระดับกว้าง\n' +
+                        '- ยืนหยัดปกป้องผลประโยชน์และชื่อเสียงของประเทศชาติ แม้อาจเสี่ยงต่อความมั่นคงในหน้าที่หรือตนเอง',
+
+                5: 'คำอธิบาย ก.5 การทำงานเป็นทีม\n\n' +
+                    'ความตั้งใจที่จะทำงานร่วมกับผู้อื่น เป็นส่วนหนึ่งของทีม หน่วยงาน หรือสถาบันอุดมศึกษา ' +
+                    'โดยผู้ปฏิบัติมีฐานะเป็นสมาชิก ไม่จำเป็นต้องเป็นหัวหน้าทีม และสามารถสร้างและรักษาสัมพันธภาพที่ดีกับสมาชิกในทีม\n\n' +
+                    'ระดับที่ 0 ไม่แสดงสมรรถนะด้านนี้ หรือแสดงอย่างไม่ชัดเจน\n\n' +
+                    'ระดับที่ 1 ทำหน้าที่ของตนในทีมได้สำเร็จ\n' +
+                    '- สนับสนุนการตัดสินใจของทีม และปฏิบัติงานตามที่ได้รับมอบหมาย\n' +
+                    '- รายงานความคืบหน้าของงานตนเองต่อทีม และให้ข้อมูลที่เป็นประโยชน์ต่อการทำงานร่วมกัน\n\n' +
+                    'ระดับที่ 2 แสดงสมรรถนะระดับที่ 1 และให้ความร่วมมือกับเพื่อนร่วมงาน\n' +
+                    '- เข้ากับผู้อื่นในทีมได้ดีและให้ความร่วมมือในการทำงาน\n' +
+                    '- กล่าวถึงเพื่อนร่วมงานในเชิงสร้างสรรค์และแสดงความเชื่อมั่นในศักยภาพของทีม\n\n' +
+                    'ระดับที่ 3 แสดงสมรรถนะระดับที่ 2 และช่วยประสานความร่วมมือของทีม\n' +
+                    '- รับฟังความคิดเห็นของสมาชิก และพร้อมเรียนรู้จากผู้อื่น\n' +
+                    '- วางแผนหรือตัดสินใจร่วมกันบนพื้นฐานของความคิดเห็นของทีม\n' +
+                    '- ส่งเสริมสัมพันธภาพภายในทีมให้เกื้อกูลต่อการทำงาน\n\n' +
+                    'ระดับที่ 4 แสดงสมรรถนะระดับที่ 3 และช่วยเหลือเพื่อนร่วมทีมเพื่อให้งานสำเร็จ\n' +
+                    '- ให้กำลังใจและยกย่องผลงานของเพื่อนร่วมทีมอย่างจริงใจ\n' +
+                    '- ยื่นมือช่วยเหลือเพื่อนร่วมทีมแม้ไม่ได้ร้องขอ และรักษามิตรภาพที่ดี\n\n' +
+                    'ระดับที่ 5 แสดงสมรรถนะระดับที่ 4 และนำทีมให้ปฏิบัติภารกิจบรรลุผล\n' +
+                    '- ส่งเสริมความสามัคคีในทีม ไม่ยึดติดความชอบส่วนตัว\n' +
+                    '- ช่วยคลี่คลายและจัดการข้อขัดแย้งในทีม\n' +
+                    '- ประสานสัมพันธ์และสร้างขวัญกำลังใจ เพื่อให้ทีมบรรลุเป้าหมายของสถาบันอุดมศึกษา'
+
+            },
+            otherDescriptions: {
+                12: 'คำอธิบาย ค.1 สภาวะผู้นำ\n\n' +
+                    'ความสามารถ หรือความตั้งใจที่จะรับบทในการเป็นผู้นำของกลุ่ม กำหนดทิศทาง เป้าหมาย วิธีการทำงาน ' +
+                    'ให้ทีมปฏิบัติงานได้อย่างราบรื่น เต็มประสิทธิภาพและบรรลุวัตถุประสงค์ของส่วนราชการ\n\n' +
+                    'ระดับที่ 0 ไม่แสดงสมรรถนะด้านนี้ หรือแสดงอย่างไม่ชัดเจน\n\n' + 
+                    'ระดับที่ 1 ดำเนินการประชุมได้ดีและคอยแจ้งข่าวสารความเป็นไปโดยตลอด\n' +
+                    '- ดำเนินการประชุมให้เป็นไปตามระเบียบ วาระ วัตถุประสงค์ และเวลา ตลอดจนมอบหมายงานให้แก่บุคคลในกลุ่มได้\n' +
+                    '- แจ้งข่าวสารให้ผู้ที่จะได้รับผลกระทบจากการตัดสินใจรับทราบอยู่เสมอแม้ไม่ได้ถูกกำหนดให้ต้องกระทำ\n' +
+                    '- อธิบายเหตุผลในการตัดสินใจให้ผู้ที่เกี่ยวข้องทราบ\n\n' + 
+                    'ระดับที่ 2 แสดงสมรรถนะระดับที่ 1 และเป็นผู้นำในการทำงานของกลุ่มและใช้อำนาจอย่างยุติธรรม\n' +
+                    '- ส่งเสริมและกระทำการเพื่อให้กลุ่มปฏิบัติหน้าที่ได้อย่างเต็มประสิทธิภาพ\n' +
+                    '- กำหนดเป้าหมาย ทิศทางที่ชัดเจน จัดกลุ่มงานและเลือกคนให้เหมาะกับงาน หรือกำหนดวิธีการที่จะทำให้กลุ่มทำงานได้ดีขึ้น\n' +
+                    '- รับฟังความคิดเห็นของผู้อื่น\n' +
+                    '- สร้างขวัญกำลังใจในการปฏิบัติงาน\n' +
+                    '- ปฏิบัติต่อสมาชิกในทีมด้วยความยุติธรรม\n\n' + 
+                    'ระดับที่ 3 แสดงสมรรถนะระดับที่ 2 และให้การดูแลและช่วยเหลือทีมงาน\n' +
+                    '- เป็นที่ปรึกษาและช่วยเหลือทีมงาน\n' +
+                    '- ปกป้องทีมงาน และชื่อเสียงของส่วนราชการ\n' +
+                    '- จัดหาบุคลากร ทรัพยากร หรือข้อมูลที่สำคัญมาให้ทีมงาน\n\n' + 
+                    'ระดับที่ 4 แสดงสมรรถนะระดับที่ 3 และประพฤติตนสมกับเป็นผู้นำ\n' +
+                    '- กำหนดธรรมเนียมปฏิบัติประจำกลุ่มและประพฤติตนอยู่ในกรอบของธรรมเนียมปฏิบัตินั้น\n' +
+                    '- ประพฤติปฏิบัติตนเป็นแบบอย่างที่ดี\n' +
+                    '- ยึดหลักธรรมาภิบาลในการปกครองผู้ใต้บังคับบัญชา\n\n' +    
+                    'ระดับที่ 5 แสดงสมรรถนะระดับที่ 4 และผลักดันให้เกิดการปรับเปลี่ยนอย่างมีประสิทธิภาพ\n' +
+                    '- ผลักดันให้การปรับเปลี่ยนสามารถดำเนินไปได้อย่างราบรื่นและประสบความสำเร็จ\n' +
+                    '- สร้างขวัญกำลังใจ และความเชื่อมั่นในการขับเคลื่อนให้เกิดการปรับเปลี่ยนอย่างมีประสิทธิภาพ', 
+
+               13: 'คำอธิบาย ค.2 วิสัยทัศน์\n\n' +
+                    'ความสามารถในการกำหนดทิศทาง ภารกิจ และเป้าหมายการทำงานที่ชัดเจน ' +
+                    'พร้อมทั้งสร้างความร่วมแรงร่วมใจเพื่อให้งานของส่วนราชการบรรลุวิสัยทัศน์ที่ตั้งไว้\n\n' +
+                    'ระดับที่ 0 ไม่แสดงสมรรถนะด้านนี้ หรือแสดงอย่างไม่ชัดเจน\n\n' +
+                    'ระดับที่ 1 รู้และเข้าใจวิสัยทัศน์ขององค์กร\n' +
+                    '- เข้าใจว่างานที่ตนรับผิดชอบเชื่อมโยงหรือสนับสนุนวิสัยทัศน์ของส่วนราชการอย่างไร\n' +
+                    '- สามารถอธิบายให้ผู้อื่นเข้าใจความเชื่อมโยงระหว่างงานกับวิสัยทัศน์ได้\n\n' +
+                    'ระดับที่ 2 แสดงสมรรถนะระดับที่ 1 และช่วยให้ผู้อื่นเข้าใจวิสัยทัศน์ขององค์กร\n' +
+                    '- ถ่ายทอดให้บุคลากรเข้าใจภาพรวมของวิสัยทัศน์และเป้าหมายของหน่วยงานภายใต้ส่วนราชการ\n' +
+                    '- เปิดโอกาสแลกเปลี่ยนข้อมูลและรับฟังความคิดเห็นเพื่อใช้ประกอบการกำหนดวิสัยทัศน์\n\n' +
+                    'ระดับที่ 3 แสดงสมรรถนะระดับที่ 2 และสร้างแรงจูงใจให้ผู้อื่นร่วมเดินตามวิสัยทัศน์\n' +
+                    '- โน้มน้าวให้สมาชิกเกิดความเต็มใจและกระตือรือร้นในการทำงานเพื่อตอบสนองวิสัยทัศน์\n' +
+                    '- ให้คำปรึกษาแนะนำแนวทางการทำงานโดยยึดวิสัยทัศน์และเป้าหมายขององค์กรเป็นหลัก\n\n' +
+                    'ระดับที่ 4 แสดงสมรรถนะระดับที่ 3 และกำหนดนโยบายให้สอดคล้องกับวิสัยทัศน์ของส่วนราชการ\n' +
+                    '- พัฒนาหรือริเริ่มนโยบายใหม่ๆ เพื่อผลักดันการนำวิสัยทัศน์ไปสู่ผลลัพธ์ที่เป็นรูปธรรม\n\n' +
+                    'ระดับที่ 5 แสดงสมรรถนะระดับที่ 4 และกำหนดวิสัยทัศน์ของส่วนราชการให้สอดคล้องกับวิสัยทัศน์ระดับประเทศ\n' +
+                    '- กำหนดวิสัยทัศน์ เป้าหมาย และทิศทางการปฏิบัติหน้าที่ของส่วนราชการให้สอดคล้องวิสัยทัศน์ระดับประเทศ\n' +
+                    '- มองการณ์ไกลวิเคราะห์ได้ว่าประเทศจะได้รับผลกระทบอย่างไรจากการเปลี่ยนแปลงทั้งภายในและภายนอก',
+
+                14: 'คำอธิบาย ค.3 การวางกลยุทธ์ภาครัฐ\n\n' +
+                    'ความเข้าใจวิสัยทัศน์และนโยบายภาครัฐ แล้วนำมาประยุกต์ใช้ในการกำหนดกลยุทธ์ของส่วนราชการให้เหมาะสมกับบทบาทภารกิจของหน่วยงาน\n\n' +
+                    'ระดับที่ 0 ไม่แสดงสมรรถนะด้านนี้ หรือแสดงอย่างไม่ชัดเจน\n\n' +
+                    'ระดับที่ 1 รู้และเข้าใจนโยบาย ภารกิจ และกลยุทธ์ภาครัฐที่เกี่ยวข้องกับหน่วยงาน\n' +
+                    '- เข้าใจความเชื่อมโยงของนโยบายและภารกิจของภาครัฐกับภารกิจของหน่วยงานที่ดูแล\n' +
+                    '- วิเคราะห์ปัญหา อุปสรรค หรือโอกาสของหน่วยงานได้ในระดับหนึ่ง\n\n' +
+                    'ระดับที่ 2 แสดงสมรรถนะระดับที่ 1 และนำประสบการณ์มาประยุกต์ใช้ในการกำหนดกลยุทธ์\n' +
+                    '- ใช้ประสบการณ์ที่มีมาช่วยกำหนดกลยุทธ์ของหน่วยงานให้สอดคล้องกับกลยุทธ์ภาครัฐ\n' +
+                    '- ปรับกลยุทธ์ให้เหมาะกับสถานการณ์ที่เปลี่ยนไปโดยอาศัยความเข้าใจระบบราชการ\n\n' +
+                    'ระดับที่ 3 แสดงสมรรถนะระดับที่ 2 และนำทฤษฎีหรือแนวคิดที่ซับซ้อนมาใช้กำหนดกลยุทธ์\n' +
+                    '- ประยุกต์ใช้ทฤษฎี แนวคิด หรือองค์ความรู้เชิงลึกเพื่อกำหนดเป้าหมายและกลยุทธ์ของหน่วยงาน\n' +
+                    '- นำแนวปฏิบัติที่ประสบความสำเร็จหรือผลการวิจัยมาพัฒนากลยุทธ์เชิงรุกของหน่วยงาน\n\n' +
+                    'ระดับที่ 4 แสดงสมรรถนะระดับที่ 3 และกำหนดกลยุทธ์ให้สอดคล้องกับสถานการณ์สำคัญต่างๆ\n' +
+                    '- ประเมินสถานการณ์ด้านเศรษฐกิจ สังคม การเมือง ทั้งในประเทศและต่างประเทศในภาพรวม\n' +
+                    '- คาดการณ์แนวโน้มในอนาคตและกำหนดกลยุทธ์ที่ช่วยให้ส่วนราชการบรรลุพันธกิจภายใต้สถานการณ์นั้น\n\n' +
+                    'ระดับที่ 5 แสดงสมรรถนะระดับที่ 4 และบูรณาการองค์ความรู้ใหม่มาใช้กำหนดกลยุทธ์ภาครัฐ\n' +
+                    '- ริเริ่มและบูรณาการองค์ความรู้ใหม่จากหลายด้านเพื่อกำหนดกลยุทธ์ภาครัฐในมุมมององค์รวม\n' +
+                    '- ปรับทิศทางกลยุทธ์การพัฒนาประเทศอย่างต่อเนื่องให้สอดรับกับบริบทที่เปลี่ยนแปลง',
+
+                15: 'คำอธิบาย ค.4 ศักยภาพเพื่อนำการปรับเปลี่ยน\n\n' +
+                    'ความสามารถในการผลักดันหน่วยงานไปสู่การปรับเปลี่ยนที่เป็นประโยชน์ ' +
+                    'พร้อมทั้งสื่อสารให้ผู้เกี่ยวข้องเข้าใจและร่วมมือจนการเปลี่ยนแปลงเกิดขึ้นจริงในองค์กร\n\n' +
+                    'ระดับที่ 0 ไม่แสดงสมรรถนะด้านนี้ หรือแสดงอย่างไม่ชัดเจน\n\n' +
+                    'ระดับที่ 1 เห็นความจำเป็นของการปรับเปลี่ยนและปรับตัวของตนเอง\n' +
+                    '- ปรับพฤติกรรมหรือแผนการทำงานของตนให้สอดคล้องกับการเปลี่ยนแปลง\n' +
+                    '- ยอมรับและเรียนรู้เพื่อให้สามารถปรับตัวต่อการเปลี่ยนแปลงนั้นได้\n\n' +
+                    'ระดับที่ 2 แสดงสมรรถนะระดับที่ 1 และช่วยให้ผู้อื่นเข้าใจการปรับเปลี่ยนที่จะเกิดขึ้น\n' +
+                    '- อธิบายให้ผู้อื่นเข้าใจถึงความจำเป็นและประโยชน์ของการเปลี่ยนแปลง\n' +
+                    '- สนับสนุนและมีส่วนร่วมในความพยายามปรับเปลี่ยนองค์กร พร้อมเสนอแนวทางปรับปรุง\n\n' +
+                    'ระดับที่ 3 แสดงสมรรถนะระดับที่ 2 และกระตุ้นให้ผู้อื่นเห็นความสำคัญของการปรับเปลี่ยน\n' +
+                    '- สร้างแรงจูงใจให้บุคลากรเห็นความจำเป็นและร่วมมือกันในการเปลี่ยนแปลง\n' +
+                    '- ชี้ให้เห็นความแตกต่างที่มีนัยสำคัญระหว่างสภาพเดิมกับสิ่งที่จะเปลี่ยนไป\n' +
+                    '- ช่วยสร้างความเข้าใจกับผู้ที่ยังไม่ยอมรับการเปลี่ยนแปลง\n\n' +
+                    'ระดับที่ 4 แสดงสมรรถนะระดับที่ 3 และวางแผนงานเพื่อรองรับการเปลี่ยนแปลงในองค์กร\n' +
+                    '- วางแผนการเปลี่ยนแปลงอย่างเป็นระบบและชี้ให้เห็นประโยชน์ที่องค์กรจะได้รับ\n' +
+                    '- เตรียมแผนและติดตามการบริหารการเปลี่ยนแปลงอย่างต่อเนื่อง\n\n' +
+                    'ระดับที่ 5 แสดงสมรรถนะระดับที่ 4 และผลักดันให้การปรับเปลี่ยนเกิดผลอย่างมีประสิทธิภาพ\n' +
+                    '- ทำให้กระบวนการเปลี่ยนแปลงดำเนินไปอย่างราบรื่นและประสบผลสำเร็จ\n' +
+                    '- สร้างขวัญกำลังใจและความเชื่อมั่นในการขับเคลื่อนการเปลี่ยนแปลงขององค์กร',
+
+                16: 'คำอธิบาย ค.5 การสอนงานและการมอบหมายงาน\n\n' +
+                    'ความตั้งใจส่งเสริมการเรียนรู้และการพัฒนาผู้อื่นในระยะยาว ' +
+                    'จนสามารถมอบหมายภาระงานและให้อิสระในการตัดสินใจปฏิบัติหน้าที่ราชการได้อย่างเหมาะสม\n\n' +
+                    'ระดับที่ 0 ไม่แสดงสมรรถนะด้านนี้ หรือแสดงอย่างไม่ชัดเจน\n\n' +
+                    'ระดับที่ 1 สอนงานหรือให้คำแนะนำเกี่ยวกับวิธีปฏิบัติงาน\n' +
+                    '- ให้คำแนะนำหรือสาธิตวิธีปฏิบัติงานอย่างเป็นขั้นตอน\n' +
+                    '- ชี้แหล่งข้อมูลหรือทรัพยากรที่เกี่ยวข้องเพื่อช่วยพัฒนาการทำงาน\n\n' +
+                    'ระดับที่ 2 แสดงสมรรถนะระดับที่ 1 และตั้งใจพัฒนาผู้ใต้บังคับบัญชาให้มีศักยภาพ\n' +
+                    '- ให้คำปรึกษาในการพัฒนาตนเอง ส่งเสริมจุดแข็งและช่วยลดจุดอ่อน\n' +
+                    '- เปิดโอกาสให้ผู้ใต้บังคับบัญชาแสดงศักยภาพเพื่อสร้างความมั่นใจในการทำงาน\n\n' +
+                    'ระดับที่ 3 แสดงสมรรถนะระดับที่ 2 และวางแผนให้โอกาสผู้ใต้บังคับบัญชาแสดงความสามารถ\n' +
+                    '- วางแผนพัฒนาผู้ใต้บังคับบัญชาทั้งระยะสั้นและระยะยาว\n' +
+                    '- มอบหมายงานและโอกาสเข้ารับการฝึกอบรมหรือพัฒนาอย่างสม่ำเสมอ\n' +
+                    '- มอบหมายความรับผิดชอบในระดับที่ต้องตัดสินใจเองบางเรื่อง เพื่อให้ได้ฝึกบริหารจัดการงาน\n\n' +
+                    'ระดับที่ 4 แสดงสมรรถนะระดับที่ 3 และช่วยขจัดอุปสรรคต่อการพัฒนาศักยภาพของผู้ใต้บังคับบัญชา\n' +
+                    '- ปรับเปลี่ยนทัศนคติหรือปัจจัยที่ขัดขวางการพัฒนาศักยภาพของบุคลากร\n' +
+                    '- ทำความเข้าใจสาเหตุของพฤติกรรมแต่ละคนเพื่อนำมาวางแนวทางพัฒนาได้ตรงจุด\n\n' +
+                    'ระดับที่ 5 แสดงสมรรถนะระดับที่ 4 และทำให้ส่วนราชการมีระบบการสอนงานและมอบหมายงานที่ชัดเจน\n' +
+                    '- สร้างและสนับสนุนให้เกิดระบบสอนงานและมอบหมายความรับผิดชอบอย่างเป็นระบบในส่วนราชการ\n' +
+                    '- ส่งเสริมให้เกิดวัฒนธรรมการเรียนรู้อย่างต่อเนื่องในหน่วยงาน'
+ 
+            }, 
         };
     },
     components: {
@@ -1198,10 +1502,13 @@ export default {
         const { staffdepartment, groupid, staffdepartmentname, groupname } = SCOPES;
         await this.setSession(STAFFID, staffdepartment, groupid, user.user.name.POSTYPENAME, user.user.name.POSITIONNAMEID);
         // this.showDataEvalu();
+        await this.loadCompetencyDescriptions();
         this.showDataSet();   
         // this.showAssesstack(); 
-
+         
     },   
+
+
     methods: { 
         setSession(staffid_Main, facid_Main, groupid_Main, postypename, postypenameid) {
             // console.log('postypename:',postypename);
@@ -1236,28 +1543,43 @@ export default {
                     console.error('Error:', error);
                 });
         },
-        // ตารางรายชื่อ
-         
-        // xxr() {
-        //     if (this.tracking_date?.evalua === undefined) {
-        //         Swal.fire({
-        //             title: 'แจ้งเตือนจากระบบ!',
-        //             text: 'กรุณาเลือก รอบประเมิน ก่อน!',
-        //             icon: 'error'
-        //         });
-        //     } else {
-        //         // เช็คว่า dataList เป็น array หรือไม่
-        //         if (Array.isArray(this.dataList)) {   
-        //             // กรองข้อมูลที่ไม่ใช่ "ลูกจ้างชั่วคราว"
-        //             // this.filteredData = this.dataList.filter(item => item.stftypename !== "ลูกจ้างชั่วคราว");
-        //             this.filteredData = this.dataList.filter(item => item.stftypename !== "ลูกจ้างชั่วคราว" && item.stftypename !== "พนักงานราชการ" && item.stftypename !== "ลูกจ้างประจำ"); 
-        //             // เรียกใช้ฟังก์ชัน showDataEvalu()
-        //             this.showDataEvalu();
-        //         } else {
-        //             console.error("dataList is not an array:", this.dataList);
-        //         }
-        //     }
-        // }, 
+
+        parsePersen(persen) {
+            const [wAch, wBeh] = String(persen || '0:0')
+            .split(':')
+            .map(v => parseFloat(v) || 0);
+
+            return { wAch, wBeh };
+        },
+
+        calcAchievement(item) {
+            // console.log('calcAchievement: ', item);
+            if (!item?.tb_tor?.persen) return '';
+            const { wAch } = this.parsePersen(item.tb_tor.persen);
+            const ach = parseFloat(item.tb_tor.achievement_score) || 0;
+            return (wAch * ach).toFixed(2);
+        },
+
+        calcBehavior(item) {
+            if (!item?.tb_tor?.persen) return '';
+            const { wBeh } = this.parsePersen(item.tb_tor.persen);
+            const beh = parseFloat(item.tb_tor.behavior) || 0;
+            return (wBeh * beh).toFixed(2);
+        },
+
+        // (ถ้าต้องการ) รวมคะแนนถ่วงน้ำหนัก 2 ส่วน
+        calcSumScore(item) {
+            if (!item?.tb_tor?.persen) return '';
+            const { wAch, wBeh } = this.parsePersen(item.tb_tor.persen);
+            const ach = parseFloat(item.tb_tor.achievement_score) || 0;
+            const beh = parseFloat(item.tb_tor.behavior) || 0;
+            return (wAch * ach + wBeh * beh).toFixed(2);
+        },
+
+
+
+
+        // ตารางรายชื่อ 
         xxr() {
             if (this.tracking_date?.evalua === undefined) {
                 Swal.fire({ title:'แจ้งเตือนจากระบบ!', text:'กรุณาเลือก รอบประเมิน ก่อน!', icon:'error' })
@@ -1292,7 +1614,7 @@ export default {
                         p_year: this.tracking_date.d_date
                     }
                 }); 
-                console.log('showDataEvalu: ',res.data);
+                // console.log('showDataEvalu: ',res.data);
                 this.products = res.data;
 
                 // ใช้ Promise.all เพื่อทำการเรียก cvb พร้อมกันหลายๆ รายการ
@@ -1317,7 +1639,7 @@ export default {
             }
         },
         async getAadioPosition(staffid_Main){ 
-            console.log('getAadioPosition: ',staffid_Main);  
+            // console.log('getAadioPosition: ',staffid_Main);  
             try {   
                 if(staffid_Main){
                     const res = await axios.get('http://127.0.0.1:8000/api/getDataAdio', {  
@@ -1331,203 +1653,100 @@ export default {
             } catch (error) {
                 console.error('Error fetching evaluation data:', error);
             } 
-        },
-        // XX One
-        // async openDataEvalu(data) {
-        //     // console.log('posnameid: ',data.posnameid);
-        //     // console.log('staffid: ',data.staffid); 
-        //     //await getAadioPosition(data.staffid);
+        },  
 
-        //     this.getAadioPosition(data.staffid);
-            
-        //     if (this.tracking_date.d_date === undefined) {
-        //         Swal.fire('แจ้งเตือนจากระบบ', 'กรุณาเลือกรอบประเมิน', 'error');
-        //     } else {
-        //         this.dataStaffid = data.staffid;
-
-        //         await this.showDataEvalu();
-        //         //await this.showdatator();
-
-        //         this.currentstaff = this.products.filter((product) => product.staffid === this.dataStaffid);
-        //         this.products_Tab1 = [];
-        //         this.p01_scores = [
-        //             { name: '0 คะแนน', code: 0 },
-        //             { name: '1 คะแนน', code: 1 },
-        //             { name: '2 คะแนน', code: 2 },
-        //             { name: '3 คะแนน', code: 3 },
-        //             { name: '4 คะแนน', code: 4 },
-        //             { name: '5 คะแนน', code: 5 }
-        //         ];
-
-        //         // ตั้งค่า coreCompetencies กลับไปเป็นค่าเริ่มต้น
-        //         this.coreCompetencies = [
-        //             { id: 1, activity: 'ก. 1 การมุ่งผลสัมฤทธิ์', indicator: '1', data_table1: '',selfAssessment:'' },
-        //             { id: 2, activity: 'ก. 2 การบริการที่ดี', indicator: '1', data_table1: '',selfAssessment:'' },
-        //             { id: 3, activity: 'ก. 3 การสั่งสมความเชี่ยวชาญในงานอาชีพ', indicator: '1', data_table1: '',selfAssessment:'' },
-        //             { id: 4, activity: 'ก. 4 การยึดมั่นในความถูกต้องชอบธรรมและจริยธรรม', indicator: '1', data_table1: '',selfAssessment:'' },
-        //             { id: 5, activity: 'ก. 5 การทำงานเป็นทีม', indicator: '1', data_table1: '',selfAssessment:'' }
-        //         ];
-
-        //         // ตั้งค่า jobSpecificCompetencies กลับไปเป็นค่าเริ่มต้น
-        //         this.jobSpecificCompetencies = [];
-
-        //         this.improvements = null;
-        //         this.suggestions = null;
- 
-        //         let facxx = this.tracking_date.fac_id ? this.tracking_date.fac_id : this.facid_Main;
-        //         await this.showdataPo(data.staffid, facxx, this.tracking_date.d_date, this.tracking_date.evalua,data.posnameid);
-        //         // await this.showdataPo(data.staffid, this.facid_Main, this.tracking_date.d_date, this.tracking_date.evalua,data.posnameid);
-
-        //         await axios.post('http://127.0.0.1:8000/api/showDataP03New', {
-        //             staff_id: data.staffid,
-        //             fac_id: this.tracking_date.fac_id,
-        //             year_id: this.tracking_date.d_date,
-        //             evalua: this.tracking_date.evalua
-        //         })
-        //         .then((res) => {
-        //             // console.log('openDataEvalu: ',res.data);
-        //             if (res.data && Array.isArray(res.data)) {
-        //                 this.products_Tab1 = res.data;
-        //                 this.products_Tab1.forEach((h) => {
-        //                     h.subP01sX.forEach((subP01) => {
-        //                         // ตรวจสอบว่าค่า p01_score นั้นถูกต้องหรือไม่
-        //                         const foundScore = this.p01_scores.find((score) => score.code === subP01.p01_score);
-        //                         if (foundScore) {
-        //                             subP01.p01_score = foundScore.code; // ใช้ค่าที่ถูกต้อง
-        //                         } else {
-        //                             subP01.p01_score = this.p01_scores[0].code; // ใช้ค่าเริ่มต้น "- ไม่ระบุ -"
-        //                         }
-        //                     });
-        //                 });
-        //             }
-        //             this.DialogAdd = true; 
-        //         })
-        //         .catch((error) => {
-        //             console.error('Error:', error);
-        //         });
-        //     }
-        // },   
-        async openDataEvalu(data) {
-            if (this.tracking_date.d_date === undefined) {
-                Swal.fire('แจ้งเตือนจากระบบ', 'กรุณาเลือกรอบประเมิน', 'error')
-                return
+        async openDataEvalu(data, idx = null) {
+            if (this.tracking_date?.d_date === undefined) {
+                Swal.fire('แจ้งเตือนจากระบบ', 'กรุณาเลือกรอบประเมิน', 'error');
+                return;
             }
 
-            // ⬇️ ทุกงานที่ทำตอนเปิด Dialog ค่อนข้างเยอะ กดครั้งเดียวให้โชว์โหลดตลอดจนเสร็จ
-            await this.withLoading(async () => {
-                this.getAadioPosition(data.staffid)
-                this.dataStaffid = data.staffid
+            // ✅ set loading (เฉพาะปุ่มประเมิน)
+            this.loadingEvalu = true;
+            this.loadingEvaluIndex = idx;
 
-                await this.showDataEvalu()
-                this.currentstaff = this.products.filter(p => p.staffid === this.dataStaffid)
+            // ✅ popup loading
+            Swal.fire({
+                title: 'กำลังโหลดข้อมูล',
+                text: 'กรุณารอสักครู่',
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                didOpen: () => Swal.showLoading()
+            });
 
-                // reset ค่าต่าง ๆ …
-                this.products_Tab1 = []
+            try { 
+
+                await this.getAadioPosition(data.staffid);
+                this.dataStaffid = data.staffid;
+
+                await this.showDataEvalu();
+                this.currentstaff = this.products.filter(p => p.staffid === this.dataStaffid);
+
+                this.products_Tab1 = [];
                 this.p01_scores = [
                 { name: '0 คะแนน', code: 0 }, { name: '1 คะแนน', code: 1 },
                 { name: '2 คะแนน', code: 2 }, { name: '3 คะแนน', code: 3 },
                 { name: '4 คะแนน', code: 4 }, { name: '5 คะแนน', code: 5 }
-                ]
+                ];
+
                 this.coreCompetencies = [
                 { id:1, activity:'ก. 1 การมุ่งผลสัมฤทธิ์', indicator:'1', data_table1:'', selfAssessment:'' },
                 { id:2, activity:'ก. 2 การบริการที่ดี', indicator:'1', data_table1:'', selfAssessment:'' },
                 { id:3, activity:'ก. 3 การสั่งสมความเชี่ยวชาญในงานอาชีพ', indicator:'1', data_table1:'', selfAssessment:'' },
                 { id:4, activity:'ก. 4 การยึดมั่นในความถูกต้องชอบธรรมและจริยธรรม', indicator:'1', data_table1:'', selfAssessment:'' },
                 { id:5, activity:'ก. 5 การทำงานเป็นทีม', indicator:'1', data_table1:'', selfAssessment:'' }
-                ]
-                this.jobSpecificCompetencies = []
-                this.improvements = null
-                this.suggestions = null
+                ];
 
-                const facxx = this.tracking_date.fac_id ? this.tracking_date.fac_id : this.facid_Main
-                await this.showdataPo(data.staffid, facxx, this.tracking_date.d_date, this.tracking_date.evalua, data.posnameid)
+                this.jobSpecificCompetencies = [];
+
+                // this.improvements = null;
+                // this.suggestions = null;
+
+                this.improvements = '-';
+                this.suggestions = '-';
+
+                const facxx = this.tracking_date.fac_id ? this.tracking_date.fac_id : this.facid_Main;
+                await this.showdataPo(data.staffid, facxx, this.tracking_date.d_date, this.tracking_date.evalua, data.posnameid);
 
                 const res = await axios.post('http://127.0.0.1:8000/api/showDataP03New', {
                 staff_id: data.staffid,
                 fac_id: this.tracking_date.fac_id,
                 year_id: this.tracking_date.d_date,
                 evalua: this.tracking_date.evalua
-                })
+                });
+
                 if (Array.isArray(res.data)) {
-                this.products_Tab1 = res.data
+                this.products_Tab1 = res.data;
                 this.products_Tab1.forEach(h => {
                     h.subP01sX.forEach(sub => {
-                    const found = this.p01_scores.find(s => s.code === sub.p01_score)
-                    sub.p01_score = found ? found.code : this.p01_scores[0].code
-                    })
-                })
+                    const found = this.p01_scores.find(s => s.code === sub.p01_score);
+                    sub.p01_score = found ? found.code : this.p01_scores[0].code;
+                    });
+                });
                 }
-                this.DialogAdd = true
-            })
-         },
-        
 
-        
-        // เพิ่มคะแนนประเมิน biwgin
-        // async openDataEvalu(staff_id) {
-        //     // console.log(staff_id);
-            
-        //     if (this.tracking_date.d_date === undefined) {
-        //         Swal.fire('แจ้งเตือนจากระบบ', 'กรุณาเลือกรอบประเมิน', 'error');
-        //     } else {
-        //         this.dataStaffid = staff_id;
-        //         await this.showDataEvalu();
-        //         this.currentstaff = this.products.filter((product) => product.staffid === this.dataStaffid);
-        //         this.products_Tab1 = [];
-        //         this.p01_scores = [
-        //             { name: '0 คะแนน', code: 0 },
-        //             { name: '1 คะแนน', code: 1 },
-        //             { name: '2 คะแนน', code: 2 },
-        //             { name: '3 คะแนน', code: 3 },
-        //             { name: '4 คะแนน', code: 4 },
-        //             { name: '5 คะแนน', code: 5 }
-        //         ];
+                this.DialogAdd = true;
 
-        //         // ตั้งค่า coreCompetencies กลับไปเป็นค่าเริ่มต้น
-        //         this.coreCompetencies = [
-        //             { id: 1, activity: 'ก. 1 การมุ่งผลสัมฤทธิ์', indicator: '1', data_table1: '',selfAssessment:'' },
-        //             { id: 2, activity: 'ก. 2 การบริการที่ดี', indicator: '1', data_table1: '',selfAssessment:'' },
-        //             { id: 3, activity: 'ก. 3 การสั่งสมความเชี่ยวชาญในงานอาชีพ', indicator: '1', data_table1: '',selfAssessment:'' },
-        //             { id: 4, activity: 'ก. 4 การยึดมั่นในความถูกต้องชอบธรรมและจริยธรรม', indicator: '1', data_table1: '',selfAssessment:'' },
-        //             { id: 5, activity: 'ก. 5 การทำงานเป็นทีม', indicator: '1', data_table1: '',selfAssessment:'' }
-        //         ];
+            } catch (error) {
+                console.error(error);
 
-        //         // ตั้งค่า jobSpecificCompetencies กลับไปเป็นค่าเริ่มต้น
-        //         this.jobSpecificCompetencies = [];
+                // ปิด loading ก่อน แล้วค่อยแจ้ง error
+                Swal.close();
+                Swal.fire({
+                icon: 'error',
+                title: 'โหลดข้อมูลไม่สำเร็จ',
+                text: 'กรุณาลองใหม่อีกครั้ง'
+                });
 
-        //         this.improvements = null;
-        //         this.suggestions = null;
+            } finally {
+                // ✅ reset loading state
+                this.loadingEvalu = false;
+                this.loadingEvaluIndex = null;
 
-        //         this.showdataPo(staff_id, this.facid_Main, this.tracking_date.d_date, this.tracking_date.evalua);
-        //         await axios.post('   http://127.0.0.1:8000/api/showDataP03New', {
-        //             staff_id: staff_id,
-        //             fac_id: this.tracking_date.fac_id,
-        //             year_id: this.tracking_date.d_date,
-        //             evalua: this.tracking_date.evalua
-        //         })
-        //         .then((res) => {
-        //             // console.log('openDataEvalu: ',res.data);
-        //             if (res.data && Array.isArray(res.data)) {
-        //                 this.products_Tab1 = res.data;
-        //                 this.products_Tab1.forEach((h) => {
-        //                     h.subP01sX.forEach((subP01) => {
-        //                         // ตรวจสอบว่าค่า p01_score นั้นถูกต้องหรือไม่
-        //                         const foundScore = this.p01_scores.find((score) => score.code === subP01.p01_score);
-        //                         if (foundScore) {
-        //                             subP01.p01_score = foundScore.code; // ใช้ค่าที่ถูกต้อง
-        //                         } else {
-        //                             subP01.p01_score = this.p01_scores[0].code; // ใช้ค่าเริ่มต้น "- ไม่ระบุ -"
-        //                         }
-        //                     });
-        //                 });
-        //             }
-        //             this.DialogAdd = true; 
-        //         })
-        //         .catch((error) => {
-        //             console.error('Error:', error);
-        //         });
-        //     }
-        // },    
+                // ✅ ปิด Swal เฉพาะกรณียังเป็น loading อยู่ (กันไปปิด popup error)
+                if (Swal.isLoading()) Swal.close();
+            }
+        }, 
         async saveEvaTab1(subP01) {
             if (subP01.p01_score === null || subP01.p01_score === undefined || subP01.p01_score === '') {
                 Swal.fire('แจ้งเตือน', 'กรุณาเลือกคะแนน !', 'error');
@@ -1558,78 +1777,97 @@ export default {
                 await this.showDataEvalu();
             }
         },
-        async saveEvaTab1_1() {
-           // console.log('this.coreCompetencies: ',this.coreCompetencies);
-            
-            this.coreCompetencies.forEach((item, index) => {
-                if (index === 0) {
-                    item.data_table1 = item.data_table1 ?? 0; // Update based on the API response
-                } else if (index === 1) {
-                    item.data_table1 = item.data_table1 ?? 0; // Update based on the API response
-                } else if (index === 2) {
-                    item.data_table1 = item.data_table1 ?? 0; // Add more conditions if necessary
-                } else if (index === 3) {
-                    item.data_table1 = item.data_table1 ?? 0; // Add more conditions if necessary
-                } else if (index === 4) {
-                    item.data_table1 = item.data_table1 ?? 0; // Add more conditions if necessary
-                } else if (index === 5) {
-                    item.data_table1 = item.data_table1 ?? 0; // Add more conditions if necessary
-                }
+
+         
+
+        async saveEvaTab1_1() { 
+            // ✅ 1) Validate ความเห็นก่อน
+            const imp = (this.improvements || '').trim();
+            const sug = (this.suggestions || '').trim();
+
+            if (!imp) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'กรอกข้อมูลไม่ครบ',
+                    text: 'กรุณากรอกข้อ 1) จุดเด่น และ/หรือ สิ่งที่ควรปรับปรุง'
+                });
+                return;
+            }
+
+            if (!sug) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'กรอกข้อมูลไม่ครบ',
+                    text: 'กรุณากรอกข้อ 2) ข้อเสนอแนะ'
+                });
+                return;
+            }
+
+            // ✅ 2) ตั้งค่า default ให้ score แบบสั้น ๆ ไม่ต้อง if index
+            this.coreCompetencies.forEach(item => {
+                item.data_table1 = item.data_table1 ?? 0;
             });
-            this.jobSpecificCompetencies.forEach((item, index) => {
-                if (index === 0) {
-                    item.SCORE = item.SCORE ?? 0; // Update based on the API response
-                } else if (index === 1) {
-                    item.SCORE = item.SCORE ?? 0; // Update based on the API response
-                } else if (index === 2) {
-                    item.SCORE = item.SCORE ?? 0; // Add more conditions if necessary
-                } else if (index === 3) {
-                    item.SCORE = item.SCORE ?? 0; // Add more conditions if necessary
-                } else if (index === 4) {
-                    item.SCORE = item.SCORE ?? 0; // Add more conditions if necessary
-                } else if (index === 5) {
-                    item.SCORE = item.SCORE ?? 0; // Add more conditions if necessary
-                }
+
+            this.jobSpecificCompetencies.forEach(item => {
+                item.SCORE = item.SCORE ?? 0;
             });
-            this.otherCompetencies.forEach((item, index) => {
-                if (index === 0) {
-                    item.selfAssessment3 = item.selfAssessment3 ?? 0; // Update based on the API response
-                } else if (index === 1) {
-                    item.selfAssessment3 = item.selfAssessment3 ?? 0; // Update based on the API response
-                } else if (index === 2) {
-                    item.selfAssessment3 = item.selfAssessment3 ?? 0; // Add more conditions if necessary
-                } else if (index === 3) {
-                    item.selfAssessment3 = item.selfAssessment3 ?? 0; // Add more conditions if necessary
-                } else if (index === 4) {
-                    item.selfAssessment3 = item.selfAssessment3 ?? 0; // Add more conditions if necessary
-                } else if (index === 5) {
-                    item.selfAssessment3 = item.selfAssessment3 ?? 0; // Add more conditions if necessary
-                }
+
+            this.otherCompetencies.forEach(item => {
+                item.selfAssessment3 = item.selfAssessment3 ?? 0;
             });
+
             const payload = {
                 staffid_po: this.staffid_po,
                 staff_id: this.staffid_Main,
                 dataStaffid: this.dataStaffid,
-                fac_id: this.tracking_date.fac_id ? this.tracking_date.fac_id :  this.facid_Main,
+                fac_id: this.tracking_date.fac_id ?? this.facid_Main,
                 year: this.tracking_date.d_date,
                 record: this.tracking_date.evalua,
                 coreCompetencies: this.coreCompetencies,
                 jobSpecificCompetencies: this.jobSpecificCompetencies,
                 otherCompetencies: this.otherCompetencies,
-                improvements: this.improvements,
-                suggestions: this.suggestions
+                improvements: imp,
+                suggestions: sug
             };
-            const res = await axios.post('http://127.0.0.1:8000/api/saveP03PoTab1', payload);
-            console.log(res.data);
-            Swal.fire({
-                position: 'top-end',
-                icon: 'success',
-                title: 'บันทึกข้อมูลสมรรถนะ / ความเห็นเพิ่มเติม เสร็จสิ้น',
-                showConfirmButton: false,
-                timer: 1500
-            });
-            await this.showDataEvalu();
+
+            try {
+
+                Swal.fire({
+                    title: 'กำลังบันทึกข้อมูล...',
+                    allowOutsideClick: false,
+                    didOpen: () => Swal.showLoading()
+                });
+
+                const res = await axios.post(
+                    'http://127.0.0.1:8000/api/saveP03PoTab1',
+                    payload
+                );
+
+                console.log('save result:', res.data);
+
+                Swal.fire({
+                    position: 'top-end',
+                    icon: 'success',
+                    title: 'บันทึกข้อมูลสมรรถนะ / ความเห็นเพิ่มเติม เสร็จสิ้น',
+                    showConfirmButton: false,
+                    timer: 1500
+                });
+
+                await this.showDataEvalu();
+
+            } catch (error) {
+
+                console.error('saveEvaTab1_1 error:', error);
+
+                Swal.fire({
+                    icon: 'error',
+                    title: 'บันทึกไม่สำเร็จ',
+                    text: 'เกิดข้อผิดพลาดในการบันทึกข้อมูล'
+                });
+
+            }
         },
+
         async onTabChange(event) {
             // console.log('onTabChange: ',event.index);
             if (event.index == 0) {
@@ -1637,11 +1875,14 @@ export default {
             }
             if (event.index == 1) {
                 //console.log('รายงาน ป.01 - ป.03 -',event.index);
+                // console.log('tab2Data: ',this.dataStaffid);
                 this.tab2Data(this.dataStaffid);
                 this.showdataPoText(this.dataStaffid, this.facid_Main, this.tracking_date.d_date, this.tracking_date.evalua);
             }
             if (event.index == 2) {
                 //console.log('แผนพัฒนาการปฏิบัติราชการรายบุคคล -',event.index);
+                console.log('chkp04data: ',this.dataStaffid, this.facid_Main);
+                
                 this.products_Tab3 = []; 
                 this.chkp04(this.dataStaffid, this.facid_Main, this.tracking_date.d_date, this.tracking_date.evalua);
                 this.chkp04data(this.dataStaffid, this.facid_Main, this.tracking_date.d_date, this.tracking_date.evalua);
@@ -1735,8 +1976,10 @@ export default {
                         });
 
                         // Update other fields
-                        this.improvements = data.improvements ?? '- ไม่มีข้อมูล -';
-                        this.suggestions = data.suggestions ?? '- ไม่มีข้อมูล -';
+                        // this.improvements = data.improvements ?? '- ไม่มีข้อมูล -';
+                        // this.suggestions = data.suggestions ?? '- ไม่มีข้อมูล -';
+                        this.improvements = data.improvements ?? 'ไม่มีข้อมูล';
+                        this.suggestions  = data.suggestions  ?? 'ไม่มีข้อมูล';
                     }
                 })
                 .catch((error) => {
@@ -1827,7 +2070,7 @@ export default {
                     record: record
                 })
                 .then((res) => {
-                    // console.log(res.data);
+                    console.log('showData04Tab3: ',res.data);
                     if (res.data.length > 0) {
                         res.data.forEach((p04) => {
                             const newData = {
@@ -1946,110 +2189,118 @@ export default {
                 .catch((error) => {
                     console.error('Error fetching data:', error);
                 });
+        }, 
+        normalizeLevelName(v) {
+            const s = String(v ?? '').trim();
+            return s.replace(/^ระดับ\s*/, '').trim();
         },
-        async showdataPo(staff_id, facid_Main, d_date, evalua, posnameid) {  
-            // ตรวจสอบว่า currentstaff มีค่าหรือไม่
+         
+        async showdataPo(staff_id, facid_Main, d_date, evalua, posnameid) {
             if (!this.currentstaff || this.currentstaff.length === 0) {
                 console.error("Error: currentstaff is undefined or empty.");
                 return;
-            } 
-             // ---- NEW: blacklist ----
-            const BLACKLIST = ['110105'];                // เพิ่มรหัสอื่นได้ เช่น '110200', '110999'
-            const isBlacklisted = BLACKLIST.includes(String(staff_id));
-
-
-            console.log('this.posadio',this.posadio); 
-            console.log('this.currentstaff[0]?.postypenameth: ',this.currentstaff[0]?.postypenameth);
-            // console.log('this.currentstaff[0]?.postypename: ',this.currentstaff[0]?.postypename);
-
-
-            
- 
-            //030968
-            //this.postypenameth = this.currentstaff[0]?.postypenameth  ?? (this.posadio === '128' ? 'ชำนาญการพิเศษ' : 'ปฏิบัติการ');
-
-            if (this.posadio === '128') {
-                    this.postypenameth = 'ชำนาญการพิเศษ';
-            } else {
-                this.postypenameth = this.currentstaff[0]?.postypenameth || 'ปฏิบัติการ';
             }
 
-            // console.log("postypenameth:", this.postypenameth);
+            const targetId = String(staff_id).trim();
+            const posadioStr = String(this.posadio).trim();
 
-            let postypetext = `ระดับ${this.postypenameth}`;  
+            this.isTargetExecutive = (posadioStr === '128') || EXECUTIVE_ALLOWLIST.has(targetId);
+
+            const scorerId = String(this.staffid_Main).trim();
+            this.canScoreExecutive = EXECUTIVE_SCORE_ALLOWLIST.has(scorerId);
+
+            const executiveExpected = this.isTargetExecutive ? 1 : 0;
+
+            const isExecutiveRole =
+                this.normalizeLevelName(this.currentstaff[0]?.posnameth) === "ผู้บริหาร";
+
+            const isSpecialExpert =
+                (posadioStr === "128") || (String(posnameid).trim() === "137" && isExecutiveRole);
+
+            if (isSpecialExpert) {
+                this.postypenameth = "ชำนาญการพิเศษ";
+            } else {
+                this.postypenameth =
+                this.normalizeLevelName(this.currentstaff[0]?.postypenameth) || "ปฏิบัติการ";
+            }
+
+            const levelName = this.normalizeLevelName(this.postypenameth);
+            const postypetext = `ระดับ${levelName}`;
 
             const levelMapping = {
-                'ระดับปฏิบัติการ': 1,
-                'ระดับปฏิบัติงาน': 1,
-                'ระดับชำนาญการ': 2,
-                'ระดับชำนาญงาน': 2,
-                'ระดับชำนาญการพิเศษ': 3,
-                'ระดับชำนาญงานพิเศษ': 3,
-                'อาจารย์': 3,
-                'ระดับเชี่ยวชาญ': 4,
-                'ระดับเชี่ยวชาญพิเศษ': 5
+                "ระดับปฏิบัติการ": 1,
+                "ระดับปฏิบัติงาน": 1,
+                "ระดับชำนาญการ": 2,
+                "ระดับชำนาญงาน": 2,
+                "ระดับชำนาญการพิเศษ": 3,
+                "ระดับชำนาญงานพิเศษ": 3,
+                "อาจารย์": 3,
+                "ระดับเชี่ยวชาญ": 4,
+                "ระดับเชี่ยวชาญพิเศษ": 5
             };
-            let xr = levelMapping[postypetext] || 0; 
+            const xr = levelMapping[postypetext] ?? 0;
 
             this.coreCompetencies = [
-                { id: 1, activity: 'ก. 1 การมุ่งผลสัมฤทธิ์', indicator: xr, data_table1: '', selfAssessment: '' },
-                { id: 2, activity: 'ก. 2 การบริการที่ดี', indicator: xr, data_table1: '', selfAssessment: '' },
-                { id: 3, activity: 'ก. 3 การสั่งสมความเชี่ยวชาญในงานอาชีพ', indicator: xr, data_table1: '', selfAssessment: '' },
-                { id: 4, activity: 'ก. 4 การยึดมั่นในความถูกต้องชอบธรรมและจริยธรรม', indicator: xr, data_table1: '', selfAssessment: '' },
-                { id: 5, activity: 'ก. 5 การทำงานเป็นทีม', indicator: xr, data_table1: '', selfAssessment: '' }
-            ];  
-            this.jobSpecificCompetencies = []; 
+                { id: 1, activity: "ก. 1 การมุ่งผลสัมฤทธิ์", indicator: xr, data_table1: "", selfAssessment: "" },
+                { id: 2, activity: "ก. 2 การบริการที่ดี", indicator: xr, data_table1: "", selfAssessment: "" },
+                { id: 3, activity: "ก. 3 การสั่งสมความเชี่ยวชาญในงานอาชีพ", indicator: xr, data_table1: "", selfAssessment: "" },
+                { id: 4, activity: "ก. 4 การยึดมั่นในความถูกต้องชอบธรรมและจริยธรรม", indicator: xr, data_table1: "", selfAssessment: "" },
+                { id: 5, activity: "ก. 5 การทำงานเป็นทีม", indicator: xr, data_table1: "", selfAssessment: "" }
+            ];
 
-            //160968
-            // const Mapping = {
-            //     '128': 1
-            // };  
-            // let executive = Mapping[this.posadio] || 0; 
-            const Mapping = { '128': 1 };  
-                let executive = Mapping[this.posadio] || 0; 
-
-                // ---- NEW: ถ้าอยู่ใน blacklist → ไม่เป็น executive
-                if (isBlacklisted) {
-                    executive = 0;
-            }
+            this.jobSpecificCompetencies = [];
 
             this.otherCompetencies = [
-                { id: 12, activity: 'ค. 1 สภาวะผู้นำ', indicator3: executive, datatable3: '', selfAssessment3: '' },
-                { id: 13, activity: 'ค. 2 วิสัยทัศน์', indicator3: executive, datatable3: '', selfAssessment3: '' },
-                { id: 14, activity: 'ค. 3 การวางกลยุทธ์ภาครัฐ', indicator3: executive, datatable3: '', selfAssessment3: '' },
-                { id: 15, activity: 'ค. 4 ศักยภาพเพื่อนำการปรับเปลี่ยน', indicator3: executive, datatable3: '', selfAssessment3: '' },
-                { id: 16, activity: 'ค. 5 การสอนงานและการมอบหมายงาน', indicator3: executive, datatable3: '', selfAssessment3: '' }
-            ]; 
+                { id: 12, activity: "ค. 1 สภาวะผู้นำ", indicator3: executiveExpected, datatable3: "", selfAssessment3: "" },
+                { id: 13, activity: "ค. 2 วิสัยทัศน์", indicator3: executiveExpected, datatable3: "", selfAssessment3: "" },
+                { id: 14, activity: "ค. 3 การวางกลยุทธ์ภาครัฐ", indicator3: executiveExpected, datatable3: "", selfAssessment3: "" },
+                { id: 15, activity: "ค. 4 ศักยภาพเพื่อนำการปรับเปลี่ยน", indicator3: executiveExpected, datatable3: "", selfAssessment3: "" },
+                { id: 16, activity: "ค. 5 การสอนงานและการมอบหมายงาน", indicator3: executiveExpected, datatable3: "", selfAssessment3: "" }
+            ];
 
-            // this.showPostype(this.currentstaff[0]?.postypenameth, this.postypenameid); // แก้ไข ตัวป2
-           await this.showPostype(this.currentstaff[0]?.postypenameth, posnameid);
+            await this.showPostype(levelName, posnameid);
 
-           await axios.post('http://127.0.0.1:8000/api/showDataPo', {
+            try {
+                const res = await axios.post("http://127.0.0.1:8000/api/showDataPo", {
                 staff_id: staff_id,
                 fac_id: facid_Main,
                 year_id: d_date,
                 record: evalua,
                 postypename: postypetext
-            }).then(res => {     
-                console.log('this.showDataPo',res.data); 
-                if (res.data.length > 0) {
-                    const data = res.data[0]; 
-                    this.coreCompetencies = this.coreCompetencies.map(item => {
-                        if (data[`p${item.id}`] !== undefined) {
-                            return {
-                                ...item,
-                                data_table1: data[`p${item.id}`],
-                                selfAssessment: data[`pa_${item.id}`]
-                            };
-                        } 
-                        return item;
-                    });  
-                } 
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
-        }, 
+                });
+
+                if (Array.isArray(res.data) && res.data.length > 0) {
+                const data = res.data[0];
+
+                // ✅ โหลดคะแนนสมรรถนะเดิม
+                this.coreCompetencies = this.coreCompetencies.map((item) => {
+                    const keyScore = `p${item.id}`;
+                    const keySelf = `pa_${item.id}`;
+                    if (data[keyScore] !== undefined) {
+                    return {
+                        ...item,
+                        data_table1: data[keyScore] ?? 0,
+                        selfAssessment: data[keySelf] ?? 0
+                    };
+                    }
+                    return item;
+                });
+
+                // ✅ สำคัญ: โหลด “ความเห็นเพิ่มเติม” ที่เคยบันทึกมาใส่ textarea
+                this.improvements = (data.improvements ?? '-');
+                this.suggestions  = (data.suggestions  ?? '-');
+                } else {
+                // ถ้าไม่พบข้อมูลเดิม ให้เป็น '-' ตามฟอร์ม
+                this.improvements = '-';
+                this.suggestions = '-';
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                // กันไม่ให้ช่องว่าง
+                this.improvements = this.improvements ?? '-';
+                this.suggestions = this.suggestions ?? '-';
+            }
+        },
  
         //29/10/67
         saveScore() {
@@ -2245,33 +2496,33 @@ export default {
 
         /*============= ความรู้/ทักษะ/สมรรถนะ ที่ต้องการพัฒนาสำหรับผู้บริหาร =============*/ 
         chkp03data(){ 
-                this.products_Tab3 = [];
-                axios.post('http://127.0.0.1:8000/api/showData04Tab3',{
-                    staff_id: this.staffid_Main,
-                    fac_id: this.facid_Main,
-                    year_id: this.tracking_date.d_date,
-                    record: this.tracking_date.evalua, 
-                }).then(res => {     
-                   // console.log('showData04Tab3',res.data);     
-                    if(res.data.length > 0){
-                        res.data.forEach(p04 => {
-                            const newData = {
-                                px04_re1: p04.px04_re1,
-                                px04_re2: p04.px04_re2,
-                                px04_re3: p04.px04_re3,
-                                id:p04.p02_id
-                            };
-                            this.products_Tab3.push(newData); 
-                        });  
-                    }
-                    this.px04_re1 = '';
-                    this.px04_re2 = '';
-                    this.px04_re3 = '';
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                });
-            },  
+            this.products_Tab3 = [];
+            axios.post('http://127.0.0.1:8000/api/showData04Tab3',{
+                staff_id: this.staffid_Main,
+                fac_id: this.facid_Main,
+                year_id: this.tracking_date.d_date,
+                record: this.tracking_date.evalua, 
+            }).then(res => {     
+                // console.log('showData04Tab3',res.data);     
+                if(res.data.length > 0){
+                    res.data.forEach(p04 => {
+                        const newData = {
+                            px04_re1: p04.px04_re1,
+                            px04_re2: p04.px04_re2,
+                            px04_re3: p04.px04_re3,
+                            id:p04.p02_id
+                        };
+                        this.products_Tab3.push(newData); 
+                    });  
+                }
+                this.px04_re1 = '';
+                this.px04_re2 = '';
+                this.px04_re3 = '';
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        },  
         AddDatap04X(){ 
             axios.post('http://127.0.0.1:8000/api/saveEvaTab03xx',{
                 staff_id: this.staffid_Main,
@@ -2343,8 +2594,7 @@ export default {
                 console.error('❌ Error:', error);
             }); 
         },
-
-
+ 
         ///***********///
  
         async saveAssess() {
@@ -2380,34 +2630,544 @@ export default {
                 });
             }
         },  
-        async printDatatracking() { 
-            const { signIn, getSession, signOut } = await useAuth() 
-            const user = await getSession();   
+
+        // async printDatatracking() { 
+        //     const { signIn, getSession, signOut } = await useAuth() 
+        //     const user = await getSession();   
+        //     const form = {
+        //         staff_id: this.staffid_Main,
+        //         group_id: this.groupid_Main,
+        //         fac_id: this.tracking_date.fac_id,
+        //         year_id: this.tracking_date.d_date,
+        //         evalua: this.tracking_date.evalua,
+        //         PREFIXFULLNAME:user.user.name.PREFIXFULLNAME,
+        //         STAFFNAME :user.user.name.STAFFNAME,
+        //         STAFFSURNAME:user.user.name.STAFFSURNAME,
+        //         POSITIONNAME:user.user.name.POSITIONNAME,
+        //         GROUPTYPENAME:user.user.name.GROUPTYPENAME,
+        //         POSTYPENAME:user.user.name.POSTYPENAME, 
+        //         SCOPES:user.user.name.SCOPES.staffdepartmentname,
+        //         postypename: `ระดับ${this.postypename}`,
+        //         postypenameid: this.postypenameid,
+        //         stftypename: this.stftypename,
+        //     } 
+        //     const queryParams = new URLSearchParams(form).toString();
+        //     // console.log(queryParams); 
+        //     const url = `http://127.0.0.1:8000/report_tracking?${queryParams}`;
+        //     window.open(url, '_blank');
+
+        // }, 
+ 
+         async printDatatrackingpdf() {
+            const { getSession } = await useAuth();
+            const user = await getSession(); 
+            
+            // รวมข้อมูลเป็น Object เดียวตามที่คุณต้องการ
             const form = {
                 staff_id: this.staffid_Main,
                 group_id: this.groupid_Main,
                 fac_id: this.tracking_date.fac_id,
                 year_id: this.tracking_date.d_date,
                 evalua: this.tracking_date.evalua,
-                PREFIXFULLNAME:user.user.name.PREFIXFULLNAME,
-                STAFFNAME :user.user.name.STAFFNAME,
-                STAFFSURNAME:user.user.name.STAFFSURNAME,
-                POSITIONNAME:user.user.name.POSITIONNAME,
-                GROUPTYPENAME:user.user.name.GROUPTYPENAME,
-                POSTYPENAME:user.user.name.POSTYPENAME, 
-                SCOPES:user.user.name.SCOPES.staffdepartmentname,
+                PREFIXFULLNAME: user.user.name.PREFIXFULLNAME,
+                STAFFNAME: user.user.name.STAFFNAME,
+                STAFFSURNAME: user.user.name.STAFFSURNAME,
+                POSITIONNAME: user.user.name.POSITIONNAME,
+                GROUPTYPENAME: user.user.name.GROUPTYPENAME,
+                POSTYPENAME: user.user.name.POSTYPENAME, 
+                SCOPES: user.user.name.SCOPES.staffdepartmentname,
                 postypename: `ระดับ${this.postypename}`,
                 postypenameid: this.postypenameid,
                 stftypename: this.stftypename,
+            };
+
+            try {
+                const response = await axios.post("http://127.0.0.1:8000/api/exportPdf_Tracking", form, { 
+                    responseType: 'blob' 
+                });
+
+                const url = window.URL.createObjectURL(response.data); 
+                window.open(url, '_blank');  
+            } catch (error) {
+                console.error("Error:", error);
             } 
-            const queryParams = new URLSearchParams(form).toString();
-            // console.log(queryParams); 
-            const url = `http://127.0.0.1:8000/report_tracking?${queryParams}`;
-            window.open(url, '_blank');
+        },
  
-        },     
-    }, 
-    
+        //110269
+        normalizeActivityRaw(raw) {
+            let s = String(raw || "").trim();
+            if (!s) return "";
+
+            // รองรับกรณีมี <br>
+            s = s.replace(/<br\s*\/?>/gi, "\n");
+
+            // ถ้าข้อความยาว ๆ มาจาก API แบบ “1. ... 2. ... 3. ...” แต่ไม่มี \n
+            // ให้แทรก \n ก่อนเลขข้อ (ยกเว้นตัวแรก)
+            s = s.replace(/(\s)(\d+(?:\.\d+)*\.)\s+/g, "\n$2 ");
+
+            // ลบช่องว่างซ้อน
+            s = s.replace(/[ \t]+/g, " ").replace(/\n{2,}/g, "\n");
+
+            return s.trim();
+        },
+
+        parseActivityText(raw) {
+            const text = this.normalizeActivityRaw(raw);
+            if (!text) return { mainTitle: "", lines: [] };
+
+            const rows = text
+                .split(/\r?\n/)
+                .map(r => r.trim())
+                .filter(Boolean);
+
+            const cleanMain = (s) =>
+                s.replace(/^(\d+\.)\s*/, "")
+                .replace(/^[-•]\s*/, "")
+                .trim();
+
+            const mainTitle = cleanMain(rows[0] || "");
+
+            const lines = rows.map((r, idx) => {
+                if (idx === 0) return { type: "main", text: cleanMain(r) };
+
+                let s = r.replace(/^[-•]\s*/, "").trim();
+                const m = s.match(/^(\d+(?:\.\d+)*\.)\s*(.*)$/);
+                const no = m ? m[1] : "";
+                const body = m ? (m[2] || "") : s;
+
+                return { type: "sub", no, text: body.trim() };
+            });
+
+            return { mainTitle, lines };
+        },
+
+        getMainSubject(raw) {
+            return this.parseActivityText(raw).mainTitle || "";
+        },
+
+        stripLeadingNo(text) {
+            return String(text || '').replace(/^\s*\d+(?:\.\d+)*\.\s*/, '').trim();
+        },
+
+        async loadCompetencyDescriptions() {
+            try {
+                const res = await axios.get('http://127.0.0.1:8000/api/competencies');
+                const map = {};
+                (res.data || []).forEach(it => {
+                if (it.WORK_NAME) map[it.WORK_NAME.trim()] = it;
+                });
+                this.competencyMap = map;
+            } catch (e) {
+                console.error('loadCompetencyDescriptions error', e);
+            }
+        },
+
+        extractNameFromActivity(activityText) {
+            if (!activityText) return '';
+            const parts = String(activityText).trim().split(/\s+/);
+            if (parts.length <= 2) return String(activityText).trim();
+            // "ก. 1 การมุ่งผลสัมฤทธิ์" -> "การมุ่งผลสัมฤทธิ์"
+            return parts.slice(2).join(' ');
+        },
+
+        openCompetencyDialog(type, row, index = null) {
+            let title = '';
+            let description = '';
+
+            if (type === 'core') {
+                title = row.activity;
+                const workName = this.extractNameFromActivity(row.activity);
+                const master = this.competencyMap[workName] || null;
+
+                description =
+                (master?.WORK_DATAIL) ||
+                (this.coreDescriptions?.[row.id]) ||
+                'ยังไม่มีคำอธิบายสำหรับรายการนี้';
+
+            } else if (type === 'job') {
+                const order = index !== null ? index + 1 : '';
+                title = `ข. ${order} ${row.WORK_NAME}`;
+
+                // ใช้จากรายการ ข. ก่อน (ถ้า API ส่งมา)
+                const baseDetail = row.WORK_DATAIL || this.competencyMap[String(row.WORK_NAME || '').trim()]?.WORK_DATAIL || '';
+                const levelDetail = row.LEVEL_DETAIL || '';
+
+                description = baseDetail || 'ยังไม่มีคำอธิบายสำหรับรายการนี้';
+                if (levelDetail) description += `\n\n${levelDetail}`;
+
+            } else if (type === 'other') {
+                title = row.activity;
+                const workName = this.extractNameFromActivity(row.activity);
+                const master = this.competencyMap[workName] || null;
+
+                description =
+                (master?.WORK_DATAIL) ||
+                (this.otherDescriptions?.[row.id]) ||
+                'ยังไม่มีคำอธิบายสำหรับรายการนี้';
+            }
+
+            this.selectedCompetency = { title, description };
+            this.competencyDialogVisible = true;
+        },
+
+        //ส่งคะแนนไประบบบุคลากร
+        toNumber(value, fallback = 0) {
+            const n = Number.parseFloat(String(value ?? '').replace(',', ''));
+            return Number.isFinite(n) ? n : fallback;
+        },
+
+        buildSendScorePayload(Item) {
+            const persen = Item?.tb_tor?.persen || '70:30';
+
+            const [weight1, weight2] = String(persen)
+                .split(':')
+                .map(v => this.toNumber(v));
+
+            const achievementScore = this.toNumber(Item?.tb_tor?.achievement_score);
+            const behaviorScore = this.toNumber(Item?.tb_tor?.behavior);
+
+            return {
+                staffid: Item.staffid,
+                staff_name: `${Item.prefixfullname ?? ''} ${Item.namefully ?? ''}`.trim(),
+
+                fac_id: this.tracking_date?.fac_id ?? this.facid_Main,
+                year: this.tracking_date?.d_date,
+                evalua: this.tracking_date?.evalua,
+
+                // องค์ประกอบที่ 1
+                component1_score: achievementScore,
+                component1_weight: weight1,
+                component1_weighted_score: Number((achievementScore * weight1).toFixed(2)),
+
+                // องค์ประกอบที่ 2
+                component2_score: behaviorScore,
+                component2_weight: weight2,
+                component2_weighted_score: Number((behaviorScore * weight2).toFixed(2)),
+
+                total_score: this.toNumber(Item?.tb_tor?.sum_score),
+                sent_by: this.staffid_Main
+            };
+        },
+
+        // buildSendScorePayload(Item) {
+        //     const persen = Item?.tb_tor?.persen || '70:30';
+
+        //     const [weight1, weight2] = String(persen)
+        //         .split(':')
+        //         .map(v => this.toNumber(v));
+
+        //     // คะแนนช่อง "คะแนน" ขององค์ประกอบที่ 1
+        //     const achievementScore = this.toNumber(Item?.tb_tor?.achievement_score);
+
+        //     // คะแนนช่อง "คะแนน" ขององค์ประกอบที่ 2
+        //     const behaviorScore = this.toNumber(Item?.tb_tor?.behavior);
+
+        //     const component1WeightedScore = Number((achievementScore * weight1).toFixed(2));
+        //     const component2WeightedScore = Number((behaviorScore * weight2).toFixed(2));
+        //     const totalScore = Number((component1WeightedScore + component2WeightedScore).toFixed(2));
+
+        //     return {
+        //         staffid: Item.staffid,
+        //         staff_name: `${Item.prefixfullname ?? ''} ${Item.namefully ?? ''}`.trim(),
+
+        //         fac_id: this.tracking_date?.fac_id ?? this.facid_Main,
+        //         fac_name: this.tracking_date?.facuties ?? '',
+        //         year: this.tracking_date?.d_date,
+        //         evalua: this.tracking_date?.evalua,
+
+        //         // ส่งตามชื่อ Field ระบบบุคลากรโดยตรง
+        //         EVO1: achievementScore,
+        //         EVA1: weight1,
+        //         EVA2: component1WeightedScore,
+
+        //         EVO2: behaviorScore,
+        //         EVB1: weight2,
+        //         EVB2: component2WeightedScore,
+
+        //         EVTOTAL: totalScore,
+        //         EVO3: this.getEvaluationText(totalScore),
+        //         EVO3VAL: this.getEvaluationValue(totalScore),
+        //         EVO3DETAIL: '',
+
+        //         sent_by: this.staffid_Main
+        //     };
+        // },
+
+
+
+        async sendAllScoresToOtherSystem() {
+            if (!this.tracking_date?.d_date || !this.tracking_date?.evalua) {
+                Swal.fire('แจ้งเตือน', 'กรุณาเลือกรอบการประเมินก่อนส่งคะแนน', 'warning');
+                return;
+            } 
+
+            const items = this.products.filter(item => {
+                return item?.staffid &&
+                    item?.tb_tor &&
+                    item.tb_tor.achievement_score !== null &&
+                    item.tb_tor.achievement_score !== '' &&
+                    item.tb_tor.behavior !== null &&
+                    item.tb_tor.behavior !== '';
+            });
+
+            if (items.length === 0) {
+                Swal.fire('แจ้งเตือน', 'ไม่พบข้อมูลคะแนนที่พร้อมส่ง', 'warning');
+                return;
+            } 
+
+            const totalPeople = this.products.length;
+            const evaluatedPeople = this.products.filter(item => item?.tb_tor).length;
+            const readyToSendPeople = items.length;
+            const waitingPeople = totalPeople - evaluatedPeople;
+
+            const roundText = [
+                this.tracking_date?.facuties,
+                this.tracking_date?.d_evaluationround,
+                this.tracking_date?.d_date
+            ].filter(Boolean).join(' ');
+
+            const safeRoundText = String(roundText || '-').replace(/[&<>"']/g, (m) => ({
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            }[m]));
+
+            const confirm = await Swal.fire({
+                title: 'ยืนยันส่งคะแนนประเมินทั้งหมด?',
+                html: `
+                    <div style="
+                        text-align:left;
+                        font-family:'Prompt', Tahoma, sans-serif;
+                        color:#1f2937;
+                    ">
+                        <div style="
+                            background:linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%);
+                            border:1px solid #fed7aa;
+                            border-radius:16px;
+                            padding:16px;
+                            margin-bottom:14px;
+                        ">
+                            <div style="
+                                font-size:13px;
+                                color:#9a3412;
+                                font-weight:700;
+                                margin-bottom:6px;
+                            ">
+                                รอบที่จะส่งคะแนน
+                            </div>
+                            <div style="
+                                font-size:16px;
+                                color:#0f172a;
+                                font-weight:800;
+                                line-height:1.6;
+                            ">
+                                ${safeRoundText}
+                            </div>
+                        </div>
+
+                        <div style="
+                            display:grid;
+                            grid-template-columns:repeat(2, 1fr);
+                            gap:10px;
+                            margin-bottom:14px;
+                        ">
+                           <div class="score-hover-card" style="
+                                background:#eff6ff;
+                                border:1px solid #bfdbfe;
+                                border-radius:14px;
+                                padding:13px 10px;
+                                text-align:center;
+                            ">
+                                <div style="font-size:12px; color:#1d4ed8; font-weight:700;">
+                                    ผู้รับการประเมินทั้งหมด
+                                </div>
+                                <div style="font-size:30px; color:#1e40af; font-weight:900;">
+                                    ${totalPeople}
+                                </div>
+                                <div style="font-size:12px; color:#475569;">คน</div>
+                            </div>
+
+                            <div class="score-hover-card" style="
+                                background:#ecfdf5;
+                                border:1px solid #bbf7d0;
+                                border-radius:14px;
+                                padding:13px 10px;
+                                text-align:center;
+                            ">
+                                <div style="font-size:12px; color:#15803d; font-weight:700;">
+                                    มีข้อมูลประเมินแล้ว
+                                </div>
+                                <div style="font-size:30px; color:#166534; font-weight:900;">
+                                    ${evaluatedPeople}
+                                </div>
+                                <div style="font-size:12px; color:#475569;">คน</div>
+                            </div>
+
+                            <div class="score-hover-card" style="
+                                background:#f0fdf4;
+                                border:1px solid #86efac;
+                                border-radius:14px;
+                                padding:13px 10px;
+                                text-align:center;
+                            ">
+                                <div style="font-size:12px; color:#16a34a; font-weight:700;">
+                                    พร้อมส่งคะแนน
+                                </div>
+                                <div style="font-size:30px; color:#15803d; font-weight:900;">
+                                    ${readyToSendPeople}
+                                </div>
+                                <div style="font-size:12px; color:#475569;">รายการ</div>
+                            </div>
+
+                            <div class="score-hover-card" style="
+                                background:#fef2f2;
+                                border:1px solid #fecaca;
+                                border-radius:14px;
+                                padding:13px 10px;
+                                text-align:center;
+                            ">
+                                <div style="font-size:12px; color:#dc2626; font-weight:700;">
+                                    รอข้อมูลประเมิน
+                                </div>
+                                <div style="font-size:30px; color:#b91c1c; font-weight:900;">
+                                    ${waitingPeople}
+                                </div>
+                                <div style="font-size:12px; color:#475569;">คน</div>
+                            </div>
+                        </div>
+
+                        <div style="
+                            background:linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+                            color:white;
+                            border-radius:16px;
+                            padding:15px 16px;
+                            text-align:center;
+                            box-shadow:0 8px 18px rgba(249,115,22,.25);
+                        ">
+                            <div style="font-size:14px; font-weight:600;">
+                                ระบบจะส่งคะแนนไปยังระบบ
+                            </div>
+                            <div style="font-size:21px; font-weight:900; margin-top:2px;">
+                                “บุคลากร”
+                            </div>
+                            <div style="font-size:14px; margin-top:6px;">
+                                จำนวน <b style="font-size:24px;">${readyToSendPeople}</b> รายการ
+                            </div>
+                        </div>
+
+                        ${
+                            waitingPeople > 0
+                                ? `
+                                    <div style="
+                                        margin-top:12px;
+                                        background:#fef2f2;
+                                        border:1px solid #fca5a5;
+                                        color:#b91c1c;
+                                        border-radius:12px;
+                                        padding:11px 13px;
+                                        font-size:13px;
+                                        line-height:1.6;
+                                    ">
+                                        <b>⚠️ หมายเหตุ:</b> มีผู้รับการประเมินที่ยังรอข้อมูลประเมิน
+                                        <b>${waitingPeople}</b> คน<br>
+                                        ระบบจะส่งเฉพาะรายการที่มีคะแนนครบถ้วนเท่านั้น
+                                    </div>
+                                `
+                                : `
+                                    <div style="
+                                        margin-top:12px;
+                                        background:#ecfdf5;
+                                        border:1px solid #bbf7d0;
+                                        color:#166534;
+                                        border-radius:12px;
+                                        padding:11px 13px;
+                                        font-size:13px;
+                                        line-height:1.6;
+                                    ">
+                                        <b>ข้อมูลครบถ้วน:</b> พร้อมส่งคะแนนทั้งหมด
+                                    </div>
+                                `
+                        }
+                    </div>
+                `,
+                icon: 'question',
+                iconColor: '#f97316',
+                showCancelButton: true,
+                confirmButtonText: `ส่งคะแนน ${readyToSendPeople} รายการ`,
+                cancelButtonText: 'ยกเลิก',
+                confirmButtonColor: '#16a34a',
+                cancelButtonColor: '#ef4444',
+                background: '#ffffff',
+                width: 650
+            });
+
+            if (!confirm.isConfirmed) return;
+
+            const payload = {
+                fac_id: this.tracking_date?.fac_id ?? this.facid_Main,
+                year: this.tracking_date.d_date,
+                evalua: this.tracking_date.evalua,
+                sent_by: this.staffid_Main,
+                scores: items.map(item => this.buildSendScorePayload(item))
+            };
+
+            this.loadingSendScoreAll = true;
+
+            try {
+                const res = await axios.post(
+                    'http://127.0.0.1:8000/api/sendEvaluateScoresToOtherSystem',
+                    payload
+                );
+
+                Swal.fire({
+                    icon: 'success',
+                    iconColor: '#16a34a',
+                    title: 'ส่งคะแนนทั้งหมดสำเร็จ',
+                    html: `
+                        <div style="
+                            font-family:'Prompt', Tahoma, sans-serif;
+                            color:#1f2937;
+                            line-height:1.7;
+                        ">
+                            <div style="
+                                background:#ecfdf5;
+                                border:1px solid #bbf7d0;
+                                border-radius:14px;
+                                padding:14px;
+                                margin-top:8px;
+                            ">
+                                ส่งคะแนนไปยังระบบ <b style="color:#166534;">“บุคลากร”</b> สำเร็จ<br>
+                                จำนวน <b style="color:#15803d; font-size:20px;">${items.length}</b> รายการ
+                            </div>
+                        </div>
+                    `,
+                    confirmButtonColor: '#16a34a',
+                    confirmButtonText: 'ตกลง'
+                });
+
+            } catch (error) {
+                console.error('sendAllScoresToOtherSystem error:', error);
+
+                Swal.fire({
+                    icon: 'error',
+                    iconColor: '#dc2626',
+                    title: 'ส่งคะแนนไม่สำเร็จ',
+                    text: error.response?.data?.message || 'เกิดข้อผิดพลาดในการส่งคะแนน',
+                    confirmButtonColor: '#dc2626',
+                    confirmButtonText: 'ตกลง'
+                });
+
+            } finally {
+                this.loadingSendScoreAll = false;
+            }
+        },
+
+
+
+ 
+    },  
     filters: {
         removeC: function (value) {
             if (!value) return '';
@@ -2656,6 +3416,36 @@ td:nth-child(3) {
   background: rgba(255,255,255,.7);
   display:flex; flex-direction:column; align-items:center; justify-content:center;
   z-index: 9999;
+} 
+
+.clickable{
+  text-align:left;
+  cursor:pointer;
+  color:#0d47a1;
+}
+.clickable:hover{
+  text-decoration: underline;
+}
+
+:global(.score-hover-card) {
+    cursor: pointer;
+    transition: 
+        transform 0.22s ease,
+        box-shadow 0.22s ease,
+        border-color 0.22s ease,
+        filter 0.22s ease;
+    will-change: transform;
+}
+
+:global(.score-hover-card:hover) {
+    transform: translateY(-7px) scale(1.035);
+    box-shadow: 0 14px 28px rgba(15, 23, 42, 0.16);
+    filter: brightness(1.02);
+    z-index: 2;
+}
+
+:global(.score-hover-card:active) {
+    transform: translateY(-2px) scale(1.01);
 }
 
 </style>
