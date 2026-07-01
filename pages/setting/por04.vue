@@ -153,43 +153,139 @@
                                         <input
                                             type="checkbox"
                                             v-model="signForm.receiver_ack"
-                                            :disabled="!!signatures.receiver_ack"
+                                            :disabled="!!signatures.receiver_ack && !signEditMode.receiver_ack"
                                         />
                                         <span>ได้รับทราบผลการประเมินและแผนพัฒนาการปฏิบัติราชการ รายบุคคลแล้ว</span>
                                     </label>
 
-                                    <div class="signature-button-wrap">
+                                   <div class="signature-button-wrap" v-if="!signatures.receiver_ack">
+                                        <input
+                                            ref="receiverSignatureFile"
+                                            type="file"
+                                            accept="image/png,image/jpeg,image/jpg"
+                                            style="display: none;"
+                                            @change="handleReceiverSignatureUpload"
+                                        />
+
+                                        <Button
+                                            label="อัปโหลดลายเซ็น"
+                                            icon="pi pi-upload"
+                                            severity="info"
+                                            size="small"
+                                            class="signature-upload-btn"
+                                            @click="$refs.receiverSignatureFile.click()"
+                                        />
+
                                         <Button
                                             label="ลงนามผู้รับการประเมิน"
                                             icon="pi pi-pencil"
                                             severity="success"
                                             size="small"
                                             class="signature-btn"
-                                            :disabled="!signForm.receiver_ack || !!signatures.receiver_ack"
-                                            @click="signP04('receiver_ack', 'ผู้รับการประเมิน')"
+                                            :disabled="!signForm.receiver_ack"
+                                            @click="savesignP04('receiver_ack', 'ผู้รับการประเมิน')"
                                         />
                                     </div>
+
+                                    <div v-if="signForm.receiver_signature_image && !signatures.receiver_ack" class="signature-preview-box">
+                                        <div class="preview-title">ตัวอย่างลายเซ็นที่อัปโหลด</div>
+                                        <img :src="signForm.receiver_signature_image" class="signature-preview-img" />
+                                        <div class="preview-file-name">
+                                            {{ signForm.receiver_signature_file_name }}
+                                        </div>
+                                    </div>
+
+                                    <div class="signature-button-wrap" v-if="signatures.receiver_ack && signEditMode.receiver_ack">
+                                        <input
+                                            ref="receiverSignatureFileEdit"
+                                            type="file"
+                                            accept="image/png,image/jpeg,image/jpg"
+                                            style="display: none;"
+                                            @change="handleReceiverSignatureUpload"
+                                        />
+
+                                        <Button
+                                            label="เปลี่ยนลายเซ็น"
+                                            icon="pi pi-upload"
+                                            severity="info"
+                                            size="small"
+                                            class="signature-upload-btn"
+                                            @click="$refs.receiverSignatureFileEdit.click()"
+                                        />
+
+                                        <Button
+                                            label="อัพเดทการลงนาม"
+                                            icon="pi pi-save"
+                                            severity="success"
+                                            size="small"
+                                            class="signature-btn"
+                                            :disabled="!signForm.receiver_ack"
+                                            @click="updateReceiverAckSignature()"
+                                        />
+
+                                        <Button
+                                            label="ยกเลิก"
+                                            icon="pi pi-times"
+                                            severity="secondary"
+                                            size="small"
+                                            class="signature-btn-cancel"
+                                            @click="cancelEditReceiverAck()"
+                                        />
+                                    </div>
+
+                                    <div v-if="signForm.receiver_signature_image && signEditMode.receiver_ack" class="signature-preview-box">
+                                        <div class="preview-title">ตัวอย่างลายเซ็นใหม่</div>
+                                        <img :src="signForm.receiver_signature_image" class="signature-preview-img" />
+                                        <div class="preview-file-name">
+                                            {{ signForm.receiver_signature_file_name }}
+                                        </div>
+                                    </div>
+
+
                                 </td>
 
                                 <td class="center-align">
                                     <div v-if="signatures.receiver_ack" class="signature-card signed">
-                                        <div class="signed-badge">ลงนามแล้ว</div>
+                                        <div class="signed-badge">
+                                            {{ signEditMode.receiver_ack ? 'กำลังแก้ไข' : 'ลงนามแล้ว' }}
+                                        </div>
 
-                                        <img
-                                            v-if="signatures.receiver_ack.signature_image"
-                                            :src="signatures.receiver_ack.signature_image"
-                                            class="signature-img"
-                                        />
+                                        <div class="signature-display-area">
+                                            <img
+                                                v-if="signatures.receiver_ack.signature_image"
+                                                :src="signatures.receiver_ack.signature_image"
+                                                class="signature-img"
+                                            />
 
-                                        <div v-else class="typed-signature">
-                                            {{ signatures.receiver_ack.signer_name }}
+                                            <div v-else class="no-signature-image">
+                                                ยังไม่มีไฟล์รูปลายเซ็น
+                                            </div>
                                         </div>
 
                                         <div>ลงชื่อ {{ signatures.receiver_ack.signer_name }}</div>
                                         <div>ตำแหน่ง {{ signatures.receiver_ack.signer_position }}</div>
                                         <div>วันที่ {{ formatThaiDate(signatures.receiver_ack.signed_at) }}</div>
-                                    </div>
 
+                                        <div class="signature-action-wrap" v-if="!signEditMode.receiver_ack">
+                                            <Button
+                                                label="แก้ไข"
+                                                icon="pi pi-pencil"
+                                                severity="warning"
+                                                size="small"
+                                                class="signature-action-btn"
+                                                @click="startEditReceiverAck()"
+                                            />
+
+                                            <Button
+                                                label="ลบ"
+                                                icon="pi pi-trash"
+                                                severity="danger"
+                                                size="small"
+                                                class="signature-action-btn"
+                                                @click="deletesignP04(signatures.receiver_ack)"
+                                            />
+                                        </div>
+                                    </div>  
                                     <div v-else class="signature-card waiting">
                                         ลงชื่อ .................................................................<br>
                                         ชื่อ: {{ user.user.name.PREFIXFULLNAME }} {{ user.user.name.STAFFNAME }} {{ user.user.name.STAFFSURNAME }}<br>
@@ -228,9 +324,20 @@
                                         {{ signatures.evaluator_no_ack.comment }}
                                     </div>
 
-                                    <small style="color:#991b1b;font-weight:600;font-size:12px;">
-                                        <i class="pi pi-info-circle"></i>
-                                        ข้อมูลส่วนนี้ดึงจากหน้าลงนามของผู้ประเมิน
+                                    <small
+                                        v-if="getSignature('evaluator_ack', 'evaluator_no_ack')"
+                                        class="sign-status-text signed"
+                                    >
+                                        <i class="pi pi-check-circle"></i>
+                                        ลงนามเรียบร้อยแล้ว
+                                    </small>
+
+                                    <small
+                                        v-else
+                                        class="sign-status-text waiting"
+                                    >
+                                        <i class="pi pi-clock"></i>
+                                        * รอลงนาม
                                     </small>
                                 </td>
 
@@ -300,9 +407,21 @@
                                         {{ signatures.superior_disagree.comment }}
                                     </div>
 
-                                    <small style="color:#991b1b;font-weight:600;font-size:12px;">
-                                        * ข้อมูลส่วนนี้ดึงจากหน้าลงนามของผู้บังคับบัญชา
-                                    </small> 
+                                    <small
+                                        v-if="getSignature('superior_agree', 'superior_disagree')"
+                                        class="sign-status-text signed"
+                                    >
+                                        <i class="pi pi-check-circle"></i>
+                                        ลงนามเรียบร้อยแล้ว
+                                    </small>
+
+                                    <small
+                                        v-else
+                                        class="sign-status-text waiting"
+                                    >
+                                        <i class="pi pi-clock"></i>
+                                        * รอลงนาม
+                                    </small>
                                 </td>
 
                                 <td class="center-align">
@@ -361,9 +480,21 @@
                                         {{ signatures.superior2_disagree.comment }}
                                     </div>
 
-                                     <small style="color:#991b1b;font-weight:600;font-size:12px;">
-                                        * ข้อมูลส่วนนี้ดึงจากหน้าลงนามของผู้บังคับบัญชาอีกชั้นหนึ่ง
-                                    </small>   
+                                     <small
+                                        v-if="getSignature('superior2_agree', 'superior2_disagree')"
+                                        class="sign-status-text signed"
+                                    >
+                                        <i class="pi pi-check-circle"></i>
+                                        ลงนามเรียบร้อยแล้ว
+                                    </small>
+
+                                    <small
+                                        v-else
+                                        class="sign-status-text waiting"
+                                    >
+                                        <i class="pi pi-clock"></i>
+                                        * รอลงนาม
+                                    </small>  
                                 </td>
 
                                 <td class="center-align">
@@ -531,6 +662,12 @@ export default {
            //ลงนามออนไลน์
             signForm: {
                 receiver_ack: false,
+                receiver_signature_image: '',
+                receiver_signature_file_name: '',
+            },
+
+            signEditMode: {
+                receiver_ack: false,
             },
 
             signatures: {
@@ -553,23 +690,38 @@ export default {
         TabPanel
     }, 
     async mounted(){  
-       // console.log(this.dataPor);  
-        const { signIn, getSession, signOut } = await useAuth()
+        const { getSession } = await useAuth()
         const user = await getSession();
-       // console.log(user.user.name);
-        const {STAFFID, SCOPES} = user.user.name
-        const {staffdepartment, groupid, staffdepartmentname, groupname} = SCOPES
-        await this.setSession(STAFFID,staffdepartment,groupid);
-        await this.loadP04Signatures(); 
-        //this.showdatator()  
-    }, 
+
+        const { STAFFID, SCOPES } = user.user.name
+        const { staffdepartment, groupid } = SCOPES
+
+        await this.setSession(STAFFID, staffdepartment, groupid);
+
+        // โหลดลายเซ็นเฉพาะตอนข้อมูลปี/รอบประเมินพร้อมแล้ว
+        if (this.dataPor?.d_date && this.dataPor?.evalua) {
+            await this.loadP04Signatures(); 
+        } else {
+            console.warn('ยังไม่โหลดลายเซ็น เพราะ dataPor ยังไม่พร้อม', this.dataPor);
+        }
+
+        // this.showdatator()
+    },
     watch: { 
-        tab4Reload(v) { 
-            // console.log("por04 tab4Reload",v);
+    tab4Reload(v) { 
             this.chkp04dataXr(); 
             this.showdatator(); 
-             
-        },  
+        },
+
+        dataPor: {
+            handler(newVal) {
+                if (newVal?.d_date && newVal?.evalua && this.staffid_Main) {
+                    this.loadP04Signatures();
+                }
+            },
+            deep: true,
+            immediate: false
+        },
     },
     computed: {
         totalscoretrack() {
@@ -917,12 +1069,21 @@ export default {
             return '';
         },
 
-        async signP04(signKey, roleName) {
+        async savesignP04(signKey, roleName) {
             try {
                 if (signKey !== 'receiver_ack') {
                     Swal.fire({
                         title: 'ไม่สามารถลงนามได้',
                         text: 'หน้านี้อนุญาตให้ลงนามเฉพาะผู้รับการประเมินเท่านั้น',
+                        icon: 'warning',
+                    });
+                    return;
+                }
+
+                if (!this.signForm.receiver_ack) {
+                    Swal.fire({
+                        title: 'กรุณาติ๊กยืนยันก่อน',
+                        text: 'กรุณาติ๊กว่าได้รับทราบผลการประเมินก่อนลงนาม',
                         icon: 'warning',
                     });
                     return;
@@ -963,23 +1124,25 @@ export default {
                     year_id: this.dataPor.d_date,
                     evalua: this.dataPor.evalua,
 
-                    sign_key: 'receiver_ack',
-                    role_name: 'ผู้รับการประเมิน',
+                    sign_key: signKey,
+                    role_name: roleName,
 
                     signer_staff_id: signer.signer_staff_id,
                     signer_name: signer.signer_name,
                     signer_position: signer.signer_position,
-                    signature_image: signer.signature_image,
+                    signature_image: this.signForm.receiver_signature_image || signer.signature_image || '',
 
                     comment: '',
                     signed_at: new Date().toISOString(),
                 };
 
-                const res = await axios.post('http://127.0.0.1:8000/api/p04/sign', payload);
+                const res = await axios.post('http://127.0.0.1:8000/api/savesign', payload);
 
-                const savedSignature = res.data?.data || payload;
+ 
 
-                this.signatures.receiver_ack = savedSignature;
+                const savedSignature = this.normalizeSignatureRow(res.data?.data || payload);
+
+                this.signatures[signKey] = savedSignature;
                 this.signForm.receiver_ack = true;
 
                 Swal.fire({
@@ -995,7 +1158,7 @@ export default {
 
                 Swal.fire({
                     title: 'เกิดข้อผิดพลาด',
-                    text: 'ไม่สามารถลงนามออนไลน์ได้',
+                    text: error.response?.data?.message || 'ไม่สามารถลงนามออนไลน์ได้',
                     icon: 'error',
                 });
             }
@@ -1003,26 +1166,483 @@ export default {
 
         async loadP04Signatures() {
             try {
-                const res = await axios.post('http://127.0.0.1:8000/api/p04/signatures', {
-                    staff_id: this.staffid_Main,
-                    year_id: this.dataPor.d_date,
-                    evalua: this.dataPor.evalua,
-                });
+                const yearId =
+                    this.dataPor?.d_date ||
+                    this.dataPor?.year_id ||
+                    this.dropdownItemYear?.code;
+
+                const evalua =
+                    this.dataPor?.evalua ||
+                    this.dataPor?.record ||
+                    this.dropdownItemRecord?.code;
+
+                if (!this.staffid_Main || !yearId || !evalua) {
+                    console.warn('loadP04Signatures missing data:', {
+                        staffid_Main: this.staffid_Main,
+                        yearId,
+                        evalua,
+                        dataPor: this.dataPor,
+                    });
+                    return;
+                }
+
+                const payload = {
+                    // staff_id = ผู้รับการประเมิน
+                    staff_id: String(this.staffid_Main),
+
+                    // ปีงบประมาณ
+                    year_id: Number(yearId),
+
+                    // รอบประเมิน
+                    evalua: Number(evalua),
+                };
+
+                console.log('loadP04Signatures payload:', payload);
+
+                const res = await axios.post(
+                    'http://127.0.0.1:8000/api/getsign',
+                    payload
+                );
 
                 const rows = res.data?.data || [];
 
-                rows.forEach(row => {
-                    this.signatures[row.sign_key] = row;
+                const nextSignatures = {
+                    receiver_ack: null,
 
-                    if (row.sign_key === 'receiver_ack') {
-                        this.signForm.receiver_ack = true;
+                    evaluator_ack: null,
+                    evaluator_no_ack: null,
+
+                    superior_agree: null,
+                    superior_disagree: null,
+
+                    superior2_agree: null,
+                    superior2_disagree: null,
+                };
+
+                rows.forEach(row => {
+                    const normalizedRow = this.normalizeSignatureRow(row);
+
+                    if (!normalizedRow?.sign_key) return;
+  
+                    // ผู้รับการประเมิน
+                    if (normalizedRow.sign_key === 'receiver_ack') {
+                        nextSignatures.receiver_ack = normalizedRow;
+                        return;
+                    }
+
+                    // ผู้ประเมิน กรณีเก็บเป็น assessor
+                    if (normalizedRow.sign_key === 'assessor') {
+                        if (normalizedRow.sign_choice === 'no_ack') {
+                            nextSignatures.evaluator_no_ack = normalizedRow;
+                        } else {
+                            nextSignatures.evaluator_ack = normalizedRow;
+                        }
+                        return;
+                    }
+
+                    // ผู้บังคับบัญชาเหนือขึ้นไป กรณีเก็บเป็น supervisor1
+                    if (normalizedRow.sign_key === 'supervisor1') {
+                        if (normalizedRow.sign_choice === 'disagree') {
+                            nextSignatures.superior_disagree = normalizedRow;
+                        } else {
+                            nextSignatures.superior_agree = normalizedRow;
+                        }
+                        return;
+                    }
+
+                    // ผู้บังคับบัญชาเหนือขึ้นไปอีกชั้นหนึ่ง กรณีเก็บเป็น supervisor2
+                    if (normalizedRow.sign_key === 'supervisor2') {
+                        if (normalizedRow.sign_choice === 'disagree') {
+                            nextSignatures.superior2_disagree = normalizedRow;
+                        } else {
+                            nextSignatures.superior2_agree = normalizedRow;
+                        }
+                        return;
+                    }
+
+                    // รองรับกรณี sign_key เป็นชื่อที่หน้า template ใช้อยู่แล้ว
+                    if (Object.prototype.hasOwnProperty.call(nextSignatures, normalizedRow.sign_key)) {
+                        nextSignatures[normalizedRow.sign_key] = normalizedRow;
                     }
                 });
 
+                this.signatures = nextSignatures;
+
+                this.signForm.receiver_ack = !!nextSignatures.receiver_ack;
+                this.signForm.receiver_signature_image = '';
+                this.signForm.receiver_signature_file_name = '';
+                this.signEditMode.receiver_ack = false;
+
+                console.log('signatures after mapping:', this.signatures);
+
             } catch (error) {
                 console.error('Error loading signatures:', error);
+
+                Swal.fire({
+                    icon: 'error',
+                    title: 'โหลดข้อมูลการลงนามไม่สำเร็จ',
+                    text: error.response?.data?.message || 'เกิดข้อผิดพลาดในการโหลดข้อมูล',
+                });
             }
         },
+
+        async updatesignP04(signature, updateData = {}) {
+            try {
+                if (!signature?.p04_id) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'ไม่พบรหัสรายการลงนาม',
+                    });
+                    return;
+                }
+
+                const confirm = await Swal.fire({
+                    title: 'ยืนยันแก้ไขข้อมูลการลงนาม?',
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonText: 'บันทึกแก้ไข',
+                    cancelButtonText: 'ยกเลิก',
+                });
+
+                if (!confirm.isConfirmed) return;
+
+                const payload = {
+                    p04_id: signature.p04_id,
+
+                    role_name: updateData.role_name ?? signature.role_name,
+                    signer_name: updateData.signer_name ?? signature.signer_name,
+                    signer_position: updateData.signer_position ?? signature.signer_position,
+                    signature_image: updateData.signature_image ?? signature.signature_image,
+                    comment: updateData.comment ?? signature.comment,
+                    signed_at: updateData.signed_at ?? signature.signed_at,
+                };
+
+                const res = await axios.post('http://127.0.0.1:8000/api/updatesign', payload);
+ 
+
+                const updated = this.normalizeSignatureRow(res.data?.data); 
+
+                if (updated?.sign_key) {
+                    this.signatures[updated.sign_key] = updated;
+                }
+
+
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'แก้ไขข้อมูลสำเร็จ',
+                    timer: 1200,
+                    showConfirmButton: false,
+                });
+
+            } catch (error) {
+                console.error(error);
+
+                Swal.fire({
+                    icon: 'error',
+                    title: 'แก้ไขข้อมูลไม่สำเร็จ',
+                    text: error.response?.data?.message || 'เกิดข้อผิดพลาดในการแก้ไขข้อมูล',
+                });
+            }
+        },
+
+        async deletesignP04(signature) {
+            try {
+                if (!signature?.p04_id) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'ไม่พบรหัสรายการลงนาม',
+                    });
+                    return;
+                }
+
+                const confirm = await Swal.fire({
+                    title: 'ยืนยันลบการลงนาม?',
+                    text: 'เมื่อลบแล้ว ผู้ใช้งานจะสามารถลงนามใหม่ได้',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'ลบ',
+                    cancelButtonText: 'ยกเลิก',
+                    confirmButtonColor: '#dc2626',
+                    cancelButtonColor: '#64748b',
+                });
+
+                if (!confirm.isConfirmed) return;
+
+                const payload = {
+                    p04_id: signature.p04_id,
+                };
+
+                const res = await axios.post('http://127.0.0.1:8000/api/deletesign', payload);
+
+                const deleted = res.data?.data;
+
+                if (deleted?.sign_key) {
+                    this.signatures[deleted.sign_key] = null;
+
+                    if (deleted.sign_key === 'receiver_ack') {
+                        this.signForm.receiver_ack = false;
+                    }
+                }
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'ลบข้อมูลการลงนามสำเร็จ',
+                    timer: 1200,
+                    showConfirmButton: false,
+                });
+
+            } catch (error) {
+                console.error(error);
+
+                Swal.fire({
+                    icon: 'error',
+                    title: 'ลบข้อมูลไม่สำเร็จ',
+                    text: error.response?.data?.message || 'เกิดข้อผิดพลาดในการลบข้อมูล',
+                });
+            }
+        },
+
+
+        // startEditReceiverAck() {
+        //     if (!this.signatures.receiver_ack) {
+        //         Swal.fire({
+        //             icon: 'warning',
+        //             title: 'ยังไม่มีข้อมูลการลงนาม',
+        //         });
+        //         return;
+        //     }
+
+        //     this.signEditMode.receiver_ack = true;
+        //     this.signForm.receiver_ack = true;
+        //     this.signForm.receiver_signature_image = this.signatures.receiver_ack.signature_image || '';
+        //     this.signForm.receiver_signature_file_name = this.signatures.receiver_ack.signature_image ? 'ลายเซ็นเดิม' : '';
+        // },
+
+        startEditReceiverAck() {
+            if (!this.signatures.receiver_ack) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'ยังไม่มีข้อมูลการลงนาม',
+                });
+                return;
+            }
+
+            this.signEditMode.receiver_ack = true;
+            this.signForm.receiver_ack = true;
+
+            // ไม่ต้องเอารูปเดิมมาใส่ใน form
+            // ให้ form เก็บเฉพาะรูปใหม่ที่ผู้ใช้ upload เท่านั้น
+            this.signForm.receiver_signature_image = '';
+            this.signForm.receiver_signature_file_name = '';
+        },
+
+        cancelEditReceiverAck() {
+            this.signEditMode.receiver_ack = false;
+
+            if (this.signatures.receiver_ack) {
+                this.signForm.receiver_ack = true;
+            }
+
+            this.signForm.receiver_signature_image = '';
+            this.signForm.receiver_signature_file_name = '';
+        },
+
+        async updateReceiverAckSignature() {
+            try {
+                const signature = this.signatures.receiver_ack;
+
+                if (!signature?.p04_id) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'ไม่พบรหัสรายการลงนาม',
+                    });
+                    return;
+                }
+
+                if (!this.signForm.receiver_ack) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'กรุณาติ๊กยืนยันก่อน',
+                        text: 'กรุณาติ๊กว่าได้รับทราบผลการประเมินก่อนอัพเดทการลงนาม',
+                    });
+                    return;
+                }
+
+                const signer = await this.getCurrentSigner();
+
+                if (Number(signer.signer_staff_id) !== Number(this.staffid_Main)) {
+                    Swal.fire({
+                        title: 'ไม่สามารถแก้ไขแทนได้',
+                        text: 'ผู้รับการประเมินต้องเป็นผู้แก้ไขการลงนามด้วยตนเอง',
+                        icon: 'warning',
+                    });
+                    return;
+                }
+
+                const confirm = await Swal.fire({
+                    title: 'ยืนยันอัพเดทการลงนาม?',
+                    html: `
+                        <div style="text-align:left">
+                            <b>ผู้ลงนาม:</b> ${signer.signer_name}<br>
+                            <b>ตำแหน่ง:</b> ${signer.signer_position}<br>
+                            <b>หมายเหตุ:</b> ระบบจะอัพเดทวันเวลาการลงนามเป็นเวลาปัจจุบัน
+                        </div>
+                    `,
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonText: 'อัพเดท',
+                    cancelButtonText: 'ยกเลิก',
+                });
+
+                if (!confirm.isConfirmed) return;
+
+                const payload = {
+                    p04_id: signature.p04_id,
+                    role_name: 'ผู้รับการประเมิน',
+
+                    signer_staff_id: signer.signer_staff_id,
+                    signer_name: signer.signer_name,
+                    signer_position: signer.signer_position,
+
+                    comment: '',
+                    signed_at: new Date().toISOString(),
+                };
+
+                // ส่งรูปเฉพาะตอนเลือกไฟล์ใหม่
+                if (this.signForm.receiver_signature_image) {
+                    payload.signature_image = this.signForm.receiver_signature_image;
+                }
+
+                const res = await axios.post('http://127.0.0.1:8000/api/updatesign', payload);
+
+                const updated = this.normalizeSignatureRow(res.data?.data);
+
+                if (updated?.sign_key) {
+                    this.signatures = {
+                        ...this.signatures,
+                        [updated.sign_key]: updated,
+                    };
+                }
+
+                this.signEditMode.receiver_ack = false;
+                this.signForm.receiver_ack = true;
+                this.signForm.receiver_signature_image = '';
+                this.signForm.receiver_signature_file_name = '';
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'อัพเดทการลงนามสำเร็จ',
+                    timer: 1500,
+                    showConfirmButton: false,
+                });
+
+            } catch (error) {
+                console.error(error);
+
+                Swal.fire({
+                    icon: 'error',
+                    title: 'อัพเดทไม่สำเร็จ',
+                    text: error.response?.data?.message || 'เกิดข้อผิดพลาดในการอัพเดทข้อมูล',
+                });
+            }
+        },
+
+        //เพิ่มรูปลายเซ็น
+        handleReceiverSignatureUpload(event) {
+            const file = event.target.files?.[0];
+
+            if (!file) return;
+
+            const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg'];
+
+            if (!allowedTypes.includes(file.type)) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'ชนิดไฟล์ไม่ถูกต้อง',
+                    text: 'กรุณาอัปโหลดเฉพาะไฟล์ PNG หรือ JPG เท่านั้น',
+                });
+
+                event.target.value = '';
+                return;
+            }
+
+            const maxSizeMB = 2;
+            const maxSizeByte = maxSizeMB * 1024 * 1024;
+
+            if (file.size > maxSizeByte) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'ไฟล์มีขนาดใหญ่เกินไป',
+                    text: `กรุณาอัปโหลดไฟล์ขนาดไม่เกิน ${maxSizeMB} MB`,
+                });
+
+                event.target.value = '';
+                return;
+            }
+
+            const reader = new FileReader();
+
+            reader.onload = (e) => {
+                this.signForm.receiver_signature_image = e.target.result;
+                this.signForm.receiver_signature_file_name = file.name;
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'อัปโหลดลายเซ็นแล้ว',
+                    text: 'กรุณากดลงนามหรืออัพเดทการลงนามเพื่อบันทึกข้อมูล',
+                    timer: 1400,
+                    showConfirmButton: false,
+                });
+            };
+
+            reader.onerror = () => {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'อ่านไฟล์ไม่สำเร็จ',
+                    text: 'กรุณาลองอัปโหลดไฟล์ใหม่อีกครั้ง',
+                });
+            };
+
+            reader.readAsDataURL(file);
+        },
+
+        //แปลงชื่อไฟล์เป็น base64 
+        normalizeSignatureRow(row) {
+            if (!row) return row;
+
+            let imageSrc =
+                row.signature_image_url ||
+                row.signature_image ||
+                '';
+
+            // กรณี backend ส่ง path สั้นมา เช่น p04_signatures/sig_xxx.png
+            if (
+                imageSrc &&
+                !imageSrc.startsWith('http://') &&
+                !imageSrc.startsWith('https://') &&
+                !imageSrc.startsWith('data:image')
+            ) {
+                imageSrc = `http://127.0.0.1:8000/storage/${imageSrc}`;
+            }
+
+            // กัน browser cache รูปเก่า
+            if (imageSrc && !imageSrc.startsWith('data:image')) {
+                const version = row.updated_at
+                    ? new Date(row.updated_at).getTime()
+                    : Date.now();
+
+                imageSrc = `${imageSrc}${imageSrc.includes('?') ? '&' : '?'}v=${version}`;
+            }
+
+            return {
+                ...row,
+                signature_image_path: row.signature_image_path || row.signature_image || '',
+                signature_image: imageSrc,
+            };
+        },
+
+
 
 
     }
@@ -1403,6 +2023,152 @@ td:nth-child(2), td:nth-child(3) {
 :deep(.signature-btn .p-button-icon) {
     margin-right: 6px;
 }
+
+.signature-action-wrap {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+}
+
+:deep(.signature-action-btn) {
+    width: auto !important;
+    min-width: 80px;
+    padding: 5px 12px !important;
+}
+
+:deep(.signature-btn-cancel) {
+    width: auto !important;
+    min-width: 90px;
+    max-width: 130px;
+    padding: 6px 18px !important;
+    display: inline-flex !important;
+    justify-content: center;
+    align-items: center;
+    margin-left: 8px;
+}
+
+.signature-button-wrap {
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+:deep(.signature-upload-btn) {
+    width: auto !important;
+    min-width: 140px;
+    max-width: 180px;
+    padding: 6px 18px !important;
+    display: inline-flex !important;
+    justify-content: center;
+    align-items: center;
+}
+
+:deep(.signature-upload-btn .p-button-label) {
+    flex: unset !important;
+}
+
+.signature-preview-box {
+    margin-top: 10px;
+    padding: 10px;
+    border: 1px dashed #94a3b8;
+    border-radius: 8px;
+    background: #f8fafc;
+    text-align: center;
+}
+
+.preview-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #334155;
+    margin-bottom: 6px;
+}
+
+.signature-preview-img {
+    max-width: 220px;
+    max-height: 90px;
+    object-fit: contain;
+    display: block;
+    margin: 0 auto 6px auto;
+    background: white;
+    border-radius: 4px;
+}
+
+.preview-file-name {
+    font-size: 12px;
+    color: #64748b;
+    word-break: break-word;
+}
+
+.signature-display-area {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 80px;
+    margin: 8px 0;
+}
+
+.signature-img {
+    display: block;
+    max-width: 240px;
+    max-height: 90px;
+    object-fit: contain;
+    margin: 4px auto 8px auto;
+    background: transparent;
+}
+
+.no-signature-image {
+    font-size: 14px;
+    color: #991b1b;
+    font-weight: 600;
+    padding: 8px 12px;
+    border: 1px dashed #fca5a5;
+    border-radius: 8px;
+    background: #fff7f7;
+}
+
+.signature-display-area {
+    height: 120px;
+    max-height: 120px;
+    overflow: hidden;
+}
+
+.signature-display-area .signature-img {
+    width: auto !important;
+    max-width: 320px !important;
+    max-height: 110px !important;
+    object-fit: contain !important;
+    transform: none !important;
+    transform-origin: center;
+}
+
+.sign-status-text {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    margin-top: 8px;
+    font-weight: 700;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.sign-status-text.signed {
+    color: #15803d;
+}
+
+.sign-status-text.waiting {
+    color: #92400e;
+}
+
+
+
+
+
+
+
+
+
+
 </style>
 
 
