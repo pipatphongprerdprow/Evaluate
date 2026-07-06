@@ -33,7 +33,7 @@ const allMenus = ref([
         label: 'แบบบันทึกข้อตกลง(TOR)ป.01-ป.03',
         items: [
             { label: 'แบบบันทึกข้อตกลง', icon: 'pi pi-fw pi-calendar', to: '/setting/coversheet' },
-            // { label: 'ประวัติการประเมิน', icon: 'pi pi-fw pi-clock', to: '/setting/history' }
+            { label: 'ลายเซ็นดิจิทัล', icon: 'pi pi-fw pi pi-user-edit', to: '/setting/digitalsignature' }
 
         ]
         

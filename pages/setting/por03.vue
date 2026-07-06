@@ -649,7 +649,7 @@
                 <div class="p-fluid formgrid"> 
                     <div class="field col-12 md:col-6">
                         <label for="radioValueDoc">เลือกประเภทการแนปเอกสาร</label> 
-                        <b style="color: red;"> (รองรับขนาดไฟล์ไม่เกิน 10 Mb) </b>
+                        <b style="color: red;"> (รองรับขนาดไฟล์ไม่เกิน 15 Mb) </b>
 
                         <!-- <Dropdown v-model="radioValueDoc" :options="radioValueDocs" optionLabel="name" placeholder="เลือกระดับการประเมินตนเอง"></Dropdown>  -->
                         <div class="grid">
@@ -1499,9 +1499,45 @@ import InputText from 'primevue/inputtext';
                 this.docSavedSuccess = false;
                 this.Data_Doc();
             }, 
-           handleFileChange(event) {
+
+            // handleFileChange(event) {
+            //     const files = event.target.files;
+            //     const maxFileSize = 10 * 1024 * 1024; // 10 MB
+            //     const validFiles = [];
+            //     let oversizedFiles = [];
+
+            //     Array.from(files).forEach(file => {
+            //         if (file.size > maxFileSize) {
+            //             oversizedFiles.push(file.name);
+            //         } else {
+            //             validFiles.push(file);
+            //         }
+            //     }); 
+            //     if (oversizedFiles.length > 0) {
+            //         Swal.fire({
+            //             icon: "error",
+            //             title: "ไฟล์มีขนาดเกิน 10 MB",
+            //             html: `
+            //                 ไฟล์ต่อไปนี้มีขนาดเกินกำหนด:<br><br>
+            //                 <strong>${oversizedFiles.join("<br>")}</strong>
+            //             `,
+            //             confirmButtonText: "ตกลง",
+            //         });
+            //     }
+
+            //     // อัปเดตเฉพาะไฟล์ที่ผ่านการตรวจสอบ
+            //     this.selectedFiles = validFiles;
+
+            //     console.log("ไฟล์ที่ผ่านการตรวจสอบ:", this.selectedFiles);
+            // },
+
+            handleFileChange(event) {
                 const files = event.target.files;
-                const maxFileSize = 10 * 1024 * 1024; // 10 MB
+
+                // กำหนดขนาดไฟล์สูงสุด 50 MB
+                const maxFileSizeMB = 25;
+                const maxFileSize = maxFileSizeMB * 1024 * 1024;
+
                 const validFiles = [];
                 let oversizedFiles = [];
 
@@ -1511,29 +1547,29 @@ import InputText from 'primevue/inputtext';
                     } else {
                         validFiles.push(file);
                     }
-                }); 
+                });
+
                 if (oversizedFiles.length > 0) {
                     Swal.fire({
                         icon: "error",
-                        title: "ไฟล์มีขนาดเกิน 10 MB",
+                        title: `ไฟล์มีขนาดเกิน ${maxFileSizeMB} MB`,
                         html: `
                             ไฟล์ต่อไปนี้มีขนาดเกินกำหนด:<br><br>
                             <strong>${oversizedFiles.join("<br>")}</strong>
                         `,
                         confirmButtonText: "ตกลง",
                     });
+
+                    // ล้างค่า input file เพื่อให้ผู้ใช้เลือกใหม่ได้
+                    event.target.value = "";
                 }
 
-                // อัปเดตเฉพาะไฟล์ที่ผ่านการตรวจสอบ
                 this.selectedFiles = validFiles;
 
                 console.log("ไฟล์ที่ผ่านการตรวจสอบ:", this.selectedFiles);
             },
 
-            // handleFileChange(event) {
-            //     const files = event.target.files;
-            //     this.selectedFiles = Array.from(files);
-            // },
+             
             add_data_file(file){
                 return new Promise((resolve, reject) => {
                     const reader = new FileReader();
@@ -1658,11 +1694,11 @@ import InputText from 'primevue/inputtext';
                         const fileData = await this.add_data_file(file);
 
                         const formData = new FormData();
-                        formData.append("text_edtDoc", this.text_edtDoc);
-                        formData.append("doc_type", this.radioValue);
-                        formData.append("doc_no", this.doc_no);
-                        formData.append("doc_name", this.doc_name);
-                        formData.append("file", JSON.stringify(fileData));
+                            formData.append("text_edtDoc", this.text_edtDoc);
+                            formData.append("doc_type", this.radioValue);
+                            formData.append("doc_no", this.doc_no);
+                            formData.append("doc_name", this.doc_name);
+                            formData.append("file", JSON.stringify(fileData));
 
                         const instance_x = axios.create({
                             headers: {
@@ -1740,10 +1776,13 @@ import InputText from 'primevue/inputtext';
                 } catch (error) {
                     console.error('Error saving document:', error);
 
+                    const errorMessage = error.response?.data?.message 
+                        || "เกิดข้อผิดพลาดในการบันทึกหลักฐาน กรุณาตรวจสอบข้อมูลและลองใหม่อีกครั้ง";
+
                     Swal.fire({
                         icon: "error",
                         title: "บันทึกไม่สำเร็จ",
-                        text: "เกิดข้อผิดพลาดในการบันทึกหลักฐาน กรุณาตรวจสอบข้อมูลและลองใหม่อีกครั้ง",
+                        text: errorMessage,
                         confirmButtonText: "ตกลง"
                     });
                 }
