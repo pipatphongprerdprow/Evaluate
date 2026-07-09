@@ -3,9 +3,9 @@
         <!-- Header -->
         <div class="page-title">
             <div class="title-icon">
-                <span style="font-size:20px;">👤</span>
-                <span style="font-size:20px;">✏️</span>
-            </div> 
+                <span style="font-size:32px;">👤</span>
+                <span style="font-size:32px;">✏️</span>
+            </div>
             <div>
                 <h2>ตั้งค่าลายเซ็นดิจิทัล</h2>
                 <p>ลายเซ็นรูปภาพจะถูกนำไปแสดงในเอกสาร และใบรับรองดิจิทัล (PKI) ใช้ยืนยันตัวตนของผู้ลงนาม</p>
@@ -19,19 +19,17 @@
                     <h3 class="card-title">ข้อมูลบุคลากร</h3>
 
                     <div class="profile-body">
-                        <div class="avatar-box">
+                        <div class="profile-avatar">
                             <img
-                                v-if="profilePhoto && !profilePhotoError"
-                                :src="profilePhoto"
-                                @error="profilePhotoError = true"
-                                alt="profile"
+                                v-if="profileImageSrc && !profileImageLoadError"
+                                :src="profileImageSrc"
+                                :alt="profileFullName"
+                                @error="profileImageLoadError = true"
                             />
-                            <div v-else class="avatar-initial">
-                                {{ initials }}
-                            </div>
+                            <span v-else>{{ profileInitial }}</span>
                         </div>
 
-                        <h4>{{ fullName || '-' }}</h4>
+                        <h4>{{ profileFullName || '-' }}</h4>
                         <p>{{ positionName || '-' }}</p>
                         <p>{{ departmentName || '-' }}</p>
                         <p>{{ email || '-' }}</p>
@@ -91,11 +89,12 @@
                                     icon="pi pi-upload"
                                     severity="info"
                                     outlined
-                                    @click="$refs.signatureInput.click()"
+                                    :disabled="isSignatureLocked"
+                                    @click="openSignatureFilePicker"
                                 />
                             </div>
 
-                            <div class="draw-panel">
+                            <div class="draw-panel" :class="{ locked: isSignatureLocked }">
                                 <div class="draw-title">
                                     <i class="pi pi-pencil"></i>
                                     <span>หรือวาดลายเซ็นด้วยตนเอง</span>
@@ -119,7 +118,7 @@
                                         icon="pi pi-refresh"
                                         severity="secondary"
                                         outlined
-                                        :disabled="!hasDrawing"
+                                        :disabled="isSignatureLocked || !hasDrawing"
                                         @click="clearCanvas"
                                     />
 
@@ -127,9 +126,12 @@
                                         label="ใช้ลายเซ็นที่วาด"
                                         icon="pi pi-check-circle"
                                         severity="info"
-                                        :disabled="!hasDrawing"
+                                        :disabled="isSignatureLocked || !hasDrawing"
                                         @click="useDrawnSignature"
                                     />
+                                </div>
+                                <div v-if="isSignatureLocked" class="signature-locked-message">
+                                    มีลายเซ็นปัจจุบันแล้ว หากต้องการเปลี่ยน กรุณากดปุ่ม “เปลี่ยนลายเซ็น”
                                 </div>
                             </div>
 
@@ -148,7 +150,7 @@
                                 </div>
 
                                 <p v-if="signatureUpdatedAt" class="updated-text">
-                                    อัปเดตล่าสุด: {{ signatureUpdatedAt }}
+                                    อัปเดตล่าสุด: {{ formatThaiDateTimeBE(signatureUpdatedAt) }}
                                 </p>
 
                                 <div class="bottom-actions">
@@ -157,18 +159,38 @@
                                         icon="pi pi-trash"
                                         severity="danger"
                                         outlined
-                                        :disabled="!hasSignature"
+                                        :disabled="!hasSavedSignature || savingSignature"
                                         @click="deleteSignature"
                                     />
 
                                     <Button
-                                        label="บันทึกลายเซ็น"
-                                        icon="pi pi-save"
-                                        severity="info"
-                                        :loading="savingSignature"
-                                        :disabled="!signaturePreview"
-                                        @click="saveSignature"
+                                        v-if="hasSavedSignature && !signatureEditMode"
+                                        label="เปลี่ยนลายเซ็น"
+                                        icon="pi pi-pencil"
+                                        severity="warning"
+                                        @click="startChangeSignature"
                                     />
+
+                                    <template v-else>
+                                        <Button
+                                            v-if="hasSavedSignature"
+                                            label="ยกเลิก"
+                                            icon="pi pi-times"
+                                            severity="secondary"
+                                            outlined
+                                            :disabled="savingSignature"
+                                            @click="cancelChangeSignature"
+                                        />
+
+                                        <Button
+                                            :label="hasSavedSignature ? 'บันทึกการเปลี่ยนลายเซ็น' : 'บันทึกลายเซ็น'"
+                                            icon="pi pi-save"
+                                            severity="info"
+                                            :loading="savingSignature"
+                                            :disabled="!canSaveSignature"
+                                            @click="saveSignature"
+                                        />
+                                    </template>
                                 </div>
                             </div>
                         </TabPanel>
@@ -202,7 +224,7 @@
                                 />
 
                                 <Button
-                                    label="อัปโหลดใบรับรอง"
+                                    :label="hasSavedCertificate ? 'เปลี่ยนใบรับรอง' : 'อัปโหลดใบรับรอง'"
                                     icon="pi pi-upload"
                                     severity="info"
                                     outlined
@@ -210,10 +232,10 @@
                                 />
 
                                 <Button
-                                    label="สร้างใบรับรองของระบบเอง"
+                                    :label="hasSavedCertificate ? 'สร้างใบรับรองใหม่' : 'สร้างใบรับรองของระบบเอง'"
                                     icon="pi pi-shield"
                                     severity="info"
-                                    @click="createSystemCertificate"
+                                    @click="openCertificateDialog"
                                 />
                             </div>
 
@@ -230,22 +252,27 @@
                                     <span>ผู้ถือใบรับรอง (CN)</span>
                                     <b>{{ certificate.cn }}</b>
                                 </div>
+
                                 <div class="certificate-row">
                                     <span>ออกโดย (Issuer)</span>
                                     <b>{{ certificate.issuer }}</b>
                                 </div>
+
                                 <div class="certificate-row">
                                     <span>มีผลตั้งแต่</span>
                                     <b>{{ certificate.validFrom }}</b>
                                 </div>
+
                                 <div class="certificate-row">
                                     <span>หมดอายุ</span>
                                     <b>{{ certificate.validTo }}</b>
                                 </div>
+
                                 <div class="certificate-row">
                                     <span>Serial Number</span>
                                     <b>{{ certificate.serial }}</b>
                                 </div>
+
                                 <div class="certificate-row">
                                     <span>ลายนิ้วมือ (SHA-256)</span>
                                     <b class="fingerprint">{{ certificate.fingerprint }}</b>
@@ -288,10 +315,10 @@
 
                     <div class="document-preview">
                         <div class="document-paper">
-                            <h4>รายงานการเดินทางไปราชการ (แบบ 8708)</h4>
+                            <h4>รายงานแบบประเมิน ป.04</h4>
                             <hr />
 
-                            <p>ผู้รายงาน: {{ fullName || '-' }}</p>
+                            <p>ผู้รายงาน: {{ profileFullName || '-' }}</p>
                             <p>ตำแหน่ง: {{ positionName || '-' }}</p>
 
                             <div class="signature-on-doc">
@@ -304,10 +331,10 @@
                                     พื้นที่แสดงลายเซ็น
                                 </div>
 
-                                <p>( {{ fullName || '........................................' }} )</p>
+                                <p>( {{ profileFullName || '........................................' }} )</p>
                                 <p>{{ positionName || 'ตำแหน่ง ........................................' }}</p>
                                 <p class="green-text" v-if="certificate.usable">
-                                    ลงนามดิจิทัลโดย {{ fullName }}
+                                    ลงนามดิจิทัลโดย {{ profileFullName }}
                                 </p>
                                 <p class="muted-text" v-else>
                                     ยังไม่ได้เชื่อมใบรับรองดิจิทัล
@@ -318,6 +345,81 @@
                 </div>
             </div>
         </div>
+
+        <!-- Create Certificate Dialog -->
+        <Dialog
+            v-model:visible="createCertDialog"
+            modal
+            class="cert-create-dialog"
+            header="สร้างใบรับรองดิจิทัลของระบบ (Self-signed X.509)"
+            :style="{ width: '600px' }"
+            :breakpoints="{ '960px': '90vw', '640px': '96vw' }"
+        >
+            <div class="cert-dialog-body">
+                <div class="cert-info-box">
+                    <i class="pi pi-info-circle"></i>
+                    <div>
+                        ระบบจะสร้างคู่กุญแจ RSA 2048 บิต และใบรับรอง self-signed อายุ 1 ปี —
+                        เก็บใบรับรองส่วนสาธารณะไว้ในระบบ และดาวน์โหลดกุญแจส่วนตัว
+                        (private key) ที่ท่านเก็บเอง ระบบไม่จัดเก็บกุญแจส่วนตัว
+                    </div>
+                </div>
+
+                <div class="p-fluid formgrid grid cert-form">
+                    <div class="field col-12">
+                        <label>ชื่อผู้ถือใบรับรอง (CN) <span>*</span></label>
+                        <InputText v-model="certForm.cn" />
+                    </div>
+
+                    <div class="field col-12 md:col-6">
+                        <label>อีเมล (emailAddress)</label>
+                        <InputText v-model="certForm.email" />
+                    </div>
+
+                    <div class="field col-12 md:col-6">
+                        <label>หน่วยงาน (OU)</label>
+                        <InputText v-model="certForm.ou" />
+                    </div>
+
+                    <div class="field col-12">
+                        <label>องค์กร (O)</label>
+                        <InputText v-model="certForm.o" />
+                    </div>
+
+                    <div class="field col-12 md:col-4">
+                        <label>ประเทศ (C)</label>
+                        <InputText v-model="certForm.c" maxlength="2" />
+                    </div>
+
+                    <div class="field col-12 md:col-4">
+                        <label>จังหวัด (ST)</label>
+                        <InputText v-model="certForm.st" />
+                    </div>
+
+                    <div class="field col-12 md:col-4">
+                        <label>อำเภอ (L)</label>
+                        <InputText v-model="certForm.l" />
+                    </div>
+                </div>
+            </div>
+
+            <template #footer>
+                <Button
+                    label="ยกเลิก"
+                    severity="secondary"
+                    text
+                    @click="createCertDialog = false"
+                />
+
+                <Button
+                    label="สร้างและบันทึกใบรับรอง"
+                    icon="pi pi-shield"
+                    severity="info"
+                    :loading="creatingCertificate"
+                    @click="createSystemCertificate"
+                />
+            </template>
+        </Dialog>
 
         <Button
             icon="pi pi-arrow-up"
@@ -332,25 +434,68 @@
 <script>
 import axios from 'axios';
 import Swal from 'sweetalert2';
+import Button from 'primevue/button';
+import TabView from 'primevue/tabview';
+import TabPanel from 'primevue/tabpanel';
+import Dialog from 'primevue/dialog';
+import InputText from 'primevue/inputtext';
 
 const API_BASE = 'http://127.0.0.1:8000/api';
+const PROFILE_IMAGE_URL = 'https://pd.msu.ac.th/staff/picture/'; 
+
+// const PROFILE_IMAGE_URL = 'http://127.0.0.1:8000/storage/profile/';
+
 
 export default {
+    components: {
+        Button,
+        TabView,
+        TabPanel,
+        Dialog,
+        InputText
+    },
+
     data() {
         return {
             userSession: null,
+            currentUserProfile: {},
+            personalRow: null,
+            staffid_Main: '',
+
             activeIndex: 0,
 
-            profilePhotoError: false,
+            profileImageLoadError: false,
 
             signaturePreview: null,
             signatureFile: null,
             signatureUpdatedAt: null,
             savingSignature: false,
+            hasSavedSignature: false,
+            signatureChanged: false,
+            createCertDialog: false,
+            creatingCertificate: false,
+            hasSavedCertificate: false,
 
+            signatureEditMode: false,
+            oldSignaturePreview: null,
+            oldSignatureUpdatedAt: null,
+ 
             isDrawing: false,
             hasDrawing: false,
             lastPoint: null,
+
+            createCertDialog: false,
+            creatingCertificate: false,
+
+            certForm: {
+                cn: '',
+                email: '',
+                ou: '',
+                o: 'มหาวิทยาลัยมหาสารคาม',
+                c: 'TH',
+                st: 'มหาสารคาม',
+                l: 'กันทรวิชัย'
+            },
 
             certificate: {
                 usable: false,
@@ -366,53 +511,93 @@ export default {
     },
 
     computed: {
-        profile() {
-            return this.userSession?.user?.name || {};
+        staffId() {
+            return this.normalizeStaffId(this.staffid_Main || this.currentUserProfile.STAFFID);
         },
 
-        fullName() {
-            return `${this.profile.PREFIXFULLNAME || ''}${this.profile.STAFFNAME || ''} ${this.profile.STAFFSURNAME || ''}`.trim();
+        profileFullName() {
+            const row = this.personalRow || {};
+            const prefix = row.prefixfullname || this.currentUserProfile.PREFIXFULLNAME || '';
+            const name =
+                row.namefully ||
+                `${this.currentUserProfile.STAFFNAME || ''} ${this.currentUserProfile.STAFFSURNAME || ''}`.trim();
+
+            return `${prefix || ''}${prefix && name ? ' ' : ''}${name || 'ผู้ใช้งานระบบ'}`.trim();
+        },
+
+        profileInitial() {
+            const name =
+                this.personalRow?.namefully ||
+                this.currentUserProfile.STAFFNAME ||
+                this.profileFullName ||
+                'P';
+
+            return String(name).trim().slice(0, 1) || 'P';
+        },
+
+        profileImageSrc() {
+            const staffid = this.normalizeStaffId(this.staffid_Main || this.currentUserProfile.STAFFID);
+            return staffid ? `${PROFILE_IMAGE_URL}${staffid}.jpg` : '';
         },
 
         positionName() {
-            return this.profile.POSITIONNAME || '';
+            return (
+                this.personalRow?.posnameth ||
+                this.currentUserProfile.POSITIONNAME ||
+                this.currentUserProfile.POSTYPENAME ||
+                ''
+            );
         },
 
         departmentName() {
-            return this.profile.SCOPES?.staffdepartmentname || '';
+            return (
+                this.personalRow?.departmentname ||
+                this.personalRow?.staffdepartmentname ||
+                this.currentUserProfile.SCOPES?.staffdepartmentname ||
+                ''
+            );
         },
 
         email() {
-            return this.profile.EMAIL || this.profile.email || '';
-        },
-
-        staffId() {
-            return this.profile.STAFFID || '';
-        },
-
-        profilePhoto() {
-            return this.profile.picture || this.profile.photo || this.profile.avatar || '';
-        },
-
-        initials() {
-            if (!this.fullName) return 'MSU';
-            return this.fullName.replace(/\s+/g, '').slice(0, 2);
+            return (
+                this.personalRow?.email ||
+                this.currentUserProfile.EMAIL ||
+                this.currentUserProfile.email ||
+                ''
+            );
         },
 
         hasSignature() {
             return !!this.signaturePreview;
+        },
+        isSignatureLocked() {
+            return this.hasSavedSignature && !this.signatureEditMode;
+        },
+
+        canSaveSignature() {
+            return !!this.signaturePreview && this.signatureChanged && !this.savingSignature;
         }
+
     },
+
+     
 
     async mounted() {
         const { getSession } = await useAuth();
         this.userSession = await getSession();
+
+        const sessionName = this.userSession?.user?.name || {};
+
+        this.currentUserProfile = sessionName;
+        this.staffid_Main = sessionName.STAFFID || '';
+        this.profileImageLoadError = false;
 
         this.$nextTick(() => {
             this.prepareCanvas();
         });
 
         window.addEventListener('resize', this.prepareCanvas);
+
         await this.loadDigitalSignatureData();
     },
 
@@ -421,35 +606,58 @@ export default {
     },
 
     methods: {
-        async loadDigitalSignatureData() {
+        normalizeStaffId(value) {
+            return String(value ?? '').replace(/\s+/g, '').trim();
+        },
+
+       async loadDigitalSignatureData() {
             try {
                 const res = await axios.post(`${API_BASE}/digital-signature/profile`, {
                     staff_id: this.staffId
                 });
 
                 const data = res.data || {};
+                const signatureUrl = data.signature_url || data.signatureUrl || null;
+                const signatureRow = data.signature || data.digital_signature || null;
 
-                this.signaturePreview = data.signature_url || null;
-                this.signatureUpdatedAt = data.signature_updated_at || null;
+                this.personalRow = data.personal || data.personalRow || this.personalRow;
+
+                this.signaturePreview = signatureUrl;
+                this.signatureUpdatedAt = data.signature_updated_at || data.signatureUpdatedAt || signatureRow?.updated_at || null;
+                this.hasSavedSignature = !!(signatureUrl || signatureRow?.signature_image);
+                this.signatureChanged = false;
+                this.signatureFile = null;
+                this.signatureEditMode = !this.hasSavedSignature;
+                this.oldSignaturePreview = this.signaturePreview;
+                this.oldSignatureUpdatedAt = this.signatureUpdatedAt;
 
                 if (data.certificate) {
-                    this.certificate = {
-                        usable: !!data.certificate.usable,
-                        fileName: data.certificate.file_name || '',
-                        cn: data.certificate.cn || '-',
-                        issuer: data.certificate.issuer || '-',
-                        validFrom: data.certificate.valid_from || '-',
-                        validTo: data.certificate.valid_to || '-',
-                        serial: data.certificate.serial || '-',
-                        fingerprint: data.certificate.fingerprint || '-'
-                    };
+                    this.setCertificateData(data.certificate);
+                    this.hasSavedCertificate = !!data.certificate.usable;
+                } else {
+                    this.hasSavedCertificate = false;
+                    this.certificate = this.getEmptyCertificate();
                 }
             } catch (error) {
-                console.warn('ยังไม่พบ API สำหรับโหลดข้อมูลลายเซ็น หรือโหลดข้อมูลไม่สำเร็จ');
+                console.warn('ยังไม่พบ API สำหรับโหลดข้อมูลลายเซ็น หรือโหลดข้อมูลไม่สำเร็จ', error);
+                this.hasSavedSignature = false;
+                this.hasSavedCertificate = false;
             }
         },
 
         handleSignatureFile(event) {
+            if (this.isSignatureLocked) {
+                event.target.value = '';
+
+                Swal.fire({
+                    icon: 'info',
+                    title: 'ยังไม่สามารถแก้ไขได้',
+                    text: 'กรุณากดปุ่ม “เปลี่ยนลายเซ็น” ก่อนอัปโหลดรูปใหม่',
+                });
+
+                return;
+            }
+
             const file = event.target.files?.[0];
             if (!file) return;
 
@@ -471,6 +679,7 @@ export default {
             this.signatureFile = file;
             this.signaturePreview = URL.createObjectURL(file);
             this.signatureUpdatedAt = 'รอบันทึกข้อมูล';
+            this.signatureChanged = true;
         },
 
         prepareCanvas() {
@@ -506,7 +715,12 @@ export default {
         },
 
         startDraw(event) {
+            if (this.isSignatureLocked) {
+                return;
+            }
+
             event.preventDefault();
+
             this.isDrawing = true;
             this.hasDrawing = true;
             this.lastPoint = this.getCanvasPoint(event);
@@ -534,23 +748,52 @@ export default {
         },
 
         clearCanvas() {
+            const canvas = this.$refs.signatureCanvas;
+            if (!canvas) return;
+
             this.prepareCanvas();
             this.hasDrawing = false;
             this.lastPoint = null;
         },
 
         useDrawnSignature() {
+            if (this.isSignatureLocked) {
+                Swal.fire({
+                    icon: 'info',
+                    title: 'ยังไม่สามารถแก้ไขได้',
+                    text: 'กรุณากดปุ่ม “เปลี่ยนลายเซ็น” ก่อนวาดลายเซ็นใหม่',
+                });
+
+                return;
+            }
+
             const canvas = this.$refs.signatureCanvas;
             if (!canvas || !this.hasDrawing) return;
 
             this.signatureFile = null;
             this.signaturePreview = canvas.toDataURL('image/png');
             this.signatureUpdatedAt = 'รอบันทึกข้อมูล';
+            this.signatureChanged = true;
         },
 
         async saveSignature() {
+            if (this.isSignatureLocked) {
+                Swal.fire({
+                    icon: 'info',
+                    title: 'ยังไม่สามารถบันทึกได้',
+                    text: 'กรุณากดปุ่ม “เปลี่ยนลายเซ็น” ก่อนแก้ไขลายเซ็น',
+                });
+
+                return;
+            }
+
             if (!this.signaturePreview) {
                 Swal.fire('แจ้งเตือน', 'กรุณาอัปโหลดหรือวาดลายเซ็นก่อนบันทึก', 'warning');
+                return;
+            }
+
+            if (!this.signatureChanged) {
+                Swal.fire('แจ้งเตือน', 'ยังไม่มีการเปลี่ยนแปลงลายเซ็น', 'warning');
                 return;
             }
 
@@ -558,7 +801,12 @@ export default {
 
             try {
                 const formData = new FormData();
+
                 formData.append('staff_id', this.staffId);
+                formData.append('signer_name', this.profileFullName || '');
+                formData.append('signer_position', this.positionName || '');
+                formData.append('department_name', this.departmentName || '');
+                formData.append('email', this.email || '');
 
                 if (this.signatureFile) {
                     formData.append('signature_file', this.signatureFile);
@@ -566,19 +814,46 @@ export default {
                     formData.append('signature_base64', this.signaturePreview);
                 }
 
-                const res = await axios.post(`${API_BASE}/digital-signature/save`, formData);
+                const endpoint = this.hasSavedSignature
+                    ? `${API_BASE}/digital-signature/update`
+                    : `${API_BASE}/digital-signature/save`;
 
-                this.signaturePreview = res.data?.signature_url || this.signaturePreview;
-                this.signatureUpdatedAt = res.data?.updated_at || new Date().toLocaleString('th-TH');
+                const res = await axios.post(endpoint, formData);
+
+                const data = res.data || {};
+
+                this.signaturePreview = data.signature_url || data.signatureUrl || this.signaturePreview;
+                this.signatureUpdatedAt = data.updated_at || data.updatedAt || new Date();
+
+                this.hasSavedSignature = true;
+                this.signatureChanged = false;
+                this.signatureFile = null;
+
+                this.signatureEditMode = false;
+                this.oldSignaturePreview = this.signaturePreview;
+                this.oldSignatureUpdatedAt = this.signatureUpdatedAt;
+
+                this.clearCanvas();
 
                 Swal.fire({
                     icon: 'success',
                     title: 'บันทึกลายเซ็นสำเร็จ',
                     showConfirmButton: false,
-                    timer: 1500
+                    timer: 1500,
                 });
+
             } catch (error) {
-                Swal.fire('เกิดข้อผิดพลาด', 'ไม่สามารถบันทึกลายเซ็นได้ กรุณาตรวจสอบ API', 'error');
+                console.error('saveSignature error:', error);
+
+                Swal.fire({
+                    icon: 'error',
+                    title: 'เกิดข้อผิดพลาด',
+                    text:
+                        error.response?.data?.error ||
+                        error.response?.data?.message ||
+                        'ไม่สามารถบันทึกลายเซ็นได้ กรุณาตรวจสอบ API',
+                });
+
             } finally {
                 this.savingSignature = false;
             }
@@ -591,29 +866,47 @@ export default {
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonText: 'ลบลายเซ็น',
-                cancelButtonText: 'ยกเลิก'
+                cancelButtonText: 'ยกเลิก',
             });
 
             if (!confirm.isConfirmed) return;
 
             try {
                 await axios.post(`${API_BASE}/digital-signature/delete`, {
-                    staff_id: this.staffId
+                    staff_id: this.staffId,
                 });
 
                 this.signaturePreview = null;
                 this.signatureFile = null;
                 this.signatureUpdatedAt = null;
+
+                this.hasSavedSignature = false;
+                this.signatureChanged = false;
+                this.signatureEditMode = true;
+
+                this.oldSignaturePreview = null;
+                this.oldSignatureUpdatedAt = null;
+
                 this.clearCanvas();
 
                 Swal.fire({
                     icon: 'success',
                     title: 'ลบลายเซ็นสำเร็จ',
                     showConfirmButton: false,
-                    timer: 1200
+                    timer: 1200,
                 });
+
             } catch (error) {
-                Swal.fire('เกิดข้อผิดพลาด', 'ไม่สามารถลบลายเซ็นได้', 'error');
+                console.error('deleteSignature error:', error);
+
+                Swal.fire({
+                    icon: 'error',
+                    title: 'เกิดข้อผิดพลาด',
+                    text:
+                        error.response?.data?.error ||
+                        error.response?.data?.message ||
+                        'ไม่สามารถลบลายเซ็นได้',
+                });
             }
         },
 
@@ -621,12 +914,30 @@ export default {
             const file = event.target.files?.[0];
             if (!file) return;
 
+            const fileName = file.name.toLowerCase();
+            const validExt = fileName.endsWith('.cer') || fileName.endsWith('.crt') || fileName.endsWith('.pem');
+
+            if (!validExt) {
+                Swal.fire('แจ้งเตือน', 'รองรับเฉพาะไฟล์ .cer, .crt หรือ .pem เท่านั้น', 'warning');
+                event.target.value = '';
+                return;
+            }
+
             const formData = new FormData();
             formData.append('staff_id', this.staffId);
             formData.append('certificate_file', file);
 
             try {
-                const res = await axios.post(`${API_BASE}/digital-certificate/upload`, formData);
+                // const res = await axios.post(`${API_BASE}/digital-certificate/upload`, formData);
+                const endpoint = this.hasSavedCertificate
+                    ? `${API_BASE}/digital-certificate/update`
+                    : `${API_BASE}/digital-certificate/upload`;
+
+                const res = await axios.post(endpoint, formData);
+                this.setCertificateData(res.data?.certificate || res.data);
+                this.hasSavedCertificate = true;
+
+
                 this.setCertificateData(res.data?.certificate || res.data);
 
                 Swal.fire({
@@ -640,48 +951,122 @@ export default {
             }
         },
 
-        async createSystemCertificate() {
-            const confirm = await Swal.fire({
-                title: 'สร้างใบรับรองของระบบเอง?',
-                text: 'ระบบจะสร้างใบรับรองสำหรับใช้แสดงตัวตนในเอกสาร',
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonText: 'สร้างใบรับรอง',
-                cancelButtonText: 'ยกเลิก'
-            });
+        openCertificateDialog() {
+            this.certForm = {
+                cn: this.profileFullName || '',
+                email: this.email || '',
+                ou: this.departmentName || '',
+                o: 'มหาวิทยาลัยมหาสารคาม',
+                c: 'TH',
+                st: 'มหาสารคาม',
+                l: 'กันทรวิชัย'
+            };
 
-            if (!confirm.isConfirmed) return;
+            this.createCertDialog = true;
+        },
+
+        async createSystemCertificate() {
+            if (!this.certForm.cn || !this.certForm.cn.trim()) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'กรุณากรอกข้อมูล',
+                    text: 'กรุณากรอกชื่อผู้ถือใบรับรอง (CN)'
+                });
+                return;
+            }
+
+            this.creatingCertificate = true;
 
             try {
                 const res = await axios.post(`${API_BASE}/digital-certificate/create`, {
                     staff_id: this.staffId,
-                    common_name: this.fullName,
-                    email: this.email
+                    common_name: this.certForm.cn,
+                    email: this.certForm.email,
+                    organizational_unit: this.certForm.ou,
+                    organization: this.certForm.o,
+                    country: this.certForm.c,
+                    state: this.certForm.st,
+                    locality: this.certForm.l
                 });
 
                 this.setCertificateData(res.data?.certificate || res.data);
+                this.hasSavedCertificate = true;
+                this.createCertDialog = false;
 
                 Swal.fire({
                     icon: 'success',
                     title: 'สร้างใบรับรองสำเร็จ',
+                    text: 'ระบบได้สร้างและบันทึกใบรับรองดิจิทัลเรียบร้อยแล้ว',
                     showConfirmButton: false,
                     timer: 1500
                 });
+
+                if (res.data?.private_key_download_url) {
+                    window.open(res.data.private_key_download_url, '_blank');
+                }
+
+                if (res.data?.private_key_pem) {
+                    this.downloadTextFile(
+                        res.data.private_key_pem,
+                        res.data.private_key_file_name || `private_key_${this.staffId}.pem`
+                    );
+                }
             } catch (error) {
-                Swal.fire('เกิดข้อผิดพลาด', 'ไม่สามารถสร้างใบรับรองได้ กรุณาตรวจสอบ API', 'error');
+                console.error('createSystemCertificate error:', error.response?.data || error);
+
+                const message =
+                    error.response?.data?.error ||
+                    error.response?.data?.message ||
+                    'ไม่สามารถสร้างใบรับรองได้ กรุณาตรวจสอบ API';
+
+                Swal.fire({
+                    icon: 'error',
+                    title: 'เกิดข้อผิดพลาด',
+                    text: message
+                });
+            } finally {
+                this.creatingCertificate = false;
             }
         },
 
         setCertificateData(data = {}) {
+            const rawCn =
+                data.cn ||
+                data.common_name ||
+                data.commonName ||
+                this.profileFullName ||
+                '-';
+
+            const rawIssuer =
+                data.issuer ||
+                data.issuer_name ||
+                rawCn ||
+                '-';
+
+            const rawFingerprint =
+                data.fingerprint ||
+                data.fingerprint_sha256 ||
+                data.sha256 ||
+                '-';
+
             this.certificate = {
-                usable: true,
-                fileName: data.file_name || data.fileName || `${this.fullName}.cer`,
-                cn: data.cn || this.fullName || '-',
-                issuer: data.issuer || 'MSU Digital Certificate Authority',
-                validFrom: data.valid_from || data.validFrom || '-',
-                validTo: data.valid_to || data.validTo || '-',
-                serial: data.serial || '-',
-                fingerprint: data.fingerprint || '-'
+                usable: data.usable !== undefined ? !!data.usable : true,
+
+                fileName: rawCn && rawCn !== '-'
+                    ? `${rawCn}.cer`
+                    : (data.file_name || data.fileName || data.certificate_file?.split('/').pop() || ''),
+
+                cn: this.extractCertificateCN(rawCn),
+
+                issuer: this.extractCertificateCN(rawIssuer),
+
+                validFrom: this.formatThaiDateTimeBE(data.valid_from || data.validFrom),
+
+                validTo: this.formatThaiDateTimeBE(data.valid_to || data.validTo),
+
+                serial: data.serial || data.serial_number || data.serialNumber || '-',
+
+                fingerprint: this.formatFingerprint(rawFingerprint)
             };
         },
 
@@ -728,7 +1113,174 @@ export default {
                 top: 0,
                 behavior: 'smooth'
             });
-        }
+        },
+        downloadTextFile(content, fileName) {
+            const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+
+            link.href = url;
+            link.download = fileName;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            setTimeout(() => window.URL.revokeObjectURL(url), 1000);
+        },
+        getEmptyCertificate() {
+            return {
+                usable: false,
+                fileName: '',
+                cn: '-',
+                issuer: '-',
+                validFrom: '-',
+                validTo: '-',
+                serial: '-',
+                fingerprint: '-'
+            };
+        },
+
+        extractCertificateCN(value) {
+            if (!value) return '-';
+
+            const text = String(value).trim(); 
+            const match = text.match(/CN\s*=\s*([^,\/]+)/i);
+
+            if (match && match[1]) {
+                return match[1].trim();
+            }
+
+            return text;
+        },
+
+        formatThaiDateTime(value) {
+            if (!value) return '-';
+
+            const text = String(value).trim(); 
+            const match = text.match(/^(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2}):(\d{2})/);
+
+            if (!match) return text;
+
+            const yearBE = Number(match[1]) + 543;
+            const month = Number(match[2]);
+            const day = Number(match[3]);
+
+            return `${day}/${month}/${yearBE} ${match[4]}:${match[5]}:${match[6]}`;
+        },
+
+        formatFingerprint(value) {
+            if (!value || value === '-') return '-';
+
+            const cleaned = String(value)
+                .replace(/[^a-fA-F0-9]/g, '')
+                .toUpperCase();
+
+            if (!cleaned) return '-';
+
+            return cleaned.match(/.{1,2}/g).join(':');
+        },
+
+        formatThaiDateTimeBE(value) {
+            if (!value) return '-'; 
+            if (value === 'รอบันทึกข้อมูล') {
+                return value;
+            }
+            const months = [
+                'มกราคม',
+                'กุมภาพันธ์',
+                'มีนาคม',
+                'เมษายน',
+                'พฤษภาคม',
+                'มิถุนายน',
+                'กรกฎาคม',
+                'สิงหาคม',
+                'กันยายน',
+                'ตุลาคม',
+                'พฤศจิกายน',
+                'ธันวาคม'
+            ];
+
+            const text = String(value).trim(); 
+            const match = text.match(/^(\d{4})-(\d{2})-(\d{2})(?:[ T](\d{2}):(\d{2})(?::(\d{2}))?)?/);
+
+            if (match) {
+                const yearBE = Number(match[1]) + 543;
+                const monthName = months[Number(match[2]) - 1];
+                const day = Number(match[3]);
+
+                const hour = match[4] || '00';
+                const minute = match[5] || '00';
+                const second = match[6] || '00';
+
+                return `${day} ${monthName} ${yearBE} เวลา ${hour}:${minute}:${second} น.`;
+            } 
+            const date = new Date(value);
+
+            if (!isNaN(date.getTime())) {
+                const day = date.getDate();
+                const monthName = months[date.getMonth()];
+                const yearBE = date.getFullYear() + 543;
+
+                const hour = String(date.getHours()).padStart(2, '0');
+                const minute = String(date.getMinutes()).padStart(2, '0');
+                const second = String(date.getSeconds()).padStart(2, '0');
+
+                return `${day} ${monthName} ${yearBE} เวลา ${hour}:${minute}:${second} น.`;
+            }
+
+            return text;
+        },
+
+        openSignatureFilePicker() {
+            if (this.isSignatureLocked) {
+                Swal.fire({
+                    icon: 'info',
+                    title: 'ยังไม่สามารถแก้ไขได้',
+                    text: 'หากต้องการเปลี่ยนลายเซ็น กรุณากดปุ่ม “เปลี่ยนลายเซ็น” ก่อน',
+                });
+                return;
+            }
+
+            this.$refs.signatureInput.click();
+        },
+
+        startChangeSignature() {
+            this.oldSignaturePreview = this.signaturePreview;
+            this.oldSignatureUpdatedAt = this.signatureUpdatedAt;
+
+            this.signatureEditMode = true;
+            this.signatureChanged = false;
+            this.signatureFile = null;
+
+            this.clearCanvas();
+
+            Swal.fire({
+                icon: 'success',
+                title: 'เปิดโหมดเปลี่ยนลายเซ็นแล้ว',
+                text: 'สามารถอัปโหลดรูปใหม่ หรือวาดลายเซ็นใหม่ได้',
+                timer: 1400,
+                showConfirmButton: false,
+            });
+        },
+
+        cancelChangeSignature() {
+            this.signaturePreview = this.oldSignaturePreview;
+            this.signatureUpdatedAt = this.oldSignatureUpdatedAt;
+
+            this.signatureEditMode = false;
+            this.signatureChanged = false;
+            this.signatureFile = null;
+
+            this.clearCanvas();
+        },
+
+
+
+
+
+
+
+
     }
 };
 </script>
@@ -749,9 +1301,9 @@ export default {
 }
 
 .title-icon {
-    width: 36px;
-    height: 36px;
-    border-radius: 12px;
+    width: 40px;
+    height: 40px;
+    border-radius: 14px;
     background: #e7f3ff;
     color: #1e88e5;
     display: flex;
@@ -796,7 +1348,7 @@ export default {
     padding: 2px 12px 14px;
 }
 
-.avatar-box {
+.profile-avatar {
     width: 96px;
     height: 96px;
     margin: 0 auto 16px;
@@ -806,17 +1358,20 @@ export default {
     display: flex;
     align-items: center;
     justify-content: center;
+    box-shadow: 0 8px 18px rgba(30, 136, 229, 0.25);
 }
 
-.avatar-box img {
+.profile-avatar img {
     width: 100%;
     height: 100%;
+    display: block;
     object-fit: cover;
+    object-position: center top;
 }
 
-.avatar-initial {
+.profile-avatar span {
     color: #ffffff;
-    font-size: 26px;
+    font-size: 30px;
     font-weight: 800;
 }
 
@@ -1037,7 +1592,11 @@ export default {
 }
 
 .fingerprint {
-    word-break: break-all;
+    word-break: normal;
+    overflow-wrap: anywhere;
+    font-family: monospace;
+    font-size: 12px;
+    line-height: 1.5;
 }
 
 .certificate-actions {
@@ -1119,6 +1678,117 @@ export default {
     position: fixed;
     right: 28px;
     bottom: 24px;
+}
+
+/* Dialog */
+:deep(.cert-create-dialog .p-dialog-header) {
+    padding: 22px 22px 18px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+:deep(.cert-create-dialog .p-dialog-title) {
+    font-size: 18px;
+    font-weight: 800;
+    color: #333247;
+}
+
+:deep(.cert-create-dialog .p-dialog-content) {
+    padding: 20px 20px 8px;
+}
+
+:deep(.cert-create-dialog .p-dialog-footer) {
+    padding: 14px 20px 18px;
+    border-top: 1px solid #eef0f4;
+}
+
+.cert-dialog-body {
+    color: #4b4b5f;
+}
+
+.cert-info-box {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    padding: 16px;
+    margin-bottom: 10px;
+    border-radius: 7px;
+    background: #d9f0ff;
+    color: #7a8492;
+    line-height: 1.6;
+}
+
+.cert-info-box i {
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
+    border-radius: 8px;
+    background: #25a8f5;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+}
+
+.cert-form .field {
+    position: relative;
+    margin-bottom: 10px;
+}
+
+.cert-form label {
+    position: absolute;
+    top: -9px;
+    left: 14px;
+    z-index: 1;
+    padding: 0 5px;
+    background: #ffffff;
+    color: #7b7688;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.cert-form label span {
+    color: #e53935;
+}
+
+.cert-form :deep(.p-inputtext) {
+    width: 100%;
+    min-height: 56px;
+    border-radius: 7px;
+    border: 1px solid #d1d5db;
+    color: #36344a;
+    font-size: 15px;
+    padding: 14px 13px 8px;
+}
+
+.cert-form :deep(.p-inputtext:focus) {
+    border-color: #2196f3;
+    box-shadow: 0 0 0 1px rgba(33, 150, 243, 0.18);
+}
+
+.draw-panel.locked {
+    background: #f8fafc;
+    border-style: dashed;
+}
+
+.draw-panel.locked .signature-canvas {
+    cursor: not-allowed;
+    background: #f3f4f6;
+    opacity: 0.7;
+}
+
+.signature-locked-message {
+    margin-bottom: 8px;
+    padding: 8px 10px;
+    border-radius: 6px;
+    background: #fff7ed;
+    color: #c2410c;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.bottom-actions {
+    align-items: center;
 }
 
 @media (max-width: 768px) {
