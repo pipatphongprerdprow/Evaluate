@@ -726,8 +726,8 @@ export default {
 
         this.tracking_dates = Array.isArray(res.data) ? res.data : [];
 
-        console.log('รอบประเมินทั้งหมด:', this.tracking_dates.length);
-        console.table(this.tracking_dates);
+        // console.log('รอบประเมินทั้งหมด:', this.tracking_dates.length);
+        //console.table(this.tracking_dates);
 
         await this.fetchScoreHistory(10);
       } catch (error) {

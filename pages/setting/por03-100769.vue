@@ -649,7 +649,8 @@
                 <div class="p-fluid formgrid"> 
                     <div class="field col-12 md:col-6">
                         <label for="radioValueDoc">เลือกประเภทการแนปเอกสาร</label> 
-                        <b style="color: red;"> (รองรับขนาดไฟล์ไม่เกิน 15 Mb) </b> 
+                        <b style="color: red;"> (รองรับขนาดไฟล์ไม่เกิน 15 Mb) </b>
+
                         <!-- <Dropdown v-model="radioValueDoc" :options="radioValueDocs" optionLabel="name" placeholder="เลือกระดับการประเมินตนเอง"></Dropdown>  -->
                         <div class="grid">
                             <div class="col-12 md:col-4">
@@ -680,7 +681,11 @@
                 <div class="p-fluid formgrid grid mt-2"> 
                     <div class="col-12 md:col-10" v-if="radioValue == 'doc' ">
                         <label for="doc_no">แนบเอกสาร</label>  
-                        <input ref="upload" type="file" name="file-upload" autocomplete="off" @change="handleFileChange">  
+                        <input ref="upload"
+                            type="file"
+                            name="file-upload" 
+                            autocomplete="off"
+                            @change="handleFileChange">  
                     </div> 
                     <div class="col-12 md:col-10" v-if="radioValue == 'link' ">
                         <label for="doc_no">แนบลิงค์เอกสาร</label>
@@ -719,9 +724,17 @@
                     <Button label="ตกลง" class="mb-2 mr-2" severity="contrast" @click="closeDocDialogWithSuccess" />
                 </template>   -->
                 <template #footer>
-                    <Button label="ตกลง" class="mb-2 mr-2" severity="contrast" :loading="closingDocLoading" :disabled="closingDocLoading" @click="closeDocDialogWithSuccess"/>
+                    <Button
+                        label="ตกลง"
+                        class="mb-2 mr-2"
+                        severity="contrast"
+                        :loading="closingDocLoading"
+                        :disabled="closingDocLoading"
+                        @click="closeDocDialogWithSuccess"
+                    />
                 </template> 
-        </Dialog> 
+        </Dialog>
+
          <!-- แก้ไขชื่อหลักฐานเชิงปนะจักษ์ -->
          <Dialog header="แก้ไขข้อมูลชื่อหลักฐานเชิงประจักษ์" maximizable v-model:visible="DialogEditFileP03" :breakpoints="{ '960px': '75vw' }" :style="{ width: '70vw' }" :modal="true" position="top">
             <form>
@@ -793,208 +806,8 @@
                 <Button label="บันทึก" icon="pi pi-check" class="mb-2 mr-2" @click="saveEditP04" />
                 <Button label="ยกเลิก" icon="pi pi-times" class="mb-2 mr-2" severity="danger" @click="DialogEditP04 = false" />
             </template>
-        </Dialog>  
-        
-        <!-- ดึงรายงานจากระบบบันทึกภาระงาน -->
-        <Dialog header="📥 ดึงรายงานจากระบบบันทึกภาระงาน" v-model:visible="DialogFinReport" :modal="true" maximizable position="top" :breakpoints="{ '960px': '95vw' }" :style="{ width: '90vw' }" >
-            <!-- ส่วนเลือกปลายทาง -->
-            <div class="p-fluid formgrid grid"> 
-                <div class="field col-12 md:col-7">
-                    <label> นำรายงานไปตอบกิจกรรม / ตัวชี้วัด <em style="color:red;">*</em> </label> 
-                    <Dropdown v-model="finTargetP01Id" :options="finP01Options" optionLabel="label" optionValue="value" placeholder="เลือกกิจกรรม / ตัวชี้วัดที่ต้องการนำข้อมูลไปตอบ" filter class="w-full" />
-                </div> 
-                <div class="field col-12 md:col-3">
-                    <label> ระดับรายงานผล <em style="color:red;">*</em> </label> 
-                    <Dropdown v-model="finTargetLevel" :options="list_no_p03s" optionLabel="name" optionValue="value" placeholder="เลือกระดับ" class="w-full"/>
-                </div> 
-                <div class="field col-12 md:col-2">
-                    <label>หลักฐานประกอบ</label> 
-                    <div class="field-checkbox mt-3">
-                        <Checkbox v-model="finImportDocuments" :binary="true" inputId="finImportDocuments" /> 
-                        <label for="finImportDocuments" class="ml-2"> นำเข้าหลักฐาน</label>
-                    </div>
-                </div>
-            </div> 
-            <!-- เพิ่มใหม่: แสดงปี รอบ และสถานะจาก FIN API -->
-            <div v-if="finPaReport" class="mb-3 p-3" style=" background-color: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; text-align: left; " >
-                <div style=" font-size: 1rem; font-weight: bold; color: #1e3a8a; margin-bottom: 10px; " >
-                    <i class="pi pi-calendar mr-2"></i> 
-                        ข้อมูลรอบประเมินจากระบบบันทึกภาระงาน
-                </div> 
-                <div class="grid">
-                    <div class="col-12 md:col-2">
-                        <b>ปีงบประมาณ:</b> {{ finPaReport?.round?.year ?? '-' }}
-                    </div> 
-                    <div class="col-12 md:col-2">
-                        <b>รอบที่:</b> {{ finPaReport?.round?.evalua ?? '-' }}
-                    </div> 
-                    <div class="col-12 md:col-5">
-                        <b>รอบประเมิน:</b> {{ finPaReport?.round?.round_name ?? '-' }}
-                    </div> 
-                    <div class="col-12 md:col-3">
-                        <b>วันที่บันทึก:</b> {{ finPaReport?.round?.recording_day ? formatThaiDate(finPaReport.round.recording_day) : '-' }}
-                    </div>
-                </div> 
-                <div class="grid mt-2">
-                    <div class="col-12 md:col-3"> <b>รหัสบุคลากร:</b> {{ finPaReport?.staff?.staff_id ?? '-' }} </div> 
-                    <div class="col-12 md:col-3"> <b>ชื่อ-สกุล:</b> {{ finPaReport?.staff?.name ?? '-' }} </div> 
-                    <div class="col-12 md:col-3"> <b>ตำแหน่ง:</b> {{ finPaReport?.staff?.position ?? '-' }} </div> 
-                    <div class="col-12 md:col-3"> <b>คณะ/หน่วยงาน:</b> {{ finPaReport?.staff?.org_name ?? '-' }} </div>
-                </div> 
-                <div class="grid mt-2" style=" border-top: 1px solid #bfdbfe; padding-top: 10px; " >
-                    <div class="col-12 md:col-6">
-                        <b>สถานะข้อมูล:</b> 
-                        <span :style="{ color: finPaReport?.found ? '#15803d' : '#dc2626', fontWeight: 'bold' }" >
-                            <i :class=" finPaReport?.found ? 'pi pi-check-circle' : 'pi pi-times-circle' " class="mr-1" ></i> 
-                            {{ finPaReport?.found ? 'พบข้อมูล' : 'ไม่พบข้อมูล' }}
-                        </span>
-                    </div> 
-                    <div class="col-12 md:col-6">
-                        <b>สถานะแบบภาระงาน:</b> 
-                        <span :style="{ color: finPaReport?.has_form ? '#15803d' : '#dc2626', fontWeight: 'bold' }" >
-                            <i :class=" finPaReport?.has_form ? 'pi pi-check-circle' : 'pi pi-times-circle' " class="mr-1" ></i> 
-                            {{ finPaReport?.has_form ? 'มีแบบภาระงาน' : 'ไม่มีแบบภาระงาน' }}
-                        </span>
-                    </div> 
-                    <!-- <div class="col-12 md:col-3">
-                        <b>โหมด:</b>
-                        {{ finPaReport?.mode ?? '-' }}
-                    </div> 
-                    <div class="col-12 md:col-3">
-                        <b>จำนวนหัวข้อ:</b>
-                        {{ Array.isArray(finPaReport?.headers) ? finPaReport.headers.length : 0 }}
-                    </div> -->
-                </div>
-            </div> 
-            <!-- แสดงข้อผิดพลาดหรือข้อความไม่พบข้อมูล -->
-            <Message v-if="finPaReportError" severity="error" :closable="false" class="mb-3" >
-                {{ finPaReportError }}
-            </Message>
-
-            <!-- Skeleton ระหว่างโหลด -->
-            <div v-if="finPaReportLoading">
-                <div class="mb-3" style=" text-align: center; color: #1d4ed8; font-weight: 600; font-size: 1rem; " >
-                    <i class="pi pi-spin pi-spinner mr-2" style="font-size: 1.2rem;" ></i>
-                    กำลังโหลดข้อมูล กรุณารอสักครู่
-                </div> 
-                <Skeleton class="mb-2" height="3rem" />
-                <Skeleton class="mb-2" height="3rem" />
-                <Skeleton height="3rem" />
-            </div> 
-            <!-- ตารางรายงาน -->
-            <template v-else>
-                <DataTable v-model:selection="selectedFinReportIds" :value="finReportItems" dataKey="id" :paginator="true" :rows="10" :rowsPerPageOptions="[10, 20, 50]" responsiveLayout="scroll" stripedRows showGridlines class="fin-report-table" >
-                    <!-- เลือกรายการ -->
-                    <Column
-                        selectionMode="multiple"
-                        headerStyle="width: 3rem"
-                    /> 
-                    <!-- ประเภทภาระงาน -->
-                    <Column field="headerTitle" header="ประเภทภาระงาน" style="width: 18%; text-align: left;" >
-                        <template #body="slotProps">
-                            <div>
-                                <b style="color:#1d4ed8;"> 
-                                    <span v-if="slotProps.data.headerNo">
-                                        {{ slotProps.data.headerNo }}.
-                                    </span>
-                                    {{ slotProps.data.headerTitle || '-' }}
-                                </b>
-                            </div> 
-                            <div v-if="slotProps.data.weight !== null && slotProps.data.weight !== ''" style=" margin-top: 6px; color: #64748b; font-size: 0.85rem; " >
-                                น้ำหนักรายการ:
-                                <b>{{ slotProps.data.weight }}</b>
-                            </div> 
-                            <div v-if="slotProps.data.target" style=" margin-top: 3px; color: #64748b; font-size: 0.85rem; " >
-                                ค่าเป้าหมาย:
-                                <b>{{ slotProps.data.target }}</b>
-                            </div>
-                        </template>
-                    </Column>
- 
-                    <!-- วันที่ -->
-                    <Column field="date" header="วันที่บันทึกข้อมูล" style="width: 11%; text-align: center;" >
-                        <template #body="slotProps">
-                            <span v-if="slotProps.data.date">
-                                {{ formatThaiDate(slotProps.data.date) }}
-                            </span> 
-                            <span v-else style="color:#999;"> - </span>
-                        </template>
-                    </Column> 
-                    <!-- รายการภาระงาน -->
-                    <Column field="itemSubject" header="รายการภาระงาน" style="width: 26%; text-align: left;" >
-                        <template #body="slotProps">
-                            <div>
-                                <b style="color:#0f172a;">
-                                    <span v-if="slotProps.data.itemNo">
-                                        {{ slotProps.data.itemNo }}.
-                                    </span>
-                                    {{ slotProps.data.itemSubject || slotProps.data.title || '-' }}
-                                </b>
-                            </div> 
-                            <div v-if=" slotProps.data.title && slotProps.data.title !== slotProps.data.itemSubject " style=" margin-top: 8px; padding: 8px; background: #f8fafc; border-left: 3px solid #60a5fa; border-radius: 4px; " >
-                                <b>ชื่อรายงาน:</b>
-                                {{ slotProps.data.title }}
-                            </div>
-                        </template>
-                    </Column> 
-
-                    <!-- รายงานผลการปฏิบัติงาน -->
-                    <Column field="detail" header="รายงานผลการปฏิบัติงาน" style="width: 29%; text-align: left;" >
-                        <template #body="slotProps">
-                            <div v-if="slotProps.data.detail" style=" white-space: pre-line; line-height: 1.6; " >
-                                {{ slotProps.data.detail }}
-                            </div> 
-                            <span v-else style="color:#999;"> - </span>
-                        </template>
-                    </Column> 
-                    <!-- หลักฐาน -->
-                    <Column header="หลักฐาน" style="width: 16%; text-align: left;" >
-                        <template #body="slotProps">
-                            <div v-if=" Array.isArray(slotProps.data.documents) && slotProps.data.documents.length > 0 ">
-                                <div v-for="(doc, index) in slotProps.data.documents" :key="`${slotProps.data.id}-doc-${index}`" style=" margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px dashed #d1d5db; " >
-                                    <a v-if="doc.url" :href="doc.url" target="_blank" rel="noopener noreferrer" style=" display: inline-flex; align-items: flex-start; gap: 6px; color: #1d4ed8; text-decoration: none; word-break: break-word; " >
-                                        <i class="pi pi-paperclip" style="margin-top: 3px;" ></i> 
-                                        <span>
-                                            {{ doc.name || `เอกสาร ${index + 1}` }}
-                                        </span>
-                                    </a> 
-                                    <span v-else style=" display: inline-flex; align-items: flex-start; gap: 6px; color: #475569; word-break: break-word; " >
-                                        <i class="pi pi-file" style="margin-top: 3px;" ></i> 
-                                        <span>
-                                            {{  doc.name || `เอกสาร ${index + 1}` }}
-                                        </span>
-                                    </span>
-                                </div>
-                            </div> 
-                            <span v-else style="color:#999;">
-                                ไม่มีหลักฐาน
-                            </span>
-                        </template>
-                    </Column> 
-                    <!-- กรณีไม่มีข้อมูล -->
-                    <template #empty>
-                        <div style=" padding: 24px; color: #b71c1c; font-weight: bold; text-align: center; " >
-                            ไม่พบข้อมูลรายงานจากระบบบันทึกภาระงาน
-                        </div>
-                    </template>
-                </DataTable>
-            </template> 
-            <template #footer>
-                <div style=" display:flex; justify-content:space-between; width:100%; " >
-                    <div>
-                        เลือกแล้ว
-                        <b>{{ selectedFinReportIds.length }}</b>
-                        รายการ
-                    </div> 
-                    <div>
-                        <Button label="บันทึกข้อมูลที่เลือก" icon="pi pi-save" severity="success" class="mr-2" :loading="finImportSaving" :disabled=" finImportSaving || selectedFinReportIds.length === 0 " @click="saveSelectedFinReports" /> 
-                        <Button label="ยกเลิก" icon="pi pi-times" severity="danger" outlined :disabled="finImportSaving" @click="DialogFinReport = false"/>
-                    </div>
-                </div>
-            </template>
         </Dialog> 
 </template> 
-
 <script>
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
@@ -1126,20 +939,6 @@ import InputText from 'primevue/inputtext';
     /*=========== 1.ผลสัมฤทธิ์ของงาน =============*/                
                 products_personP03: [], 
                 docSavedSuccess: false, 
-    /*=========== ดึงข้อมูลป.03มาจากระบบภาระงานพี่แจ้ =============*/        
-                finPaReport: null,
-                finPaReportLoading: false,
-                finPaReportError: null,  
-                DialogFinReport: false,  // Dialog ดึงรายงานจากระบบภาระงาน 
-                finReportItems: [], // รายการรายงานที่แปลงจาก FIN API 
-                selectedFinReportIds: [], // ID รายการที่ผู้ใช้เลือก 
-                finTargetP01Id: null, // ป.01 ที่ต้องการนำข้อมูลไปบันทึก  
-                finTargetLevel: null,  // ระดับ ป.03 ที่ต้องการนำไปตอบ 
-                finP01Options: [], // รายการตัวเลือก ป.01 ทั้งหมด  
-                finCurrentP01: null, // รายละเอียดแถวที่กดเข้ามา 
-                finImportSaving: false, // สถานะกำลังบันทึก 
-                finImportDocuments: true, // ให้เลือกว่าจะนำหลักฐานมาด้วยหรือไม่
-
     /*=========== โหลดข้อมูลสเกลตั้นระหว่างบันทึกข้อมูลระหว่างข้อ =============*/ 
                 rowLoadingIds: [],
                 savingListP03: false,
@@ -1160,13 +959,13 @@ import InputText from 'primevue/inputtext';
                         this.OpenDialogDoc(item);
                     }
                 },
-                 {
-                    label: 'ดึงรายงานระบบบันทึกภาระงาน',
-                    icon: 'pi pi-cloud-download',
-                    command: () => {
-                        this.openFinReportDialog(item);
-                    }
-                },
+                //  {
+                //     label: 'ระดับคะแนนประเมินตนเอง',
+                //         icon: 'pi pi-thumbs-up',
+                //         command: () => {
+                //             this.OpenDialogScore(item);
+                //         }
+                // },
                 {
                     label: 'ลบข้อมูล',
                     icon: 'pi pi-times',
@@ -1197,7 +996,8 @@ import InputText from 'primevue/inputtext';
                 { id: 16, activity: 'ค. 5 การสอนงานและการมอบหมายงาน', indicator: '0', datatable3: '' }
             ],
                 posadio: 0,
- 
+
+
 /*============= รายงานผลการปฏิบัติราชการตามตัวชี้วัด/ เกณฑ์การประเมิน =============*/
                 DialogAdd: false,
                 list_no_p03: { name: '- เลือกระดับ -', value: 0 },
@@ -1526,54 +1326,22 @@ import InputText from 'primevue/inputtext';
         }, 
 
         methods: { 
- 
-            //ดึงข้อมูลภาระงานระบบพี่แจ้
             async reloadAllData() {
-                if (
-                    !this.staffid_Main ||
-                    !this.dataPor?.d_date ||
-                    !this.dataPor?.evalua
-                ) {
-                    return;
-                }
+                if (!this.staffid_Main || !this.dataPor?.d_date || !this.dataPor?.evalua) return;
 
                 try {
-                    await this.getAadioPosition(
-                        this.staffid_Main
-                    );
-
-                    await Promise.all([
-                        this.showDataP03(),
-                        this.showdataPo(),
-                        this.showAssess(),
-                        this.getjobSpecificCompetencies()
-                    ]);
-
+                    await this.getAadioPosition(this.staffid_Main);
+                    await this.showDataP03();
+                    await this.showdataPo();                 
+                    await this.showAssess();                 
+                    await this.getjobSpecificCompetencies(); 
                     await this.chkp03data();
-
                 } catch (error) {
-                    console.error(
-                        'reloadAllData error:',
-                        error
-                    );
+                    console.error('reloadAllData error:', error);
                 }
-            },
- 
-            // async reloadAllData() {
-            //     if (!this.staffid_Main || !this.dataPor?.d_date || !this.dataPor?.evalua) return;
+            }, 
 
-            //     try {
-            //         await this.getAadioPosition(this.staffid_Main);
-            //         await this.showDataP03();
-            //         await this.showdataPo();                 
-            //         await this.showAssess();                 
-            //         await this.getjobSpecificCompetencies(); 
-            //         await this.chkp03data();
-            //     } catch (error) {
-            //         console.error('reloadAllData error:', error);
-            //     }
-            // }, 
- 
+            
             async setSession(staffid_Main, facid_Main, groupid_Main, postypename, postypenameid, positionname) { 
                 this.staffid_Main = staffid_Main;
                 this.facid_Main = facid_Main;
@@ -1625,900 +1393,7 @@ import InputText from 'primevue/inputtext';
                     console.error('Error:', error);
                 });
             }, 
- 
-            /*============= ดึงข้อมูลป.03มาจากระบบภาระงานพี่แจ้ =============*/
-
-             async getFinPaReport() {
-                if (
-                    !this.staffid_Main ||
-                    !this.dataPor?.d_date ||
-                    !this.dataPor?.evalua
-                ) {
-                    return null;
-                }
-
-                this.finPaReportLoading = true;
-                this.finPaReportError = null;
-
-                const params = {
-                    staff_id: this.staffid_Main,
-                    year: Number(this.dataPor.d_date),
-                    evalua: Number(this.dataPor.evalua)
-                };
-
-                console.log('FIN API PARAMS:', params);
-
-                try {
-                    const response = await axios.post(
-                        'http://127.0.0.1:8000/api/getFinPaReport',
-                        params
-                    );
-
-                    const wrapper = response.data;
-                    const finData = wrapper?.data;
-
-                    console.log('FIN API RESPONSE:', finData);
-
-                    if (wrapper?.ok !== true) {
-                        throw new Error(
-                            wrapper?.message ||
-                            'ไม่สามารถดึงข้อมูลจาก FIN API ได้'
-                        );
-                    }
-
-                    this.finPaReport = finData;
-
-                    /*
-                    * API ติดต่อสำเร็จ แต่ไม่พบแบบภาระงาน
-                    */
-                    if (finData?.found === false) {
-                        const apiYear =
-                            finData?.round?.year ??
-                            params.year;
-
-                        const apiEvalua =
-                            finData?.round?.evalua ??
-                            params.evalua;
-
-                        this.finPaReportError =
-                            `ไม่พบข้อมูลภาระงานของรหัสบุคลากร ${params.staff_id} ` +
-                            `ปี ${apiYear} รอบที่ ${apiEvalua}`;
-
-                        return finData;
-                    }
-
-                    /*
-                    * พบข้อมูลรอบ แต่ยังไม่มีแบบฟอร์ม
-                    */
-                    if (finData?.has_form === false) {
-                        this.finPaReportError =
-                            'พบบุคลากรและรอบประเมิน แต่ยังไม่มีแบบบันทึกภาระงานในระบบ FIN';
-
-                        return finData;
-                    }
-
-                    return finData;
-
-                } catch (error) {
-                    this.finPaReport = null;
-
-                    this.finPaReportError =
-                        error.response?.data?.message ||
-                        error.message ||
-                        'เกิดข้อผิดพลาดในการเรียก FIN API';
-
-                    console.error('getFinPaReport error:', error);
-
-                    return null;
-
-                } finally {
-                    this.finPaReportLoading = false;
-                }
-            },
-
-            buildFinP01Options() {
-                const options = [];
-
-                (this.products_personP03 || []).forEach((header) => {
-                    (header.subP01sX || []).forEach((item) => {
-                        options.push({
-                            value: item.p01_id,
-                            label:
-                                `${header.h_no || ''}. ${header.nameH || ''} ` +
-                                `- ${item.p01_no || ''} ${this.getMainSubject(item.p01_subject)}`
-                        });
-                    });
-                });
-
-                this.finP01Options = options;
-            },
-
-            async openFinReportDialog(item) {
-                this.finCurrentP01 = item;
-                this.finTargetP01Id = item.p01_id;
-                this.finTargetLevel = null;
-                this.selectedFinReportIds = [];
-                this.finImportDocuments = true;
-                this.finPaReportError = null;
-                this.finReportItems = [];
-
-                this.buildFinP01Options();
-
-                this.DialogFinReport = true;
-
-                try {
-                    const report = await this.getFinPaReport();
-
-                    if (!report) {
-                        this.finReportItems = [];
-                        return;
-                    }
-
-                    if (report.found === false) {
-                        this.finPaReportError =
-                            'ไม่พบข้อมูลภาระงานในปีและรอบประเมินที่เลือก';
-
-                        return;
-                    }
-
-                    if (report.has_form === false) {
-                        this.finPaReportError =
-                            'พบบุคลากร แต่ยังไม่มีแบบบันทึกภาระงาน';
-
-                        return;
-                    }
-
-                    console.log(
-                        'FIN HEADERS RAW:',
-                        report.headers
-                    );
-
-                    this.finReportItems =
-                        this.normalizeFinReportItems(report);
-
-                    console.log(
-                        'FIN NORMALIZED ITEMS:',
-                        this.finReportItems
-                    );
-
-                    if (this.finReportItems.length === 0) {
-                        const totalAssignments = (report.headers || [])
-                            .reduce((headerTotal, header) => {
-                                const items = Array.isArray(header.items)
-                                    ? header.items
-                                    : [];
-
-                                return headerTotal + items.reduce(
-                                    (itemTotal, item) => {
-                                        return itemTotal + (
-                                            Array.isArray(item.assignments)
-                                                ? item.assignments.length
-                                                : 0
-                                        );
-                                    },
-                                    0
-                                );
-                            }, 0);
-
-                        if (totalAssignments === 0) {
-                            this.finPaReportError =
-                                'พบแบบภาระงานและหัวข้อประเมิน แต่ไม่พบรายงานผลที่บันทึกไว้ใน assignments';
-                        } else {
-                            this.finPaReportError =
-                                `พบข้อมูล assignments จำนวน ${totalAssignments} รายการ ` +
-                                'แต่ยังไม่สามารถอ่านรายละเอียดรายงานได้ กรุณาเปิด assignments ใน Console เพื่อตรวจสอบชื่อฟิลด์';
-                        }
-                    }
-
-                } catch (error) {
-                    console.error(
-                        'openFinReportDialog error:',
-                        error
-                    );
-
-                    this.finReportItems = [];
-
-                    this.finPaReportError =
-                        error.response?.data?.message ||
-                        error.message ||
-                        'ไม่สามารถดึงรายงานจากระบบภาระงานได้';
-                }
-            },
-
-            normalizeFinReportItems(payload) {
-                if (
-                    !payload ||
-                    !Array.isArray(payload.headers)
-                ) {
-                    return [];
-                }
-
-                const result = [];
-                let runningId = 0;
-
-                const firstText = (obj, keys, fallback = '') => {
-                    for (const key of keys) {
-                        const value = obj?.[key];
-
-                        if (
-                            value !== undefined &&
-                            value !== null &&
-                            String(value).trim() !== ''
-                        ) {
-                            return String(value).trim();
-                        }
-                    }
-
-                    return fallback;
-                };
-
-                /*
-                * แปลงไฟล์แนบ/หลักฐาน
-                */
-                const normalizeDocuments = (source) => {
-                    if (!source || typeof source !== 'object') {
-                        return [];
-                    }
-
-                    const rawDocuments =
-                        source.attachments ??
-                        source.files ??
-                        source.documents ??
-                        source.evidences ??
-                        source.report_files ??
-                        source.file_attach ??
-                        source.uploads ??
-                        [];
-
-                    if (!Array.isArray(rawDocuments)) {
-                        return [];
-                    }
-
-                    return rawDocuments.map((doc, index) => {
-                        const name = firstText(
-                            doc,
-                            [
-                                'name',
-                                'filename',
-                                'file_name',
-                                'original_name',
-                                'attachment_name',
-                                'doc_name',
-                                'title'
-                            ],
-                            `เอกสาร ${index + 1}`
-                        );
-
-                        let url = firstText(
-                            doc,
-                            [
-                                'url',
-                                'file_url',
-                                'download_url',
-                                'attachment_url',
-                                'doc_link',
-                                'link',
-                                'path'
-                            ],
-                            ''
-                        );
-
-                        /*
-                        * กรณี API ส่ง relative path
-                        */
-                        if (
-                            url &&
-                            !/^https?:\/\//i.test(url)
-                        ) {
-                            url =
-                                'https://fin.msu.ac.th/' +
-                                url.replace(/^\/+/, '');
-                        }
-
-                        return {
-                            name,
-                            url: url || null,
-                            raw: doc
-                        };
-                    });
-                };
-
-                /*
-                * ตรวจว่า Object นี้เป็น "รายการรายงานจริง"
-                */
-                const isReportObject = (obj) => {
-                    if (!obj || typeof obj !== 'object') {
-                        return false;
-                    }
-
-                    const reportTitle = firstText(obj, [
-                        'report_title',
-                        'report_name',
-                        'title',
-                        'name',
-                        'subject',
-                        'work_name',
-                        'task_name',
-                        'activity_name'
-                    ]);
-
-                    const reportDetail = firstText(obj, [
-                        'report_detail',
-                        'report_description',
-                        'report',
-                        'detail',
-                        'description',
-                        'result',
-                        'result_detail',
-                        'work_detail',
-                        'note',
-                        'remark'
-                    ]);
-
-                    const reportDate = firstText(obj, [
-                        'report_date',
-                        'date',
-                        'work_date',
-                        'action_date',
-                        'created_at',
-                        'updated_at'
-                    ]);
-
-                    const documents = normalizeDocuments(obj);
-
-                    /*
-                    * ต้องมีรายละเอียดรายงาน วันที่ หรือหลักฐาน
-                    * ไม่เอาเฉพาะ item.subject เพราะนั่นเป็นหัวข้อภาระงาน
-                    */
-                    return Boolean(
-                        reportDetail ||
-                        reportDate ||
-                        documents.length > 0 ||
-                        (
-                            reportTitle &&
-                            (
-                                obj.report_id ||
-                                obj.assignment_id ||
-                                obj.work_report_id
-                            )
-                        )
-                    );
-                };
-
-                /*
-                * อ่าน Object รายงาน และ Object ลูกทุกระดับ
-                */
-                const walkObject = (
-                    obj,
-                    context
-                ) => {
-                    if (!obj || typeof obj !== 'object') {
-                        return;
-                    }
-
-                    if (isReportObject(obj)) {
-                        runningId++;
-
-                        const documents = normalizeDocuments(obj);
-
-                        result.push({
-                            id: String(
-                                obj.report_id ??
-                                obj.assignment_id ??
-                                obj.work_report_id ??
-                                obj.id ??
-                                `fin-report-${runningId}`
-                            ),
-
-                            headerNo:
-                                context.headerNo,
-
-                            headerTitle:
-                                context.headerTitle,
-
-                            itemId:
-                                context.itemId,
-
-                            itemNo:
-                                context.itemNo,
-
-                            itemSubject:
-                                context.itemSubject,
-
-                            target:
-                                context.target,
-
-                            weight:
-                                context.weight,
-
-                            date: firstText(obj, [
-                                'report_date',
-                                'date',
-                                'work_date',
-                                'action_date',
-                                'created_at',
-                                'updated_at'
-                            ]),
-
-                            title: firstText(
-                                obj,
-                                [
-                                    'report_title',
-                                    'report_name',
-                                    'title',
-                                    'name',
-                                    'subject',
-                                    'work_name',
-                                    'task_name',
-                                    'activity_name'
-                                ],
-                                context.itemSubject
-                            ),
-
-                            detail: firstText(obj, [
-                                'report_detail',
-                                'report_description',
-                                'report',
-                                'detail',
-                                'description',
-                                'result',
-                                'result_detail',
-                                'work_detail',
-                                'note',
-                                'remark'
-                            ]),
-
-                            documents,
-
-                            raw: obj
-                        });
-                    }
-
-                    /*
-                    * ไล่ทุก property ที่เป็น Array
-                    * รองรับ assignments, reports, files และโครงสร้างซ้อนอื่น
-                    */
-                    Object.keys(obj).forEach((key) => {
-                        const value = obj[key];
-
-                        if (Array.isArray(value)) {
-                            value.forEach((child) => {
-                                if (
-                                    child &&
-                                    typeof child === 'object'
-                                ) {
-                                    walkObject(
-                                        child,
-                                        context
-                                    );
-                                }
-                            });
-                        } else if (
-                            value &&
-                            typeof value === 'object'
-                        ) {
-                            walkObject(
-                                value,
-                                context
-                            );
-                        }
-                    });
-                };
-
-                /*
-                * โครงสร้างจริง:
-                * headers -> items -> assignments
-                */
-                payload.headers.forEach((header) => {
-                    const headerNo =
-                        header.header_no ?? '';
-
-                    const headerTitle =
-                        header.header_name ?? '';
-
-                    const items = Array.isArray(header.items)
-                        ? header.items
-                        : [];
-
-                    items.forEach((item) => {
-                        const context = {
-                            headerNo,
-                            headerTitle,
-
-                            itemId:
-                                item.item_id ?? null,
-
-                            itemNo:
-                                item.no ?? '',
-
-                            itemSubject:
-                                item.subject ?? '',
-
-                            target:
-                                item.target ?? '',
-
-                            weight:
-                                item.weight ?? ''
-                        };
-
-                        /*
-                        * อ่านเฉพาะ assignments ของแต่ละตัวชี้วัด
-                        */
-                        const assignments =
-                            Array.isArray(item.assignments)
-                                ? item.assignments
-                                : [];
-
-                        assignments.forEach((assignment) => {
-                            walkObject(
-                                assignment,
-                                context
-                            );
-                        });
-                    });
-                });
-
-                /*
-                * กันรายการซ้ำ
-                */
-                const unique = [];
-                const usedKeys = new Set();
-
-                result.forEach((row) => {
-                    const key = [
-                        row.id,
-                        row.itemId,
-                        row.date,
-                        row.title,
-                        row.detail
-                    ].join('|');
-
-                    if (!usedKeys.has(key)) {
-                        usedKeys.add(key);
-                        unique.push(row);
-                    }
-                });
-
-                console.log(
-                    'FIN REPORT ITEMS NORMALIZED:',
-                    unique
-                );
-
-                return unique;
-            },
-
-            formatThaiDate(dateValue) {
-                if (!dateValue) {
-                    return '-';
-                }
-
-                try {
-                    const raw = String(dateValue).trim(); 
-
-                    const match = raw.match(
-                        /^(\d{4})-(\d{2})-(\d{2})/
-                    );
-
-                    if (!match) {
-                        return raw;
-                    }
-
-                    const year = Number(match[1]);
-                    const month = Number(match[2]);
-                    const day = Number(match[3]);
-
-                    const thaiMonths = [
-                        '',
-                        'มกราคม',
-                        'กุมภาพันธ์',
-                        'มีนาคม',
-                        'เมษายน',
-                        'พฤษภาคม',
-                        'มิถุนายน',
-                        'กรกฎาคม',
-                        'สิงหาคม',
-                        'กันยายน',
-                        'ตุลาคม',
-                        'พฤศจิกายน',
-                        'ธันวาคม'
-                    ];
-
-                    if (
-                        !year ||
-                        month < 1 ||
-                        month > 12 ||
-                        day < 1 ||
-                        day > 31
-                    ) {
-                        return raw;
-                    }
-
-                    const buddhistYear = year + 543;
-
-                    return `${day} ${thaiMonths[month]} ${buddhistYear}`;
-
-                } catch (error) {
-                    console.error(
-                        'formatThaiDate error:',
-                        error
-                    );
-
-                    return String(dateValue);
-                }
-            },
-
-
-
-
-            buildFinReportText(rows) {
-                return rows
-                    .map((row, index) => {
-                        const lines = [];
-
-                        if (row.headerTitle) {
-                            lines.push(
-                                `ประเภทภาระงาน: ${row.headerTitle}`
-                            );
-                        }
-
-                        if (row.itemSubject) {
-                            lines.push(
-                                `ภาระงาน: ${row.itemNo ? row.itemNo + '. ' : ''}${row.itemSubject}`
-                            );
-                        }
-
-                        if (
-                            row.title &&
-                            row.title !== row.itemSubject
-                        ) {
-                            lines.push(
-                                `ชื่อรายงาน: ${row.title}`
-                            );
-                        }
-
-                        if (row.date) {
-                            lines.push(
-                                `วันที่ดำเนินการ: ${row.date}`
-                            );
-                        }
-
-                        if (row.detail) {
-                            lines.push(
-                                `ผลการปฏิบัติงาน: ${row.detail}`
-                            );
-                        }
-
-                        return (
-                            `${index + 1}. ` +
-                            lines.join('\n   ')
-                        );
-                    })
-                    .join('\n\n');
-            },
-
-            async saveSelectedFinReports() {
-                if (!this.finTargetP01Id) {
-                    Swal.fire(
-                        'ข้อมูลไม่ครบ',
-                        'กรุณาเลือกกิจกรรม / ตัวชี้วัดที่ต้องการนำรายงานไปตอบ',
-                        'warning'
-                    );
-                    return;
-                }
-
-                if (!this.finTargetLevel) {
-                    Swal.fire(
-                        'ข้อมูลไม่ครบ',
-                        'กรุณาเลือกระดับรายงานผล',
-                        'warning'
-                    );
-                    return;
-                }
-
-                if (
-                    !Array.isArray(this.selectedFinReportIds) ||
-                    this.selectedFinReportIds.length === 0
-                ) {
-                    Swal.fire(
-                        'ยังไม่ได้เลือกรายการ',
-                        'กรุณาเลือกรายงานอย่างน้อย 1 รายการ',
-                        'warning'
-                    );
-                    return;
-                }
-
-                const selectedRows = this.selectedFinReportIds;
-
-                const reportText = this.buildFinReportText(
-                    selectedRows
-                );
-
-                const p01Id = this.finTargetP01Id;
-
-                this.finImportSaving = true;
-                this.startRowLoading(p01Id);
-
-                try {
-                    /*
-                    * 1. โหลดข้อมูลรายงานเดิมของ ป.03
-                    * เพื่อไม่ให้ข้อมูลเก่าถูกลบทิ้ง
-                    */
-                    const oldReportResponse = await axios.post(
-                        'http://127.0.0.1:8000/api/p03indData',
-                        {
-                            p01_id: p01Id
-                        }
-                    );
-
-                    const oldReports = Array.isArray(oldReportResponse.data)
-                        ? oldReportResponse.data.map((row) => ({
-                            p03ind_id: row.p03ind_id,
-                            p03ind_no: row.p03ind_no,
-                            p03ind_Items: row.p03ind_Items
-                        }))
-                        : [];
-
-                    /*
-                    * 2. เพิ่มข้อมูลจาก FIN เข้าไปในรายการเดิม
-                    */
-                    const newReport = {
-                        p03ind_no: this.finTargetLevel,
-                        p03ind_Items: reportText
-                    };
-
-                    const productsList = [
-                        ...oldReports,
-                        newReport
-                    ];
-
-                    /*
-                    * 3. บันทึกข้อความลง table_p03_ind
-                    */
-                    await axios.post(
-                        'http://127.0.0.1:8000/api/saveListP03',
-                        {
-                            p_id: p01Id,
-                            products_list: productsList
-                        }
-                    );
-
-                    /*
-                    * 4. บันทึกหลักฐานเป็นลิงก์ลง table_doc
-                    */
-                    if (this.finImportDocuments) {
-                        await this.saveFinDocuments(
-                            selectedRows,
-                            p01Id
-                        );
-                    }
-
-                    this.DialogFinReport = false;
-
-                    await this.showDataP03();
-
-                    await Swal.fire({
-                        icon: 'success',
-                        title: 'นำเข้าข้อมูลสำเร็จ',
-                        html:
-                            `บันทึกรายงานจำนวน <b>${selectedRows.length}</b> รายการ` +
-                            `<br>เข้าสู่ระดับที่ <b>${this.finTargetLevel}</b>`,
-                        showConfirmButton: false,
-                        timer: 2200,
-                        timerProgressBar: true
-                    });
-
-                } catch (error) {
-                    console.error(
-                        'saveSelectedFinReports error:',
-                        error
-                    );
-
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'นำเข้าข้อมูลไม่สำเร็จ',
-                        text:
-                            error.response?.data?.message ||
-                            error.message ||
-                            'เกิดข้อผิดพลาดในการบันทึกข้อมูล'
-                    });
-
-                } finally {
-                    this.stopRowLoading(p01Id);
-                    this.finImportSaving = false;
-                }
-            },
-
-            async saveFinDocuments(selectedRows, p01Id) {
-                const allDocuments = [];
-
-                selectedRows.forEach((report) => {
-                    if (!Array.isArray(report.documents)) {
-                        return;
-                    }
-
-                    report.documents.forEach((doc) => {
-                        if (!doc.url) {
-                            return;
-                        }
-
-                        allDocuments.push({
-                            name:
-                                doc.name ||
-                                report.title ||
-                                'หลักฐานจากระบบบันทึกภาระงาน',
-
-                            url: doc.url
-                        });
-                    });
-                });
-
-                if (allDocuments.length === 0) {
-                    return;
-                }
-
-                /*
-                * โหลดหลักฐานเดิม เพื่อหาลำดับเอกสารถัดไป
-                */
-                const oldDocResponse = await axios.post(
-                    'http://127.0.0.1:8000/api/sheachDataDoc',
-                    {
-                        p_id: p01Id
-                    }
-                );
-
-                const oldDocuments = Array.isArray(oldDocResponse.data)
-                    ? oldDocResponse.data
-                    : [];
-
-                let nextDocNo = oldDocuments.reduce(
-                    (max, row) => {
-                        const no = Number(row.doc_no || 0);
-                        return no > max ? no : max;
-                    },
-                    0
-                ) + 1;
-
-                /*
-                * บันทึกทีละลิงก์ด้วย API เดิม saveDocP03
-                */
-                for (const document of allDocuments) {
-                    const formData = new FormData();
-
-                    formData.append(
-                        'text_edtDoc',
-                        p01Id
-                    );
-
-                    formData.append(
-                        'doc_type',
-                        'link'
-                    );
-
-                    formData.append(
-                        'doc_no',
-                        nextDocNo
-                    );
-
-                    formData.append(
-                        'doc_name',
-                        document.name
-                    );
-
-                    formData.append(
-                        'doc_link',
-                        document.url
-                    );
-
-                    await axios.post(
-                        'http://127.0.0.1:8000/api/saveDocP03',
-                        formData
-                    );
-
-                    nextDocNo++;
-                }
-            },
-
-            /*============= รายงานผลการปฏิบัติราชการตามตัวชี้วัด/ เกณฑ์การประเมิน =============*/
+/*============= รายงานผลการปฏิบัติราชการตามตัวชี้วัด/ เกณฑ์การประเมิน =============*/
             // เปิดหน้าต่างสำหรับบันทึก P03
             OpenDialogAdd(item){ 
                 // console.log(item); 
@@ -2546,69 +1421,24 @@ import InputText from 'primevue/inputtext';
                     console.error('Error:', error);
                 });
             },
- 
-             //ดึงข้อมูลภาระงานระบบพี่แจ้ 
-             AddDatalist() {
-                if (
-                    !this.list_no_p03 ||
-                    !this.list_no_p03.value
-                ) {
-                    Swal.fire(
-                        'ไม่มีข้อมูล',
-                        'กรุณาเลือกระดับ',
-                        'error'
-                    );
-                    return;
-                }
-
-                if (
-                    !this.list_text_p03 ||
-                    !String(this.list_text_p03).trim()
-                ) {
-                    Swal.fire(
-                        'ไม่มีข้อมูล',
-                        'กรุณากรอกรายงานชื่อตัวชี้วัด / เกณฑ์การประเมิน',
-                        'error'
-                    );
-                    return;
-                }
-
-                this.products_list_p03.push({
-                    p03ind_no: this.list_no_p03.value,
-                    p03ind_Items:
-                        String(this.list_text_p03).trim()
-                });
-
-                this.products_list_p03.sort(
-                    (a, b) =>
-                        Number(a.p03ind_no) -
-                        Number(b.p03ind_no)
-                );
-
-                this.list_text_p03 = null;
-            },
- 
             // เพิ่มรายงานผลการปฏิบัติราชการตามตัวชี้วัด/ เกณฑ์การประเมิน
-            // AddDatalist(){  
+            AddDatalist(){  
 
-            //     if(this.list_no_p03.length === 0){ 
-            //         Swal.fire("ไม่มีข้อมูล","กรุณาตรวจสอบข้อมูล ลำดับ!","error"); 
-            //     } else if(this.list_text_p03 == null){ 
-            //         Swal.fire("ไม่มีข้อมูล","กรุณาตรวจสอบข้อมูลชื่อตัวชี้วัด / เกณฑ์การประเมิน!","error");
-            //     } else { 
-            //         this.products_list_p03.push({
-            //             p03ind_no: this.list_no_p03.value,
-            //             p03ind_Items: this.list_text_p03
-            //         }); 
+                if(this.list_no_p03.length === 0){ 
+                    Swal.fire("ไม่มีข้อมูล","กรุณาตรวจสอบข้อมูล ลำดับ!","error"); 
+                } else if(this.list_text_p03 == null){ 
+                    Swal.fire("ไม่มีข้อมูล","กรุณาตรวจสอบข้อมูลชื่อตัวชี้วัด / เกณฑ์การประเมิน!","error");
+                } else { 
+                    this.products_list_p03.push({
+                        p03ind_no: this.list_no_p03.value,
+                        p03ind_Items: this.list_text_p03
+                    }); 
                     
-            //         this.products_list_p03.sort((a, b) => a.p03ind_no - b.p03ind_no); 
-            //         this.list_text_p03 = null;
-            //     } 
+                    this.products_list_p03.sort((a, b) => a.p03ind_no - b.p03ind_no); 
+                    this.list_text_p03 = null;
+                } 
                 
-            // }, 
-
-
-
+            }, 
             // ลบรายงานผลการปฏิบัติราชการตามตัวชี้วัด/ เกณฑ์การประเมิน
             DeleteRegislicklist(index){ 
                 // console.log(data); 
@@ -2656,7 +1486,7 @@ import InputText from 'primevue/inputtext';
                     this.savingListP03 = false;
                 }
             }, 
-            /*============= หลักฐานที่แสดงถึงผลการปฏิบัติราชการตามเกณฑ์การประเมิน(หลักฐานเชิงประจักษ์) =============*/
+/*============= หลักฐานที่แสดงถึงผลการปฏิบัติราชการตามเกณฑ์การประเมิน(หลักฐานเชิงประจักษ์) =============*/
             OpenDialogDoc(item){ 
                 //console.log(item); 
                 this.DialogDoc = true;
@@ -2738,7 +1568,8 @@ import InputText from 'primevue/inputtext';
 
                 console.log("ไฟล์ที่ผ่านการตรวจสอบ:", this.selectedFiles);
             },
- 
+
+             
             add_data_file(file){
                 return new Promise((resolve, reject) => {
                     const reader = new FileReader();
@@ -3240,7 +2071,6 @@ import InputText from 'primevue/inputtext';
                     console.error('Error fetching data:', error);
                 });
             },
-
             showjobSpecificCompetencies (){
                 axios.post('   http://127.0.0.1:8000/api/showdataposp02', { 
                 p_year: this.dataPor.d_date,
@@ -3257,7 +2087,6 @@ import InputText from 'primevue/inputtext';
                     console.error('Error fetching data:', error);
                 });
             } ,
-
             /*============= ความรู้/ทักษะ/สมรรถนะ ที่ต้องการพัฒนา =============*/ 
             chkp03data(){ 
                 this.products_Tab3 = [];
@@ -3286,8 +2115,7 @@ import InputText from 'primevue/inputtext';
                 .catch(error => {
                     console.error('Error:', error);
                 });
-            }, 
-
+            },  
             AddDatap04(){ 
                 axios.post('   http://127.0.0.1:8000/api/saveEvaTab03xx',{
                     staff_id: this.staffid_Main,
@@ -3322,7 +2150,6 @@ import InputText from 'primevue/inputtext';
                     console.error('Error:', error);
                 }); 
             },
-
             DeleteRegislick(item) { 
                 // Add logic to remove the selected item  
                 axios.post('   http://127.0.0.1:8000/api/delEvaTab03xx',{
@@ -3336,7 +2163,6 @@ import InputText from 'primevue/inputtext';
                 });   
 
             },  
-
             async saveAssess() {
                 try {
                     const response = await axios.post('   http://127.0.0.1:8000/api/savedataAssess', { 
@@ -3370,7 +2196,6 @@ import InputText from 'primevue/inputtext';
                     });
                 }
             },  
-
             showAssess( ) {
                 axios .post('   http://127.0.0.1:8000/api/showdataAssess', { 
                     staff_id:this.staffid_Main,
@@ -3575,11 +2400,9 @@ import InputText from 'primevue/inputtext';
                     this.text_searchEditP03 = data.p03ind_Items;
                 } 
             },
-
             cancelDialogEdiP03(){ 
                 this.DialogEditListP03 = false;  
             }, 
-
             saveDataxEditP03(){ 
                 // console.log({
                 //     text_search_noEditP03: this.text_search_noEditP03,
@@ -3621,7 +2444,6 @@ import InputText from 'primevue/inputtext';
                     this.text_searchEditFileP03 = data.doc_name;
                 } 
             }, 
-
             cancelDialogEditFileP03(){ 
                 this.DialogEditFileP03 = false;  
             }, 
@@ -3649,7 +2471,6 @@ import InputText from 'primevue/inputtext';
                     console.error('Error:', error);
                 }); 
             },
-
             async loadCompetencyDescriptions() {
                 try {
                     const res = await axios.get('http://127.0.0.1:8000/api/competencies');
@@ -3707,7 +2528,6 @@ import InputText from 'primevue/inputtext';
                 this.selectedCompetency = { title, description };
                 this.competencyDialogVisible = true;
             }, 
-
             extractNameFromActivity(activityText) {
                 if (!activityText) return '';
                 const parts = activityText.trim().split(/\s+/);
@@ -3756,7 +2576,6 @@ import InputText from 'primevue/inputtext';
                     Swal.fire("error", "เกิดข้อผิดพลาดในการแก้ไขข้อมูล", "error");
                 }
             }, 
-
             confirmCloseDocDialog() {
                 // ถ้ามีข้อมูลในตาราง = ถือว่าบันทึกครบระดับหนึ่ง (หรือใช้ flag อย่างเดียวก็ได้)
                 const hasData = Array.isArray(this.products_doc_p03) && this.products_doc_p03.length > 0;
@@ -3856,7 +2675,6 @@ import InputText from 'primevue/inputtext';
             normalizeLevelName(v) {
                 return String(v ?? '').trim().replace(/^ระดับ\s*/,''); // ตัด "ระดับ"
             },
-
             getForcedExpectedLevel(staffId) {
                 const id = String(staffId ?? '').trim();
                 return FORCE_EXPECTED_LEVEL.get(id) ?? null;
@@ -4027,7 +2845,7 @@ import InputText from 'primevue/inputtext';
   th {
     background-color: #edf2bb;
     font-weight: bold;
-  }
+  }​
   
 
   td {
