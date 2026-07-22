@@ -172,8 +172,15 @@
 
                                         <p v-if="subP01.subITemP03doc.length == 0" style="padding-left: 8px;margin-bottom: 5px;">
                                             <b style="color: red;">- ไม่มีข้อมูล -</b>
-                                        </p>
-                                    </template>
+                                        </p> 
+                                    </template> 
+                                    <Button
+                                        icon="pi pi-save"
+                                        severity="primary"
+                                        label="ระบบภาระงาน"
+                                        @click="openWorkloadSystem(subP01)"
+                                    />
+                                   
                                 </td>
  
                                 <!-- <td style=" vertical-align: middle;" class="text-center"> 
@@ -194,6 +201,7 @@
                                     <b v-if="subP01.score==2">&#10003;</b>
                                     <b v-if="subP01.score!=2"></b>
                                 </td> -->
+
                                 <td style="vertical-align: top;" class="text-center">
                                     <template v-if="isRowLoading(subP01.p01_id)">
                                         <Skeleton shape="circle" size="1.2rem" />
@@ -957,12 +965,20 @@
                                         <span>
                                             {{ doc.name || `เอกสาร ${index + 1}` }}
                                         </span>
+
+                                        <!-- <span>
+                                            {{ slotProps.data.detail || `เอกสาร ${index + 1}` }}
+                                        </span> -->
                                     </a> 
                                     <span v-else style=" display: inline-flex; align-items: flex-start; gap: 6px; color: #475569; word-break: break-word; " >
                                         <i class="pi pi-file" style="margin-top: 3px;" ></i> 
                                         <span>
                                             {{  doc.name || `เอกสาร ${index + 1}` }}
                                         </span>
+
+                                        <!-- <span>
+                                            {{ slotProps.data.detail || `เอกสาร ${index + 1}` }}
+                                        </span> -->
                                     </span>
                                 </div>
                             </div> 
@@ -2246,10 +2262,7 @@ import InputText from 'primevue/inputtext';
                     return String(dateValue);
                 }
             },
-
-
-
-
+ 
             buildFinReportText(rows) {
                 return rows
                     .map((row, index) => {
@@ -2454,11 +2467,7 @@ import InputText from 'primevue/inputtext';
 
                 if (allDocuments.length === 0) {
                     return;
-                }
-
-                /*
-                * โหลดหลักฐานเดิม เพื่อหาลำดับเอกสารถัดไป
-                */
+                } 
                 const oldDocResponse = await axios.post(
                     'http://127.0.0.1:8000/api/sheachDataDoc',
                     {
@@ -2476,11 +2485,7 @@ import InputText from 'primevue/inputtext';
                         return no > max ? no : max;
                     },
                     0
-                ) + 1;
-
-                /*
-                * บันทึกทีละลิงก์ด้วย API เดิม saveDocP03
-                */
+                ) + 1; 
                 for (const document of allDocuments) {
                     const formData = new FormData();
 
@@ -2517,7 +2522,7 @@ import InputText from 'primevue/inputtext';
                     nextDocNo++;
                 }
             },
-
+ 
             /*============= รายงานผลการปฏิบัติราชการตามตัวชี้วัด/ เกณฑ์การประเมิน =============*/
             // เปิดหน้าต่างสำหรับบันทึก P03
             OpenDialogAdd(item){ 
@@ -3370,7 +3375,7 @@ import InputText from 'primevue/inputtext';
                     });
                 }
             },  
-
+  
             showAssess( ) {
                 axios .post('   http://127.0.0.1:8000/api/showdataAssess', { 
                     staff_id:this.staffid_Main,
@@ -3957,7 +3962,18 @@ import InputText from 'primevue/inputtext';
                 const id = String(p01Id);
                 this.rowLoadingIds = this.rowLoadingIds.filter(x => x !== id);
             },
- 
+
+            openWorkloadSystem(subP01) {
+                const url =
+                    `https://fin.msu.ac.th/msu_assign/pa_report.php` +
+                    `?staff_id=${this.staffid_Main}` +
+                    `&year=${this.year_Main}` +
+                    `&evalua=1` +
+                    `&item_id=${subP01.item_id}`;
+
+                window.open(url, '_blank');
+            },
+        
         },
     } 
      

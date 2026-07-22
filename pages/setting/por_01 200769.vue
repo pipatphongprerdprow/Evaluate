@@ -1,6 +1,6 @@
 <template>
   <div class="col md:col-12 text-right"> 
-    <!-- <Button label="Export" icon="pi pi-file-word" class="mr-2 mb-2" @click="printDataP01" /> --> 
+    <!-- <Button label="Export" icon="pi pi-file-word" class="mr-2 mb-2" @click="printDataP01" />  -->
     <Button label="Export" icon="pi pi-file-pdf" class="mr-2 mb-2" @click="printDataP01" />
   </div> 
   <div class="col md:col-12 text-left" v-if="totalWeight < 100">
@@ -937,37 +937,8 @@ export default {
         })
         .catch((error) => console.error("Error:", error));
     },
-
-    // async printDataP01() {
-    //   const { getSession } = await useAuth();
-    //   const user = await getSession(); 
-    //   try {
-    //     const response = await axios.post("http://127.0.0.1:8000/api/exportPdf_P01", {
-    //       staff_id: this.staffid_Main,
-    //       group_id: this.groupid_Main,
-    //       fac_id: this.dataPor.fac_id,
-    //       year_id: this.dataPor.d_date,
-    //       evalua: this.dataPor.evalua,
-    //       PREFIXFULLNAME: user.user.name.PREFIXFULLNAME,
-    //       STAFFNAME: user.user.name.STAFFNAME,
-    //       STAFFSURNAME: user.user.name.STAFFSURNAME,
-    //       POSITIONNAME: user.user.name.POSITIONNAME,
-    //       GROUPTYPENAME: user.user.name.GROUPTYPENAME,
-    //       POSTYPENAME: user.user.name.POSTYPENAME,
-    //       SCOPES: user.user.name.SCOPES.staffdepartmentname,
-    //       },
-    //   {
-    //     responseType: 'blob' // 🔥 สำคัญ 
-    //     });
-
-    //     console.log('response: ',response.data); 
-    //     const url = window.URL.createObjectURL(response.data); 
-    //     window.open(url, '_blank');  
-    //   } catch (error) {
-    //     console.error("Error:", error);
-    //   } 
-    // },
-
+ 
+    
     async printDataP01() {
       const { getSession } = await useAuth();
       const user = await getSession();
@@ -1031,8 +1002,9 @@ export default {
         console.error("Error:", error);
         Swal.fire('เกิดข้อผิดพลาด', 'ไม่สามารถสร้างไฟล์ PDF ได้', 'error');
       }
-    },
+     },
 
+     
     //Export word (เดิม)
 
     // async printDataP01() {

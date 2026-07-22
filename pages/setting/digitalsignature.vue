@@ -16,8 +16,7 @@
             <!-- Left Profile Card -->
             <div class="col-12 lg:col-4 xl:col-4">
                 <div class="card profile-card">
-                    <h3 class="card-title">ข้อมูลบุคลากร</h3>
-
+                    <h3 class="card-title">ข้อมูลบุคลากร</h3> 
                     <div class="profile-body">
                         <div class="profile-avatar">
                             <img
@@ -27,8 +26,7 @@
                                 @error="profileImageLoadError = true"
                             />
                             <span v-else>{{ profileInitial }}</span>
-                        </div>
-
+                        </div> 
                         <h4>{{ profileFullName || '-' }}</h4>
                         <p>{{ positionName || '-' }}</p>
                         <p>{{ departmentName || '-' }}</p>
@@ -558,13 +556,35 @@ export default {
             );
         },
 
+        // email() {
+        //     return (
+        //         this.personalRow?.email ||
+        //         this.currentUserProfile.EMAIL ||
+        //         this.currentUserProfile.email ||
+        //         ''
+        //     );
+        // },
+
         email() {
-            return (
-                this.personalRow?.email ||
-                this.currentUserProfile.EMAIL ||
-                this.currentUserProfile.email ||
-                ''
-            );
+            const row = this.personalRow || {};
+            const profile = this.currentUserProfile || {};
+
+            const value =
+                row.email ||
+                row.EMAIL ||
+                row.email_address ||
+                row.EMAIL_ADDRESS ||
+                row.staffemail ||
+                row.STAFFEMAIL ||
+                profile.email ||
+                profile.EMAIL ||
+                profile.email_address ||
+                profile.EMAIL_ADDRESS ||
+                profile.staffemail ||
+                profile.STAFFEMAIL ||
+                '';
+
+            return String(value).trim();
         },
 
         hasSignature() {
@@ -582,15 +602,50 @@ export default {
 
      
 
+    // async mounted() {
+    //     const { getSession } = await useAuth();
+    //     this.userSession = await getSession();
+
+    //     const sessionName = this.userSession?.user?.name || {};
+
+    //     this.currentUserProfile = sessionName;
+    //     this.staffid_Main = sessionName.STAFFID || '';
+    //     this.profileImageLoadError = false;
+
+    //     this.$nextTick(() => {
+    //         this.prepareCanvas();
+    //     });
+
+    //     window.addEventListener('resize', this.prepareCanvas);
+
+    //     await this.loadDigitalSignatureData();
+    // },
+
     async mounted() {
         const { getSession } = await useAuth();
         this.userSession = await getSession();
 
-        const sessionName = this.userSession?.user?.name || {};
+        const sessionUser = this.userSession?.user || {};
 
-        this.currentUserProfile = sessionName;
-        this.staffid_Main = sessionName.STAFFID || '';
-        this.profileImageLoadError = false;
+        // กรณีข้อมูลจริงอยู่ใน user โดยตรง
+        this.currentUserProfile =
+            typeof sessionUser.name === 'object' && sessionUser.name !== null
+                ? {
+                    ...sessionUser,
+                    ...sessionUser.name
+                }
+                : sessionUser;
+
+        this.staffid_Main =
+            this.currentUserProfile.STAFFID ||
+            this.currentUserProfile.staff_id ||
+            '';
+
+        this.profileImageLoadError = false; 
+
+        // console.log('Session user:', sessionUser);
+        // console.log('Current profile:', this.currentUserProfile);
+        // console.log('Session email:', this.currentUserProfile.email);
 
         this.$nextTick(() => {
             this.prepareCanvas();
@@ -610,40 +665,90 @@ export default {
             return String(value ?? '').replace(/\s+/g, '').trim();
         },
 
-       async loadDigitalSignatureData() {
-            try {
-                const res = await axios.post(`${API_BASE}/digital-signature/profile`, {
+    //    async loadDigitalSignatureData() {
+    //         try {
+    //             const res = await axios.post(`${API_BASE}/digital-signature/profile`, {
+    //                 staff_id: this.staffId
+    //             });
+
+    //             const data = res.data || {};
+    //             const signatureUrl = data.signature_url || data.signatureUrl || null;
+    //             const signatureRow = data.signature || data.digital_signature || null;
+
+    //             this.personalRow = data.personal || data.personalRow || this.personalRow;
+
+    //             this.signaturePreview = signatureUrl;
+    //             this.signatureUpdatedAt = data.signature_updated_at || data.signatureUpdatedAt || signatureRow?.updated_at || null;
+    //             this.hasSavedSignature = !!(signatureUrl || signatureRow?.signature_image);
+    //             this.signatureChanged = false;
+    //             this.signatureFile = null;
+    //             this.signatureEditMode = !this.hasSavedSignature;
+    //             this.oldSignaturePreview = this.signaturePreview;
+    //             this.oldSignatureUpdatedAt = this.signatureUpdatedAt;
+
+    //             if (data.certificate) {
+    //                 this.setCertificateData(data.certificate);
+    //                 this.hasSavedCertificate = !!data.certificate.usable;
+    //             } else {
+    //                 this.hasSavedCertificate = false;
+    //                 this.certificate = this.getEmptyCertificate();
+    //             }
+    //         } catch (error) {
+    //             console.warn('ยังไม่พบ API สำหรับโหลดข้อมูลลายเซ็น หรือโหลดข้อมูลไม่สำเร็จ', error);
+    //             this.hasSavedSignature = false;
+    //             this.hasSavedCertificate = false;
+    //         }
+    //     },
+
+    async loadDigitalSignatureData() {
+        try {
+            const res = await axios.post(
+                `${API_BASE}/digital-signature/profile`,
+                {
                     staff_id: this.staffId
-                });
-
-                const data = res.data || {};
-                const signatureUrl = data.signature_url || data.signatureUrl || null;
-                const signatureRow = data.signature || data.digital_signature || null;
-
-                this.personalRow = data.personal || data.personalRow || this.personalRow;
-
-                this.signaturePreview = signatureUrl;
-                this.signatureUpdatedAt = data.signature_updated_at || data.signatureUpdatedAt || signatureRow?.updated_at || null;
-                this.hasSavedSignature = !!(signatureUrl || signatureRow?.signature_image);
-                this.signatureChanged = false;
-                this.signatureFile = null;
-                this.signatureEditMode = !this.hasSavedSignature;
-                this.oldSignaturePreview = this.signaturePreview;
-                this.oldSignatureUpdatedAt = this.signatureUpdatedAt;
-
-                if (data.certificate) {
-                    this.setCertificateData(data.certificate);
-                    this.hasSavedCertificate = !!data.certificate.usable;
-                } else {
-                    this.hasSavedCertificate = false;
-                    this.certificate = this.getEmptyCertificate();
                 }
-            } catch (error) {
-                console.warn('ยังไม่พบ API สำหรับโหลดข้อมูลลายเซ็น หรือโหลดข้อมูลไม่สำเร็จ', error);
-                this.hasSavedSignature = false;
+            );
+
+            const data = res.data?.data || res.data || {};
+
+            // console.log('ข้อมูลทั้งหมดจาก API:', data);
+            // console.log('ข้อมูลบุคลากร:', data.personal);
+            // console.log('Email จาก API:', {
+            //     email: data.personal?.email,
+            //     EMAIL: data.personal?.EMAIL,
+            //     profileEmail: this.currentUserProfile?.EMAIL
+            // });
+
+            const signatureUrl = data.signature_url || data.signatureUrl || null; 
+            const signatureRow = data.signature || data.digital_signature || null; 
+
+            this.personalRow = data.personal || data.personalRow || data.profile || data.staff || {}; 
+            this.signaturePreview = signatureUrl; 
+            this.signatureUpdatedAt = data.signature_updated_at || data.signatureUpdatedAt || signatureRow?.updated_at || null; 
+            this.hasSavedSignature = !!( signatureUrl || signatureRow?.signature_image ); 
+            this.signatureChanged = false;
+            this.signatureFile = null;
+            this.signatureEditMode = !this.hasSavedSignature;
+            this.oldSignaturePreview = this.signaturePreview;
+            this.oldSignatureUpdatedAt = this.signatureUpdatedAt;
+
+            if (data.certificate) {
+                this.setCertificateData(data.certificate);
+                this.hasSavedCertificate = !!data.certificate.usable;
+            } else {
                 this.hasSavedCertificate = false;
+                this.certificate = this.getEmptyCertificate();
             }
-        },
+        } catch (error) {
+            console.error(
+                'โหลดข้อมูลลายเซ็นไม่สำเร็จ:',
+                error.response?.data || error
+            );
+
+            this.hasSavedSignature = false;
+            this.hasSavedCertificate = false;
+        }
+    },
 
         handleSignatureFile(event) {
             if (this.isSignatureLocked) {
