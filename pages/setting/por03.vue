@@ -2,8 +2,8 @@
     <div class="grid">
         <div class="col-12 lg:col-12 xl:col-12">
             <div class="col md:col-12 text-right">
-               <!-- <Button label="Export" icon="pi pi-file-word" class="mr-2 mb-2 " @click="printDataP03"></Button>  -->
-                <Button label="Export" icon="pi pi-file-pdf" class="mr-2 mb-2" @click="printDataP03X" />
+               <Button label="Export" icon="pi pi-file-word" class="mr-2 mb-2 " @click="printDataP03"></Button> 
+                <!-- <Button label="Export" icon="pi pi-file-pdf" class="mr-2 mb-2" @click="printDataP03X" /> -->
             </div>   
               <!-- {{ user }} -->
             <div class="card mb-0">
@@ -174,12 +174,12 @@
                                             <b style="color: red;">- ไม่มีข้อมูล -</b>
                                         </p> 
                                     </template> 
-                                    <Button
+                                    <!-- <Button
                                         icon="pi pi-save"
                                         severity="primary"
                                         label="ระบบภาระงาน"
                                         @click="openWorkloadSystem(subP01)"
-                                    />
+                                    /> -->
                                    
                                 </td>
  
@@ -3498,74 +3498,75 @@ import InputText from 'primevue/inputtext';
                 window.open(url, "_blank");
             },
  
-            async printDataP03X() {
-                const { getSession } = await useAuth();
-                const user = await getSession(); 
+            //pdf
+            // async printDataP03X() {
+            //     const { getSession } = await useAuth();
+            //     const user = await getSession(); 
  
-                try {  
-                        Swal.fire({
-                            title: 'กำลังสร้างไฟล์ PDF...',
-                            allowOutsideClick: false,
-                            didOpen: () => {
-                        Swal.showLoading();
-                        }
-                    });
+            //     try {  
+            //             Swal.fire({
+            //                 title: 'กำลังสร้างไฟล์ PDF...',
+            //                 allowOutsideClick: false,
+            //                 didOpen: () => {
+            //             Swal.showLoading();
+            //             }
+            //         });
 
-                    const payload = {
-                    staff_id: this.staffid_Main,
-                    group_id: this.groupid_Main,
-                    fac_id: this.dataPor.fac_id,
-                    year_id: this.dataPor.d_date,
-                    evalua: this.dataPor.evalua,
+            //         const payload = {
+            //         staff_id: this.staffid_Main,
+            //         group_id: this.groupid_Main,
+            //         fac_id: this.dataPor.fac_id,
+            //         year_id: this.dataPor.d_date,
+            //         evalua: this.dataPor.evalua,
 
-                    posadio: this.posadio, 
-                    postypenameid: this.postypenameid,
-                    postypename: `ระดับ${this.postypename}`, 
+            //         posadio: this.posadio, 
+            //         postypenameid: this.postypenameid,
+            //         postypename: `ระดับ${this.postypename}`, 
                     
-                    PREFIXFULLNAME: user.user.name.PREFIXFULLNAME,
-                    STAFFNAME: user.user.name.STAFFNAME,
-                    STAFFSURNAME: user.user.name.STAFFSURNAME,
-                    POSITIONNAME: user.user.name.POSITIONNAME,
-                    POSTYPENAME: user.user.name.POSTYPENAME,
-                    SCOPES: user.user.name.SCOPES.staffdepartmentname,
-                    };
+            //         PREFIXFULLNAME: user.user.name.PREFIXFULLNAME,
+            //         STAFFNAME: user.user.name.STAFFNAME,
+            //         STAFFSURNAME: user.user.name.STAFFSURNAME,
+            //         POSITIONNAME: user.user.name.POSITIONNAME,
+            //         POSTYPENAME: user.user.name.POSTYPENAME,
+            //         SCOPES: user.user.name.SCOPES.staffdepartmentname,
+            //         };
 
-                    const response = await axios.post(
-                    "http://127.0.0.1:8000/api/exportPdf_P03",
-                    payload,
-                    {
-                        responseType: 'arraybuffer',
-                        headers: { Accept: 'application/pdf' }
-                    }
-                    );
-                    Swal.close();
+            //         const response = await axios.post(
+            //         "http://127.0.0.1:8000/api/exportPdf_P03",
+            //         payload,
+            //         {
+            //             responseType: 'arraybuffer',
+            //             headers: { Accept: 'application/pdf' }
+            //         }
+            //         );
+            //         Swal.close();
 
-                    const blob = new Blob([response.data], { type: 'application/pdf' });
-                    const url = window.URL.createObjectURL(blob);
+            //         const blob = new Blob([response.data], { type: 'application/pdf' });
+            //         const url = window.URL.createObjectURL(blob);
 
-                    const preview = window.open('', '_blank');
-                    if (preview) {
-                        preview.document.body.style.margin = '0';
-                        const iframe = preview.document.createElement('iframe');
-                        iframe.style.width = '100%';
-                        iframe.style.height = '100%';
-                        iframe.style.border = 'none';
-                        iframe.src = url;
-                        preview.document.body.appendChild(iframe);
-                        preview.addEventListener('beforeunload', () => {
-                            try { window.URL.revokeObjectURL(url); } catch (e) {}
-                        });
-                    } else {
-                        window.open(url, '_blank');
-                        setTimeout(() => window.URL.revokeObjectURL(url), 100);
-                    }
+            //         const preview = window.open('', '_blank');
+            //         if (preview) {
+            //             preview.document.body.style.margin = '0';
+            //             const iframe = preview.document.createElement('iframe');
+            //             iframe.style.width = '100%';
+            //             iframe.style.height = '100%';
+            //             iframe.style.border = 'none';
+            //             iframe.src = url;
+            //             preview.document.body.appendChild(iframe);
+            //             preview.addEventListener('beforeunload', () => {
+            //                 try { window.URL.revokeObjectURL(url); } catch (e) {}
+            //             });
+            //         } else {
+            //             window.open(url, '_blank');
+            //             setTimeout(() => window.URL.revokeObjectURL(url), 100);
+            //         }
 
-                } catch (error) {
-                    Swal.close();
-                    console.error("Error:", error);
-                    Swal.fire('เกิดข้อผิดพลาด', 'ไม่สามารถสร้างไฟล์ PDF ได้', 'error');
-                }
-            }, 
+            //     } catch (error) {
+            //         Swal.close();
+            //         console.error("Error:", error);
+            //         Swal.fire('เกิดข้อผิดพลาด', 'ไม่สามารถสร้างไฟล์ PDF ได้', 'error');
+            //     }
+            // }, 
 
              // แก้ไขตัวชี้วัด / เกณฑ์การประเมิน
             EditRegislickP03(data){

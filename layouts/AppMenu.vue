@@ -39,14 +39,14 @@ const allMenus = ref([
         
     }, 
 
-    {
-        id: 'signature',
-        label: 'Digitalsignature',
-        items: [ 
-            { label: 'ลายเซ็นดิจิทัล', icon: 'pi pi-fw pi pi-user-edit', to: '/setting/digitalsignature' } 
-        ]
+    // {
+    //     id: 'signature',
+    //     label: 'Digitalsignature',
+    //     items: [ 
+    //         { label: 'ลายเซ็นดิจิทัล', icon: 'pi pi-fw pi pi-user-edit', to: '/setting/digitalsignature' } 
+    //     ]
         
-    }, 
+    // }, 
     
     {
         id: 'history',

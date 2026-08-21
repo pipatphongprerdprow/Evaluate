@@ -19,7 +19,11 @@
                       placeholder="เลือกคณะ / หน่วยงาน"
                       class="faculty-select"
                       filter
-                      :disabled="loading || facultyOptions.length === 0"
+                      :disabled="
+                        loading ||
+                        facultyOptions.length === 0 ||
+                        facultyOptions.length === 1
+                      "
                       @change="onFacultyChange"
                   /> 
                   <Dropdown
@@ -434,6 +438,7 @@
   import Swal from 'sweetalert2';
 
   const PROFILE_IMAGE_URL = 'https://pd.msu.ac.th/staff/picture/';
+  const SUPER_ADMIN_STAFF_IDS = ['5009942', '5009680'];
 
   export default {
     data() {
@@ -491,6 +496,32 @@
     },
 
     computed: {
+
+      
+      // ✅ ตรวจว่าเป็น Super Admin หรือไม่ 
+      isSuperAdmin() {
+        return SUPER_ADMIN_STAFF_IDS.includes(
+          String(this.staffid_Main || '').trim()
+        );
+      },
+
+      canViewAllFaculties() {
+        const group = String(this.groupid_Main || '').trim();
+
+        if (this.isSuperAdmin) {
+          return true;
+        }
+
+        return ['3', '4'].includes(group);
+      },
+ 
+      isHrOwnFacultyOnly() {
+        return (
+          String(this.groupid_Main || '').trim() === '2' &&
+          !this.isSuperAdmin
+        );
+      },
+ 
      
       evaluatedRows() {
         const rows = Array.isArray(this.products) ? this.products : [];
@@ -660,7 +691,9 @@
       },
 
       facultyOptions() {
-        const rows = Array.isArray(this.facultyList) ? this.facultyList : [];
+        const rows = Array.isArray(this.facultyList)
+          ? this.facultyList
+          : [];
 
         return rows
           .map((item) => {
@@ -686,13 +719,18 @@
           })
           .filter((item) => item.fac_id || item.facuties)
           .sort((a, b) => {
-            return String(a.facuties || '').localeCompare(String(b.facuties || ''), 'th');
+            return String(a.facuties || '').localeCompare(
+              String(b.facuties || ''),
+              'th'
+            );
           });
       },
  
       filteredTrackingDates() {
         return Array.isArray(this.tracking_dates) ? this.tracking_dates : [];
       },
+
+ 
  
     },
 
@@ -718,18 +756,40 @@
         await this.onFacultySelectAll();
 
         // 2) ตั้งค่าเริ่มต้นเป็นคณะของผู้ใช้งาน
-        this.selected_faculty =
-          this.facultyOptions.find((item) => {
-            return String(item.fac_id) === String(this.facid_Main);
-          }) ||
-          this.facultyOptions[0] ||
-          null;
+
+        // this.selected_faculty =
+        //   this.facultyOptions.find((item) => {
+        //     return String(item.fac_id) === String(this.facid_Main);
+        //   }) ||
+        //   this.facultyOptions[0] ||
+        //   null;
+
+        const ownFaculty = this.facultyOptions.find((item) => {
+          return String(item.fac_id || '').trim() ===
+                String(this.facid_Main || '').trim();
+        });
+
+        if (this.isHrOwnFacultyOnly) {
+
+          // เจ้าหน้าที่บุคคลทั่วไป
+          // บังคับเป็นหน่วยงานตัวเอง
+          this.selected_faculty = ownFaculty || null;
+
+        } else {
+
+          // Super Admin / group 3 / group 4
+          // ให้เริ่มต้นจากหน่วยงานของตนเองก่อน
+          // แต่สามารถเปลี่ยน Dropdown ได้
+          this.selected_faculty =
+            ownFaculty ||
+            this.facultyOptions[0] ||
+            null;
+        }
 
         // 3) โหลดรอบประเมินของคณะที่เลือก
         if (this.selected_faculty?.fac_id) {
           await this.showDataSet(this.selected_faculty.fac_id);
-
-          // 4) ถ้าต้องการให้ข้อมูลแสดงทันที
+ 
           this.tracking_date = this.filteredTrackingDates[0] || null;
 
           if (this.tracking_date) {
@@ -769,27 +829,50 @@
 
       async showDataSet(facId = null) {
         try {
-          const targetFacId = String(
-            facId || this.selected_faculty?.fac_id || ''
+
+          let targetFacId = String(
+            facId ||
+            this.selected_faculty?.fac_id ||
+            ''
           ).trim();
+
+
+          // =============================================
+          // ✅ เจ้าหน้าที่บุคคล group 2 ทั่วไป
+          // บังคับหน่วยงานตัวเอง
+          // =============================================
+          if (this.isHrOwnFacultyOnly) {
+            targetFacId = String(
+              this.facid_Main || ''
+            ).trim();
+          }
+
 
           if (!targetFacId) {
             this.tracking_dates = [];
             return;
           }
 
-          const res = await axios.get('http://127.0.0.1:8000/api/searchDateSetFaculty', {
-            params: {
-              fac_id: targetFacId
+          const res = await axios.get(
+            'http://127.0.0.1:8000/api/searchDateSetFaculty',
+            {
+              params: {
+                fac_id: targetFacId,
+
+                staff_id: this.staffid_Main,
+                group_id: this.groupid_Main,
+ 
+                user_fac_id: this.facid_Main
+              }
             }
-          });
+          );
 
-          // console.log('searchDateSetFaculty fac_id:', targetFacId);
-          // console.log('searchDateSetFaculty result:', res.data);
-
-          this.tracking_dates = Array.isArray(res.data) ? res.data : [];
+          this.tracking_dates = Array.isArray(res.data)
+            ? res.data
+            : [];
 
         } catch (error) {
+
           console.error('showDataSet error:', error);
 
           this.tracking_dates = [];
@@ -837,36 +920,59 @@
   
       async showDataEvalu() {
         try {
+
           if (!this.selected_faculty?.fac_id || !this.tracking_date) {
             this.products = [];
             return;
           }
 
-          const res = await axios.get('http://127.0.0.1:8000/api/showDataEvalu', {
-            params: {
-              staff_id: this.staffid_Main,
 
-              // จุดสำคัญ ใช้คณะที่เลือกจาก Dropdown
-              fac_id: this.selected_faculty.fac_id,
+          let targetFacId = String(
+            this.selected_faculty.fac_id || ''
+          ).trim();
+ 
+          if (this.isHrOwnFacultyOnly) {
+            targetFacId = String(
+              this.facid_Main || ''
+            ).trim();
+          }
 
-              group_id: this.groupid_Main,
-              evalua: this.tracking_date.evalua,
-              p_year: this.tracking_date.d_date
+
+          const res = await axios.get(
+            'http://127.0.0.1:8000/api/showDataEvalu',
+            {
+              params: {
+                staff_id: this.staffid_Main,
+
+                // คณะที่กำลังเลือก
+                fac_id: this.selected_faculty.fac_id,
+ 
+                user_fac_id: this.facid_Main,
+
+                group_id: this.groupid_Main,
+                evalua: this.tracking_date.evalua,
+                p_year: this.tracking_date.d_date
+              }
             }
-          });
+          );
 
-          // console.log('showDataEvalu:', res.data);
-
-          this.products = Array.isArray(res.data) ? res.data : [];
+          this.products = Array.isArray(res.data)
+            ? res.data
+            : [];
 
           this.$nextTick(() => {
             this.animateDashboardNumbers();
           });
 
         } catch (error) {
-          console.error('showDataEvalu error:', error);
+
+          console.error(
+            'showDataEvalu error:',
+            error
+          );
 
           this.products = [];
+
           this.clearCounterAnimations();
           this.resetAnimatedNumbers();
 
@@ -1125,22 +1231,28 @@
         this.clearCounterAnimations();
         this.resetAnimatedNumbers();
 
-        if (!this.selected_faculty?.fac_id) return;
+        if (!this.selected_faculty?.fac_id) {
+          return;
+        }
 
         await this.withLoading(async () => {
-          await this.showDataSet(this.selected_faculty.fac_id);
+          await this.showDataSet(
+            this.selected_faculty.fac_id
+          );
         });
       },
  
       async onFacultySelectAll() {
         try {
-          const res = await axios.get('http://127.0.0.1:8000/api/searchDataFaculty', {
-            params: {
-              access_token: this.access_token
+          const res = await axios.get(
+            'http://127.0.0.1:8000/api/searchDataFaculty',
+            {
+              params: {
+                access_token: this.access_token,
+                staff_id: this.staffid_Main
+              }
             }
-          });
-
-          // console.log('searchDataFaculty:', res.data);
+          );
 
           this.facultyList = Array.isArray(res.data)
             ? res.data
@@ -1152,12 +1264,6 @@
           console.error('onFacultySelectAll error:', error);
 
           this.facultyList = [];
-
-          Swal.fire({
-            icon: 'error',
-            title: 'โหลดรายชื่อคณะ / หน่วยงานไม่สำเร็จ',
-            text: 'กรุณาตรวจสอบ API searchDataFaculty'
-          });
         }
       },
 

@@ -929,82 +929,707 @@
                                                     </tr> 
                                                 </tbody>
                                             </table> 
-                                            <h5 class="mb-4"><i class="" style="font-size: x-large;"></i> ส่วนที่ 4 การรับทราบผลการประเมิน</h5>
-                                                    <table class="styled-table">
-                                                    <tbody>
-                                                        <tr>
-                                                        <td>
-                                                            <b>ผู้รับการประเมิน</b><br>
-                                                            <label for="receiver-acknowledgment">[ &nbsp;&nbsp; ] ได้รับทราบผลการประเมินและแผนพัฒนาการปฏิบัติราชการ รายบุคคลแล้ว</label><br>
-                                                        </td>
-                                                            <td class="center-align"><br><br>
-                                                                ลงชื่อ .................................................................<br>
-                                                                ชื่อ {{ currentstaff[0].prefixfullname }} {{ currentstaff[0].staffname }} {{   currentstaff[0].staffsurname }}<br>
-                                                                ตำแหน่ง {{ currentstaff[0].posnameth }}<br>
-                                                                วันที่ .......... เดือน .......................... พ.ศ.
+                                            <h5 class="mb-4">
+                                                    <i class="" style="font-size: x-large;"></i>
+                                                    ส่วนที่ 4 การรับทราบผลการประเมิน
+                                                </h5>
+
+                                                <table class="styled-table sign-table">
+                                                    <tbody> 
+
+                                                        <tr class="receiver-row">
+                                                            <td class="left-align sign-left-cell">
+                                                                <b>ผู้รับการประเมิน</b><br>
+
+                                                                <label class="sign-check-line readonly-check">
+                                                                    <input
+                                                                        type="checkbox"
+                                                                        :checked="!!signatures.receiver_ack"
+                                                                        disabled
+                                                                    />
+                                                                    <span>
+                                                                        ได้รับทราบผลการประเมินและแผนพัฒนาการปฏิบัติราชการ รายบุคคลแล้ว
+                                                                    </span>
+                                                                </label>
+
+                                                                <small
+                                                                    v-if="signatures.receiver_ack"
+                                                                    class="receiver-signed-text"
+                                                                >
+                                                                    ลงนามออนไลน์เรียบร้อยแล้ว
+                                                                </small>
+
+                                                                <small
+                                                                    v-else
+                                                                    class="receiver-not-signed-text"
+                                                                >
+                                                                    ยังไม่พบข้อมูลการลงนามของผู้รับการประเมิน
+                                                                </small>
+                                                            </td>
+
+                                                            <td class="center-align sign-right-cell">
+                                                                <template v-if="signatures.receiver_ack">
+                                                                    <div class="receiver-signature-card">
+                                                                        <div class="receiver-sign-badge">
+                                                                            ลงนามแล้ว
+                                                                        </div>
+
+                                                                        <div class="receiver-signature-image-wrap">
+                                                                            <img
+                                                                                v-if="signatures.receiver_ack.signature_image"
+                                                                                :src="signatures.receiver_ack.signature_image"
+                                                                                class="receiver-signature-img"
+                                                                            />
+
+                                                                            <span v-else class="online-signature receiver-name-signature">
+                                                                                {{ signatures.receiver_ack.signer_name }}
+                                                                            </span>
+                                                                        </div>
+
+                                                                        <div class="receiver-signature-detail">
+                                                                            <div>
+                                                                                ลงชื่อ {{ signatures.receiver_ack.signer_name }}
+                                                                            </div>
+
+                                                                            <div>
+                                                                                ตำแหน่ง {{ signatures.receiver_ack.signer_position || '-' }}
+                                                                            </div>
+
+                                                                            <div>
+                                                                                วันที่ {{ formatThaiDateTime(signatures.receiver_ack.signed_at) }}
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </template>
+
+                                                                <template v-else>
+                                                                    <div class="receiver-signature-empty">
+                                                                        <br>
+                                                                        ลงชื่อ .................................................................<br>
+                                                                        ชื่อ {{ currentstaff?.[0]?.prefixfullname || '' }}
+                                                                        {{ currentstaff?.[0]?.staffname || '' }}
+                                                                        {{ currentstaff?.[0]?.staffsurname || '' }}<br>
+                                                                        ตำแหน่ง {{ currentstaff?.[0]?.posnameth || '' }}<br>
+                                                                        วันที่ .......... เดือน .......................... พ.ศ.
+                                                                    </div>
+                                                                </template>
                                                             </td>
                                                         </tr>
+
                                                         <tr>
-                                                            <td>
+                                                            <td class="left-align">
                                                                 <b>ผู้ประเมิน</b><br>
-                                                                <label for="evaluator-acknowledgment-1">[ &nbsp;&nbsp; ] ได้แจ้งผลการประเมินและผู้รับการประเมินได้ลงนามรับทราบ รายบุคคลแล้ว</label><br>
-                                                                <label for="evaluator-acknowledgment-2">[ &nbsp;&nbsp; ] ได้แจ้งผลการประเมินเมื่อวันที่ ..............................แต่ผู้รับการประเมินไม่ลงนามรับทราบผลการประเมิน โดยมี .......................... เป็นพยาน</label><br>
-                                                                ลงชื่อ .................................................................<br>
-                                                                ชื่อ {{assessorText}}<br>
-                                                                ตำแหน่ง {{assessor_positionText}}<br>
-                                                                วันที่ .......... เดือน .......................... พ.ศ...........
+
+                                                                <label class="sign-check-line">
+                                                                    <input
+                                                                        type="checkbox"
+                                                                        :checked="signForm.assessor_choice === 'ack'" 
+                                                                        :disabled="!!signatures.assessor && !signEditMode.assessor"
+                                                                        @change="selectSignChoice('assessor', 'ack')"
+                                                                    />
+                                                                    <span>ได้แจ้งผลการประเมินและผู้รับการประเมินได้ลงนามรับทราบ รายบุคคลแล้ว</span>
+                                                                </label>
+
+                                                                <label class="sign-check-line">
+                                                                    <input
+                                                                        type="checkbox"
+                                                                        :checked="signForm.assessor_choice === 'no_ack'"
+                                                                        :disabled="!!signatures.assessor && !signEditMode.assessor"
+                                                                        @change="selectSignChoice('assessor', 'no_ack')"
+                                                                    />
+                                                                    <span>ได้แจ้งผลการประเมินแล้ว แต่ผู้รับการประเมินไม่ลงนามรับทราบผลการประเมิน</span>
+                                                                </label>
+
+                                                                <Textarea
+                                                                    v-if="signForm.assessor_choice === 'no_ack' && (!signatures.assessor || signEditMode.assessor)"
+                                                                    v-model="signForm.assessor_comment"
+                                                                    rows="3"
+                                                                    class="p-inputtextarea p-inputtext p-component mt-2"
+                                                                    placeholder="ระบุพยาน หรือรายละเอียดเพิ่มเติม"
+                                                                />
+
+                                                                <!-- ✅ วางกล่องลงนามพยานตรงนี้ -->
+                                                                <div
+                                                                    v-if="signForm.assessor_choice === 'no_ack'"
+                                                                    class="witness-sign-box"
+                                                                >
+                                                                    <div class="witness-title">
+                                                                        ลงนามพยานกรณีผู้รับการประเมินไม่ลงนามรับทราบผลการประเมิน
+                                                                    </div>
+
+                                                                    <div class="witness-grid">
+                                                                        <!-- พยานคนที่ 1 -->
+                                                                        <div class="witness-card">
+                                                                            <div class="witness-card-title">พยานคนที่ 1</div>
+
+                                                                            <template v-if="signatures.assessor_witness1">
+                                                                                <img
+                                                                                    v-if="signatures.assessor_witness1.signature_image"
+                                                                                    :src="signatures.assessor_witness1.signature_image"
+                                                                                    class="witness-signature-img"
+                                                                                />
+
+                                                                                <div class="witness-detail">
+                                                                                    ลงชื่อ {{ signatures.assessor_witness1.signer_name }}<br>
+                                                                                    ตำแหน่ง {{ signatures.assessor_witness1.signer_position || '-' }}<br>
+                                                                                    วันที่ {{ formatThaiDateTime(signatures.assessor_witness1.signed_at) }}
+                                                                                </div>
+                                                                                <Button
+                                                                                    v-if="signEditMode.assessor"
+                                                                                    label="ลบพยานคนที่ 1"
+                                                                                    icon="pi pi-trash"
+                                                                                    severity="danger"
+                                                                                    size="small"
+                                                                                    class="mt-2"
+                                                                                    :loading="loadingDeleteSign.assessor_witness1"
+                                                                                    @click="deleteP04Signature('assessor_witness1')"
+                                                                                />
+                                                                            </template>
+
+                                                                            <template v-else>
+                                                                                <Button
+                                                                                    label="ลงนามพยานคนที่ 1"
+                                                                                    icon="pi pi-pencil"
+                                                                                    severity="warning"
+                                                                                    size="small"
+                                                                                    :loading="loadingSign.assessor_witness1"
+                                                                                    :disabled="!currentDigitalSignature.usable"
+                                                                                    @click="signP04('assessor_witness1')"
+                                                                                />
+                                                                            </template>
+                                                                        </div>
+
+                                                                        <!-- พยานคนที่ 2 -->
+                                                                        <div class="witness-card">
+                                                                            <div class="witness-card-title">พยานคนที่ 2</div>
+
+                                                                            <template v-if="signatures.assessor_witness2">
+                                                                                <img
+                                                                                    v-if="signatures.assessor_witness2.signature_image"
+                                                                                    :src="signatures.assessor_witness2.signature_image"
+                                                                                    class="witness-signature-img"
+                                                                                />
+
+                                                                                <div class="witness-detail">
+                                                                                    ลงชื่อ {{ signatures.assessor_witness2.signer_name }}<br>
+                                                                                    ตำแหน่ง {{ signatures.assessor_witness2.signer_position || '-' }}<br>
+                                                                                    วันที่ {{ formatThaiDateTime(signatures.assessor_witness2.signed_at) }}
+                                                                                </div> 
+                                                                                <Button
+                                                                                    v-if="signEditMode.assessor"
+                                                                                    label="ลบพยานคนที่ 2"
+                                                                                    icon="pi pi-trash"
+                                                                                    severity="danger"
+                                                                                    size="small"
+                                                                                    class="mt-2"
+                                                                                    :loading="loadingDeleteSign.assessor_witness2"
+                                                                                    @click="deleteP04Signature('assessor_witness2')"
+                                                                                /> 
+                                                                            </template>
+
+                                                                            <template v-else>
+                                                                                <Button
+                                                                                    label="ลงนามพยานคนที่ 2"
+                                                                                    icon="pi pi-pencil"
+                                                                                    severity="warning"
+                                                                                    size="small"
+                                                                                    :loading="loadingSign.assessor_witness2"
+                                                                                    :disabled="!currentDigitalSignature.usable"
+                                                                                    @click="signP04('assessor_witness2')"
+                                                                                />
+                                                                            </template>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <small
+                                                                        v-if="!hasTwoAssessorWitnesses()"
+                                                                        class="sign-warning"
+                                                                    >
+                                                                        * ต้องมีพยานลงนามครบ 2 คนก่อน จึงจะเปิดปุ่มลงนามของผู้ประเมิน
+                                                                    </small>
+
+                                                                    <small
+                                                                        v-else
+                                                                        class="receiver-signed-text"
+                                                                    >
+                                                                        พยานลงนามครบ 2 คนแล้ว สามารถลงนามผู้ประเมินได้
+                                                                    </small>
+                                                                </div>
+                                                                <div
+                                                                    v-if="signEditMode.assessor && signForm.assessor_choice === 'ack' && hasAnyAssessorWitness()"
+                                                                    class="witness-clear-notice"
+                                                                >
+                                                                    หากบันทึกสถานะเป็น “ได้แจ้งผลการประเมินและผู้รับการประเมินได้ลงนามรับทราบ รายบุคคลแล้ว”
+                                                                    ระบบจะลบข้อมูลพยานเดิมออกจากรายการนี้โดยอัตโนมัติ
+                                                                </div>
+
+                                                                <small v-if="!signForm.assessor_choice && !signatures.assessor" class="sign-warning">
+                                                                    * กรุณาเลือกสถานะก่อนลงนาม
+                                                                </small>
+                                                                <small
+                                                                    v-if="!currentDigitalSignature.usable && !signatures.assessor"
+                                                                    class="sign-warning">
+                                                                    * ยังไม่มีลายเซ็น กรุณาตั้งค่าลายเซ็นอิเล็กทรอนิกส์ก่อนลงนาม
+                                                                </small> 
                                                             </td>
-                                                        <td class="center-align"><br><br>
-                                                            ลงชื่อ .................................................................<br>
-                                                            ชื่อ {{assessorText}}<br>
-                                                            ตำแหน่ง {{assessor_positionText}}<br>
-                                                            วันที่ .......... เดือน .......................... พ.ศ...........
-                                                        </td>
+
+                                                            <td class="center-align sign-right-cell">
+                                                                <template v-if="signatures.assessor">
+                                                                    <div class="approval-signature-card">
+                                                                        <div class="approval-sign-badge">ลงนามแล้ว</div>
+
+                                                                        <div class="approval-signature-image-wrap">
+                                                                            <img
+                                                                                v-if="signatures.assessor.signature_image"
+                                                                                :src="signatures.assessor.signature_image"
+                                                                                class="approval-signature-img"
+                                                                            />
+
+                                                                            <span v-else class="online-signature approval-name-signature">
+                                                                                {{ signatures.assessor.signer_name }}
+                                                                            </span>
+                                                                        </div>
+
+                                                                        <div class="approval-signature-detail">
+                                                                            <div>ลงชื่อ {{ signatures.assessor.signer_name }}</div>
+                                                                            <div>ตำแหน่ง {{ signatures.assessor.signer_position || '-' }}</div>
+                                                                            <div>วันที่ {{ formatThaiDateTime(signatures.assessor.signed_at) }}</div>
+                                                                        </div>
+
+                                                                        <div class="approval-action-row">
+                                                                            <template v-if="!signEditMode.assessor">
+                                                                                <Button
+                                                                                    label="อัพเดทลายเซ็น"
+                                                                                    icon="pi pi-refresh"
+                                                                                    severity="warning"
+                                                                                    size="small"
+                                                                                    class="approval-action-btn"
+                                                                                    :loading="loadingUpdateSignature.assessor"
+                                                                                    :disabled="!currentDigitalSignature.usable"
+                                                                                    @click="updateP04SignatureFromDigital('assessor')"
+                                                                                />
+
+                                                                                <Button
+                                                                                    label="แก้ไขสถานะ"
+                                                                                    icon="pi pi-pencil"
+                                                                                    severity="info"
+                                                                                    size="small"
+                                                                                    class="approval-action-btn"
+                                                                                    @click="startEditP04Signature('assessor')"
+                                                                                />
+
+                                                                                <Button
+                                                                                    label="ลบ"
+                                                                                    icon="pi pi-trash"
+                                                                                    severity="danger"
+                                                                                    size="small"
+                                                                                    class="approval-action-btn"
+                                                                                    :loading="loadingDeleteSign.assessor"
+                                                                                    @click="deleteP04Signature('assessor')"
+                                                                                />
+                                                                            </template>
+
+                                                                            <template v-else>
+                                                                                <Button
+                                                                                    label="บันทึก"
+                                                                                    icon="pi pi-save"
+                                                                                    severity="success"
+                                                                                    size="small"
+                                                                                    class="approval-action-btn"
+                                                                                    :loading="loadingSign.assessor"
+                                                                                    @click="updateP04Signature('assessor')"
+                                                                                />
+
+                                                                                <Button
+                                                                                    label="ยกเลิก"
+                                                                                    icon="pi pi-times"
+                                                                                    severity="secondary"
+                                                                                    size="small"
+                                                                                    class="approval-action-btn"
+                                                                                    @click="cancelEditP04Signature('assessor')"
+                                                                                />
+                                                                            </template>
+                                                                        </div>
+                                                                    </div>
+                                                                </template>
+
+                                                                <template v-else>
+                                                                    <div class="approval-signature-empty">
+                                                                        ลงชื่อ .................................................................<br>
+                                                                        ชื่อ {{ assessorText || '-' }}<br>
+                                                                        ตำแหน่ง {{ assessor_positionText || '-' }}<br>
+                                                                        วันที่ .......... เดือน .......................... พ.ศ...........
+
+                                                                        <div class="signature-button-wrap">
+                                                                            <Button
+                                                                                label="ลงนาม"
+                                                                                icon="pi pi-pencil"
+                                                                                severity="success"
+                                                                                size="small"
+                                                                                class="signature-btn"
+                                                                                :loading="loadingSign.assessor"
+                                                                                :disabled="!canSignAssessor()"
+                                                                                @click="signP04('assessor')"
+                                                                            />
+                                                                        </div>
+                                                                    </div>
+                                                                </template>
+                                                            </td>
                                                         </tr>
-                                                    </tbody>
-                                                    </table>
-                                                    <h5 class="mb-4"><i class="" style="font-size: x-large;"></i> ส่วนที่ 5  ความเห็นของผู้บังคับบัญชาเหนือขึ้นไป</h5>
-                                                    <table class="styled-table">
-                                                        <tbody>
-                                                            <tr>
-                                                                <td>
-                                                                    <b>ผู้บังคับบัญชาเหนือขึ้นไป</b><br>
-                                                                    <label for="evaluator-acknowledgment-3">[ &nbsp;&nbsp;] เห็นด้วยกับผลการประเมิน</label><br>
-                                                                    <label for="evaluator-acknowledgment-3">[ &nbsp;&nbsp;] มีความเห็นต่าง ดังนี้<br>..............................................................................................................</label><br>
-                                                                    .....................................................................................................................................<br>
-                                                                    .....................................................................................................................................
-                                                                </td>
-                                                                <td class="center-align"><br><br>
-                                                                    
-                                                                    ลงชื่อ .................................................................<br>
-                                                                            (.......................................................)<br>
-                                                                        ตำแหน่ง .................................................................<br>
-                                                                    <!-- ชื่อ : {{ user.user.name.PREFIXFULLNAME }} {{ user.user.name.STAFFNAME }} {{ user.user.name.STAFFSURNAME }}<br>
-                                                                    ตำแหน่ง : {{ user.user.name.POSITIONNAME }}<br> -->
-                                                                    วันที่ : .......... เดือน .......................... พ.ศ.............
-                                                                </td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td>
-                                                                    <b>ผู้บังคับบัญชาเหนือขึ้นไปอีกชั้นหนึ่ง (ถ้ามี)</b><br>
-                                                                    
-                                                                    <label for="evaluator-acknowledgment-5">[ &nbsp;&nbsp;] เห็นด้วยกับผลการประเมิน</label><br>
-                                                                    
-                                                                    <label for="evaluator-acknowledgment-6">[ &nbsp;&nbsp;] มีความเห็นต่าง ดังนี้<br>...............................................................................................................</label><br>
-                                                                    .......................................................................................................................................<br>
-                                                                    .......................................................................................................................................
-                                                                </td>
-                                                                <td class="center-align"><br><br>
-                                                                    ลงชื่อ .................................................................<br>
-                                                                        (.......................................................)<br>
-                                                                    ตำแหน่ง .................................................................<br>
-                                                                    <!-- ชื่อ {{ assessorText }}<br>
-                                                                    ตำแหน่ง {{ assessor_positionText }}<br> -->
-                                                                    วันที่ .......... เดือน .......................... พ.ศ...........
-                                                                </td>
-                                                            </tr>
                                                     </tbody>
                                                 </table> 
+
+                                                <h5 class="mb-4">
+                                                    <i class="" style="font-size: x-large;"></i>
+                                                    ส่วนที่ 5  ความเห็นของผู้บังคับบัญชาเหนือขึ้นไป
+                                                </h5>
+
+                                                <table class="styled-table sign-table">
+                                                    <tbody>
+                                                        <!-- ผู้บังคับบัญชาเหนือขึ้นไป -->
+                                                        <tr class="approval-row">
+                                                            <td class="left-align sign-left-cell">
+                                                                <b>ผู้บังคับบัญชาเหนือขึ้นไป</b><br>
+
+                                                                <label class="sign-check-line">
+                                                                    <input
+                                                                        type="checkbox"
+                                                                        :checked="signForm.supervisor1_choice === 'agree'"
+                                                                        :disabled="!!signatures.supervisor1 && !signEditMode.supervisor1"
+                                                                        @change="selectSignChoice('supervisor1', 'agree')"
+                                                                    />
+                                                                    <span>เห็นด้วยกับผลการประเมิน</span>
+                                                                </label>
+
+                                                                <label class="sign-check-line">
+                                                                    <input
+                                                                        type="checkbox"
+                                                                        :checked="signForm.supervisor1_choice === 'disagree'"
+                                                                        :disabled="!!signatures.supervisor1 && !signEditMode.supervisor1"
+                                                                        @change="selectSignChoice('supervisor1', 'disagree')"
+                                                                    />
+                                                                    <span>มีความเห็นต่าง ดังนี้</span>
+                                                                </label>
+
+                                                                <Textarea
+                                                                    v-if="signForm.supervisor1_choice === 'disagree' && (!signatures.supervisor1 || signEditMode.supervisor1)"
+                                                                    v-model="signForm.supervisor1_comment"
+                                                                    rows="3"
+                                                                    class="p-inputtextarea p-inputtext p-component mt-2"
+                                                                    placeholder="ระบุความเห็นต่าง"
+                                                                />
+
+                                                                <small
+                                                                    v-if="!signForm.supervisor1_choice && !signatures.supervisor1"
+                                                                    class="sign-warning"
+                                                                >
+                                                                    * กรุณาเลือกสถานะก่อนลงนาม
+                                                                </small>
+                                                                <small
+                                                                    v-if="!currentDigitalSignature.usable && !signatures.supervisor1"
+                                                                    class="sign-warning">
+                                                                    * ยังไม่มีลายเซ็น กรุณาตั้งค่าลายเซ็นอิเล็กทรอนิกส์ก่อนลงนาม
+                                                                </small>
+
+                                                                <small
+                                                                    v-if="signatures.supervisor1"
+                                                                    class="receiver-signed-text"
+                                                                >
+                                                                    ลงนามออนไลน์เรียบร้อยแล้ว
+                                                                </small>
+                                                                <div
+                                                                    v-if="signatures.supervisor1?.sign_choice === 'disagree' && signatures.supervisor1?.comment"
+                                                                    class="disagree-comment-box"
+                                                                >
+                                                                    <div class="disagree-comment-title">
+                                                                        <b>ความเห็นต่าง</b>
+                                                                    </div>
+                                                                    <div class="disagree-comment-text">
+                                                                        {{ signatures.supervisor1.comment }}
+                                                                    </div>
+                                                                </div>
+ 
+                                                            </td>
+
+                                                            <td class="center-align sign-right-cell">
+                                                                <template v-if="signatures.supervisor1">
+                                                                    <div class="approval-signature-card">
+                                                                        <div class="approval-sign-badge">ลงนามแล้ว</div>
+
+                                                                        <div class="approval-signature-image-wrap">
+                                                                            <img
+                                                                                v-if="signatures.supervisor1.signature_image"
+                                                                                :src="signatures.supervisor1.signature_image"
+                                                                                class="approval-signature-img"
+                                                                            />
+
+                                                                            <span
+                                                                                v-else
+                                                                                class="online-signature approval-name-signature"
+                                                                            >
+                                                                                {{ signatures.supervisor1.signer_name }}
+                                                                            </span>
+                                                                        </div>
+
+                                                                        <div class="approval-signature-detail">
+                                                                            <div>ลงชื่อ {{ signatures.supervisor1.signer_name }}</div>
+                                                                            <div>ตำแหน่ง {{ signatures.supervisor1.signer_position || '-' }}</div>
+                                                                            <div>วันที่ {{ formatThaiDateTime(signatures.supervisor1.signed_at) }}</div>
+                                                                        </div>
+
+                                                                        <div class="approval-action-row">
+                                                                            <template v-if="!signEditMode.supervisor1">
+                                                                                <Button
+                                                                                    label="อัพเดทลายเซ็น"
+                                                                                    icon="pi pi-refresh"
+                                                                                    severity="warning"
+                                                                                    size="small"
+                                                                                    class="approval-action-btn"
+                                                                                    :loading="loadingUpdateSignature.supervisor1"
+                                                                                    :disabled="!currentDigitalSignature.usable"
+                                                                                    @click="updateP04SignatureFromDigital('supervisor1')"
+                                                                                />
+
+                                                                                <Button
+                                                                                    label="แก้ไขสถานะ"
+                                                                                    icon="pi pi-pencil"
+                                                                                    severity="info"
+                                                                                    size="small"
+                                                                                    class="approval-action-btn"
+                                                                                    @click="startEditP04Signature('supervisor1')"
+                                                                                />
+
+                                                                                <Button
+                                                                                    label="ลบ"
+                                                                                    icon="pi pi-trash"
+                                                                                    severity="danger"
+                                                                                    size="small"
+                                                                                    class="approval-action-btn"
+                                                                                    :loading="loadingDeleteSign.supervisor1"
+                                                                                    @click="deleteP04Signature('supervisor1')"
+                                                                                />
+                                                                            </template>
+
+                                                                            <template v-else>
+                                                                                <Button
+                                                                                    label="บันทึก"
+                                                                                    icon="pi pi-save"
+                                                                                    severity="success"
+                                                                                    size="small"
+                                                                                    class="approval-action-btn"
+                                                                                    :loading="loadingSign.supervisor1"
+                                                                                    @click="updateP04Signature('supervisor1')"
+                                                                                />
+
+                                                                                <Button
+                                                                                    label="ยกเลิก"
+                                                                                    icon="pi pi-times"
+                                                                                    severity="secondary"
+                                                                                    size="small"
+                                                                                    class="approval-action-btn"
+                                                                                    @click="cancelEditP04Signature('supervisor1')"
+                                                                                />
+                                                                            </template>
+                                                                        </div>
+                                                                    </div>
+                                                                </template>
+
+                                                                <template v-else>
+                                                                    <div class="approval-signature-empty">
+                                                                        ลงชื่อ .................................................................<br>
+                                                                        ( ................................................................. )<br>
+                                                                        ตำแหน่ง .................................................................<br>
+                                                                        วันที่ .......... เดือน .......................... พ.ศ.............
+
+                                                                        <div class="signature-button-wrap">
+                                                                            <Button
+                                                                                label="ลงนาม"
+                                                                                icon="pi pi-pencil"
+                                                                                severity="success"
+                                                                                size="small"
+                                                                                class="signature-btn"
+                                                                                :loading="loadingSign.supervisor1"
+                                                                                :disabled="!signForm.supervisor1_choice || !currentDigitalSignature.usable"
+                                                                                @click="signP04('supervisor1')"
+                                                                            />
+                                                                        </div>
+                                                                    </div>
+                                                                </template>
+                                                            </td>
+                                                        </tr>
+
+                                                        <!-- ผู้บังคับบัญชาเหนือขึ้นไปอีกชั้นหนึ่ง ถ้ามี -->
+                                                        <tr class="approval-row">
+                                                            <td class="left-align sign-left-cell">
+                                                                <b>ผู้บังคับบัญชาเหนือขึ้นไปอีกชั้นหนึ่ง (ถ้ามี)</b><br>
+
+                                                                <label class="sign-check-line">
+                                                                    <input
+                                                                        type="checkbox"
+                                                                        :checked="signForm.supervisor2_choice === 'agree'"
+                                                                        :disabled="!!signatures.supervisor2 && !signEditMode.supervisor2"
+                                                                        @change="selectSignChoice('supervisor2', 'agree')"
+                                                                    />
+                                                                    <span>เห็นด้วยกับผลการประเมิน</span>
+                                                                </label>
+
+                                                                <label class="sign-check-line">
+                                                                    <input
+                                                                        type="checkbox"
+                                                                        :checked="signForm.supervisor2_choice === 'disagree'"
+                                                                        :disabled="!!signatures.supervisor2 && !signEditMode.supervisor2"
+                                                                        @change="selectSignChoice('supervisor2', 'disagree')"
+                                                                    />
+                                                                    <span>มีความเห็นต่าง ดังนี้</span>
+                                                                </label>
+
+                                                                <Textarea
+                                                                    v-if="signForm.supervisor2_choice === 'disagree' && (!signatures.supervisor2 || signEditMode.supervisor2)"
+                                                                    v-model="signForm.supervisor2_comment"
+                                                                    rows="3"
+                                                                    class="p-inputtextarea p-inputtext p-component mt-2"
+                                                                    placeholder="ระบุความเห็นต่าง"
+                                                                />
+
+                                                                <small
+                                                                    v-if="!signForm.supervisor2_choice && !signatures.supervisor2"
+                                                                    class="sign-warning"
+                                                                >
+                                                                    * กรุณาเลือกสถานะก่อนลงนาม
+                                                                </small>
+                                                                <small
+                                                                    v-if="!currentDigitalSignature.usable && !signatures.supervisor2"
+                                                                    class="sign-warning">
+                                                                    * ยังไม่มีลายเซ็น กรุณาตั้งค่าลายเซ็นอิเล็กทรอนิกส์ก่อนลงนาม
+                                                                </small>
+
+                                                                <small
+                                                                    v-if="signatures.supervisor2"
+                                                                    class="receiver-signed-text"
+                                                                >
+                                                                    ลงนามออนไลน์เรียบร้อยแล้ว
+                                                                </small> 
+                                                                <div
+                                                                    v-if="signatures.supervisor2?.sign_choice === 'disagree' && signatures.supervisor2?.comment"
+                                                                    class="disagree-comment-box"
+                                                                >
+                                                                    <div class="disagree-comment-title">
+                                                                        <b>ความเห็นต่าง</b>
+                                                                    </div>
+                                                                    <div class="disagree-comment-text">
+                                                                        {{ signatures.supervisor2.comment }}
+                                                                    </div>
+                                                                </div> 
+                                                            </td>
+
+                                                            <td class="center-align sign-right-cell">
+                                                                <template v-if="signatures.supervisor2">
+                                                                    <div class="approval-signature-card">
+                                                                        <div class="approval-sign-badge">ลงนามแล้ว</div>
+
+                                                                        <div class="approval-signature-image-wrap">
+                                                                            <img
+                                                                                v-if="signatures.supervisor2.signature_image"
+                                                                                :src="signatures.supervisor2.signature_image"
+                                                                                class="approval-signature-img"
+                                                                            />
+
+                                                                            <span
+                                                                                v-else
+                                                                                class="online-signature approval-name-signature"
+                                                                            >
+                                                                                {{ signatures.supervisor2.signer_name }}
+                                                                            </span>
+                                                                        </div>
+
+                                                                        <div class="approval-signature-detail">
+                                                                            <div>ลงชื่อ {{ signatures.supervisor2.signer_name || '-' }}</div>
+                                                                            <div>ตำแหน่ง {{ signatures.supervisor2.signer_position || '-' }}</div>
+                                                                            <div>วันที่ {{ formatThaiDateTime(signatures.supervisor2.signed_at) }}</div>
+                                                                        </div>
+
+                                                                        <div class="approval-action-row">
+                                                                            <template v-if="!signEditMode.supervisor2">
+                                                                                <Button
+                                                                                    label="อัพเดทลายเซ็น"
+                                                                                    icon="pi pi-refresh"
+                                                                                    severity="warning"
+                                                                                    size="small"
+                                                                                    class="approval-action-btn"
+                                                                                    :loading="loadingUpdateSignature.supervisor2"
+                                                                                    :disabled="!currentDigitalSignature.usable"
+                                                                                    @click="updateP04SignatureFromDigital('supervisor2')"
+                                                                                />
+
+                                                                                <Button
+                                                                                    label="แก้ไขสถานะ"
+                                                                                    icon="pi pi-pencil"
+                                                                                    severity="info"
+                                                                                    size="small"
+                                                                                    class="approval-action-btn"
+                                                                                    @click="startEditP04Signature('supervisor2')"
+                                                                                />
+
+                                                                                <Button
+                                                                                    label="ลบ"
+                                                                                    icon="pi pi-trash"
+                                                                                    severity="danger"
+                                                                                    size="small"
+                                                                                    class="approval-action-btn"
+                                                                                    :loading="loadingDeleteSign.supervisor2"
+                                                                                    @click="deleteP04Signature('supervisor2')"
+                                                                                />
+                                                                            </template>
+
+                                                                            <template v-else>
+                                                                                <Button
+                                                                                    label="บันทึก"
+                                                                                    icon="pi pi-save"
+                                                                                    severity="success"
+                                                                                    size="small"
+                                                                                    class="approval-action-btn"
+                                                                                    :loading="loadingSign.supervisor2"
+                                                                                    @click="updateP04Signature('supervisor2')"
+                                                                                />
+
+                                                                                <Button
+                                                                                    label="ยกเลิก"
+                                                                                    icon="pi pi-times"
+                                                                                    severity="secondary"
+                                                                                    size="small"
+                                                                                    class="approval-action-btn"
+                                                                                    @click="cancelEditP04Signature('supervisor2')"
+                                                                                />
+                                                                            </template>
+                                                                        </div>
+                                                                    </div>
+                                                                </template>
+
+                                                                <template v-else>
+                                                                    <div class="approval-signature-empty">
+                                                                        ลงชื่อ .................................................................<br>
+                                                                        ( ................................................................. )<br>
+                                                                        ตำแหน่ง .................................................................<br>
+                                                                        วันที่ .......... เดือน .......................... พ.ศ...........
+
+                                                                        <div class="signature-button-wrap">
+                                                                            <Button
+                                                                                label="ลงนาม"
+                                                                                icon="pi pi-pencil"
+                                                                                severity="success"
+                                                                                size="small"
+                                                                                class="signature-btn"
+                                                                                :loading="loadingSign.supervisor2"
+                                                                                :disabled="!signForm.supervisor2_choice || !currentDigitalSignature.usable"
+                                                                                @click="signP04('supervisor2')"
+                                                                            />
+                                                                        </div>
+                                                                    </div>
+                                                                </template>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
                                             </div>
                                         </div>  
                                     </div>
@@ -1043,6 +1668,10 @@ import axios from 'axios';
 import Swal from 'sweetalert2';
 import TabView from 'primevue/tabview';
 import TabPanel from 'primevue/tabpanel';
+
+const API_BASE = 'http://127.0.0.1:8000/api';
+
+
 // import { LogarithmicScale } from 'chart.js';
 // import InputNumber from 'primevue/inputnumber'; 
 // import ProgressSpinner from 'primevue/progressspinner'
@@ -1257,6 +1886,75 @@ export default {
             //datatable3: [] 
             posadio: 0,
             competencyMap: {},
+
+            //ลงนามออนไลน์
+            
+            signatures: {
+                receiver_ack: null,
+
+                assessor: null,
+                assessor_witness1: null,
+                assessor_witness2: null,
+                supervisor1: null,
+                supervisor2: null
+            },
+ 
+            loadingSign: {
+                assessor: false,
+                assessor_witness1: false,
+                assessor_witness2: false,
+                supervisor1: false,
+                supervisor2: false
+            },
+
+            loadingDeleteSign: {
+                assessor: false,
+                assessor_witness1: false,
+                assessor_witness2: false,
+                supervisor1: false,
+                supervisor2: false
+            },
+
+            currentDigitalSignature: {
+                usable: false,
+                signature_path: '',
+                signature_url: '',
+                updated_at: null,
+            },
+
+            loadingUpdateSignature: {
+                assessor: false,
+                supervisor1: false,
+                supervisor2: false,
+            },
+
+            signEditMode: {
+                assessor: false,
+                supervisor1: false,
+                supervisor2: false
+            },
+
+            signForm: {
+                assessor_choice: '',
+                supervisor1_choice: '',
+                supervisor2_choice: '',
+
+                assessor_comment: '',
+                supervisor1_comment: '',
+                supervisor2_comment: '',
+
+                assessor_signature_image: '',
+                assessor_signature_file_name: '',
+
+                supervisor1_signature_image: '',
+                supervisor1_signature_file_name: '',
+
+                supervisor2_signature_image: '',
+                supervisor2_signature_file_name: '',
+            },
+
+
+
 
             //ส่งคะแนนประเมินไประบบบุคลากร
             loadingSendScoreAll: false,
@@ -1501,10 +2199,13 @@ export default {
         const { STAFFID, SCOPES } = user.user.name;
         const { staffdepartment, groupid, staffdepartmentname, groupname } = SCOPES;
         await this.setSession(STAFFID, staffdepartment, groupid, user.user.name.POSTYPENAME, user.user.name.POSITIONNAMEID);
-        // this.showDataEvalu();
+
+        await this.loadCurrentDigitalSignature();
+        
         await this.loadCompetencyDescriptions();
         this.showDataSet();   
         // this.showAssesstack(); 
+        // this.showDataEvalu();
          
     },   
 
@@ -1575,10 +2276,7 @@ export default {
             const beh = parseFloat(item.tb_tor.behavior) || 0;
             return (wAch * ach + wBeh * beh).toFixed(2);
         },
-
-
-
-
+ 
         // ตารางรายชื่อ 
         xxr() {
             if (this.tracking_date?.evalua === undefined) {
@@ -1678,6 +2376,7 @@ export default {
 
                 await this.getAadioPosition(data.staffid);
                 this.dataStaffid = data.staffid;
+                this.resetTrackingSignState();
 
                 await this.showDataEvalu();
                 this.currentstaff = this.products.filter(p => p.staffid === this.dataStaffid);
@@ -1747,6 +2446,7 @@ export default {
                 if (Swal.isLoading()) Swal.close();
             }
         }, 
+
         async saveEvaTab1(subP01) {
             if (subP01.p01_score === null || subP01.p01_score === undefined || subP01.p01_score === '') {
                 Swal.fire('แจ้งเตือน', 'กรุณาเลือกคะแนน !', 'error');
@@ -1777,9 +2477,7 @@ export default {
                 await this.showDataEvalu();
             }
         },
-
-         
-
+ 
         async saveEvaTab1_1() { 
             // ✅ 1) Validate ความเห็นก่อน
             const imp = (this.improvements || '').trim();
@@ -1886,16 +2584,33 @@ export default {
                 this.products_Tab3 = []; 
                 this.chkp04(this.dataStaffid, this.facid_Main, this.tracking_date.d_date, this.tracking_date.evalua);
                 this.chkp04data(this.dataStaffid, this.facid_Main, this.tracking_date.d_date, this.tracking_date.evalua);
-            }
+            } 
+
             if (event.index == 3) {
-                //console.log('รายงาน ป.04 -',event.index);
+                await this.loadCurrentDigitalSignature();
+
                 this.tab2Data(this.dataStaffid);
-                await this.chkp04dataT4(this.dataStaffid, this.facid_Main, this.tracking_date.d_date, this.tracking_date.evalua);
-                await this.chkp03data(this.dataStaffid, this.facid_Main, this.tracking_date.d_date, this.tracking_date.evalua);
+
+                await this.chkp04dataT4(
+                    this.dataStaffid,
+                    this.facid_Main,
+                    this.tracking_date.d_date,
+                    this.tracking_date.evalua
+                );
+
+                await this.chkp03data(
+                    this.dataStaffid,
+                    this.facid_Main,
+                    this.tracking_date.d_date,
+                    this.tracking_date.evalua
+                );
+
                 await this.showdatator();
-                
+                await this.loadP04Signatures();
+                await this.loadReceiverP04Signature();
             }
         },
+
         async tab2Data(staff_id) {
             await axios.post('http://127.0.0.1:8000/api/showDataP03New', {
                 staff_id: staff_id,
@@ -1919,6 +2634,7 @@ export default {
                 console.error('Error:', error);
             });
         },
+
         showdataPoText(staff_id, fac_id, year_id, record) {
             // console.log(staff_id);
             
@@ -1929,7 +2645,7 @@ export default {
                     record: record
                 })
                 .then((res) => {
-                    console.log('showDataPo: ',res.data);
+                    //console.log('showDataPo: ',res.data);
                     if (res.data.length > 0) {
                         const data = res.data[0];
                         this.coreCompetencies.forEach((item) => {
@@ -1986,6 +2702,7 @@ export default {
                     console.error('Error:', error);
                 });
         },
+
         chkp04(staff_id, fac_id, year_id, record) {
             axios
                 .post('http://127.0.0.1:8000/api/showDataPo', {
@@ -2006,6 +2723,7 @@ export default {
                     console.error('Error:', error);
                 });
         },
+
         AddDatap04() {
             const newData = {
                 p04_re1: this.p04_re1,
@@ -2023,6 +2741,7 @@ export default {
             this.px04_re2 = '';
             this.px04_re3 = '';  
         },
+
         AddDatap04X() {
             const newData = {
                 px04_re1: this.px04_re1,
@@ -2034,10 +2753,12 @@ export default {
             this.px04_re2 = '';
             this.px04_re3 = '';
         },
+
         DeleteRegislick(item) {
             // Add logic to remove the selected item
             this.products_Tab3 = this.products_Tab3.filter((product) => product !== item);
         },
+
         saveEvaTab3() {
             axios
                 .post('http://127.0.0.1:8000/api/saveEvaTab3', {
@@ -2061,6 +2782,7 @@ export default {
                     console.error('Error:', error);
                 });
         },
+
         chkp04data(staff_id, fac_id, year_id, record) {
             axios
                 .post('http://127.0.0.1:8000/api/showData04Tab3', {
@@ -2089,6 +2811,7 @@ export default {
                     console.error('Error:', error);
                 });
         },
+
         chkp04dataT4(staff_id, fac_id, year_id, record) {
             axios
                 .post('http://127.0.0.1:8000/api/showData04Tab3', {
@@ -2126,6 +2849,7 @@ export default {
                         console.error('Error fetching data:', error);
                     });
         },
+
         async showPostype(postypename,postypenameid) {
             //console.log('showPostype: ',postypename, postypenameid);
             //let postypenameText = postypename ? postypename : `ชำนาญการพิเศษ`;
@@ -2148,6 +2872,7 @@ export default {
                 });
             await this.getjobSpecificCompetencies();
         }, 
+
         getjobSpecificCompetencies(dataStaffid) {
             //console.log(this.staffid_Main,this.dataPor);
 
@@ -2190,6 +2915,7 @@ export default {
                     console.error('Error fetching data:', error);
                 });
         }, 
+
         normalizeLevelName(v) {
             const s = String(v ?? '').trim();
             return s.replace(/^ระดับ\s*/, '').trim();
@@ -2315,6 +3041,7 @@ export default {
                     console.error('เกิดข้อผิดพลาดในการบันทึกคะแนน:', error);
                 });
         },
+
         saveDatatorScore() {
             //console.log(res.data);
             if (!this.assessor || !this.assessor_position) {
@@ -2389,6 +3116,7 @@ export default {
                 }, 0);
             }, 0);
         }, 
+
         function_totalWeighttrack() { 
             this.totalWeighttrack = this.products_Tab2.reduce((total, h) => {
                 return total + h.subP01sX.reduce((subTotal, subP01) => {
@@ -2396,6 +3124,7 @@ export default {
                 }, 0);
             }, 0);
         },
+
         function_WeightedScoreSumtrack() {
             this.WeightedScoreSumtrack = this.products_Tab2
                 .reduce((total, h) => {
@@ -2405,6 +3134,7 @@ export default {
                 }, 0)
                 .toFixed(3);
         },
+
         function_WeightedScoreSumX() {
             this.WeightedScoreSumX = this.products_Tab2
                 .reduce((total, h) => {
@@ -2414,6 +3144,7 @@ export default {
                 }, 0)
                 .toFixed(2);
         },
+
         function_WeightedScoreSumXT() {
             this.WeightedScoreSumXT = this.products_Tab2
                 .reduce((total, h) => {
@@ -2523,6 +3254,7 @@ export default {
                 console.error('Error:', error);
             });
         },  
+
         AddDatap04X(){ 
             axios.post('http://127.0.0.1:8000/api/saveEvaTab03xx',{
                 staff_id: this.staffid_Main,
@@ -2557,6 +3289,7 @@ export default {
                 console.error('Error:', error);
             }); 
         },
+
         DeleteRegislickPX(item) { 
             // Add logic to remove the selected item  
             axios.post('http://127.0.0.1:8000/api/delEvaTab03xx',{
@@ -2569,6 +3302,7 @@ export default {
                 console.error('Error:', error);
             });    
         },   
+
         AddDataXXR(){
             console.log('📤 Sending data:', this.products_Tab3T4);  
 
@@ -2848,53 +3582,7 @@ export default {
                 sent_by: this.staffid_Main
             };
         },
-
-        // buildSendScorePayload(Item) {
-        //     const persen = Item?.tb_tor?.persen || '70:30';
-
-        //     const [weight1, weight2] = String(persen)
-        //         .split(':')
-        //         .map(v => this.toNumber(v));
-
-        //     // คะแนนช่อง "คะแนน" ขององค์ประกอบที่ 1
-        //     const achievementScore = this.toNumber(Item?.tb_tor?.achievement_score);
-
-        //     // คะแนนช่อง "คะแนน" ขององค์ประกอบที่ 2
-        //     const behaviorScore = this.toNumber(Item?.tb_tor?.behavior);
-
-        //     const component1WeightedScore = Number((achievementScore * weight1).toFixed(2));
-        //     const component2WeightedScore = Number((behaviorScore * weight2).toFixed(2));
-        //     const totalScore = Number((component1WeightedScore + component2WeightedScore).toFixed(2));
-
-        //     return {
-        //         staffid: Item.staffid,
-        //         staff_name: `${Item.prefixfullname ?? ''} ${Item.namefully ?? ''}`.trim(),
-
-        //         fac_id: this.tracking_date?.fac_id ?? this.facid_Main,
-        //         fac_name: this.tracking_date?.facuties ?? '',
-        //         year: this.tracking_date?.d_date,
-        //         evalua: this.tracking_date?.evalua,
-
-        //         // ส่งตามชื่อ Field ระบบบุคลากรโดยตรง
-        //         EVO1: achievementScore,
-        //         EVA1: weight1,
-        //         EVA2: component1WeightedScore,
-
-        //         EVO2: behaviorScore,
-        //         EVB1: weight2,
-        //         EVB2: component2WeightedScore,
-
-        //         EVTOTAL: totalScore,
-        //         EVO3: this.getEvaluationText(totalScore),
-        //         EVO3VAL: this.getEvaluationValue(totalScore),
-        //         EVO3DETAIL: '',
-
-        //         sent_by: this.staffid_Main
-        //     };
-        // },
-
-
-
+ 
         async sendAllScoresToOtherSystem() {
             if (!this.tracking_date?.d_date || !this.tracking_date?.evalua) {
                 Swal.fire('แจ้งเตือน', 'กรุณาเลือกรอบการประเมินก่อนส่งคะแนน', 'warning');
@@ -3164,10 +3852,1024 @@ export default {
             }
         },
 
+        //ลงนามออนไลน์
+        async loadP04Signatures() {
+            try {
+                const oldAssessorChoice = this.signForm.assessor_choice;
+                const oldAssessorComment = this.signForm.assessor_comment;
 
+                const res = await axios.get('http://127.0.0.1:8000/api/p04-signatures', {
+                    params: {
+                        staff_id: this.dataStaffid,
+                        year: this.tracking_date.d_date,
+                        evalua: this.tracking_date.evalua
+                    }
+                });
 
+                const data = res.data?.data || res.data || {};
+
+                const assessor = this.normalizeTrackingSignatureRow(data.assessor || null);
+                const witness1 = this.normalizeTrackingSignatureRow(data.assessor_witness1 || null);
+                const witness2 = this.normalizeTrackingSignatureRow(data.assessor_witness2 || null);
+
+                this.signatures = {
+                    receiver_ack: this.signatures.receiver_ack || null,
+
+                    assessor: assessor,
+                    assessor_witness1: witness1,
+                    assessor_witness2: witness2,
+
+                    supervisor1: this.normalizeTrackingSignatureRow(data.supervisor1 || null),
+                    supervisor2: this.normalizeTrackingSignatureRow(data.supervisor2 || null),
+                };
+
+                /**
+                 * ✅ จุดสำคัญ:
+                 * ถ้าผู้ประเมินยังไม่ได้ลงนาม แต่มีพยานอย่างน้อย 1 คน
+                 * ให้ถือว่าเป็น flow no_ack และคง checkbox ไว้
+                 */
+                if (this.signatures.assessor) {
+                    this.applyLoadedTrackingSignatureToForm('assessor', this.signatures.assessor);
+                } else if (this.signatures.assessor_witness1 || this.signatures.assessor_witness2) {
+                    this.signForm.assessor_choice = 'no_ack';
+                    this.signForm.assessor_comment = oldAssessorComment || this.signForm.assessor_comment || '';
+                } else {
+                    this.signForm.assessor_choice = oldAssessorChoice || '';
+                    this.signForm.assessor_comment = oldAssessorComment || '';
+                }
+
+                this.applyLoadedTrackingSignatureToForm('supervisor1', this.signatures.supervisor1);
+                this.applyLoadedTrackingSignatureToForm('supervisor2', this.signatures.supervisor2);
+
+            } catch (error) {
+                console.error('loadP04Signatures error:', error);
+            }
+        },
+
+        async signP04(role) {
+            try {
+                const choice = this.getTrackingChoice(role);
+
+                if (!choice) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'กรุณาเลือกสถานะก่อนลงนาม',
+                    });
+                    return;
+                }
  
+                const comment = String(this.getTrackingComment(role) || '').trim();
+ 
+                const needComment =
+                    (role === 'assessor' && choice === 'no_ack') ||
+                    (['supervisor1', 'supervisor2'].includes(role) && choice === 'disagree');
+
+                if (needComment && !comment) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'กรุณาระบุรายละเอียด',
+                        text: role === 'assessor'
+                            ? 'กรณีผู้รับการประเมินไม่ลงนามรับทราบ กรุณาระบุพยานหรือรายละเอียดเพิ่มเติม'
+                            : 'กรณีมีความเห็นต่าง กรุณาระบุความเห็นต่างก่อนลงนาม',
+                    });
+                    return;
+                }
+
+                if (role === 'assessor' && choice === 'no_ack' && !this.hasTwoAssessorWitnesses()) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'ต้องมีพยานลงนามครบ 2 คน',
+                        text: 'กรณีผู้รับการประเมินไม่ลงนามรับทราบ ต้องให้พยานคนที่ 1 และพยานคนที่ 2 ลงนามก่อน ผู้ประเมินจึงจะลงนามได้',
+                    });
+                    return;
+                }
+
+
+
+                // โหลดข้อมูลการลงนามล่าสุดก่อน กันข้อมูลค้างจากหน้าจอ
+                await this.loadP04Signatures();
+
+                if (this.signatures[role]?.p04_id) {
+                    Swal.fire({
+                        icon: 'info',
+                        title: 'รายการนี้ลงนามแล้ว',
+                        text: 'หากต้องการเปลี่ยนลายเซ็น ให้กดปุ่ม “อัพเดทลายเซ็น” หรือ “ลบ” แล้วลงนามใหม่',
+                    });
+                    return;
+                }
+
+                // ดึงข้อมูลคนที่ล็อกอินเข้ามากดลงนาม
+                const signer = await this.getCurrentTrackingSigner();
+
+                // เช็กว่าคนที่กดลงนาม มีลายเซ็นใน digital_signatures หรือยัง
+                if (!signer.signature_image) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'ยังไม่มีลายเซ็น',
+                        text: 'กรุณาไปตั้งค่าลายเซ็นอิเล็กทรอนิกส์/ลายเซ็นดิจิทัลประจำตัวก่อนลงนาม',
+                    });
+                    return;
+                }
+
+                const confirm = await Swal.fire({
+                    title: 'ยืนยันการลงนาม?',
+                    html: `
+                        <div style="text-align:left">
+                            <b>ผู้ลงนาม:</b> ${signer.signer_name}<br>
+                            <b>รหัสผู้ลงนาม:</b> ${signer.signer_staffid}<br>
+                            <b>ตำแหน่ง:</b> ${signer.signer_position || '-'}<br>
+                            <b>สถานะ:</b> ${this.getTrackingChoiceText(role, choice)}
+                            ${
+                                needComment
+                                    ? `<br><b>รายละเอียด:</b> ${comment}`
+                                    : ''
+                            }
+                        </div>
+                    `,
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonText: 'ยืนยันลงนาม',
+                    cancelButtonText: 'ยกเลิก',
+                });
+
+                if (!confirm.isConfirmed) return;
+
+                this.loadingSign[role] = true;
+
+                const payload = {
+                    // staff_id = ผู้รับการประเมินที่เปิดดูอยู่
+                    staff_id: String(this.dataStaffid),
+
+                    fac_id: this.tracking_date?.fac_id || this.facid_Main,
+                    group_id: this.groupid_Main,
+
+                    year: this.tracking_date.d_date,
+                    year_id: this.tracking_date.d_date,
+                    evalua: this.tracking_date.evalua,
+
+                    signer_type: role,
+                    sign_choice: choice,
+                    sign_choice_text: this.getTrackingChoiceText(role, choice),
+
+                    // ✅ ส่ง comment เฉพาะกรณีที่ต้องมีรายละเอียด
+                    comment: needComment ? comment : null,
+
+                    // สำคัญ: staffid ของคนที่กดลงนามจริง
+                    // backend จะใช้ตัวนี้ไปดึงลายเซ็นจาก digital_signatures
+                    signer_staffid: signer.signer_staffid,
+                    signer_name: signer.signer_name,
+                    signer_position: signer.signer_position,
+                };
+
+                // ✅ ใช้เช็กใน DevTools ว่า comment ถูกส่งไปจริงหรือไม่
+                console.log('SIGN P04 PAYLOAD:', payload);
+
+                const res = await axios.post(`${API_BASE}/p04-signatures/sign`, payload);
+
+                // backend ส่ง record ที่มี signature_image_url กลับมา
+                // ต้องใช้ normalizeTrackingSignatureRow เพื่อแปลง URL สำหรับแสดงรูป
+                const saved = this.normalizeTrackingSignatureRow(res.data?.data || res.data);
+
+                this.signatures = {
+                    ...this.signatures,
+                    [role]: saved,
+                };
+
+                this.applyLoadedTrackingSignatureToForm(role, saved);
+                this.signEditMode[role] = false;
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'ลงนามสำเร็จ',
+                    text: 'ระบบดึงลายเซ็นของผู้ลงนามมาแสดงเรียบร้อยแล้ว',
+                    timer: 1500,
+                    showConfirmButton: false,
+                });
+
+            } catch (error) {
+                console.error('signP04 error:', error);
+
+                if (error.response?.status === 409 && error.response?.data?.data) {
+                    const existingSignature = this.normalizeTrackingSignatureRow(
+                        error.response.data.data
+                    );
+
+                    this.signatures = {
+                        ...this.signatures,
+                        [role]: existingSignature,
+                    };
+
+                    this.applyLoadedTrackingSignatureToForm(role, existingSignature);
+
+                    Swal.fire({
+                        icon: 'info',
+                        title: 'รายการนี้มีการลงนามแล้ว',
+                        text: 'ระบบได้โหลดข้อมูลการลงนามเดิมมาแสดงให้แล้ว',
+                        timer: 1800,
+                        showConfirmButton: false,
+                    });
+
+                    return;
+                }
+
+                Swal.fire({
+                    icon: 'error',
+                    title: 'ลงนามไม่สำเร็จ',
+                    text:
+                        error.response?.data?.error ||
+                        error.response?.data?.message ||
+                        'เกิดข้อผิดพลาดในการลงนาม',
+                });
+            } finally {
+                this.loadingSign[role] = false;
+            }
+        },
+ 
+        formatThaiDateTime(dateValue) {
+            if (!dateValue) return '';
+
+            const d = new Date(dateValue);
+            return d.toLocaleDateString('th-TH', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+        },
+
+        selectSignChoice(role, value) {
+            const key = `${role}_choice`;
+
+            // ถ้าคลิกตัวเดิมซ้ำ ให้ยกเลิกการเลือก
+            if (this.signForm[key] === value) {
+                this.signForm[key] = '';
+                return;
+            }
+
+            // เลือกได้ทีละ 1 ตัวเท่านั้น
+            this.signForm[key] = value;
+        },
+
+        async loadReceiverP04Signature() {
+            try {
+                if (!this.dataStaffid || !this.tracking_date?.d_date || !this.tracking_date?.evalua) {
+                    this.signatures.receiver_ack = null;
+                    return;
+                }
+
+                const res = await axios.post('http://127.0.0.1:8000/api/getsign', {
+                    // สำคัญ: ใช้ staffid ของผู้รับการประเมินที่กำลังเปิดดู
+                    staff_id: String(this.dataStaffid),
+                    year_id: this.tracking_date.d_date,
+                    evalua: this.tracking_date.evalua,
+                });
+
+                const rows = res.data?.data || [];
+
+                // เอาเฉพาะลายเซ็นของผู้รับการประเมิน และต้องเป็น staffid คนเดียวกัน
+                const receiverAck = rows.find(row => {
+                    return row.sign_key === 'receiver_ack'
+                        && String(row.staff_id) === String(this.dataStaffid);
+                }) || null;
+
+                this.signatures.receiver_ack = this.normalizeP04SignatureRow(receiverAck);
+
+            } catch (error) {
+                console.error('loadReceiverP04Signature error:', error);
+                this.signatures.receiver_ack = null;
+            }
+        },
+
+        normalizeP04SignatureRow(row) {
+            if (!row) return null;
+
+            let imageSrc = row.signature_image_url || row.signature_image || '';
+
+            if (
+                imageSrc &&
+                !imageSrc.startsWith('http') &&
+                !imageSrc.startsWith('data:image')
+            ) {
+                imageSrc = `http://127.0.0.1:8000/storage/${imageSrc}`;
+            }
+
+            if (imageSrc && !imageSrc.startsWith('data:image')) {
+                const version = row.updated_at
+                    ? new Date(row.updated_at).getTime()
+                    : Date.now();
+
+                imageSrc = `${imageSrc}${imageSrc.includes('?') ? '&' : '?'}v=${version}`;
+            }
+
+            return {
+                ...row,
+                signature_image_path: row.signature_image_path || row.signature_image || '',
+                signature_image: imageSrc,
+            };
+        },
+ 
+        async getCurrentTrackingSigner() {
+            const { getSession } = await useAuth();
+            const session = await getSession();
+
+            const name = session.user.name || {};
+
+            return {
+                signer_staffid: String(name.STAFFID || this.staffid_Main || ''),
+                signer_name: `${name.PREFIXFULLNAME || ''}${name.STAFFNAME || ''} ${name.STAFFSURNAME || ''}`.trim(),
+                signer_position: name.POSITIONNAME || '',
+
+                // ปรับชื่อ field ได้ตาม session จริงของระบบคุณ
+                signature_image:
+                    name.SIGNATURE_IMAGE_URL ||
+                    name.signature_image_url ||
+                    name.SIGNATURE_IMAGE ||
+                    name.signature_image ||
+                    '',
+            };
+        },
+
+        normalizeTrackingSignatureRow(row) {
+            if (!row) return null;
+
+            let imageSrc =
+                row.signature_image_url ||
+                row.signature_image ||
+                row.signer_signature_image ||
+                '';
+
+            if (
+                imageSrc &&
+                !imageSrc.startsWith('http') &&
+                !imageSrc.startsWith('data:image')
+            ) {
+                imageSrc = `http://127.0.0.1:8000/storage/${imageSrc}`;
+            }
+
+            if (imageSrc && !imageSrc.startsWith('data:image')) {
+                const version = row.updated_at
+                    ? new Date(row.updated_at).getTime()
+                    : Date.now();
+
+                imageSrc = `${imageSrc}${imageSrc.includes('?') ? '&' : '?'}v=${version}`;
+            }
+
+            return {
+                ...row,
+                signature_image_path: row.signature_image_path || row.signature_image || '',
+                signature_image: imageSrc,
+            };
+        },
+
+        //ลงนามออนไลน์ผู้ประเมิน
+        applyLoadedTrackingSignatureToForm(role, signature) {
+            const choiceKey = `${role}_choice`;
+            const commentKey = `${role}_comment`;
+
+            if (!signature) {
+                this.signForm[choiceKey] = '';
+                this.signForm[commentKey] = '';
+                return;
+            }
+
+            this.signForm[choiceKey] = signature.sign_choice || '';
+            this.signForm[commentKey] = signature.comment || '';
+        },
+
+        startEditP04Signature(role) {
+            const signature = this.signatures[role];
+
+            if (!signature?.p04_id) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'ยังไม่มีข้อมูลการลงนาม',
+                });
+                return;
+            }
+
+            this.applyLoadedTrackingSignatureToForm(role, signature);
+            this.signEditMode[role] = true;
+            this.clearTrackingSignatureUpload(role);
+        },
+
+        cancelEditP04Signature(role) {
+            this.applyLoadedTrackingSignatureToForm(role, this.signatures[role]);
+            this.signEditMode[role] = false;
+            this.clearTrackingSignatureUpload(role);
+        },
+
+        async updateP04Signature(role) {
+            const signature = this.signatures[role];
+
+            if (!signature?.p04_id) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'ไม่พบรหัสรายการลงนาม',
+                });
+                return;
+            }
+
+            const choiceKey = `${role}_choice`;
+            const commentKey = `${role}_comment`;
+            const choice = this.signForm[choiceKey];
+            const comment = String(this.signForm[commentKey] || '').trim();
+            const shouldClearWitness =
+                role === 'assessor' &&
+                choice === 'ack' &&
+                this.hasAnyAssessorWitness();
+
+            const choiceText = {
+                ack: 'ได้แจ้งผลการประเมินและผู้รับการประเมินได้ลงนามรับทราบ',
+                no_ack: 'ได้แจ้งผลการประเมินแล้ว แต่ผู้รับการประเมินไม่ลงนามรับทราบ',
+                agree: 'เห็นด้วยกับผลการประเมิน',
+                disagree: 'มีความเห็นต่าง'
+            };
+
+            if (!this.signForm[choiceKey]) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'กรุณาเลือกสถานะก่อนบันทึก',
+                });
+                return;
+            } 
+
+            if (
+                ['no_ack', 'disagree'].includes(this.signForm[choiceKey]) &&
+                !String(this.signForm[commentKey] || '').trim()
+            ) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'กรุณาระบุรายละเอียด',
+                    text: 'กรณีไม่ลงนามรับทราบ หรือมีความเห็นต่าง กรุณาระบุรายละเอียดเพิ่มเติม'
+                });
+                return;
+            }
+
+            const confirm = await Swal.fire({
+                title: 'ยืนยันแก้ไขการลงนาม?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'บันทึก',
+                cancelButtonText: 'ยกเลิก',
+                confirmButtonColor: '#f97316',
+                cancelButtonColor: '#6b7280'
+            });
+
+            if (!confirm.isConfirmed) return;
+
+            this.loadingSign[role] = true;
+
+            try {
+                const signer = await this.getCurrentTrackingSigner();
+ 
+                const payload = {
+                    p04_id: signature.p04_id,
+                    signer_type: role,
+
+                    sign_choice: choice,
+                    sign_choice_text: choiceText[choice] || '',
+                    comment: ['no_ack', 'disagree'].includes(choice) ? comment : null,
+
+                    signer_staffid: signer.signer_staffid,
+                    signer_name: signer.signer_name,
+                    signer_position: signer.signer_position,
+                };
+
+                // ส่งลายเซ็นเฉพาะตอนเลือกไฟล์ใหม่เท่านั้น
+                if (this.signForm[`${role}_signature_image`]) {
+                    payload.signature_image = this.signForm[`${role}_signature_image`];
+                }
+
+                const res = await axios.post(
+                    'http://127.0.0.1:8000/api/p04-signatures/update',
+                    payload
+                );
+
+
+                const updatedSignature = res.data?.data || res.data;
+
+                this.signatures = {
+                    ...this.signatures,
+                    [role]: this.normalizeTrackingSignatureRow(updatedSignature),
+                };
+
+                this.applyLoadedTrackingSignatureToForm(role, this.signatures[role]);
+                this.signEditMode[role] = false;
+                this.clearTrackingSignatureUpload(role);
+
+                if (shouldClearWitness) {
+                    await this.deleteAssessorWitnessesSilently();
+
+                    this.signForm.assessor_choice = 'ack';
+                    this.signForm.assessor_comment = '';
+                }
+
+                Swal.fire({
+                    position: 'top-end',
+                    icon: 'success',
+                    title: 'แก้ไขการลงนามเรียบร้อย',
+                    showConfirmButton: false,
+                    timer: 1200
+                });
+
+            } catch (error) {
+                console.error('updateP04Signature error:', error);
+
+                Swal.fire({
+                    icon: 'error',
+                    title: 'แก้ไขไม่สำเร็จ',
+                    text: error.response?.data?.message || 'เกิดข้อผิดพลาดในการแก้ไขข้อมูล'
+                });
+
+            } finally {
+                this.loadingSign[role] = false;
+            }
+        },
+
+        async deleteP04Signature(role) {
+            const signature = this.signatures[role];
+
+            if (!signature?.p04_id) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'ไม่พบรหัสรายการลงนาม',
+                });
+                return;
+            }
+
+            const roleText = {
+                assessor: 'ผู้ประเมิน',
+                assessor_witness1: 'พยานคนที่ 1',
+                assessor_witness2: 'พยานคนที่ 2',
+                supervisor1: 'ผู้บังคับบัญชาเหนือขึ้นไป',
+                supervisor2: 'ผู้บังคับบัญชาเหนือขึ้นไปอีกชั้นหนึ่ง',
+            };
+
+            const oldAssessorChoice = this.signForm.assessor_choice;
+            const oldAssessorComment = this.signForm.assessor_comment;
+
+            const confirm = await Swal.fire({
+                title: 'ยืนยันลบการลงนาม?',
+                html: `
+                    <div style="text-align:left; line-height:1.8;">
+                        <b>บทบาท:</b> ${roleText[role] || '-'}<br>
+                        <b>ผู้ลงนาม:</b> ${signature.signer_name || '-'}<br>
+                        <span style="color:#b91c1c;">
+                            เมื่อลบแล้วจะต้องลงนามใหม่อีกครั้ง
+                        </span>
+                    </div>
+                `,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'ลบ',
+                cancelButtonText: 'ยกเลิก',
+                confirmButtonColor: '#dc2626',
+                cancelButtonColor: '#6b7280',
+            });
+
+            if (!confirm.isConfirmed) return;
+
+            this.loadingDeleteSign[role] = true;
+
+            try {
+                await axios.post(`${API_BASE}/p04-signatures/delete`, {
+                    p04_id: signature.p04_id,
+                    signer_type: role,
+                });
+
+                this.signatures = {
+                    ...this.signatures,
+                    [role]: null,
+                };
+
+                if (['assessor_witness1', 'assessor_witness2'].includes(role)) {
+                    this.signForm.assessor_choice = oldAssessorChoice;
+                    this.signForm.assessor_comment = oldAssessorComment;
+                } else {
+                    this.signForm[`${role}_choice`] = '';
+                    this.signForm[`${role}_comment`] = '';
+
+                    if (this.signEditMode[role] !== undefined) {
+                        this.signEditMode[role] = false;
+                    }
+
+                    this.clearTrackingSignatureUpload(role);
+                }
+
+                Swal.fire({
+                    position: 'top-end',
+                    icon: 'success',
+                    title: 'ลบการลงนามเรียบร้อย',
+                    showConfirmButton: false,
+                    timer: 1200,
+                });
+
+            } catch (error) {
+                console.error('deleteP04Signature error:', error);
+
+                Swal.fire({
+                    icon: 'error',
+                    title: 'ลบไม่สำเร็จ',
+                    text:
+                        error.response?.data?.error ||
+                        error.response?.data?.message ||
+                        'เกิดข้อผิดพลาดในการลบข้อมูล',
+                });
+
+            } finally {
+                this.loadingDeleteSign[role] = false;
+            }
+        },
+
+        // อัพโหลดลายเซ็นผู้ประเมิน
+        handleTrackingSignatureUpload(event, role) {
+            const file = event.target.files?.[0];
+
+            if (!file) return;
+
+            const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg'];
+
+            if (!allowedTypes.includes(file.type)) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'ชนิดไฟล์ไม่ถูกต้อง',
+                    text: 'กรุณาอัปโหลดเฉพาะไฟล์ PNG หรือ JPG เท่านั้น',
+                });
+
+                event.target.value = '';
+                return;
+            }
+
+            const maxSizeMB = 2;
+            const maxSizeByte = maxSizeMB * 1024 * 1024;
+
+            if (file.size > maxSizeByte) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'ไฟล์มีขนาดใหญ่เกินไป',
+                    text: `กรุณาอัปโหลดไฟล์ขนาดไม่เกิน ${maxSizeMB} MB`,
+                });
+
+                event.target.value = '';
+                return;
+            }
+
+            const reader = new FileReader();
+
+            reader.onload = (e) => {
+                this.signForm[`${role}_signature_image`] = e.target.result;
+                this.signForm[`${role}_signature_file_name`] = file.name;
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'อัปโหลดลายเซ็นแล้ว',
+                    text: 'กรุณากดลงนามหรือบันทึกแก้ไขเพื่อบันทึกข้อมูล',
+                    timer: 1400,
+                    showConfirmButton: false,
+                });
+            };
+
+            reader.onerror = () => {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'อ่านไฟล์ไม่สำเร็จ',
+                    text: 'กรุณาลองอัปโหลดไฟล์ใหม่อีกครั้ง',
+                });
+            };
+
+            reader.readAsDataURL(file);
+        },
+
+        clearTrackingSignatureUpload(role) {
+            this.signForm[`${role}_signature_image`] = '';
+            this.signForm[`${role}_signature_file_name`] = '';
+
+            const refMap = {
+                assessor: 'assessorSignatureFile',
+                supervisor1: 'supervisor1SignatureFile',
+                supervisor2: 'supervisor2SignatureFile',
+            };
+
+            const refName = refMap[role];
+
+            if (refName && this.$refs[refName]) {
+                this.$refs[refName].value = '';
+            }
+        },
+
+
+        ///040669แก้เพิ่ม
+        async loadCurrentDigitalSignature(staffId = null) {
+            const targetStaffId = String(staffId || this.staffid_Main || '').trim();
+
+            try {
+                if (!targetStaffId) {
+                    this.currentDigitalSignature = {
+                        staff_id: '',
+                        usable: false,
+                        signature_path: '',
+                        signature_url: '',
+                        updated_at: null,
+                    };
+                    return this.currentDigitalSignature;
+                }
+
+                const res = await axios.post(`${API_BASE}/digital-signature/profile`, {
+                    staff_id: targetStaffId,
+                });
+
+                const data = res.data || {};
+                const signatureRow = data.signature || data.digital_signature || null;
+
+                this.currentDigitalSignature = {
+                    staff_id: targetStaffId,
+                    usable: !!(signatureRow?.signature_image || data.signature_url || data.signatureUrl),
+                    signature_path: signatureRow?.signature_image || '',
+                    signature_url: data.signature_url || data.signatureUrl || '',
+                    updated_at: data.signature_updated_at || signatureRow?.updated_at || null,
+                };
+
+                return this.currentDigitalSignature;
+
+            } catch (error) {
+                console.error('loadCurrentDigitalSignature error:', error);
+
+                this.currentDigitalSignature = {
+                    staff_id: targetStaffId,
+                    usable: false,
+                    signature_path: '',
+                    signature_url: '',
+                    updated_at: null,
+                };
+
+                return this.currentDigitalSignature;
+            }
+        },
+
+        async getCurrentTrackingSigner() {
+            const { getSession } = await useAuth();
+            const session = await getSession();
+            const name = session.user.name || {};
+
+            const signerStaffId = String(name.STAFFID || this.staffid_Main || '').trim();
+
+            // สำคัญ: โหลดลายเซ็นของ staffid ที่กำลังกดลงนามจริง
+            const digitalSignature = await this.loadCurrentDigitalSignature(signerStaffId);
+
+            return {
+                signer_staffid: signerStaffId,
+                signer_name: `${name.PREFIXFULLNAME || ''}${name.STAFFNAME || ''} ${name.STAFFSURNAME || ''}`.trim(),
+                signer_position: name.POSITIONNAME || '',
+
+                // ใช้ตรวจว่ามีลายเซ็นหรือไม่เท่านั้น
+                // ตอนบันทึกจริง backend จะไปดึงจาก digital_signatures ด้วย signer_staffid อีกครั้ง
+                signature_image:
+                    digitalSignature.signature_path ||
+                    digitalSignature.signature_url ||
+                    '',
+            };
+        },
+
+        getTrackingChoice(role) {
+            if (['assessor_witness1', 'assessor_witness2'].includes(role)) {
+                return 'witness_ack';
+            }
+
+            return this.signForm[`${role}_choice`] || '';
+        },
+
+        getTrackingComment(role) {
+            return this.signForm[`${role}_comment`] || '';
+        },
+
+        getTrackingChoiceText(role, choice) {
+            const map = {
+                assessor: {
+                    ack: 'ได้แจ้งผลการประเมินและผู้รับการประเมินได้ลงนามรับทราบ รายบุคคลแล้ว',
+                    no_ack: 'ได้แจ้งผลการประเมินแล้ว แต่ผู้รับการประเมินไม่ลงนามรับทราบผลการประเมิน',
+                },
+                assessor_witness1: {
+                    witness_ack: 'ลงนามเป็นพยานคนที่ 1 กรณีผู้รับการประเมินไม่ลงนามรับทราบ',
+                },
+                assessor_witness2: {
+                    witness_ack: 'ลงนามเป็นพยานคนที่ 2 กรณีผู้รับการประเมินไม่ลงนามรับทราบ',
+                },
+                supervisor1: {
+                    agree: 'เห็นด้วยกับผลการประเมิน',
+                    disagree: 'มีความเห็นต่าง',
+                },
+                supervisor2: {
+                    agree: 'เห็นด้วยกับผลการประเมิน',
+                    disagree: 'มีความเห็นต่าง',
+                },
+            };
+
+            return map[role]?.[choice] || '';
+        },
+
+        async updateP04SignatureFromDigital(role) {
+            try {
+                const signature = this.signatures[role];
+
+                if (!signature?.p04_id) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'ไม่พบรายการลงนาม',
+                    });
+                    return;
+                }
+
+                await this.loadCurrentDigitalSignature();
+
+                const signer = await this.getCurrentTrackingSigner();
+
+                if (!this.currentDigitalSignature.usable) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'ยังไม่มีลายเซ็น',
+                        text: 'กรุณาไปตั้งค่าลายเซ็นอิเล็กทรอนิกส์/ลายเซ็นดิจิทัลประจำตัวก่อนอัพเดทลายเซ็น',
+                    });
+                    return;
+                }
+
+                const choice =
+                    this.getTrackingChoice(role) ||
+                    signature.sign_choice ||
+                    '';
+
+                if (!choice) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'กรุณาเลือกสถานะ',
+                        text: 'กรุณาเลือกสถานะก่อนอัพเดทลายเซ็น',
+                    });
+                    return;
+                }
+
+                const comment =
+                    this.getTrackingComment(role) ||
+                    signature.comment ||
+                    '';
+
+                const confirm = await Swal.fire({
+                    title: 'ยืนยันอัพเดทลายเซ็น?',
+                    html: `
+                        <div style="text-align:left; line-height:1.8;">
+                            ระบบจะนำลายเซ็นล่าสุดของผู้ที่ล็อกอินเข้ามา
+                            จากหน้า <b>ตั้งค่าลายเซ็นดิจิทัล</b>
+                            มาแทนลายเซ็นเดิมในแบบ ป.04<br><br>
+                            <b>ผู้ลงนาม:</b> ${signer.signer_name}<br>
+                            <b>ตำแหน่ง:</b> ${signer.signer_position || '-'}
+                        </div>
+                    `,
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonText: 'อัพเดทลายเซ็น',
+                    cancelButtonText: 'ยกเลิก',
+                });
+
+                if (!confirm.isConfirmed) return;
+
+                this.loadingUpdateSignature[role] = true;
+
+                const payload = {
+                    p04_id: signature.p04_id,
+                    signer_type: role,
+
+                    sign_choice: choice,
+                    sign_choice_text:
+                        this.getTrackingChoiceText(role, choice) ||
+                        signature.sign_choice_text ||
+                        '',
+
+                    comment: comment || null,
+
+                    signer_staffid: signer.signer_staffid,
+                    signer_name: signer.signer_name,
+                    signer_position: signer.signer_position,
+
+                    refresh_signature: true,
+                };
+
+                console.log('UPDATE DIGITAL SIGNATURE PAYLOAD:', payload);
+
+                const res = await axios.post(
+                    `${API_BASE}/p04-signatures/update`,
+                    payload
+                );
+
+                const updated = this.normalizeTrackingSignatureRow(
+                    res.data?.data || res.data
+                );
+
+                this.signatures = {
+                    ...this.signatures,
+                    [role]: updated,
+                };
+
+                this.applyLoadedTrackingSignatureToForm(role, updated);
+                this.signEditMode[role] = false;
+                this.clearTrackingSignatureUpload(role);
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'อัพเดทลายเซ็นสำเร็จ',
+                    text: 'ระบบได้นำลายเซ็นล่าสุดมาแสดงในแบบ ป.04 แล้ว',
+                    timer: 1500,
+                    showConfirmButton: false,
+                });
+
+            } catch (error) {
+                console.error('updateP04SignatureFromDigital error:', error);
+
+                Swal.fire({
+                    icon: 'error',
+                    title: 'อัพเดทลายเซ็นไม่สำเร็จ',
+                    text:
+                        error.response?.data?.error ||
+                        error.response?.data?.message ||
+                        'เกิดข้อผิดพลาดในการอัพเดทลายเซ็น',
+                });
+
+            } finally {
+                this.loadingUpdateSignature[role] = false;
+            }
+        },
+
+        hasTwoAssessorWitnesses() {
+            return !!(
+                this.signatures.assessor_witness1?.p04_id &&
+                this.signatures.assessor_witness2?.p04_id
+            );
+        },
+
+        canSignAssessor() {
+            if (!this.signForm.assessor_choice || !this.currentDigitalSignature.usable) {
+                return false;
+            }
+
+            if (this.signForm.assessor_choice === 'no_ack') {
+                return this.hasTwoAssessorWitnesses();
+            }
+
+            return true;
+        },
+
+        resetTrackingSignState() {
+            this.signatures = {
+                receiver_ack: null,
+                assessor: null,
+                assessor_witness1: null,
+                assessor_witness2: null,
+                supervisor1: null,
+                supervisor2: null,
+            };
+
+            this.signForm.assessor_choice = '';
+            this.signForm.assessor_comment = '';
+
+            this.signForm.supervisor1_choice = '';
+            this.signForm.supervisor1_comment = '';
+
+            this.signForm.supervisor2_choice = '';
+            this.signForm.supervisor2_comment = '';
+
+            this.signEditMode.assessor = false;
+            this.signEditMode.supervisor1 = false;
+            this.signEditMode.supervisor2 = false;
+        },
+
+        hasAnyAssessorWitness() {
+            return !!(
+                this.signatures.assessor_witness1?.p04_id ||
+                this.signatures.assessor_witness2?.p04_id
+            );
+        },
+
+        async deleteAssessorWitnessesSilently() {
+            const witnessRoles = ['assessor_witness1', 'assessor_witness2']
+                .filter(role => this.signatures[role]?.p04_id);
+
+            if (witnessRoles.length === 0) return;
+
+            await Promise.all(
+                witnessRoles.map(role => {
+                    return axios.post(`${API_BASE}/p04-signatures/delete`, {
+                        p04_id: this.signatures[role].p04_id,
+                        signer_type: role,
+                    });
+                })
+            );
+
+            this.signatures = {
+                ...this.signatures,
+                assessor_witness1: null,
+                assessor_witness2: null,
+            };
+        },
+
+
     },  
+
     filters: {
         removeC: function (value) {
             if (!value) return '';
@@ -3447,5 +5149,587 @@ td:nth-child(3) {
 :global(.score-hover-card:active) {
     transform: translateY(-2px) scale(1.01);
 }
+
+
+
+/* ลงนามออนไลน์ */
+.signature-box {
+    line-height: 1.9;
+    text-align: center;
+}
+
+.online-signature {
+    display: inline-block;
+    min-width: 230px;
+    color: #0d47a1;
+    font-weight: 700;
+    font-size: 16px;
+    border-bottom: 1px dotted #333;
+    padding: 0 8px;
+}
+
+.signature-button-wrap {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 8px;
+}
+
+:deep(.signature-btn) {
+    width: auto !important;
+    min-width: 110px;
+    max-width: 140px;
+    padding: 6px 18px !important;
+    display: inline-flex !important;
+    justify-content: center;
+}
+
+:deep(.signature-btn .p-button-label) {
+    flex: unset !important;
+}
+
+.sign-table td {
+    vertical-align: top;
+}
+
+.left-align {
+    text-align: left !important;
+}
+
+.sign-check-line {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin: 8px 0;
+    line-height: 1.6;
+    cursor: pointer;
+}
+
+.sign-check-line input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    margin-top: 4px;
+    cursor: pointer;
+}
+
+.sign-warning {
+    display: block;
+    margin-top: 8px;
+    color: #b91c1c;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.signature-box {
+    line-height: 1.9;
+    text-align: center;
+}
+
+.online-signature {
+    display: inline-block;
+    min-width: 230px;
+    color: #0d47a1;
+    font-weight: 700;
+    font-size: 16px;
+    border-bottom: 1px dotted #333;
+    padding: 0 8px;
+}
+
+.signature-button-wrap {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 8px;
+}
+
+:deep(.signature-btn) {
+    width: auto !important;
+    min-width: 110px;
+    max-width: 140px;
+    padding: 6px 18px !important;
+    display: inline-flex !important;
+    justify-content: center;
+}
+
+:deep(.signature-btn .p-button-label) {
+    flex: unset !important;
+}
+
+/* ===== ผู้รับการประเมิน: กล่องลายเซ็นแบบสวยงาม ===== */
+
+.sign-table .receiver-row td {
+    vertical-align: top !important;
+}
+
+.sign-table .sign-left-cell {
+    width: 52% !important;
+    padding: 14px 16px !important;
+    background: #ffffff;
+}
+
+.sign-table .sign-right-cell {
+    width: 48% !important;
+    padding: 10px 12px !important;
+    background: #ffffff;
+}
+
+.receiver-signed-text {
+    display: inline-block;
+    margin-top: 6px;
+    color: #15803d;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.receiver-not-signed-text {
+    display: inline-block;
+    margin-top: 6px;
+    color: #b91c1c;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.receiver-signature-card {
+    position: relative;
+    width: 100%;
+    min-height: 315px;
+    padding: 22px 24px 20px 24px;
+    border: 1.8px solid #22c55e;
+    border-radius: 10px;
+    background: #effdf4;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    box-shadow:
+        0 8px 18px rgba(34, 197, 94, 0.08),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.75);
+}
+
+.receiver-sign-badge {
+    position: absolute;
+    top: 14px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #22c55e;
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 6px 18px;
+    border-radius: 999px;
+    line-height: 1;
+    box-shadow: 0 4px 10px rgba(34, 197, 94, 0.25);
+}
+
+.receiver-signature-card {
+    position: relative;
+    width: 100%;
+    min-height: 315px;
+    padding: 22px 24px 20px 24px;
+    border: 1.8px solid #22c55e;
+    border-radius: 10px;
+    background: #effdf4;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+
+    box-shadow:
+        0 8px 18px rgba(34, 197, 94, 0.08),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.75);
+
+    overflow: hidden;
+}
+
+.receiver-signature-image-wrap {
+    width: 100%;
+    height: 135px;
+    margin-top: 42px;
+    margin-bottom: 12px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    overflow: hidden;
+}
+
+.receiver-signature-img {
+    display: block;
+    width: auto !important;
+    height: auto !important;
+
+    max-width: 90% !important;
+    max-height: 125px !important;
+
+    object-fit: contain !important;
+    margin: 0 auto !important;
+    background: transparent;
+
+    transform: none !important;
+}
+
+.receiver-signature-detail {
+    width: 100%;
+    text-align: center;
+    color: #334155;
+    font-size: 14px;
+    line-height: 1.85;
+    font-weight: 500;
+    margin-top: 4px;
+    position: relative;
+    z-index: 2;
+}
+
+.receiver-signature-detail {
+    text-align: center;
+    color: #334155;
+    font-size: 14px;
+    line-height: 1.85;
+    font-weight: 500;
+}
+
+.receiver-name-signature {
+    min-width: 240px;
+}
+
+.receiver-signature-empty {
+    min-height: 165px;
+    line-height: 1.9;
+    text-align: center;
+    color: #334155;
+    padding-top: 18px;
+}
+
+.readonly-check {
+    cursor: default;
+    color: #334155;
+}
+
+.readonly-check input {
+    cursor: not-allowed !important;
+}
+
+.readonly-check span {
+    font-weight: 600;
+    color: #334155;
+}
+
+/* ===== การ์ดลายเซ็น ผู้ประเมิน / ผู้บังคับบัญชา ===== */
+
+.approval-signature-card {
+    position: relative;
+    width: 100%;
+    min-height: 255px;
+    padding: 22px 24px 18px 24px;
+    border: 1.8px solid #22c55e;
+    border-radius: 10px;
+    background: #effdf4;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    box-shadow:
+        0 8px 18px rgba(34, 197, 94, 0.08),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.75);
+}
+
+.approval-sign-badge {
+    position: absolute;
+    top: 14px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #22c55e;
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 6px 18px;
+    border-radius: 999px;
+    line-height: 1;
+    box-shadow: 0 4px 10px rgba(34, 197, 94, 0.25);
+}
+
+.approval-signature-card {
+    position: relative;
+    width: 100%;
+    min-height: 315px;
+    padding: 22px 24px 20px 24px;
+    border: 1.8px solid #22c55e;
+    border-radius: 10px;
+    background: #effdf4;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+
+    box-shadow:
+        0 8px 18px rgba(34, 197, 94, 0.08),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.75);
+
+    overflow: hidden;
+}
+
+.approval-signature-image-wrap {
+    width: 100%;
+    height: 135px;
+    margin-top: 42px;
+    margin-bottom: 12px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    overflow: hidden;
+}
+
+.approval-signature-img {
+    display: block;
+    width: auto !important;
+    height: auto !important;
+
+    max-width: 90% !important;
+    max-height: 125px !important;
+
+    object-fit: contain !important;
+    margin: 0 auto !important;
+    background: transparent;
+
+    transform: none !important;
+}
+
+.approval-signature-detail {
+    width: 100%;
+    text-align: center;
+    color: #334155;
+    font-size: 14px;
+    line-height: 1.85;
+    font-weight: 500;
+    margin-top: 4px;
+    position: relative;
+    z-index: 2;
+}
+
+.approval-action-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    margin-top: 12px;
+    flex-wrap: wrap;
+    position: relative;
+    z-index: 2;
+}
+
+ 
+.approval-signature-detail {
+    text-align: center;
+    color: #334155;
+    font-size: 14px;
+    line-height: 1.85;
+    font-weight: 500;
+}
+
+.approval-name-signature {
+    min-width: 260px;
+}
+
+.approval-signature-empty {
+    min-height: 165px;
+    line-height: 1.9;
+    text-align: center;
+    color: #334155;
+    padding-top: 10px;
+}
+
+.approval-row td {
+    vertical-align: top !important;
+}
+
+.approval-row .sign-left-cell {
+    width: 52% !important;
+    padding: 14px 16px !important;
+    background: #ffffff;
+}
+
+.approval-row .sign-right-cell {
+    width: 48% !important;
+    padding: 10px 12px !important;
+    background: #ffffff;
+}
+  
+ .approval-action-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    margin-top: 12px;
+    flex-wrap: wrap;
+}
+
+:deep(.approval-action-btn) {
+    width: auto !important;
+    min-width: 86px;
+    padding: 6px 14px !important;
+    display: inline-flex !important;
+    justify-content: center;
+}
+
+:deep(.approval-action-btn .p-button-label) {
+    flex: unset !important;
+}
+
+.signature-button-wrap {
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+:deep(.signature-upload-btn) {
+    width: auto !important;
+    min-width: 140px;
+    max-width: 190px;
+    padding: 6px 18px !important;
+    display: inline-flex !important;
+    justify-content: center;
+    align-items: center;
+}
+
+:deep(.signature-upload-btn .p-button-label) {
+    flex: unset !important;
+}
+
+.signature-preview-box {
+    margin-top: 10px;
+    padding: 10px;
+    border: 1px dashed #94a3b8;
+    border-radius: 8px;
+    background: #f8fafc;
+    text-align: center;
+}
+
+.preview-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #334155;
+    margin-bottom: 6px;
+}
+
+.signature-preview-img {
+    max-width: 260px;
+    max-height: 105px;
+    object-fit: contain;
+    display: block;
+    margin: 0 auto 6px auto;
+    background: white;
+    border-radius: 4px;
+}
+
+.preview-file-name {
+    font-size: 12px;
+    color: #64748b;
+    word-break: break-word;
+}
+
+.approval-signature-img,
+.receiver-signature-img {
+    image-rendering: auto;
+}
+
+/* ถ้ารูปเป็นลายเซ็นจริงและมีพื้นที่โปร่งใส จะยังดูใหญ่พอดี */
+.approval-signature-image-wrap img,
+.receiver-signature-image-wrap img {
+    object-position: center center;
+}
+
+.disagree-comment-box {
+    margin-top: 12px;
+    padding: 12px 14px;
+    border-radius: 10px;
+    background: #fff1f2;
+    border: 1px solid #9f1239;
+    color: #7f1d1d;
+    text-align: left;
+    line-height: 1.7;
+}
+
+.disagree-comment-title {
+    font-weight: 700;
+    color: #7f1d1d;
+    margin-bottom: 4px;
+}
+
+.disagree-comment-title::before {
+    content: "⚠ ";
+}
+
+.disagree-comment-text {
+    white-space: pre-line;
+    font-size: 14px;
+    color: #7f1d1d;
+}
+
+.witness-sign-box {
+    margin-top: 14px;
+    padding: 14px;
+    border-radius: 12px;
+    border: 1px solid #f59e0b;
+    background: #fffbeb;
+}
+
+.witness-title {
+    font-weight: 700;
+    color: #92400e;
+    margin-bottom: 10px;
+}
+
+.witness-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.witness-card {
+    border: 1px solid #fbbf24;
+    border-radius: 12px;
+    background: #ffffff;
+    padding: 12px;
+    text-align: center;
+}
+
+.witness-card-title {
+    font-weight: 700;
+    color: #78350f;
+    margin-bottom: 8px;
+}
+
+.witness-signature-img {
+    max-width: 170px;
+    max-height: 80px;
+    object-fit: contain;
+    margin: 6px auto;
+    display: block;
+}
+
+.witness-detail {
+    font-size: 13px;
+    line-height: 1.7;
+    color: #374151;
+}
+
+.witness-clear-notice {
+    margin-top: 10px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    background: #fef2f2;
+    border: 1px solid #dc2626;
+    color: #991b1b;
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+
 
 </style>
