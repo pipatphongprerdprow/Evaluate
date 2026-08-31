@@ -683,7 +683,7 @@ export default {
 
       await this.withLoading(async () => {
         await Promise.all([
-          this.showDataEvalu(),
+          this.showDataEvaludashboardstaff(),
           this.fetchEvaluationRecommendations(),
         ]);
       });
@@ -741,9 +741,9 @@ export default {
       }
     },
  
-    async showDataEvalu() {
+    async showDataEvaludashboardstaff() {
       try {
-        const res = await axios.get(`${API}/showDataEvalu`, {
+        const res = await axios.get(`${API}/showDataEvaludashboardstaff`, {
           params: {
             staff_id: this.staffid_Main,
             fac_id: this.tracking_date?.fac_id ?? this.facid_Main,
@@ -760,7 +760,7 @@ export default {
         Swal.fire({
           icon: 'error',
           title: 'โหลดข้อมูลประเมินไม่สำเร็จ',
-          text: 'กรุณาตรวจสอบ API showDataEvalu',
+          text: 'กรุณาตรวจสอบ API showDataEvaludashboardstaff',
         });
       }
     },
@@ -784,29 +784,7 @@ export default {
         this.loadingHistory = false;
       }
     },
-
-    // async fetchScoreHistoryItem(round) {
-    //   try {
-    //     const res = await axios.get(`${API}/showDataEvalu`, {
-    //       params: {
-    //         staff_id: this.staffid_Main,
-    //         fac_id: round?.fac_id,
-    //         group_id: this.groupid_Main,
-    //         evalua: round?.evalua,
-    //         p_year: round?.d_date,
-    //       },
-    //     });
-
-    //     const row = this.filterOnlyLoginStaff(Array.isArray(res.data) ? res.data : [])[0] || null;
-    //     const score = row?.tb_tor ? this.parseScore(row.tb_tor.sum_score) : null;
-
-    //     return this.makeScoreHistoryItem(round, score, score !== null ? this.scoreLevel(score) : 'ไม่มีข้อมูล');
-    //   } catch (error) {
-    //     console.error('fetchScoreHistory item error:', error);
-    //     return this.makeScoreHistoryItem(round, null, 'โหลดข้อมูลไม่สำเร็จ');
-    //   }
-    // },
-
+ 
     async fetchScoreHistoryItem(round) {
       try {
         const announced = this.isScoreAnnounced(round);
@@ -815,7 +793,7 @@ export default {
           return this.makeScoreHistoryItem(round, null, 'รอประกาศผลคะแนน', false);
         }
 
-        const res = await axios.get(`${API}/showDataEvalu`, {
+        const res = await axios.get(`${API}/showDataEvaludashboardstaff`, {
           params: {
             staff_id: this.staffid_Main,
             fac_id: round?.fac_id ?? this.facid_Main,
