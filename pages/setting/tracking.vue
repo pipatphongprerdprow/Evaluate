@@ -2657,41 +2657,126 @@ export default {
         //     window.open(url, '_blank');
 
         // }, 
+
  
-         async printDatatrackingpdf() {
+        //140969 PDF เดิม
+        //  async printDatatrackingpdf() {
+        //     const { getSession } = await useAuth();
+        //     const user = await getSession(); 
+            
+        //     // รวมข้อมูลเป็น Object เดียวตามที่คุณต้องการ
+        //     const form = {
+        //         staff_id: this.staffid_Main,
+        //         group_id: this.groupid_Main,
+        //         fac_id: this.tracking_date.fac_id,
+        //         year_id: this.tracking_date.d_date,
+        //         evalua: this.tracking_date.evalua,
+        //         PREFIXFULLNAME: user.user.name.PREFIXFULLNAME,
+        //         STAFFNAME: user.user.name.STAFFNAME,
+        //         STAFFSURNAME: user.user.name.STAFFSURNAME,
+        //         POSITIONNAME: user.user.name.POSITIONNAME,
+        //         GROUPTYPENAME: user.user.name.GROUPTYPENAME,
+        //         POSTYPENAME: user.user.name.POSTYPENAME, 
+        //         SCOPES: user.user.name.SCOPES.staffdepartmentname,
+        //         postypename: `ระดับ${this.postypename}`,
+        //         postypenameid: this.postypenameid,
+        //         stftypename: this.stftypename,
+        //     };
+
+        //     try {
+        //         const response = await axios.post("http://127.0.0.1:8000/api/exportPdf_Tracking", form, { 
+        //             responseType: 'blob' 
+        //         });
+
+        //         const url = window.URL.createObjectURL(response.data); 
+        //         window.open(url, '_blank');  
+        //     } catch (error) {
+        //         console.error("Error:", error);
+        //     } 
+        // },
+
+        async printDatatrackingpdf() {
             const { getSession } = await useAuth();
             const user = await getSession(); 
-            
-            // รวมข้อมูลเป็น Object เดียวตามที่คุณต้องการ
-            const form = {
-                staff_id: this.staffid_Main,
+            const exportStaff = (this.products || []).filter(item => { 
+                const staffType = String(
+                    item?.stftypename ?? ''
+                ).trim(); 
+                // ต้องมีคำว่า "พนักงาน"
+                if (!staffType.includes('พนักงาน')) {
+                    return false;
+                } 
+                // แต่ไม่เอาพนักงานราชการ
+                if (staffType.includes('พนักงานราชการ')) {
+                    return false;
+                }
+                return true;
+            }); 
+            const staffIds = exportStaff
+                .map(item => String(item.staffid ?? '').trim())
+                .filter(id => id !== ''); 
+
+            // console.log('================ EXPORT PDF ================');
+            // console.log('products ทั้งหมด:', this.products);
+            // console.log('พนักงานที่จะ Export:', exportStaff);
+            // console.log('staffIds:', staffIds);
+            // console.log('============================================');
+ 
+            const form = { 
+                staff_id: this.staffid_Main, 
                 group_id: this.groupid_Main,
-                fac_id: this.tracking_date.fac_id,
-                year_id: this.tracking_date.d_date,
-                evalua: this.tracking_date.evalua,
-                PREFIXFULLNAME: user.user.name.PREFIXFULLNAME,
+                fac_id: this.tracking_date.fac_id, 
+                year_id: this.tracking_date.d_date, 
+                evalua: this.tracking_date.evalua,  
+                staff_ids: staffIds, 
+                PREFIXFULLNAME: user.user.name.PREFIXFULLNAME, 
                 STAFFNAME: user.user.name.STAFFNAME,
-                STAFFSURNAME: user.user.name.STAFFSURNAME,
-                POSITIONNAME: user.user.name.POSITIONNAME,
-                GROUPTYPENAME: user.user.name.GROUPTYPENAME,
+                STAFFSURNAME: user.user.name.STAFFSURNAME, 
+                POSITIONNAME: user.user.name.POSITIONNAME, 
+                GROUPTYPENAME: user.user.name.GROUPTYPENAME, 
                 POSTYPENAME: user.user.name.POSTYPENAME, 
-                SCOPES: user.user.name.SCOPES.staffdepartmentname,
-                postypename: `ระดับ${this.postypename}`,
-                postypenameid: this.postypenameid,
+                SCOPES: user.user.name.SCOPES.staffdepartmentname, 
+                postypename: `ระดับ${this.postypename}`, 
+                postypenameid: this.postypenameid, 
                 stftypename: this.stftypename,
-            };
-
-            try {
-                const response = await axios.post("http://127.0.0.1:8000/api/exportPdf_Tracking", form, { 
-                    responseType: 'blob' 
-                });
-
-                const url = window.URL.createObjectURL(response.data); 
-                window.open(url, '_blank');  
-            } catch (error) {
-                console.error("Error:", error);
-            } 
+            }; 
+            try { 
+                const response = await axios.post(
+                    'http://127.0.0.1:8000/api/exportPdf_Tracking',
+                    form,
+                    {
+                        responseType: 'blob'
+                    }
+                ); 
+                const url = window.URL.createObjectURL(
+                    new Blob(
+                        [response.data],
+                        {
+                            type: 'application/pdf'
+                        }
+                    )
+                ); 
+                window.open(
+                    url,
+                    '_blank'
+                );
+            } catch (error) { 
+                console.error(
+                    'exportPdf_Tracking Error:',
+                    error
+                );  
+                if (error.response?.data instanceof Blob) { 
+                    const text =
+                        await error.response.data.text(); 
+                    console.error(
+                        'Laravel Error:',
+                        text
+                    ); 
+                }
+            }
         },
+
+
  
         //110269
         normalizeActivityRaw(raw) {

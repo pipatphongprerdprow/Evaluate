@@ -560,9 +560,10 @@ export default {
             });
 
             const row = res.data?.[0] || {};
+            console.log(`row-getjobSpecificCompetencies:`, row);
 
             // ใส่คะแนนตาราง ข.
-            this.jobSpecificCompetencies = this.jobSpecificCompetencies.map((it, i) => ({
+            this.jobSpecificCompetencies = this.jobSpecificCompetencies.map((it, i) => ({ 
                 ...it,
                 SCORE: row[`p${i + 6}`] ?? it.SCORE ?? null,
                 SCOREPERSON: row[`pa_${i + 6}`] ?? it.SCOREPERSON ?? null
@@ -667,6 +668,8 @@ export default {
         },
  
         async showPostype(postypename, postypenameid) {
+            console.log(`Fetching postype data for: ${postypename}, ID: ${postypenameid}`);
+            
             const res = await axios.post('http://127.0.0.1:8000/api/showdatapostypenameAdmin', {
                 postypename,
                 postypenameid

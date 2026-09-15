@@ -2962,13 +2962,25 @@ import InputText from 'primevue/inputtext';
                 }
             },
 
+            // resetFormFields() {
+            //     this.radioValue = 'doc';
+            //     this.doc_no = null;
+            //     this.doc_name = null;
+            //     this.doc_link = null;
+            //     this.selectedFiles = [];  // เคลียร์ selected files
+            //     this.$refs.upload.value = '';  // รีเซ็ตฟิลด์อัปโหลดไฟล์
+            // },
+
             resetFormFields() {
                 this.radioValue = 'doc';
                 this.doc_no = null;
                 this.doc_name = null;
                 this.doc_link = null;
-                this.selectedFiles = [];  // เคลียร์ selected files
-                this.$refs.upload.value = '';  // รีเซ็ตฟิลด์อัปโหลดไฟล์
+                this.selectedFiles = [];
+
+                if (this.$refs.upload) {
+                    this.$refs.upload.value = '';
+                }
             },
 
             Data_Doc(){
