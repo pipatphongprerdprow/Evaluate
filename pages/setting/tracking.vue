@@ -3,29 +3,17 @@
         <div  class="col-12 lg:col-12 xl:col-12">
             <div class="card mb-0"> 
                 <div class="formgroup-inline mb-1">
-                    <div class="col md:col-5"> 
+                    <div class="col md:col-4"> 
                         <h3 class="mb-4 card-header"><i class="pi pi-credit-card" style="font-size: x-large;"></i> ตรวจติดตามแบบประเมิน</h3>    
-                    </div>
-
-                    <!-- {{ products }}  -->
-
-                     <!-- {{ user.user }}    -->
-
-                    <!-- <div class="col md:col-3" >  
-                         
-                        <label for="tracking_date"></label>
-                        <Dropdown  v-model="tracking_fac" :options="tracking_facuty"  optionLabel="label" placeholder="กรุณาเลือกเลือกคณะ" style="max-width: 500px; width: 100%"/> 
-                    </div>  -->
-                    <div class="col md:col-5" >  
-                        <!-- <h3 class="mb- card-header"><i class="" style="font-size: x-large;"></i> ปีงบประมาณ: {{ tracking_date.d_date }}</h3>   -->
-                        <label for="tracking_date"></label>
-                        <!-- {{ tracking_dates }} -->
-                         
+                    </div> 
+                    <div class="col md:col-5" >   
+                        <label for="tracking_date"></label> 
                         <Dropdown v-model="tracking_date" :options="tracking_dates" :optionLabel="(item) => `${item.facuties} ${item.d_evaluationround} ${item.d_date}`" placeholder="กรุณาเลือกรอบการประเมิน" style=" max-width: 500px; width: 100%"></Dropdown> 
                     </div> 
                         <Button class="mb-2 mr-2" icon="pi pi-search" :disabled="loading || !tracking_date" @click="xxr" /> &nbsp;&nbsp;&nbsp;&nbsp;
                         <!-- <Button label="Export" icon="pi pi-file-word" class="mr-2 mb-2" :disabled="loading" @click="printDatatracking" /> -->
                         <Button label="Export" icon="pi pi-file-pdf" class="mr-2 mb-2" :disabled="loading" @click="printDatatrackingpdf" />
+                        <Button label="Excel" icon="pi pi-file-excel" class="mr-2 mb-2" severity="success" :disabled="loading" @click="printDatatrackingexcel" />
                     </div>  
                     <div v-if="loading" class="loading-wrap">
                         <ProgressSpinner style="width:60px;height:60px" strokeWidth="6" />
@@ -1120,6 +1108,10 @@ const EXECUTIVE_SCORE_ALLOWLIST = new Set([
     '140123',//นายประยุกต์ ศรีวิไล ประเมินผูบริหาร 'สำนักงานอธิการบดี,สำนักตรวจสอบภายใน'
     '5003323',//นายรัตนโชติ เทียนมงคล ประเมินผูบริหาร 'สำนักวิทยบริการ'
     '5001470',//นางสาวอัญญารัตน์ นาถธีระพงษ์ ประเมินผูบริหาร 'สำนักศึกษาทั่วไป' 
+    '4120101',//นายอนงค์ฤทธิ์ แข็งแรง 'กองแผนงาน' 
+    '410402',//นายนพวิทย์ ศรีเวียงธนาธิป 'กองแผนงาน' 
+
+    
     
     ]);
     
@@ -2776,7 +2768,107 @@ export default {
             }
         },
 
+        async printDatatrackingexcel() {
+            if (!this.tracking_date?.d_date || !this.tracking_date?.evalua) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'กรุณาเลือกรอบการประเมิน',
+                    text: 'เลือกรอบการประเมินก่อน Export Excel'
+                }); 
+                return;
+            } 
+            const { getSession } = await useAuth();
+            const user = await getSession(); 
+            const exportStaff = (this.products || []).filter(item => {
+                const staffType = String(
+                    item?.stftypename ?? ''
+                ).trim(); 
+                if (!staffType.includes('พนักงาน')) {
+                    return false;
+                } 
+                if (staffType.includes('พนักงานราชการ')) {
+                    return false;
+                } 
+                return true;
+            }); 
+            const staffIds = exportStaff
+                .map(item => String(item.staffid ?? '').trim())
+                .filter(id => id !== ''); 
+            if (staffIds.length === 0) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'ไม่พบข้อมูล',
+                    text: 'ไม่พบข้อมูลพนักงานสำหรับ Export Excel'
+                }); 
+                return;
+            } 
+            const form = {
+                staff_id: this.staffid_Main,
+                group_id: this.groupid_Main, 
+                fac_id: this.tracking_date.fac_id,
+                year_id: this.tracking_date.d_date,
+                evalua: this.tracking_date.evalua, 
+                staff_ids: staffIds, 
+                PREFIXFULLNAME: user.user.name.PREFIXFULLNAME,
+                STAFFNAME: user.user.name.STAFFNAME,
+                STAFFSURNAME: user.user.name.STAFFSURNAME, 
+                POSITIONNAME: user.user.name.POSITIONNAME,
+                GROUPTYPENAME: user.user.name.GROUPTYPENAME,
+                POSTYPENAME: user.user.name.POSTYPENAME, 
+                SCOPES: user.user.name.SCOPES.staffdepartmentname, 
+                postypename: `ระดับ${this.postypename}`,
+                postypenameid: this.postypenameid, 
+                stftypename: this.stftypename
+            }; 
+            try { 
+                this.loading = true; 
+                const response = await axios.post(
+                    'http://127.0.0.1:8000/api/exportExcel_Tracking',
+                    form,
+                    {
+                        responseType: 'blob'
+                    }
+                ); 
+                const blob = new Blob(
+                    [response.data],
+                    {
+                        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+                    }
+                ); 
+                const url = window.URL.createObjectURL(blob); 
+                const link = document.createElement('a'); 
+                link.href = url; 
+                link.download =
+                    `รายงานตรวจติดตามแบบประเมิน_${this.tracking_date.d_date}_รอบ${this.tracking_date.evalua}.xlsx`; 
+                document.body.appendChild(link); 
+                link.click(); 
+                document.body.removeChild(link); 
+                window.URL.revokeObjectURL(url); 
+            } catch (error) { 
+                console.error(
+                    'exportExcel_Tracking Error:',
+                    error
+                ); 
+                if (error.response?.data instanceof Blob) { 
+                    const text =
+                        await error.response.data.text(); 
+                    console.error(
+                        'Laravel Error:',
+                        text
+                    );
+                } 
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Export Excel ไม่สำเร็จ',
+                    text: 'เกิดข้อผิดพลาดในการสร้างไฟล์ Excel'
+                });
 
+            } finally { 
+                this.loading = false;
+            }
+        },
+
+ 
  
         //110269
         normalizeActivityRaw(raw) {
