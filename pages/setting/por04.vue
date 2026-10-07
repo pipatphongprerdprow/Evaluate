@@ -363,9 +363,8 @@ export default {
     watch: { 
         tab4Reload(v) { 
             // console.log("por04 tab4Reload",v);
-            this.chkp04dataXr(); 
-            this.showdatator();  
-        },  
+            this.reloadP04();
+        },
     },
     computed: {
         totalscoretrack() {
@@ -527,11 +526,16 @@ export default {
            // console.log('setSession');  
             this.staffid_Main = staffid_Main
             this.facid_Main = facid_Main
-            this.groupid_Main = groupid_Main  
-        },  
+            this.groupid_Main = groupid_Main
+        },
+        // โหลดข้อมูล ป04 ทั้งหมด (เรียกจาก coversheet.vue ตอนเลือกรอบ และตอนเปลี่ยนแท็บ)
+        reloadP04() {
+            if (!this.dataPor?.d_date || !this.dataPor?.evalua) return Promise.resolve();
+            return Promise.all([this.chkp04dataXr(), this.showdatator()]);
+        },
         showdatator() {  
-            //console.log(this.dataPor.d_date,scoreA04); 
-            axios.post('   http://127.0.0.1:8000/api/showdatator', {
+            //console.log(this.dataPor.d_date,scoreA04);
+            return axios.post('   http://127.0.0.1:8000/api/showdatator', {
                 p_year: this.dataPor.d_date,
                 evalua: this.dataPor.evalua,
                 p_staffid: this.staffid_Main
@@ -557,7 +561,7 @@ export default {
         /*============= ความรู้/ทักษะ/สมรรถนะ ที่ต้องการพัฒนา =============*/ 
         chkp04dataXr(){  
             this.products_Tab3T4 = [];
-            axios.post('   http://127.0.0.1:8000/api/showData04Tab3',{
+            return axios.post('   http://127.0.0.1:8000/api/showData04Tab3',{
                 staff_id: this.staffid_Main,
                 fac_id: this.facid_Main,
                 year_id: this.dataPor.d_date,

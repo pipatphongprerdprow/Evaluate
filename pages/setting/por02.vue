@@ -635,8 +635,8 @@ export default {
                 { id: 16, activity: 'ค. 5 การสอนงานและการมอบหมายงาน', indicator3: executive, datatable3: '', selfAssessment3: '' }
             ];
  
-        await this.showPostype(positionname, postypenameid); 
-            axios.post('http://127.0.0.1:8000/api/showDataPo', {
+        await this.showPostype(positionname, postypenameid);
+            await axios.post('http://127.0.0.1:8000/api/showDataPo', {
                 staff_id: this.staffid_Main,
                 fac_id: this.facid_Main,
                 year_id: this.dataPor.d_date,

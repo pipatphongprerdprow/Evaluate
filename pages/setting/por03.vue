@@ -1533,13 +1533,8 @@ import InputText from 'primevue/inputtext';
                     await this.reloadAllData();
                 }
             },
-            dataPor: {
-                deep: true,
-                async handler() {
-                    await this.reloadAllData();
-                }
-            }
-        }, 
+            // dataPor: โหลดข้อมูลเมื่อเปลี่ยนรอบ ย้ายไปเรียกจาก coversheet.vue (onRoundChange) เพื่อรอแสดง Loading
+        },
 
         methods: { 
  

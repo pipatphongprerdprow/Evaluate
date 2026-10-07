@@ -19,7 +19,7 @@
                         :optionLabel="(item) => item.d_evaluationround + ' ' + item.d_date"
                         placeholder="กรุณาเลือกรอบการประเมิน"
                         style="max-width: 500px;width: 100%;border: outset;"
-                        @change="showdatator" 
+                        @change="onRoundChange"
                         /> 
                     </div> 
                 </div> 
@@ -173,13 +173,13 @@
                     <Por01 ref="p01Ref" :dataPor="product_date" @weight-changed="onP01WeightChanged" />
                 </TabPanel> 
                 <TabPanel header="แบบ ป02" value="2">
-                    <Por02 :dataPor="product_date" :tab2Reload="por02key" />
-                </TabPanel> 
+                    <Por02 ref="p02Ref" :dataPor="product_date" :tab2Reload="por02key" />
+                </TabPanel>
                 <TabPanel header="แบบ ป03" value="3">
-                    <Por03 :dataPor="product_date" :tab3Reload="por03key" /> 
-                </TabPanel>  
+                    <Por03 ref="p03Ref" :dataPor="product_date" :tab3Reload="por03key" />
+                </TabPanel>
                 <TabPanel header="แบบ ป04" value="4">
-                    <Por04 :dataPor="product_date" :tab4Reload="por04key" />
+                    <Por04 ref="p04Ref" :dataPor="product_date" :tab4Reload="por04key" />
                 </TabPanel> 
             </TabView>
         </div>
@@ -235,6 +235,7 @@ const user = await getSession();
                 //แก้บันทึกแบบข้อตกลงไม่ให้บันทึกซ้า
                 isTorSaved: false,
                 isSaving: false,
+                roundLoadSeq: 0,
 
                 user: {
                     user: {
@@ -455,7 +456,7 @@ const user = await getSession();
                 this.assessor_position = null;
                 this.dropdownProportion = null;
 
-                axios.post('http://127.0.0.1:8000/api/showdatator', {
+                return axios.post('http://127.0.0.1:8000/api/showdatator', {
                     p_year: this.product_date.d_date,
                     evalua: this.product_date.evalua,
                     p_staffid: this.staffid_Main
@@ -482,6 +483,36 @@ const user = await getSession();
                     this.dropdownProportion = null;
                     console.error(error);
                 });
+            },
+
+            // เลือกรอบประเมิน: แสดง Loading จนกว่าใบปะหน้า และ ป01–ป04 โหลดข้อมูลครบ
+            async onRoundChange() {
+                const seq = ++this.roundLoadSeq;
+
+                Swal.fire({
+                    title: 'กำลังโหลดข้อมูล',
+                    text: 'กรุณารอสักครู่...',
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                    showConfirmButton: false,
+                    didOpen: () => { Swal.showLoading(); }
+                });
+
+                // รอให้ dataPor ใหม่ส่งถึง component ลูกก่อน
+                await this.$nextTick();
+
+                await Promise.allSettled([
+                    this.showdatator(),
+                    this.$refs.p01Ref?.showDataPerson?.(),
+                    this.$refs.p02Ref?.refreshP02?.(),
+                    this.$refs.p03Ref?.reloadAllData?.(),
+                    this.$refs.p04Ref?.reloadP04?.(),
+                ]);
+
+                // ปิดเฉพาะเมื่อเป็นการเลือกรอบล่าสุด และ popup ที่เปิดอยู่ยังเป็น Loading
+                if (seq === this.roundLoadSeq && Swal.isLoading()) {
+                    Swal.close();
+                }
             },
         
             onTabChange(event) {

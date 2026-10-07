@@ -725,12 +725,7 @@ export default {
   },
 
   watch: {
-    dataPor: {
-      handler() {
-        this.showDataPerson();
-      },
-      deep: true,
-    },
+    // dataPor: โหลดข้อมูลเมื่อเปลี่ยนรอบ ย้ายไปเรียกจาก coversheet.vue (onRoundChange) เพื่อรอแสดง Loading
 
     checkboxValue(newVal) {
       const totalItems = (this.products_person || []).flatMap((item) => item.subP01s || []).length;
@@ -920,7 +915,7 @@ export default {
     async showDataPerson() {
       if (!this.dataPor || !this.dataPor.d_date || !this.dataPor.evalua) return;
 
-      axios
+      return axios
         .post("http://127.0.0.1:8000/api/showDataPersonX", {
           staff_id: this.staffid_Main,
           fac_id: this.dataPor.fac_id,
