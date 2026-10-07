@@ -77,6 +77,7 @@ const allMenus = ref([
             { label: 'จัดการ รอบประเมิน', icon: 'pi pi-fw pi-calendar', to: '/setting/setting_date' },
             { label: 'ตรวจสอบ แบบประเมิน', icon: 'pi pi-fw pi-star', to: '/setting/checkevaluate' },
             { label: 'เพิ่มสิทธิ์การใช้งาน', icon: 'pi pi-fw pi-user-plus', to: '/setting/setting_user' },
+            { label: 'ประวัติการใช้งาน', icon: 'pi pi-fw pi-history', to: '/setting/auditlog', auditOnly: true },
             //{ label: 'จัดการสิทธิ์บุคคล', icon: 'pi pi-fw pi-user', to: '/setting/setting_useradmin' }, 
         ]
     }, 
@@ -131,8 +132,22 @@ watch(status, async (newStatus) => {
     }
 }, { immediate: true });
 
-// // กรองเมนูตาม group_chkUser
+// เมนู "ประวัติการใช้งาน" เห็นเฉพาะ staffid ใน AUDIT_VIEWER_STAFFIDS
 const model = computed(() => {
+    const canViewAudit = isAuditViewer(staff.value);
+    const menus = roleMenus.value.map((menu) =>
+        menu.items ? { ...menu, items: menu.items.filter((item) => !item.auditOnly || canViewAudit) } : menu
+    );
+
+    if (canViewAudit && !menus.some((menu) => menu.id === 'hr')) {
+        const hr = allMenus.value.find((menu) => menu.id === 'hr');
+        menus.push({ ...hr, items: hr.items.filter((item) => item.auditOnly) });
+    }
+    return menus;
+});
+
+// // กรองเมนูตาม group_chkUser
+const roleMenus = computed(() => {
     if (group_chkUser.value === null) return []; // ถ้าเป็น null คืนค่าเป็นอาร์เรย์ว่าง
 
     const group = String(group_chkUser.value); // แปลงเป็น string เพื่อป้องกันข้อผิดพลาด
