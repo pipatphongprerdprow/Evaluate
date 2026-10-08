@@ -6,30 +6,16 @@ const { layoutConfig, onMenuToggle } = useLayout();
 const outsideClickListener = ref(null);
 const topbarMenuActive = ref(false);
 const router = useRouter();
-const inactivityTimeout = ref(null); // ตัวแปรเก็บ timeout
 
 const { signIn, signOut } = useAuth();
 const { status, data: sessionData } = useAuthState();
 
-// ฟังก์ชันรีเซ็ต timeout ทุกครั้งที่มีการใช้งาน
-const resetTimeout = () => {
-    clearTimeout(inactivityTimeout.value);
-    inactivityTimeout.value = setTimeout(() => {
-        signOut();
-    }, 1000 * 60 * 60 * 6);  
-}; 
-// ดักจับเหตุการณ์ของผู้ใช้
+// หมดเวลาเมื่อไม่ใช้งาน 6 ชั่วโมง ย้ายไปอยู่ที่ plugins/session-timeout.client.js
 onMounted(() => {
     bindOutsideClickListener();
-    resetTimeout();
-    window.addEventListener('mousemove', resetTimeout);
-    window.addEventListener('keydown', resetTimeout);
 });
 onBeforeUnmount(() => {
     unbindOutsideClickListener();
-    clearTimeout(inactivityTimeout.value);
-    window.removeEventListener('mousemove', resetTimeout);
-    window.removeEventListener('keydown', resetTimeout);
 });
 
 const logoUrl = computed(() => {

@@ -99,6 +99,9 @@
                     <i class="pi pi-user text-blue-500" style="font-size: 6rem;"></i>
                 </div>   
                 <h3 class="text-900 font-bold text-2xl mb-2">ยินดีต้อนรับ</h3>
+                <Message v-if="timeoutText" severity="warn" :closable="false" class="w-full mb-3">
+                    หมดเวลาการใช้งาน เนื่องจากไม่ได้ใช้งานระบบเกิน {{ timeoutText }} กรุณาเข้าสู่ระบบใหม่
+                </Message>
                 <p class="text-600 text-center mb-4">กรุณาเข้าสู่ระบบเพื่อใช้งานระบบประเมินผลการปฏิบัติงาน</p>
                 <Button 
                     @click="signIn('erpauth')" 
@@ -117,8 +120,28 @@
         auth: false
     });
     
+    import Swal from 'sweetalert2';
+
     const { status, data: sessionData, data } = useAuthState();
     const { signIn } = useAuth();  
+
+    // ถูกออกจากระบบเพราะไม่ได้ใช้งานนานเกินกำหนด (plugins/session-timeout.client.js ส่ง ?timeout= มา)
+    const route = useRoute();
+    const timeoutText = computed(() => (status.value === 'authenticated' ? '' : String(route.query.timeout ?? '')));
+
+    onMounted(async () => {
+        if (!timeoutText.value) return;
+        const result = await Swal.fire({
+            icon: 'warning',
+            title: 'หมดเวลาการใช้งาน',
+            text: `คุณไม่ได้ใช้งานระบบเกิน ${timeoutText.value} ระบบได้ออกจากระบบให้อัตโนมัติ กรุณาเข้าสู่ระบบใหม่`,
+            confirmButtonText: 'เข้าสู่ระบบใหม่',
+            showCancelButton: true,
+            cancelButtonText: 'ปิด',
+            allowOutsideClick: false
+        });
+        if (result.isConfirmed) signIn('erpauth');
+    });
     
     // รอให้ session โหลดเสร็จก่อนแสดงผล
     const user = computed(() => sessionData.value || {});

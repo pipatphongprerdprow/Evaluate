@@ -76,7 +76,11 @@ export default NuxtAuthHandler({
     }
   ],
   session: {
-    strategy: 'jwt'
+    strategy: 'jwt',
+    // หมดอายุถ้าไม่มีการใช้งานตามเวลาที่กำหนด (ต่ออายุทุกครั้งที่ browser ขอ session ใหม่)
+    // ต้องตรงกับ SESSION_IDLE_TIMEOUT_MS ใน plugins/session-timeout.client.js
+    // ทดสอบ: 2 * 60 (2 นาที)  ใช้จริง: 6 * 60 * 60 (6 ชั่วโมง)
+    maxAge:  8 * 60 * 60
   },
   callbacks: {
     jwt: async ({ token, user, account, profile }) => {
