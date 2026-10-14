@@ -3507,10 +3507,18 @@ import InputText from 'primevue/inputtext';
  
             //pdf
             async printDataP03X() {
-                const { getSession } = await useAuth();
-                const user = await getSession(); 
- 
-                try {  
+                // Reserve a tab during the click, before any asynchronous work.
+                const preview = window.open('', '_blank');
+                let pdfUrl = null;
+                try {
+                    if (preview) {
+                        preview.document.title = 'กำลังสร้าง PDF ป.03';
+                        preview.document.body.textContent = 'กำลังสร้างไฟล์ PDF กรุณารอสักครู่...';
+                    }
+                    const { getSession } = useAuth();
+                    const user = await getSession();
+                    if (!user?.user?.name) throw new Error('Session unavailable');
+
                         Swal.fire({
                             title: 'กำลังสร้างไฟล์ PDF...',
                             allowOutsideClick: false,
@@ -3548,27 +3556,55 @@ import InputText from 'primevue/inputtext';
                     );
                     Swal.close();
 
+                    // An HTML/JSON error page must not be displayed as a PDF.
+                    const signature = new TextDecoder().decode(new Uint8Array(response.data).slice(0, 5));
+                    if (signature !== '%PDF-') throw new Error('Invalid PDF response');
                     const blob = new Blob([response.data], { type: 'application/pdf' });
-                    const url = window.URL.createObjectURL(blob);
+                    pdfUrl = window.URL.createObjectURL(blob);
 
-                    const preview = window.open('', '_blank');
-                    if (preview) {
+                    if (preview && !preview.closed) {
+                        preview.document.title = 'เอกสาร ป.03';
+                        preview.document.body.textContent = '';
                         preview.document.body.style.margin = '0';
                         const iframe = preview.document.createElement('iframe');
+                        iframe.title = 'เอกสาร PDF ป.03';
                         iframe.style.width = '100%';
-                        iframe.style.height = '100%';
+                        iframe.style.height = '100vh';
                         iframe.style.border = 'none';
-                        iframe.src = url;
+                        iframe.src = pdfUrl;
                         preview.document.body.appendChild(iframe);
-                        preview.addEventListener('beforeunload', () => {
-                            try { window.URL.revokeObjectURL(url); } catch (e) {}
-                        });
+                        const url = pdfUrl;
+                        const cleanup = window.setInterval(() => {
+                            if (preview.closed) {
+                                window.clearInterval(cleanup);
+                                window.URL.revokeObjectURL(url);
+                            }
+                        }, 1000);
+                        window.addEventListener('pagehide', () => {
+                            window.clearInterval(cleanup);
+                            window.URL.revokeObjectURL(url);
+                        }, { once: true });
                     } else {
-                        window.open(url, '_blank');
-                        setTimeout(() => window.URL.revokeObjectURL(url), 100);
+                        // A real click allows opening the file even when popups are blocked.
+                        const link = document.createElement('a');
+                        link.href = pdfUrl;
+                        link.target = '_blank';
+                        link.rel = 'noopener noreferrer';
+                        link.textContent = 'เปิด PDF ป.03 เพื่อดู พิมพ์ หรือดาวน์โหลด';
+                        link.style.textDecoration = 'underline';
+                        const url = pdfUrl;
+                        window.addEventListener('pagehide', () => window.URL.revokeObjectURL(url), { once: true });
+                        Swal.fire({
+                            icon: 'info',
+                            title: 'ไฟล์ PDF พร้อมแล้ว',
+                            html: link,
+                            confirmButtonText: 'ปิด'
+                        });
                     }
 
                 } catch (error) {
+                    if (preview && !preview.closed) preview.close();
+                    if (pdfUrl) window.URL.revokeObjectURL(pdfUrl);
                     Swal.close();
                     console.error("Error:", error);
                     Swal.fire('เกิดข้อผิดพลาด', 'ไม่สามารถสร้างไฟล์ PDF ได้', 'error');
