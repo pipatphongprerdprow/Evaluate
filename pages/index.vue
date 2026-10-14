@@ -104,7 +104,7 @@
                 </Message>
                 <p class="text-600 text-center mb-4">กรุณาเข้าสู่ระบบเพื่อใช้งานระบบประเมินผลการปฏิบัติงาน</p>
                 <Button 
-                    @click="signIn('erpauth')" 
+                    @click="signIn('erpauth', { callbackUrl: authHome })" 
                     label="เข้าสู่ระบบด้วย รหัส สลิปเงินเดือน" 
                     icon="pi pi-sign-in" 
                     class="p-button-lg"
@@ -123,7 +123,8 @@
     import Swal from 'sweetalert2';
 
     const { status, data: sessionData, data } = useAuthState();
-    const { signIn } = useAuth();  
+    const { signIn } = useAuth();
+const authHome = useRuntimeConfig().app.baseURL || "/";  
 
     // ถูกออกจากระบบเพราะไม่ได้ใช้งานนานเกินกำหนด (plugins/session-timeout.client.js ส่ง ?timeout= มา)
     const route = useRoute();
@@ -140,7 +141,7 @@
             cancelButtonText: 'ปิด',
             allowOutsideClick: false
         });
-        if (result.isConfirmed) signIn('erpauth');
+        if (result.isConfirmed) signIn('erpauth', { callbackUrl: authHome });
     });
     
     // รอให้ session โหลดเสร็จก่อนแสดงผล

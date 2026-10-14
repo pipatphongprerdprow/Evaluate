@@ -6,7 +6,7 @@ import { watch } from 'vue';
 // - ระหว่างใช้งานอยู่ ขอ session ใหม่เป็นระยะ เพื่อไม่ให้ session ฝั่ง server หมดอายุก่อน
 //   (ต้องตรงกับ session.maxAge ใน server/api/auth/[...].js)
 // ทดสอบ: 2 นาที  ใช้จริง: 6 * 60 * 60 * 1000 (6 ชั่วโมง)
-const SESSION_IDLE_TIMEOUT_MS =  8 * 60 * 60 * 1000 ;
+const SESSION_IDLE_TIMEOUT_MS = 6 * 60 * 60 * 1000;
 
 const LAST_ACTIVITY_KEY = 'evaluate_last_activity';
 const CHECK_INTERVAL_MS = Math.min(30 * 1000, SESSION_IDLE_TIMEOUT_MS / 8);
@@ -85,7 +85,7 @@ export default defineNuxtPlugin(() => {
     };
 
     const check = () => {
-        if (status.value !== 'authenticated' || signingOut) return;
+        if (status.value !== 'authenticated' || !sessionMarker() || signingOut) return;
 
         if (import.meta.dev && readLastActivity()) {
             const left = Math.max(0, Math.round((SESSION_IDLE_TIMEOUT_MS - (Date.now() - readLastActivity())) / 1000));
@@ -101,7 +101,7 @@ export default defineNuxtPlugin(() => {
     };
 
     const onActivity = () => {
-        if (status.value !== 'authenticated' || signingOut) return;
+        if (status.value !== 'authenticated' || !sessionMarker() || signingOut) return;
 
         const now = Date.now();
         if (now - lastWrite < ACTIVITY_THROTTLE_MS) return;
@@ -131,8 +131,9 @@ export default defineNuxtPlugin(() => {
     // session ถูกตัดจากฝั่ง server ระหว่างเปิดหน้าค้างไว้ (เช่น refresh ตอนกลับมาที่หน้าเว็บ)
     // แจ้งเฉพาะกรณีไม่ได้ใช้งานจริง ถ้ากดออกจากระบบเองจะไม่แจ้ง
     watch(
-        status,
-        (value, oldValue) => {
+        [status, sessionMarker],
+        ([value], previous = []) => {
+            const [oldValue] = previous;
             if (value === 'authenticated') {
                 check();
             } else if (value === 'unauthenticated') {

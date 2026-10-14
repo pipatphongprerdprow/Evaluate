@@ -36,8 +36,8 @@
             <TabView :activeIndex="activeIndex" @tabChange="onTabChange" :class="{ 'lock-next-tabs': !isP01WeightOk }" >
                 <TabPanel header="แบบ ใบปะหน้า" value="0">
                     <div class="col md:col-12 text-right">
-                        <!-- <Button label="Export" icon="pi pi-file-word" class="mr-2 mb-2" @click="printDataP01" /> -->
-                         <Button label="Export" icon="pi pi-file-pdf" class="mr-2 mb-2" @click="printDatacoverpage" />
+                        
+                         <ExportFormatPicker class="mr-2 mb-2" @word="printDatacoverpage('word')" @pdf="printDatacoverpage()" />
                     </div> 
 
                     <div v-if="user.user" class="card"> 
@@ -588,7 +588,7 @@ const user = await getSession();
             //     window.location.href = url;
             // }, 
 
-            async printDatacoverpage() {
+            async printDatacoverpage(format = 'pdf') {
                 const { getSession } = await useAuth();
                 const user = await getSession(); 
 
@@ -600,11 +600,12 @@ const user = await getSession();
 
                 try {
                     // แสดง Loading สักครู่
-                    Swal.fire({ title: 'กำลังสร้างไฟล์ PDF...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
+                    Swal.fire({ title: format === 'word' ? 'กำลังสร้างไฟล์ Word...' : 'กำลังสร้างไฟล์ PDF...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
 
                     const response = await axios.post("http://127.0.0.1:8000/api/exportPdf_coverpage", {
                         // ส่งค่า ID ต่างๆ ที่ Backend ต้องการ
-                        staff_id: this.staffid_Main,
+                        document_format: format,
+                    staff_id: this.staffid_Main,
                         group_id: this.groupid_Main,
                         fac_id: this.facid_Main, // แก้จาก this.dataPor เป็น this.facid_Main
                         year_id: this.product_date.d_date,
@@ -625,11 +626,23 @@ const user = await getSession();
                     }, {
                         // รับข้อมูลไบนารี่เป็น ArrayBuffer (ปลอดภัยกว่าในบางกรณี)
                         responseType: 'arraybuffer',
-                        headers: { 'Accept': 'application/pdf' }
+                        headers: { 'Accept': format === 'word' ? 'application/msword' : 'application/pdf' }
                     });
 
                         // ปิด loading
                         Swal.close();
+                if (format === 'word') {
+                    const fileUrl = URL.createObjectURL(new Blob([response.data], { type: 'application/msword' }));
+                    const link = document.createElement('a');
+                    link.href = fileUrl;
+                    link.download = 'printReportCoverpage.doc';
+                    document.body.appendChild(link);
+                    link.click();
+                    link.remove();
+                    setTimeout(() => URL.revokeObjectURL(fileUrl), 1000);
+                    return;
+                }
+
 
                         // สร้าง Blob จาก ArrayBuffer ที่ได้มา แล้วสร้าง URL สำหรับ preview
                         const blob = new Blob([response.data], { type: 'application/pdf' });
@@ -674,7 +687,7 @@ const user = await getSession();
                 } catch (error) {
                     Swal.close();
                     console.error("Error exporting PDF:", error);
-                    Swal.fire('เกิดข้อผิดพลาด', 'ไม่สามารถสร้างไฟล์ PDF ได้', 'error');
+                    Swal.fire('เกิดข้อผิดพลาด', format === 'word' ? 'ไม่สามารถสร้างไฟล์ Word ได้' : 'ไม่สามารถสร้างไฟล์ PDF ได้', 'error');
                 } 
             },
 

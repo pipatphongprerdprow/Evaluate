@@ -1,7 +1,7 @@
 <template>
     <div class="col md:col-12 text-right">
-            <!-- <Button label="Export" icon="pi pi-file-word" class="mr-2 mb-2 " @click="printDataP04"></Button> -->
-            <Button label="Export" icon="pi pi-file-pdf" class="mr-2 mb-2 " @click="printDataP04X"></Button>
+            
+            <ExportFormatPicker class="mr-2 mb-2" @word="printDataP04X('word')" @pdf="printDataP04X()" />
         </div> 
     <div v-if="user.user" class="card">
         <h4 style="text-align: left">แบบสรุปการประเมินผล</h4>
@@ -601,43 +601,13 @@ export default {
         //     window.open(url, '_blank'); 
         // },  
 
-        // async printDataP04X() {
-        //     const { getSession } = await useAuth();
-        //     const user = await getSession(); 
-        //     try {
-        //         const response = await axios.post("http://127.0.0.1:8000/api/exportPdf_P04", {
-        //             staff_id: this.staffid_Main,
-        //             group_id: this.groupid_Main,
-        //             fac_id: this.dataPor.fac_id,
-        //             year_id: this.dataPor.d_date,
-        //             evalua: this.dataPor.evalua,
-        //             period_text: this.evaluationPeriodText, 
-        //             // ข้อมูลส่วนตัว
-        //             PREFIXFULLNAME: user.user.name.PREFIXFULLNAME,
-        //             STAFFNAME: user.user.name.STAFFNAME,
-        //             STAFFSURNAME: user.user.name.STAFFSURNAME,
-        //             POSITIONNAME: user.user.name.POSITIONNAME,
-        //             GROUPTYPENAME: user.user.name.GROUPTYPENAME,
-        //             POSTYPENAME: user.user.name.POSTYPENAME, 
-        //             SCOPES: user.user.name.SCOPES.staffdepartmentname,
-        //             // ส่ง ID ตำแหน่งเพื่อไป Query สมรรถนะกลุ่ม ข.
-        //             postypenameid: user.user.name.POSTYPENAMEID || '' 
-        //         }, { responseType: 'blob' });
-
-        //         const url = window.URL.createObjectURL(response.data); 
-        //         window.open(url, '_blank');  
-        //     } catch (error) {
-        //         console.error("Error:", error);
-        //     } 
-        // }, 
-
-        async printDataP04X() {
+        async printDataP04X(format = 'pdf') {
             const { getSession } = await useAuth();
             const user = await getSession(); 
  
             try { 
                 Swal.fire({
-                title: 'กำลังสร้างไฟล์ PDF...',
+                title: format === 'word' ? 'กำลังสร้างไฟล์ Word...' : 'กำลังสร้างไฟล์ PDF...',
                 allowOutsideClick: false,
                 didOpen: () => {
                     Swal.showLoading();
@@ -647,6 +617,7 @@ export default {
                 const response = await axios.post(
                 "http://127.0.0.1:8000/api/exportPdf_P04",
                 {
+                    document_format: format,
                     staff_id: this.staffid_Main,
                     group_id: this.groupid_Main,
                     fac_id: this.dataPor.fac_id,
@@ -664,10 +635,22 @@ export default {
                 },
                 {
                     responseType: 'arraybuffer',
-                    headers: { Accept: 'application/pdf' }
+                    headers: { Accept: format === 'word' ? 'application/msword' : 'application/pdf' }
                 }
                 );
                 Swal.close();
+                if (format === 'word') {
+                    const fileUrl = URL.createObjectURL(new Blob([response.data], { type: 'application/msword' }));
+                    const link = document.createElement('a');
+                    link.href = fileUrl;
+                    link.download = 'report_p04.doc';
+                    document.body.appendChild(link);
+                    link.click();
+                    link.remove();
+                    setTimeout(() => URL.revokeObjectURL(fileUrl), 1000);
+                    return;
+                }
+
                 const blob = new Blob([response.data], { type: 'application/pdf' });
                 const url = window.URL.createObjectURL(blob);
 
@@ -691,7 +674,7 @@ export default {
             } catch (error) {
                 Swal.close();
                 console.error("Error:", error);
-                Swal.fire('เกิดข้อผิดพลาด', 'ไม่สามารถสร้างไฟล์ PDF ได้', 'error');
+                Swal.fire('เกิดข้อผิดพลาด', format === 'word' ? 'ไม่สามารถสร้างไฟล์ Word ได้' : 'ไม่สามารถสร้างไฟล์ PDF ได้', 'error');
             }
         }, 
     }

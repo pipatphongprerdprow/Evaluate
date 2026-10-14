@@ -1,4 +1,6 @@
+import { authHomeRedirect } from '~/utils/authNavigation';
 import { NuxtAuthHandler } from '#auth'
+import { decode as decodeJwt } from 'next-auth/jwt'
 // import GoogleProvider from 'next-auth/providers/google'
 // import { randomBytes } from "crypto" 
 
@@ -80,9 +82,19 @@ export default NuxtAuthHandler({
     // หมดอายุถ้าไม่มีการใช้งานตามเวลาที่กำหนด (ต่ออายุทุกครั้งที่ browser ขอ session ใหม่)
     // ต้องตรงกับ SESSION_IDLE_TIMEOUT_MS ใน plugins/session-timeout.client.js
     // ทดสอบ: 2 * 60 (2 นาที)  ใช้จริง: 6 * 60 * 60 (6 ชั่วโมง)
-    maxAge:  8 * 60 * 60
+    maxAge: 6 * 60 * 60
+  },
+  jwt: {
+    maxAge: 6 * 60 * 60,
+    async decode(params) {
+      const token = await decodeJwt(params);
+      // Reject older cookies issued before the six-hour JWT limit was configured.
+      if (!token || !Number.isFinite(token.iat) || Date.now() / 1000 - token.iat >= 6 * 60 * 60) return null;
+      return token;
+    }
   },
   callbacks: {
+    redirect: async ({ url, baseUrl }) => authHomeRedirect(baseUrl, useRuntimeConfig().app.baseURL, url),
     jwt: async ({ token, user, account, profile }) => {
       
       if (user?.email) {

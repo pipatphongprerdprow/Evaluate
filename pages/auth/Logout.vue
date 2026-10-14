@@ -1,13 +1,8 @@
-<template>
-  <button @click="logout">Logout</button>
-</template>
-
-<script>
-export default {
-  methods: {
-    async logout() {
-      await this.$auth.logout();
-    },
-  },
-};
+<script setup>
+const { signOut } = useAuth();
+const authHome = useRuntimeConfig().app.baseURL || '/';
 </script>
+
+<template>
+    <button @click="signOut({ callbackUrl: authHome })">ออกจากระบบ</button>
+</template>

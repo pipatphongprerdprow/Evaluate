@@ -2,6 +2,7 @@
 import { ref, computed, watch } from 'vue';
 import AppMenuItem from './AppMenuItem.vue';
 import axios from 'axios';
+import { isSuperAdmin } from '~/utils/superAdmins';
 
 const { status, data: sessionData } = useAuthState();
 
@@ -77,11 +78,19 @@ const allMenus = ref([
             { label: 'จัดการ รอบประเมิน', icon: 'pi pi-fw pi-calendar', to: '/setting/setting_date' },
             { label: 'ตรวจสอบ แบบประเมิน', icon: 'pi pi-fw pi-star', to: '/setting/checkevaluate' },
             { label: 'เพิ่มสิทธิ์การใช้งาน', icon: 'pi pi-fw pi-user-plus', to: '/setting/setting_user' },
-            { label: 'ประวัติการใช้งาน', icon: 'pi pi-fw pi-history', to: '/setting/auditlog', auditOnly: true },
             //{ label: 'จัดการสิทธิ์บุคคล', icon: 'pi pi-fw pi-user', to: '/setting/setting_useradmin' }, 
         ]
     }, 
      {
+        id: 'superadmin',
+        label: 'Supperadmin',
+        items: [
+            { label: 'จัดการผู้ใช้งาน (Admin)', icon: 'pi pi-fw pi-users', to: '/setting/setting_dateSuperadmin' },
+            { label: 'เพิ่มสิทธิ์การใช้งาน (Admin)', icon: 'pi pi-fw pi-user-plus', to: '/setting/setting_userSuperadmin' },
+            { label: 'ประวัติการใช้งาน', icon: 'pi pi-fw pi-history', to: '/setting/auditlog' }
+        ]
+    },
+    {
         id: 'contact',
         label: 'ช่องทางการติดต่อ',
         items: [
@@ -101,47 +110,32 @@ const allMenus = ref([
 
 const group_chkUser = ref(null);
 
-const fetchUserGroup = async () => {
+let roleRequest = 0;
+
+// Reset permissions on logout/account change and ignore responses from the previous session.
+watch([status, staff, faculty], async ([currentStatus, currentStaff, currentFaculty]) => {
+    const request = ++roleRequest;
+    group_chkUser.value = null;
+    if (currentStatus !== 'authenticated' || !currentStaff) return;
     try {
-        // ใช้ .value สำหรับ computed properties
-        const staffValue = staff.value;
-        const facultyValue = faculty.value;
-        
-        if (!staffValue) {
-            return; // ถ้ายังไม่มี staff ให้ return ออกไปก่อน
-        }
-        
-        const res = await axios.post('http://127.0.0.1:8000/api/testUser', { 
-            staff: staffValue, 
-            faculty: facultyValue 
-        }); 
-       // console.log('fetchUserGroup: ',res.data);
-        
+        const res = await axios.post('http://127.0.0.1:8000/api/testUser', {
+            staff: currentStaff, faculty: currentFaculty
+        });
+        if (request !== roleRequest) return;
         group_chkUser.value = res.data?.[0]?.status_user || res.data?.status_user || null;
-        //console.log('group_chkUser: ', group_chkUser.value);
-
     } catch (error) {
-        console.error('Error:', error);
-    }
-}; 
-
-// Watch สำหรับเรียก fetchUserGroup เมื่อ session เปลี่ยน
-watch(status, async (newStatus) => {
-    if (newStatus === 'authenticated') {
-        await fetchUserGroup();
+        if (request === roleRequest) group_chkUser.value = null;
+        console.error('Unable to load current user permissions');
     }
 }, { immediate: true });
 
-// เมนู "ประวัติการใช้งาน" เห็นเฉพาะ staffid ใน AUDIT_VIEWER_STAFFIDS
+// หมวด Supperadmin เห็นเฉพาะ staffid ที่กำหนด
 const model = computed(() => {
-    const canViewAudit = isAuditViewer(staff.value);
-    const menus = roleMenus.value.map((menu) =>
-        menu.items ? { ...menu, items: menu.items.filter((item) => !item.auditOnly || canViewAudit) } : menu
-    );
-
-    if (canViewAudit && !menus.some((menu) => menu.id === 'hr')) {
-        const hr = allMenus.value.find((menu) => menu.id === 'hr');
-        menus.push({ ...hr, items: hr.items.filter((item) => item.auditOnly) });
+    const menus = [...roleMenus.value];
+    if (status.value === 'authenticated' && isSuperAdmin(staff.value)) {
+        const manualIndex = menus.findIndex((menu) => menu.id === 'manual');
+        menus.splice(manualIndex === -1 ? menus.length : manualIndex, 0,
+            allMenus.value.find((menu) => menu.id === 'superadmin'));
     }
     return menus;
 });

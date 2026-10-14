@@ -1,7 +1,6 @@
 <template>
     <div class="col md:col-12 text-right">
-        <Button label="Export" icon="pi pi-file-word" class="mr-2 mb-2 " @click="printDataP01"></Button>
-        <!-- <Button label="Export" icon="pi pi-file-pdf" class="mr-2 mb-2" @click="printDataP02" /> -->
+        <ExportFormatPicker class="mr-2 mb-2" @word="printDataP01" @pdf="printDataP02" />
     </div> 
     <div class="card">
         <h3 class="mb-4" style="text-align: left;">
@@ -728,82 +727,82 @@ export default {
         },  
 
         //pdf
-        // async printDataP02() {
-        //     const { getSession } = await useAuth();
-        //     const user = await getSession(); 
-        //     const staffId = String(this.staffid_Main).trim();
+        async printDataP02() {
+            const { getSession } = await useAuth();
+            const user = await getSession(); 
+            const staffId = String(this.staffid_Main).trim();
 
-        //     // เช็ค d_date จาก dataPor เหมือนฟังก์ชันที่ทำได้
-        //     if (!this.dataPor?.d_date) {
-        //         Swal.fire('แจ้งเตือน', 'กรุณาเลือกรอบการประเมินก่อน Export', 'warning');
-        //         return;
-        //     }
+            // เช็ค d_date จาก dataPor เหมือนฟังก์ชันที่ทำได้
+            if (!this.dataPor?.d_date) {
+                Swal.fire('แจ้งเตือน', 'กรุณาเลือกรอบการประเมินก่อน Export', 'warning');
+                return;
+            }
 
-        //     try {
-        //         Swal.fire({ 
-        //             title: 'กำลังสร้างไฟล์ PDF...', 
-        //             allowOutsideClick: false, 
-        //             didOpen: () => { Swal.showLoading(); } 
-        //         });
+            try {
+                Swal.fire({ 
+                    title: 'กำลังสร้างไฟล์ PDF...', 
+                    allowOutsideClick: false, 
+                    didOpen: () => { Swal.showLoading(); } 
+                });
 
-        //         const payload = {
-        //             staff_id: this.staffid_Main,
-        //             group_id: this.groupid_Main,
-        //             fac_id: this.dataPor.fac_id, // ใช้ dataPor
-        //             year_id: this.dataPor.d_date, // ใช้ dataPor
-        //             evalua: this.dataPor.evalua,   // ใช้ dataPor
+                const payload = {
+                    staff_id: this.staffid_Main,
+                    group_id: this.groupid_Main,
+                    fac_id: this.dataPor.fac_id, // ใช้ dataPor
+                    year_id: this.dataPor.d_date, // ใช้ dataPor
+                    evalua: this.dataPor.evalua,   // ใช้ dataPor
                     
-        //             PREFIXFULLNAME: user.user.name.PREFIXFULLNAME,
-        //             STAFFNAME: user.user.name.STAFFNAME,
-        //             STAFFSURNAME: user.user.name.STAFFSURNAME,
-        //             POSITIONNAME: user.user.name.POSITIONNAME,
-        //             GROUPTYPENAME: user.user.name.GROUPTYPENAME,
-        //             POSTYPENAME: user.user.name.POSTYPENAME,
-        //             SCOPES: user.user.name.SCOPES.staffdepartmentname,
+                    PREFIXFULLNAME: user.user.name.PREFIXFULLNAME,
+                    STAFFNAME: user.user.name.STAFFNAME,
+                    STAFFSURNAME: user.user.name.STAFFSURNAME,
+                    POSITIONNAME: user.user.name.POSITIONNAME,
+                    GROUPTYPENAME: user.user.name.GROUPTYPENAME,
+                    POSTYPENAME: user.user.name.POSTYPENAME,
+                    SCOPES: user.user.name.SCOPES.staffdepartmentname,
                     
-        //             // ส่งค่าเพิ่มตามแบบ p01 ที่คุณทำได้
-        //             postypename: `ระดับ${this.postypename}`,
-        //             postypenameid: this.postypenameid,
-        //             executive: (typeof EXECUTIVE_ALLOWLIST !== 'undefined' && EXECUTIVE_ALLOWLIST.has(staffId)) ? 1 : 0,
-        //             posadio: this.posadio,
+                    // ส่งค่าเพิ่มตามแบบ p01 ที่คุณทำได้
+                    postypename: `ระดับ${this.postypename}`,
+                    postypenameid: this.postypenameid,
+                    executive: (typeof EXECUTIVE_ALLOWLIST !== 'undefined' && EXECUTIVE_ALLOWLIST.has(staffId)) ? 1 : 0,
+                    posadio: this.posadio,
                     
-        //             persen: this.dropdownProportion,
-        //             period_text: this.displayEvaluationPeriod,
-        //         };
+                    persen: this.dropdownProportion,
+                    period_text: this.displayEvaluationPeriod,
+                };
 
-        //         const response = await axios.post("http://127.0.0.1:8000/api/exportPdf_P02", payload, {
-        //             responseType: 'arraybuffer',
-        //             headers: { Accept: 'application/pdf' }
-        //         });
+                const response = await axios.post("http://127.0.0.1:8000/api/exportPdf_P02", payload, {
+                    responseType: 'arraybuffer',
+                    headers: { Accept: 'application/pdf' }
+                });
 
-        //         Swal.close();
+                Swal.close();
 
-        //         const blob = new Blob([response.data], { type: 'application/pdf' });
-        //         const url = window.URL.createObjectURL(blob);
+                const blob = new Blob([response.data], { type: 'application/pdf' });
+                const url = window.URL.createObjectURL(blob);
 
-        //         const preview = window.open('', '_blank');
-        //         if (preview) {
-        //             preview.document.body.style.margin = '0';
-        //             const iframe = preview.document.createElement('iframe');
-        //             iframe.style.width = '100%';
-        //             iframe.style.height = '100%';
-        //             iframe.style.border = 'none';
-        //             iframe.src = url;
-        //             preview.document.body.appendChild(iframe);
-        //             preview.addEventListener('beforeunload', () => {
-        //                 try { window.URL.revokeObjectURL(url); } catch (e) {}
-        //             });
-        //         } else {
-        //             window.open(url, '_blank');
-        //             setTimeout(() => window.URL.revokeObjectURL(url), 100);
-        //         }
+                const preview = window.open('', '_blank');
+                if (preview) {
+                    preview.document.body.style.margin = '0';
+                    const iframe = preview.document.createElement('iframe');
+                    iframe.style.width = '100%';
+                    iframe.style.height = '100%';
+                    iframe.style.border = 'none';
+                    iframe.src = url;
+                    preview.document.body.appendChild(iframe);
+                    preview.addEventListener('beforeunload', () => {
+                        try { window.URL.revokeObjectURL(url); } catch (e) {}
+                    });
+                } else {
+                    window.open(url, '_blank');
+                    setTimeout(() => window.URL.revokeObjectURL(url), 100);
+                }
 
-        //     } catch (error) {
-        //         Swal.close();
-        //         console.error("Error exporting PDF:", error);
-        //         Swal.fire('เกิดข้อผิดพลาด', 'ไม่สามารถสร้างไฟล์ PDF ได้', 'error');
-        //     } 
-        // },
+            } catch (error) {
+                Swal.close();
+                console.error("Error exporting PDF:", error);
+                Swal.fire('เกิดข้อผิดพลาด', 'ไม่สามารถสร้างไฟล์ PDF ได้', 'error');
+            } 
+        },
 
         // เมื่อคลิกชื่อสมรรถนะ ให้เปิด Dialog
         openCompetencyDialog(type, row, index = null) {

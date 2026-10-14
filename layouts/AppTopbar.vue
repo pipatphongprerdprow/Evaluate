@@ -8,6 +8,7 @@ const topbarMenuActive = ref(false);
 const router = useRouter();
 
 const { signIn, signOut } = useAuth();
+const authHome = useRuntimeConfig().app.baseURL || "/";
 const { status, data: sessionData } = useAuthState();
 
 // หมดเวลาเมื่อไม่ใช้งาน 6 ชั่วโมง ย้ายไปอยู่ที่ plugins/session-timeout.client.js
@@ -88,13 +89,13 @@ const isOutsideClicked = (event) => {
 
         <div class="layout-topbar-menu" :class="topbarMenuClasses">
             <template v-if="status !== 'authenticated'">
-                <button @click="signIn('erpauth')" class="p-link layout-topbar-button pr-4">
+                <button @click="signIn('erpauth', { callbackUrl: authHome })" class="p-link layout-topbar-button pr-4">
                     <i class="pi pi-sign-in"></i>
                     <i style="font-size: 1.25em;margin-left: 0.25em;margin-right: 1em;text-wrap: nowrap;">เข้าสู่ระบบ</i>
                 </button>
             </template>
             <template v-else>
-                <button @click="signOut()" class="p-link layout-topbar-button pr-4">
+                <button @click="signOut({ callbackUrl: authHome })" class="p-link layout-topbar-button pr-4">
                     <i class="pi pi-sign-out"></i>
                     <i style="font-size: 1.25em;margin-left: 0.25em;margin-right: 1em;text-wrap: nowrap;">ออกจากระบบ</i>
                 </button>
