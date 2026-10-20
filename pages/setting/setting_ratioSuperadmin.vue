@@ -16,6 +16,8 @@ const rows = ref([]);
 const loading = ref(false);
 const loadingRounds = ref(false);
 const loadingFaculties = ref(false);
+const isLoadingData = computed(() => loadingFaculties.value || loadingRounds.value || loading.value);
+const loadingMessage = computed(() => loadingFaculties.value ? 'กำลังโหลดคณะ / หน่วยงาน…' : loadingRounds.value ? 'กำลังโหลดรอบประเมินของหน่วยงาน…' : 'กำลังโหลดข้อมูลบุคลากร…');
 const saving = ref(false);
 const editing = ref(null);
 const details = ref(null);
@@ -156,15 +158,20 @@ async function save() {
             </div>
         </div>
         </section>
-        <section class="list-panel">
+        <section class="list-panel" :aria-busy="isLoadingData">
         <div class="list-toolbar">
-            <div><div class="list-title">รายชื่อบุคลากร <span class="count-pill">{{ rows.length }}</span></div><p class="list-caption">{{ round?.label || 'รายการ TOR จะแสดงเมื่อเลือกรอบประเมิน' }}</p></div>
+            <div><div class="list-title">รายชื่อบุคลากร <span class="count-pill">{{ isLoadingData ? '…' : rows.length }}</span></div><p class="list-caption">{{ round?.label || 'รายการ TOR จะแสดงเมื่อเลือกรอบประเมิน' }}</p></div>
             <div class="toolbar-actions">
                 <span class="p-input-icon-left"><i class="pi pi-search"></i><InputText v-model="search" aria-label="ค้นหาชื่อหรือรหัสบุคลากร" placeholder="ค้นหาชื่อหรือรหัสบุคลากร" :disabled="!round" /></span>
-                <Button icon="pi pi-refresh" outlined rounded aria-label="โหลดข้อมูลใหม่" title="โหลดข้อมูลใหม่" :disabled="!round || loading || saving" @click="loadRows" />
+                <Button icon="pi pi-refresh" outlined rounded aria-label="โหลดข้อมูลใหม่" title="โหลดข้อมูลใหม่" :disabled="!round || isLoadingData || saving" @click="loadRows" />
             </div>
         </div>
-        <DataTable :value="filteredRows" dataKey="p01_id" :loading="loading" paginator :rows="20" :rowsPerPageOptions="[20, 50, 100]" :alwaysShowPaginator="false" responsiveLayout="scroll" class="people-table">
+        <div v-if="isLoadingData" class="loading-state" role="status" aria-live="polite">
+            <i class="pi pi-spin pi-spinner" aria-hidden="true"></i>
+            <strong>{{ loadingMessage }}</strong>
+            <span>กรุณารอสักครู่ ระบบกำลังเรียกข้อมูล</span>
+        </div>
+        <DataTable v-else :value="filteredRows" dataKey="p01_id" paginator :rows="20" :rowsPerPageOptions="[20, 50, 100]" :alwaysShowPaginator="false" responsiveLayout="scroll" class="people-table">
             <template #empty><div class="empty-state"><i class="pi pi-folder-open"></i><strong>{{ search ? 'ไม่พบรายชื่อที่ค้นหา' : 'ยังไม่มีรายการแสดง' }}</strong><span>{{ search ? 'ลองค้นหาด้วยชื่อหรือรหัสบุคลากรอื่น' : round ? 'ไม่พบรายการ TOR ที่บันทึกไว้ในคณะและรอบประเมินนี้' : 'กรุณาเลือกคณะ / หน่วยงาน และรอบประเมินด้านบน' }}</span></div></template>
             <Column field="p_staffname" header="บุคลากร" sortable><template #body="{ data }"><div class="person-cell"><span class="person-icon"><i class="pi pi-user"></i></span><div class="person-label"><strong>{{ data.p_staffname || '-' }}</strong><small>(รหัส {{ data.p_staffid }})</small></div></div></template></Column>
             <Column field="persen" header="สัดส่วน" style="width: 18%"><template #body="{ data }"><span class="ratio-badge" :class="{ 'ratio-balanced': data.persen === '50:50' }">{{ data.persen || '-' }}</span></template></Column>
@@ -229,6 +236,12 @@ async function save() {
 .row-actions { flex-wrap: nowrap; }
 .row-actions :deep(.p-button) { flex-shrink: 0; white-space: nowrap; }
 .details-button :deep(.p-button-label) { white-space: nowrap; }
+.details-button.p-button.p-button-outlined { color: #1d4ed8; border-color: #93c5fd; background: #eff6ff; }
+.details-button.p-button.p-button-outlined:enabled:hover { color: #1e40af; border-color: #60a5fa; background: #dbeafe; }
+.details-button.p-button:focus-visible { outline: 2px solid #2563eb; outline-offset: 3px; }
+.loading-state { min-height: 18rem; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1rem; padding: 2rem; text-align: center; }
+.loading-state i { font-size: 2rem; color: var(--primary-color); }
+.loading-state span { color: var(--text-color-secondary); }
 .ratio-badge { display: inline-block; padding: .4rem .85rem; border-radius: .5rem; background: #eff6ff; color: #1d4ed8; font-weight: 700; white-space: nowrap; }
 .ratio-balanced { background: #ecfdf5; color: #047857; }
 .people-table :deep(.p-datatable-thead > tr > th) { background: var(--surface-50); color: var(--text-color-secondary); padding: 1rem 1.5rem; font-weight: 600; }
