@@ -131,7 +131,7 @@ async function download(person, format) {
                 <Column header="สถานะ"><template #body="{ data }"><Tag :severity="data.ready ? 'success' : 'warning'" :value="data.ready ? 'พร้อมส่งออก' : 'รอผลคะแนน'" /><small v-if="!data.ready && data.readiness_reason" class="readiness-reason">{{ data.readiness_reason }}</small></template></Column>
                 <Column header="แบบ ป.04"><template #body="{ data }"><ExportFormatPicker v-if="data.ready && !downloading" @word="download(data, 'word')" @pdf="download(data, 'pdf')" /><Button v-else :class="{ 'waiting-score-button': !data.ready }" :label="data.ready ? 'กำลังส่งออก' : 'รอผลคะแนน'" :icon="data.ready ? 'pi pi-spin pi-spinner' : 'pi pi-clock'" disabled outlined /></template></Column>
             </DataTable>
-            <p class="text-500 text-sm mt-3 mb-0">พร้อมส่งออกเมื่อมีคะแนนผลสัมฤทธิ์ครบทุกงาน และมีผลประเมินพฤติกรรมจากผู้บริหารแล้ว</p>
+            <p class="text-500 text-sm mt-3 mb-0">พร้อมส่งออกเมื่อมีคะแนนสรุปผลสัมฤทธิ์และพฤติกรรมใน ป.04 ครบ โดยไม่บังคับรหัสผู้ประเมินของแต่ละงาน</p>
         </section>
     </div>
 </template>
