@@ -4,6 +4,7 @@ import Button from 'primevue/button';
 import Dialog from 'primevue/dialog';
 
 const emit = defineEmits(['word', 'pdf']);
+defineProps({ buttonLabel: { type: String, default: 'Export' } });
 const visible = ref(false);
 function selectFormat(format) {
     visible.value = false;
@@ -13,7 +14,7 @@ function selectFormat(format) {
 
 <template>
     <span>
-        <Button label="Export" icon="pi pi-download" @click="visible = true" />
+        <Button :label="buttonLabel" icon="pi pi-download" @click="visible = true" />
         <Dialog v-model:visible="visible" header="Export เอกสาร" modal dismissable-mask :draggable="false" class="export-dialog" :style="{ width: '560px', maxWidth: 'calc(100vw - 32px)' }">
             <template #header>
                 <div class="export-heading">

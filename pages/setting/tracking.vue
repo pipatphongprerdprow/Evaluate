@@ -33,7 +33,7 @@
                         </tr>
                     </thead>
                     <tbody>  
-                        <tr v-for="(Item, index) in products.filter(item => item.tb_tor).concat(products.filter(item => !item.tb_tor))" :key="index">
+                        <tr v-for="(Item, index) in sortedProducts" :key="Item.staffid ?? index">
                             <td style="padding-left: 5px;width: 30%;text-align: left;">   
                                 <b style="color: blue;">{{ Item.prefixfullname }} {{ Item.namefully }} </b> 
                             </td>  
@@ -170,17 +170,16 @@
                                                             </td> 
 
                                                             <td style="text-align: left;"> 
-                                                                <p v-for="(subIitemDoc, inDoc) in (subP01?.subITemP03doc || []).slice().sort((a, b) => a.doc_no - b.doc_no)" 
-                                                                :key="inDoc"> 
-                                                                    <a v-if="subIitemDoc?.doc_file" 
-                                                                    :href="' http://127.0.0.1:8000/storage/uploadsP03/' + subIitemDoc?.doc_file" target="_blank">
-                                                                        <b>เอกสารลำดับที่ {{ subIitemDoc?.doc_no }}</b> {{ subIitemDoc?.doc_name || '-' }}
-                                                                    </a> 
-                                                                    <a v-else-if="subIitemDoc?.doc_link" 
-                                                                    :href="subIitemDoc?.doc_link" target="_blank">
-                                                                        <b>เอกสารลำดับที่ {{ subIitemDoc?.doc_no }}</b> {{ subIitemDoc?.doc_name || '-' }}
-                                                                    </a>
-                                                                </p>
+<div v-for="group in groupEvidenceDocuments(subP01.subITemP03doc)" :key="group.number" style="padding: 0 8px; margin-bottom: 12px;">
+    <b>เอกสารระดับที่ {{ group.number }}</b>
+    <ol :style="{ paddingLeft: group.documents.length > 1 ? '1.5rem' : '0', listStyleType: group.documents.length > 1 ? 'decimal' : 'none', margin: '4px 0' }">
+        <li v-for="(doc, index) in group.documents" :key="index" style="overflow-wrap: anywhere; margin-bottom: 4px;">
+            <a v-if="doc.doc_file" :href="'http://127.0.0.1:8000/storage/uploadsP03/' + doc.doc_file" target="_blank" rel="noopener noreferrer">{{ doc.doc_name || '-' }}</a>
+            <a v-else-if="doc.doc_link" :href="doc.doc_link" target="_blank" rel="noopener noreferrer">{{ doc.doc_name || '-' }}</a>
+            <span v-else>{{ doc.doc_name || '-' }}</span>
+        </li>
+    </ol>
+</div>
                                                                 <p v-if="(subP01?.subITemP03doc || []).length === 0" style="color: red;">- ไม่มีข้อมูล -</p>
                                                             </td> 
                                                             <td style="text-align: center;">{{ subP01?.score || '-' }}</td>   
@@ -433,20 +432,16 @@
                                                                 </p>
                                                             </td> 
                                                             <td style="text-align: left;"> 
-                                                                <p v-for="(subIitemDoc, inDoc) in subP01.subITemP03doc.slice().sort((a, b) => a.doc_no - b.doc_no)" 
-                                                                :key="inDoc" 
-                                                                style="padding-left: 8px;margin-bottom: 5px;"> 
-                                                                
-                                                                    <a v-if="subIitemDoc.doc_file!=null && subIitemDoc.doc_link==null" 
-                                                                    :href="' http://127.0.0.1:8000/storage/uploadsP03/' + subIitemDoc.doc_file" target="_blank">
-                                                                        <b>เอกสารลำดับที่</b> <b>{{ subIitemDoc.doc_no }}</b> {{ subIitemDoc.doc_name }}
-                                                                    </a> 
-                                                                    
-                                                                    <a v-if="subIitemDoc.doc_link!=null && subIitemDoc.doc_file==null" 
-                                                                    :href="subIitemDoc.doc_link" target="_blank">
-                                                                        <b>เอกสารลำดับที่</b> <b>{{ subIitemDoc.doc_no }}</b> {{ subIitemDoc.doc_name }}
-                                                                    </a> 
-                                                                </p>
+<div v-for="group in groupEvidenceDocuments(subP01.subITemP03doc)" :key="group.number" style="padding: 0 8px; margin-bottom: 12px;">
+    <b>เอกสารระดับที่ {{ group.number }}</b>
+    <ol :style="{ paddingLeft: group.documents.length > 1 ? '1.5rem' : '0', listStyleType: group.documents.length > 1 ? 'decimal' : 'none', margin: '4px 0' }">
+        <li v-for="(doc, index) in group.documents" :key="index" style="overflow-wrap: anywhere; margin-bottom: 4px;">
+            <a v-if="doc.doc_file" :href="'http://127.0.0.1:8000/storage/uploadsP03/' + doc.doc_file" target="_blank" rel="noopener noreferrer">{{ doc.doc_name || '-' }}</a>
+            <a v-else-if="doc.doc_link" :href="doc.doc_link" target="_blank" rel="noopener noreferrer">{{ doc.doc_name || '-' }}</a>
+            <span v-else>{{ doc.doc_name || '-' }}</span>
+        </li>
+    </ol>
+</div>
 
                                                                 <p v-if="subP01.subITemP03doc.length == 0" style="padding-left: 8px;margin-bottom: 5px;">
                                                                     <b style="color: red;">- ไม่มีข้อมูล -</b>
@@ -1501,7 +1496,34 @@ export default {
     },   
 
 
+    computed: {
+        sortedProducts() {
+            const score = (item) => {
+                const value = item?.tb_tor?.sum_score;
+                if (value === null || value === undefined || String(value).trim() === '') return null;
+                const number = Number(value);
+                return Number.isFinite(number) ? number : null;
+            };
+            return [...this.products].sort((a, b) => {
+                const aScore = score(a);
+                const bScore = score(b);
+                if (aScore === null && bScore === null) return 0;
+                if (aScore === null) return 1;
+                if (bScore === null) return -1;
+                return bScore - aScore;
+            });
+        }
+    },
     methods: { 
+        groupEvidenceDocuments(documents) {
+            const groups = new Map();
+            for (const document of documents || []) {
+                const number = String(document.doc_no ?? '').trim();
+                if (!groups.has(number)) groups.set(number, { number, documents: [] });
+                groups.get(number).documents.push(document);
+            }
+            return [...groups.values()].sort((a, b) => Number(a.number) - Number(b.number));
+        },
         setSession(staffid_Main, facid_Main, groupid_Main, postypename, postypenameid) {
             // console.log('postypename:',postypename);
             this.staffid_Main = staffid_Main;
@@ -2690,7 +2712,7 @@ export default {
         async printDatatrackingpdf() {
             const { getSession } = await useAuth();
             const user = await getSession(); 
-            const exportStaff = (this.products || []).filter(item => { 
+            const exportStaff = this.sortedProducts.filter(item => { 
                 const staffType = String(
                     item?.stftypename ?? ''
                 ).trim(); 
@@ -2779,7 +2801,7 @@ export default {
             } 
             const { getSession } = await useAuth();
             const user = await getSession(); 
-            const exportStaff = (this.products || []).filter(item => {
+            const exportStaff = this.sortedProducts.filter(item => {
                 const staffType = String(
                     item?.stftypename ?? ''
                 ).trim(); 

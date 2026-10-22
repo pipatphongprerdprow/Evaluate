@@ -78,6 +78,7 @@ const allMenus = ref([
             { label: 'จัดการ รอบประเมิน', icon: 'pi pi-fw pi-calendar', to: '/setting/setting_date' },
             { label: 'ตรวจสอบ แบบประเมิน', icon: 'pi pi-fw pi-star', to: '/setting/checkevaluate' },
             { label: 'เพิ่มสิทธิ์การใช้งาน', icon: 'pi pi-fw pi-user-plus', to: '/setting/setting_user' },
+            { label: 'Export แบบ ป.04', icon: 'pi pi-fw pi-download', to: '/setting/export_p04' },
             //{ label: 'จัดการสิทธิ์บุคคล', icon: 'pi pi-fw pi-user', to: '/setting/setting_useradmin' }, 
         ]
     }, 
@@ -134,6 +135,9 @@ watch([status, staff, faculty], async ([currentStatus, currentStaff, currentFacu
 const model = computed(() => {
     const menus = [...roleMenus.value];
     if (status.value === 'authenticated' && isSuperAdmin(staff.value)) {
+        if (!menus.some(menu => menu.id === 'hr')) {
+            menus.push({ id: 'hr-p04', label: 'เจ้าหน้าที่บุคคล', items: [{ label: 'Export แบบ ป.04', icon: 'pi pi-fw pi-download', to: '/setting/export_p04' }] });
+        }
         const manualIndex = menus.findIndex((menu) => menu.id === 'manual');
         menus.splice(manualIndex === -1 ? menus.length : manualIndex, 0,
             allMenus.value.find((menu) => menu.id === 'superadmin'));

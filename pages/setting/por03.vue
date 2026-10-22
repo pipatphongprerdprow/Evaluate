@@ -147,17 +147,16 @@
                                     </template>
 
                                     <template v-else>
-                                        <p
-                                            v-for="(subIitemDoc, inDoc) in subP01.subITemP03doc.slice().sort((a, b) => a.doc_no - b.doc_no)"
-                                            :key="inDoc"
-                                            style="padding-left: 8px;margin-bottom: 5px;"
-                                        >
+                                        <div v-for="group in groupEvidenceDocuments(subP01.subITemP03doc)" :key="group.number" style="padding-left: 8px; margin-bottom: 12px;">
+                                            <b>เอกสารระดับที่ {{ group.number }}</b>
+                                            <ol :style="{ paddingLeft: group.documents.length > 1 ? '1.5rem' : '0', listStyleType: group.documents.length > 1 ? 'decimal' : 'none', margin: '4px 0 0' }">
+                                            <li v-for="(subIitemDoc, inDoc) in group.documents" :key="inDoc" style="margin-bottom: 4px; overflow-wrap: anywhere;">
                                             <a
                                                 v-if="subIitemDoc.doc_file!=null && subIitemDoc.doc_link==null"
                                                 :href="'http://127.0.0.1:8000/storage/uploadsP03/' + subIitemDoc.doc_file"
                                                 target="_blank"
                                             >
-                                                <b>เอกสารลำดับที่</b> <b>{{ subIitemDoc.doc_no }}</b> {{ subIitemDoc.doc_name }}
+                                                {{ subIitemDoc.doc_name }}
                                             </a>
 
                                             <a
@@ -165,9 +164,11 @@
                                                 :href="subIitemDoc.doc_link"
                                                 target="_blank"
                                             >
-                                                <b>เอกสารลำดับที่</b> <b>{{ subIitemDoc.doc_no }}</b> {{ subIitemDoc.doc_name }}
+                                                {{ subIitemDoc.doc_name }}
                                             </a>
-                                        </p>
+                                            </li>
+                                            </ol>
+                                        </div>
 
                                         <p v-if="subP01.subITemP03doc.length == 0" style="padding-left: 8px;margin-bottom: 5px;">
                                             <b style="color: red;">- ไม่มีข้อมูล -</b>
@@ -676,8 +677,8 @@
                 </div>   
                 <div class="p-fluid formgrid grid"> 
                     <div class="col-12 md:col-2">
-                        <label for="doc_no">ลำดับ</label>
-                        <InputText v-model="doc_no" type="number" placeholder="ลำดับเอกสาร" autocomplete="off"/>  
+                        <label for="doc_no">ระดับ</label>
+                        <InputText v-model="doc_no" type="number" placeholder="ระดับเอกสาร" autocomplete="off"/>  
                     </div> 
                     <div class="col-12 md:col-10">
                         <label for="doc_no">ชื่อไฟล์</label>
@@ -703,7 +704,7 @@
                         <DataTable :value="products_doc_p03" :rows="10" :paginator="true" responsiveLayout="scroll" dataKey="id">
                             <Column field="doc_no" header="ลำดับเอกสาร" style="width: 15%">
                                 <template #body="Item">
-                                    เอกสารลำดับที่ {{ Item.data.doc_no }}
+                                    เอกสารระดับที่ {{ Item.data.doc_no }}
                                 </template>
                             </Column>
                             <Column field="doc_name" header="ชื่อไฟล์" style="text-align: left;width: 35%">
@@ -1536,6 +1537,15 @@ import InputText from 'primevue/inputtext';
         },
 
         methods: { 
+            groupEvidenceDocuments(documents) {
+                const groups = new Map();
+                for (const document of documents || []) {
+                    const number = String(document.doc_no ?? '').trim();
+                    if (!groups.has(number)) groups.set(number, { number, documents: [] });
+                    groups.get(number).documents.push(document);
+                }
+                return [...groups.values()].sort((a, b) => Number(a.number) - Number(b.number));
+            },
  
             //ดึงข้อมูลภาระงานระบบพี่แจ้
             async reloadAllData() {

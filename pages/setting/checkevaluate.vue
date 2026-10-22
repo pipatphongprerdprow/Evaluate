@@ -87,7 +87,7 @@
                             <TabPanel header="แบบใบปะหน้า"> 
                                     <div class="col md:col-12 text-right">
                                         <!-- <Button label="Export_ใบปะหน้า" icon="pi pi-file-word" class="mr-2 mb-2 " @click="printDatacoversheet"></Button> -->
-                                        <Button label="Export_ใบปะหน้า" icon="pi pi-file-pdf" class="mr-2 mb-2 " @click="printDatacoversheetpdf"></Button>
+                                        <ExportFormatPicker buttonLabel="Export ใบปะหน้า" class="mr-2 mb-2" @word="printDatacoversheetpdf('word')" @pdf="printDatacoversheetpdf('pdf')" />
                                     </div> 
                                     <div class="card">
                                         <h3 class="mb-4" style="text-align: right;">
@@ -144,9 +144,9 @@
                                     <Button label="Export_ป.02" icon="pi pi-file-word" class="mr-2 mb-2" @click="printDataP02" />
                                     <Button label="Export_ป.03" icon="pi pi-file-word" class="mr-2 mb-2" @click="printDataP03" /> -->
 
-                                    <Button label="Export_ป.01" icon="pi pi-file-pdf" class="mr-2 mb-2" @click="printDataP01pdf" /> 
-                                    <Button label="Export_ป.02" icon="pi pi-file-pdf" class="mr-2 mb-2" @click="printDataP02pdf" /> 
-                                    <Button label="Export_ป.03" icon="pi pi-file-pdf" class="mr-2 mb-2" @click="printDataP03pdf" />
+                                    <ExportFormatPicker buttonLabel="Export ป.01" class="mr-2 mb-2" @word="printDataP01pdf('word')" @pdf="printDataP01pdf('pdf')" />
+                                    <ExportFormatPicker buttonLabel="Export ป.02" class="mr-2 mb-2" @word="printDataP02pdf('word')" @pdf="printDataP02pdf('pdf')" />
+                                    <ExportFormatPicker buttonLabel="Export ป.03" class="mr-2 mb-2" @word="printDataP03pdf('word')" @pdf="printDataP03pdf('pdf')" />
                                 </div>
                                 <div class="grid">
                                     <div class="col-12 lg:col-12 xl:col-12">
@@ -245,20 +245,16 @@
                                                             
                                                             <!-- //รายงานป.01 -->  
                                                             <td style="text-align: left;"> 
-                                                                <p v-for="(subIitemDoc, inDoc) in subP01.subITemP03doc.slice().sort((a, b) => a.doc_no - b.doc_no)" 
-                                                                :key="inDoc" 
-                                                                style="padding-left: 8px;margin-bottom: 5px;"> 
-                                                                
-                                                                    <a v-if="subIitemDoc.doc_file!=null && subIitemDoc.doc_link==null" 
-                                                                    :href="' http://127.0.0.1:8000/storage/uploadsP03/' + subIitemDoc.doc_file" target="_blank">
-                                                                        <b>เอกสารลำดับที่</b> <b>{{ subIitemDoc.doc_no }}</b> {{ subIitemDoc.doc_name }}
-                                                                    </a> 
-                                                                    
-                                                                    <a v-if="subIitemDoc.doc_link!=null && subIitemDoc.doc_file==null" 
-                                                                    :href="subIitemDoc.doc_link" target="_blank">
-                                                                        <b>เอกสารลำดับที่</b> <b>{{ subIitemDoc.doc_no }}</b> {{ subIitemDoc.doc_name }}
-                                                                    </a> 
-                                                                </p>
+<div v-for="group in groupEvidenceDocuments(subP01.subITemP03doc)" :key="group.number" style="padding: 0 8px; margin-bottom: 12px;">
+    <b>เอกสารระดับที่ {{ group.number }}</b>
+    <ol :style="{ paddingLeft: group.documents.length > 1 ? '1.5rem' : '0', listStyleType: group.documents.length > 1 ? 'decimal' : 'none', margin: '4px 0' }">
+        <li v-for="(doc, index) in group.documents" :key="index" style="overflow-wrap: anywhere; margin-bottom: 4px;">
+            <a v-if="doc.doc_file" :href="'http://127.0.0.1:8000/storage/uploadsP03/' + doc.doc_file" target="_blank" rel="noopener noreferrer">{{ doc.doc_name || '-' }}</a>
+            <a v-else-if="doc.doc_link" :href="doc.doc_link" target="_blank" rel="noopener noreferrer">{{ doc.doc_name || '-' }}</a>
+            <span v-else>{{ doc.doc_name || '-' }}</span>
+        </li>
+    </ol>
+</div>
 
                                                                 <p v-if="subP01.subITemP03doc.length == 0" style="padding-left: 8px;margin-bottom: 5px;">
                                                                     <b style="color: red;">- ไม่มีข้อมูล -</b>
@@ -521,7 +517,7 @@
                             <TabPanel header="รายงาน ป.04">
                                 <div class="col md:col-12 text-right">
                                     <!-- <Button label="Export_ป.04" icon="pi pi-file-word" class="mr-2 mb-2 " @click="printDataP04"></Button> -->
-                                    <Button label="Export_ป.04" icon="pi pi-file-word" class="mr-2 mb-2 " @click="printDataP04pdf"></Button>
+                                    <ExportFormatPicker buttonLabel="Export ป.04" class="mr-2 mb-2" @word="printDataP04pdf('word')" @pdf="printDataP04pdf('pdf')" />
                                 </div> 
                                 <div class="card">
                                     <h4 style="text-align: left">แบบสรุปการประเมินผล</h4>
@@ -952,6 +948,15 @@ export default {
         // this.showAssesstack(); 
     },   
     methods: { 
+        groupEvidenceDocuments(documents) {
+            const groups = new Map();
+            for (const document of documents || []) {
+                const number = String(document.doc_no ?? '').trim();
+                if (!groups.has(number)) groups.set(number, { number, documents: [] });
+                groups.get(number).documents.push(document);
+            }
+            return [...groups.values()].sort((a, b) => Number(a.number) - Number(b.number));
+        },
         setSession(staffid_Main, facid_Main, groupid_Main, postypename, postypenameid) {
             // console.log('postypename:',postypename);
             this.staffid_Main = staffid_Main;
@@ -2212,14 +2217,15 @@ export default {
  
         // },  
 
-        async printDatacoversheetpdf() {
+        async printDatacoversheetpdf(format = 'pdf') {
             const { getSession } = await useAuth();
             const user = await getSession();  
             try {
                 // แสดง Loading สักครู่
-                Swal.fire({ title: 'กำลังสร้างไฟล์ PDF...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
+                Swal.fire({ title: format === 'word' ? 'กำลังสร้างไฟล์ Word...' : 'กำลังสร้างไฟล์ PDF...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
 
                 const response = await axios.post("http://127.0.0.1:8000/api/exportPdf_coverpage", {
+                    document_format: format,
                     staff_id: this.printStaffData.staffid,
                     group_id: this.groupid_Main,
                     fac_id: this.facid_Main,
@@ -2237,12 +2243,23 @@ export default {
                     period_text: this.period_text
                 }, {
                     responseType: 'arraybuffer',
-                    headers: { Accept: 'application/pdf' }
+                    headers: { Accept: format === 'word' ? 'application/msword' : 'application/pdf' }
                 });
 
                 Swal.close();
 
                 // สร้าง Blob และแสดง preview ในแท็บใหม่ (iframe)
+                if (format === 'word') {
+                    const url = window.URL.createObjectURL(new Blob([response.data], { type: 'application/msword' }));
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.download = 'report_coversheet_' + this.printStaffData.staffid + '.doc';
+                    document.body.appendChild(link);
+                    link.click();
+                    link.remove();
+                    setTimeout(() => window.URL.revokeObjectURL(url), 1000);
+                    return;
+                }
                 const blob = new Blob([response.data], { type: 'application/pdf' });
                 const url = window.URL.createObjectURL(blob);
 
@@ -2267,7 +2284,7 @@ export default {
             } catch (error) {
                 Swal.close();
                 console.error("Error exporting PDF:", error);
-                Swal.fire('เกิดข้อผิดพลาด', 'ไม่สามารถสร้างไฟล์ PDF ได้', 'error');
+                Swal.fire('เกิดข้อผิดพลาด', format === 'word' ? 'ไม่สามารถสร้างไฟล์ Word ได้' : 'ไม่สามารถสร้างไฟล์ PDF ได้', 'error');
             } 
         },
         
@@ -2297,14 +2314,15 @@ export default {
         //     window.open(url, '_blank'); 
         // },
  
-        async printDataP01pdf() {
+        async printDataP01pdf(format = 'pdf') {
             const { getSession } = await useAuth();
             const user = await getSession();  
             try {
                 // แสดง Loading สักครู่
-                Swal.fire({ title: 'กำลังสร้างไฟล์ PDF...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
+                Swal.fire({ title: format === 'word' ? 'กำลังสร้างไฟล์ Word...' : 'กำลังสร้างไฟล์ PDF...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
 
                 const response = await axios.post("http://127.0.0.1:8000/api/exportPdf_P01", {
+                    document_format: format,
                     staff_id: this.printStaffData.staffid, // รหัสพันงาน
                     group_id: this.groupid_Main, // กลุ่ม
                     fac_id: this.facid_Main, // คณะ
@@ -2322,11 +2340,22 @@ export default {
                     period_text: this.period_text
                 }, {
                     responseType: 'arraybuffer',
-                    headers: { Accept: 'application/pdf' }
+                    headers: { Accept: format === 'word' ? 'application/msword' : 'application/pdf' }
                 });
 
                 Swal.close();
 
+                if (format === 'word') {
+                    const url = window.URL.createObjectURL(new Blob([response.data], { type: 'application/msword' }));
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.download = 'report_P01_' + this.printStaffData.staffid + '.doc';
+                    document.body.appendChild(link);
+                    link.click();
+                    link.remove();
+                    setTimeout(() => window.URL.revokeObjectURL(url), 1000);
+                    return;
+                }
                 const blob = new Blob([response.data], { type: 'application/pdf' });
                 const url = window.URL.createObjectURL(blob);
 
@@ -2350,7 +2379,7 @@ export default {
             } catch (error) {
                 Swal.close();
                 console.error("Error exporting PDF:", error);
-                Swal.fire('เกิดข้อผิดพลาด', 'ไม่สามารถสร้างไฟล์ PDF ได้', 'error');
+                Swal.fire('เกิดข้อผิดพลาด', format === 'word' ? 'ไม่สามารถสร้างไฟล์ Word ได้' : 'ไม่สามารถสร้างไฟล์ PDF ได้', 'error');
             } 
         },
 
@@ -2403,14 +2432,15 @@ export default {
  
         // }, 
 
-        async printDataP02pdf() {
+        async printDataP02pdf(format = 'pdf') {
             const { getSession } = await useAuth();
             const user = await getSession();  
             try {
                 // แสดง Loading สักครู่
-                Swal.fire({ title: 'กำลังสร้างไฟล์ PDF...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
+                Swal.fire({ title: format === 'word' ? 'กำลังสร้างไฟล์ Word...' : 'กำลังสร้างไฟล์ PDF...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
 
                 const response = await axios.post("http://127.0.0.1:8000/api/exportPdf_P02", {
+                    document_format: format,
                     staff_id: this.printStaffData.staffid, // รหัสพันงาน
                     group_id: this.groupid_Main, // กลุ่ม
                     fac_id: this.facid_Main, // คณะ
@@ -2432,11 +2462,22 @@ export default {
                     period_text: this.period_text
                 }, {
                     responseType: 'arraybuffer',
-                    headers: { Accept: 'application/pdf' }
+                    headers: { Accept: format === 'word' ? 'application/msword' : 'application/pdf' }
                 }); 
 
                 Swal.close();
 
+                if (format === 'word') {
+                    const url = window.URL.createObjectURL(new Blob([response.data], { type: 'application/msword' }));
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.download = 'report_P02_' + this.printStaffData.staffid + '.doc';
+                    document.body.appendChild(link);
+                    link.click();
+                    link.remove();
+                    setTimeout(() => window.URL.revokeObjectURL(url), 1000);
+                    return;
+                }
                 const blob = new Blob([response.data], { type: 'application/pdf' });
                 const url = window.URL.createObjectURL(blob);
 
@@ -2460,7 +2501,7 @@ export default {
             } catch (error) {
                 Swal.close();
                 console.error("Error exporting PDF:", error);
-                Swal.fire('เกิดข้อผิดพลาด', 'ไม่สามารถสร้างไฟล์ PDF ได้', 'error');
+                Swal.fire('เกิดข้อผิดพลาด', format === 'word' ? 'ไม่สามารถสร้างไฟล์ Word ได้' : 'ไม่สามารถสร้างไฟล์ PDF ได้', 'error');
             } 
         },
 
@@ -2491,14 +2532,15 @@ export default {
         //         window.open(url, '_blank'); 
         // }, 
  
-        async printDataP03pdf() {
+        async printDataP03pdf(format = 'pdf') {
             const { getSession } = await useAuth();
             const user = await getSession();  
             try {
                 // แสดง Loading สักครู่
-                Swal.fire({ title: 'กำลังสร้างไฟล์ PDF...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
+                Swal.fire({ title: format === 'word' ? 'กำลังสร้างไฟล์ Word...' : 'กำลังสร้างไฟล์ PDF...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
 
                 const response = await axios.post("http://127.0.0.1:8000/api/exportPdf_P03", {
+                    document_format: format,
                     staff_id: this.printStaffData.staffid, // รหัสพันงาน
                     group_id: this.groupid_Main, // กลุ่ม
                     fac_id: this.facid_Main, // คณะ
@@ -2518,11 +2560,22 @@ export default {
                     period_text: this.period_text
                 }, {
                     responseType: 'arraybuffer',
-                    headers: { Accept: 'application/pdf' }
+                    headers: { Accept: format === 'word' ? 'application/msword' : 'application/pdf' }
                 });
 
                 Swal.close();
 
+                if (format === 'word') {
+                    const url = window.URL.createObjectURL(new Blob([response.data], { type: 'application/msword' }));
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.download = 'report_P03_' + this.printStaffData.staffid + '.doc';
+                    document.body.appendChild(link);
+                    link.click();
+                    link.remove();
+                    setTimeout(() => window.URL.revokeObjectURL(url), 1000);
+                    return;
+                }
                 const blob = new Blob([response.data], { type: 'application/pdf' });
                 const url = window.URL.createObjectURL(blob);
 
@@ -2546,7 +2599,7 @@ export default {
             } catch (error) {
                 Swal.close();
                 console.error("Error exporting PDF:", error);
-                Swal.fire('เกิดข้อผิดพลาด', 'ไม่สามารถสร้างไฟล์ PDF ได้', 'error');
+                Swal.fire('เกิดข้อผิดพลาด', format === 'word' ? 'ไม่สามารถสร้างไฟล์ Word ได้' : 'ไม่สามารถสร้างไฟล์ PDF ได้', 'error');
             } 
         },
 
@@ -2575,14 +2628,15 @@ export default {
         //     window.open(url, '_blank'); 
         // },  
 
-        async printDataP04pdf() {
+        async printDataP04pdf(format = 'pdf') {
             const { getSession } = await useAuth();
             const user = await getSession();  
             try {
                 // แสดง Loading สักครู่
-                Swal.fire({ title: 'กำลังสร้างไฟล์ PDF...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
+                Swal.fire({ title: format === 'word' ? 'กำลังสร้างไฟล์ Word...' : 'กำลังสร้างไฟล์ PDF...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
 
                 const response = await axios.post("http://127.0.0.1:8000/api/exportPdf_P04", {
+                    document_format: format,
                     staff_id: this.printStaffData.staffid, // รหัสพันงาน
                     group_id: this.groupid_Main, // กลุ่ม
                     fac_id: this.facid_Main, // คณะ
@@ -2599,11 +2653,22 @@ export default {
                     period_text: this.period_text
                 }, {
                     responseType: 'arraybuffer',
-                    headers: { Accept: 'application/pdf' }
+                    headers: { Accept: format === 'word' ? 'application/msword' : 'application/pdf' }
                 });
 
                 Swal.close();
 
+                if (format === 'word') {
+                    const url = window.URL.createObjectURL(new Blob([response.data], { type: 'application/msword' }));
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.download = 'report_P04_' + this.printStaffData.staffid + '.doc';
+                    document.body.appendChild(link);
+                    link.click();
+                    link.remove();
+                    setTimeout(() => window.URL.revokeObjectURL(url), 1000);
+                    return;
+                }
                 const blob = new Blob([response.data], { type: 'application/pdf' });
                 const url = window.URL.createObjectURL(blob);
 
@@ -2627,9 +2692,9 @@ export default {
             } catch (error) {
                 Swal.close();
                 console.error("Error exporting PDF:", error);
-                Swal.fire('เกิดข้อผิดพลาด', 'ไม่สามารถสร้างไฟล์ PDF ได้', 'error');
+                Swal.fire('เกิดข้อผิดพลาด', format === 'word' ? 'ไม่สามารถสร้างไฟล์ Word ได้' : 'ไม่สามารถสร้างไฟล์ PDF ได้', 'error');
             } 
-        }, 
+        },
 
 
         async withLoading(msg, fn) {
