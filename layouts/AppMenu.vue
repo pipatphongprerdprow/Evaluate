@@ -89,6 +89,7 @@ const allMenus = ref([
             { label: 'จัดการผู้ใช้งาน (Admin)', icon: 'pi pi-fw pi-users', to: '/setting/setting_dateSuperadmin' },
             { label: 'เพิ่มสิทธิ์การใช้งาน (Admin)', icon: 'pi pi-fw pi-user-plus', to: '/setting/setting_userSuperadmin' },
             { label: 'จัดการสัดส่วน', icon: 'pi pi-fw pi-sliders-h', to: '/setting/setting_ratioSuperadmin' },
+            { label: 'การติดตามการกรอกข้อมูล', icon: 'pi pi-fw pi-chart-bar', to: '/setting/form_progress' },
             { label: 'ประวัติการใช้งาน', icon: 'pi pi-fw pi-history', to: '/setting/auditlog' }
         ]
     },
